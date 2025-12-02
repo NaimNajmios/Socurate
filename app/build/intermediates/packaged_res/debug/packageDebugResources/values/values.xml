@@ -1,60 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="football_green">#00A651</color>
-    <color name="football_green_dark">#008C45</color>
-    <color name="football_green_light">#33B86A</color>
-    <color name="md_theme_dark_background">#191C1A</color>
-    <color name="md_theme_dark_error">#FFB4AB</color>
-    <color name="md_theme_dark_errorContainer">#93000A</color>
-    <color name="md_theme_dark_inverseOnSurface">#191C1A</color>
-    <color name="md_theme_dark_inversePrimary">#00A651</color>
-    <color name="md_theme_dark_inverseSurface">#E1E3DE</color>
-    <color name="md_theme_dark_onBackground">#E1E3DE</color>
-    <color name="md_theme_dark_onError">#690005</color>
-    <color name="md_theme_dark_onErrorContainer">#FFDAD6</color>
-    <color name="md_theme_dark_onPrimary">#003824</color>
-    <color name="md_theme_dark_onPrimaryContainer">#B8F1D1</color>
-    <color name="md_theme_dark_onSecondary">#1F352A</color>
-    <color name="md_theme_dark_onSecondaryContainer">#CFE9D9</color>
-    <color name="md_theme_dark_onSurface">#E1E3DE</color>
-    <color name="md_theme_dark_onSurfaceVariant">#C1C9BF</color>
-    <color name="md_theme_dark_onTertiary">#073543</color>
-    <color name="md_theme_dark_onTertiaryContainer">#C1E8FB</color>
-    <color name="md_theme_dark_outline">#8B938A</color>
-    <color name="md_theme_dark_primary">#9DD4B6</color>
-    <color name="md_theme_dark_primaryContainer">#005138</color>
-    <color name="md_theme_dark_secondary">#B3CCBD</color>
-    <color name="md_theme_dark_secondaryContainer">#354B40</color>
-    <color name="md_theme_dark_surface">#191C1A</color>
-    <color name="md_theme_dark_surfaceVariant">#414941</color>
-    <color name="md_theme_dark_tertiary">#A5CCDE</color>
-    <color name="md_theme_dark_tertiaryContainer">#244C5B</color>
-    <color name="md_theme_light_background">#FBFDF8</color>
-    <color name="md_theme_light_error">#BA1A1A</color>
-    <color name="md_theme_light_errorContainer">#FFDAD6</color>
-    <color name="md_theme_light_inverseOnSurface">#F0F1EC</color>
-    <color name="md_theme_light_inversePrimary">#9DD4B6</color>
-    <color name="md_theme_light_inverseSurface">#2E312E</color>
-    <color name="md_theme_light_onBackground">#191C1A</color>
-    <color name="md_theme_light_onError">#FFFFFF</color>
-    <color name="md_theme_light_onErrorContainer">#410002</color>
-    <color name="md_theme_light_onPrimary">#FFFFFF</color>
-    <color name="md_theme_light_onPrimaryContainer">#002113</color>
-    <color name="md_theme_light_onSecondary">#FFFFFF</color>
-    <color name="md_theme_light_onSecondaryContainer">#0A1F16</color>
-    <color name="md_theme_light_onSurface">#191C1A</color>
-    <color name="md_theme_light_onSurfaceVariant">#414941</color>
-    <color name="md_theme_light_onTertiary">#FFFFFF</color>
-    <color name="md_theme_light_onTertiaryContainer">#001F29</color>
-    <color name="md_theme_light_outline">#717971</color>
-    <color name="md_theme_light_primary">#00A651</color>
-    <color name="md_theme_light_primaryContainer">#B8F1D1</color>
-    <color name="md_theme_light_secondary">#4D6357</color>
-    <color name="md_theme_light_secondaryContainer">#CFE9D9</color>
-    <color name="md_theme_light_surface">#FBFDF8</color>
-    <color name="md_theme_light_surfaceVariant">#DDE5DB</color>
-    <color name="md_theme_light_tertiary">#3D6373</color>
-    <color name="md_theme_light_tertiaryContainer">#C1E8FB</color>
+<resources xmlns:ns1="http://schemas.android.com/tools">
+    <color name="dark_surface">#1F1F1F</color>
+    <color name="dark_surface_variant">#2A2A2A</color>
+    <color name="destructive_red">#FF3B30</color>
+    <color name="divider">#333333</color>
+    <color name="info_blue">#007AFF</color>
+    <color name="md_theme_dark_background">#000000</color>
+    <color name="md_theme_dark_error">#FF3B30</color>
+    <color name="md_theme_dark_errorContainer">#5C1A1A</color>
+    <color name="md_theme_dark_inverseOnSurface">#000000</color>
+    <color name="md_theme_dark_inversePrimary">#00FF66</color>
+    <color name="md_theme_dark_inverseSurface">#FFFFFF</color>
+    <color name="md_theme_dark_onBackground">#FFFFFF</color>
+    <color name="md_theme_dark_onError">#FFFFFF</color>
+    <color name="md_theme_dark_onErrorContainer">#FFB4AB</color>
+    <color name="md_theme_dark_onPrimary">#000000</color>
+    <color name="md_theme_dark_onPrimaryContainer">#FFFFFF</color>
+    <color name="md_theme_dark_onSecondary">#000000</color>
+    <color name="md_theme_dark_onSecondaryContainer">#B0B0B0</color>
+    <color name="md_theme_dark_onSurface">#FFFFFF</color>
+    <color name="md_theme_dark_onSurfaceVariant">#B0B0B0</color>
+    <color name="md_theme_dark_onTertiary">#000000</color>
+    <color name="md_theme_dark_onTertiaryContainer">#FFFFFF</color>
+    <color name="md_theme_dark_outline">#333333</color>
+    <color name="md_theme_dark_primary">#00FF66</color>
+    <color name="md_theme_dark_primaryContainer">#00CC52</color>
+    <color name="md_theme_dark_secondary">#33FF85</color>
+    <color name="md_theme_dark_secondaryContainer">#1F1F1F</color>
+    <color name="md_theme_dark_surface">#1F1F1F</color>
+    <color name="md_theme_dark_surfaceVariant">#2A2A2A</color>
+    <color name="md_theme_dark_tertiary">#00FF66</color>
+    <color name="md_theme_dark_tertiaryContainer">#2A2A2A</color>
+    <color name="neon_green">#00FF66</color>
+    <color name="neon_green_dark">#00CC52</color>
+    <color name="neon_green_light">#33FF85</color>
+    <color name="pure_black">#000000</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="text_tertiary">#808080</color>
+    <color name="warning_orange">#FF9500</color>
     <string name="advanced_settings">Advanced Settings</string>
     <string name="api_endpoint_default">https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent</string>
     <string name="api_endpoint_label">API Endpoint</string>
@@ -81,6 +65,7 @@
     <string name="error_title">Error</string>
     <string name="extracting_content">Extracting content from URL…</string>
     <string name="generate_button">Generate Post</string>
+    <string name="generated_draft">Generated Draft</string>
     <string name="generating_post">Generating post with AI…</string>
     <string name="hashtags_help">Separate with spaces or commas</string>
     <string name="hashtags_hint">e.g., #BolaSepak #Football #JDT</string>
@@ -113,32 +98,48 @@
     <string name="tone_formal">Formal (Professional)</string>
     <string name="tone_label">Post Tone</string>
     <string name="warning_title">Warning</string>
-    <style name="Theme.Oreamnos" parent="Theme.Material3.Light.NoActionBar">
-        <item name="colorPrimary">@color/md_theme_light_primary</item>
-        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
-        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
-        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
-        <item name="colorSecondary">@color/md_theme_light_secondary</item>
-        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
-        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
-        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
-        <item name="colorTertiary">@color/md_theme_light_tertiary</item>
-        <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
-        <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
-        <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
-        <item name="colorError">@color/md_theme_light_error</item>
-        <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
-        <item name="colorOnError">@color/md_theme_light_onError</item>
-        <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
-        <item name="android:colorBackground">@color/md_theme_light_background</item>
-        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
-        <item name="colorSurface">@color/md_theme_light_surface</item>
-        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
-        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
-        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
-        <item name="colorOutline">@color/md_theme_light_outline</item>
-        <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
-        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
-        <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
+    <style name="Theme.Oreamnos" parent="Theme.Material3.Dark.NoActionBar">
+        
+        <item name="colorPrimary">@color/neon_green</item>
+        <item name="colorOnPrimary">@color/pure_black</item>
+        <item name="colorPrimaryContainer">@color/neon_green_dark</item>
+        <item name="colorOnPrimaryContainer">@color/text_primary</item>
+        
+        
+        <item name="colorSecondary">@color/neon_green_light</item>
+        <item name="colorOnSecondary">@color/pure_black</item>
+        <item name="colorSecondaryContainer">@color/dark_surface</item>
+        <item name="colorOnSecondaryContainer">@color/text_secondary</item>
+        
+        
+        <item name="colorTertiary">@color/neon_green</item>
+        <item name="colorOnTertiary">@color/pure_black</item>
+        <item name="colorTertiaryContainer">@color/dark_surface_variant</item>
+        <item name="colorOnTertiaryContainer">@color/text_primary</item>
+        
+        
+        <item name="colorError">@color/destructive_red</item>
+        <item name="colorOnError">@color/text_primary</item>
+        <item name="colorErrorContainer">@color/dark_surface_variant</item>
+        <item name="colorOnErrorContainer">@color/destructive_red</item>
+        
+        
+        <item name="android:colorBackground">@color/pure_black</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/dark_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        
+        
+        <item name="colorOutline">@color/md_theme_dark_outline</item>
+        
+        
+        <item name="android:statusBarColor">@color/pure_black</item>
+        <item name="android:windowLightStatusBar" ns1:targetApi="m">false</item>
+        
+        
+        <item name="android:navigationBarColor">@color/pure_black</item>
+        <item name="android:windowLightNavigationBar" ns1:targetApi="o">false</item>
     </style>
 </resources>

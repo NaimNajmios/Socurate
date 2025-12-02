@@ -73,6 +73,7 @@
     <string name="restore_original">Restore Original</string>
     <string name="edited_indicator">(Edited)</string>
     <string name="original_post">Original Post</string>
+    <string name="generated_draft">Generated Draft</string>
     
     <!-- Accessibility -->
     <string name="content_description_settings_icon">Settings</string>

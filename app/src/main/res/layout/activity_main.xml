@@ -4,18 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/pure_black"
     tools:context=".MainActivity">
 
     <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/pure_black"
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="@string/app_name"
+            app:titleTextColor="@color/text_primary"
             app:menu="@menu/menu_main" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -30,34 +34,40 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="20dp">
 
             <!-- Input Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="12dp">
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@color/dark_surface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Input"
-                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                        android:layout_marginBottom="8dp" />
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/input_hint"
-                        app:boxBackgroundMode="outline">
+                        app:boxBackgroundMode="none"
+                        app:hintTextColor="@color/text_secondary">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/inputText"
@@ -66,7 +76,10 @@
                             android:minLines="5"
                             android:maxLines="10"
                             android:gravity="top|start"
-                            android:inputType="textMultiLine|textCapSentences" />
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:background="@null" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -74,58 +87,82 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Output Section -->
+            <!-- Generated Draft Section -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/outputCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:visibility="gone"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="12dp">
+                app:cardBackgroundColor="@color/dark_surface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
+                    <!-- Header with Sparkle Icon -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
+                        android:layout_marginBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_sparkle"
+                            android:contentDescription="@string/generated_draft"
+                            android:layout_marginEnd="8dp" />
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/output_label"
-                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+                            android:text="@string/generated_draft"
+                            android:textColor="@color/neon_green"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true" />
 
                         <TextView
                             android:id="@+id/editedIndicator"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/edited_indicator"
-                            android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                            android:textColor="?attr/colorSecondary"
+                            android:textColor="@color/neon_green"
+                            android:textSize="11sp"
                             android:visibility="gone"
                             android:layout_marginEnd="8dp" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/editButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="36dp"
                             android:text="@string/edit_button"
+                            android:textColor="@color/pure_black"
+                            android:textSize="12sp"
                             android:minWidth="0dp"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp"
-                            style="@style/Widget.Material3.Button.TextButton.Icon"
-                            app:icon="@android:drawable/ic_menu_edit" />
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:backgroundTint="@color/neon_green"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            app:cornerRadius="18dp"
+                            app:icon="@android:drawable/ic_menu_edit"
+                            app:iconSize="16dp"
+                            app:iconTint="@color/pure_black"
+                            style="@style/Widget.Material3.Button" />
 
                     </LinearLayout>
 
+                    <!-- Output Text -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/outputTextLayout"
                         android:layout_width="match_parent"
@@ -138,7 +175,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/output_placeholder"
-                            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:lineSpacingExtra="4dp"
                             android:minLines="4"
                             android:maxLines="15"
                             android:gravity="top|start"
@@ -150,12 +189,15 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Hashtag Checkbox -->
                     <com.google.android.material.checkbox.MaterialCheckBox
                         android:id="@+id/includeHashtagsCheckbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/include_hashtags"
+                        android:textColor="@color/text_secondary"
                         android:checked="true"
+                        app:buttonTint="@color/neon_green"
                         android:layout_marginBottom="16dp" />
 
                     <!-- Action Buttons -->
@@ -163,23 +205,37 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="end">
+                        android:gravity="center">
 
+                        <!-- Copy Button -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/copyButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
                             android:text="@string/copy_button"
-                            android:layout_marginEnd="8dp"
+                            android:textColor="@color/pure_black"
+                            android:textStyle="bold"
+                            android:backgroundTint="@color/neon_green"
+                            app:cornerRadius="24dp"
                             app:icon="@android:drawable/ic_menu_save"
-                            style="@style/Widget.Material3.Button.OutlinedButton" />
+                            app:iconTint="@color/pure_black"
+                            style="@style/Widget.Material3.Button" />
 
+                        <!-- Share Button -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/shareButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/share_button"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="12dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:backgroundTint="@color/dark_surface_variant"
+                            app:cornerRadius="24dp"
                             app:icon="@android:drawable/ic_menu_share"
+                            app:iconTint="@color/text_primary"
+                            app:iconGravity="textStart"
+                            app:iconPadding="0dp"
                             style="@style/Widget.Material3.Button" />
 
                     </LinearLayout>
@@ -198,16 +254,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="20dp"
         android:text="@string/generate_button"
-        app:icon="@android:drawable/ic_menu_send" />
+        android:textColor="@color/pure_black"
+        android:textStyle="bold"
+        app:backgroundTint="@color/neon_green"
+        app:icon="@android:drawable/ic_menu_send"
+        app:iconTint="@color/pure_black" />
 
     <!-- Progress Overlay -->
     <FrameLayout
         android:id="@+id/progressOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80000000"
+        android:background="#CC000000"
         android:visibility="gone"
         android:clickable="true"
         android:focusable="true">
@@ -218,13 +278,14 @@
             android:layout_gravity="center"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="24dp"
-            android:background="@android:color/white"
+            android:padding="32dp"
+            android:background="@drawable/dark_card_bg"
             android:elevation="8dp">
 
             <ProgressBar
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:indeterminateTint="@color/neon_green"
                 android:layout_marginBottom="16dp" />
 
             <TextView
@@ -232,7 +293,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/processing"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
 
         </LinearLayout>
 

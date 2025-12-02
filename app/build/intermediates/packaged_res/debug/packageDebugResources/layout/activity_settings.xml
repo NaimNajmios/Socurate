@@ -4,19 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/pure_black"
     tools:context=".SettingsActivity">
 
     <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/pure_black"
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="@string/settings"
-            app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel" />
+            app:titleTextColor="@color/text_primary"
+            app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
+            app:navigationIconTint="@color/text_primary" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -30,253 +35,319 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="20dp">
 
-            <!-- API Configuration Section -->
+            <!-- API KEY Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="API KEY"
+                android:textColor="@color/text_tertiary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp" />
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="12dp">
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/dark_surface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="API Configuration"
-                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                        android:layout_marginBottom="16dp" />
+                    android:padding="20dp">
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/api_key_label"
-                        app:boxBackgroundMode="outline"
+                        app:boxBackgroundMode="none"
                         app:endIconMode="password_toggle"
-                        app:helperText="@string/api_key_help"
-                        android:layout_marginBottom="8dp">
+                        app:endIconTint="@color/neon_green"
+                        app:hintTextColor="@color/text_secondary"
+                        android:layout_marginBottom="16dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/apiKeyInput"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="textPassword" />
+                            android:textColor="@color/text_primary"
+                            android:inputType="textPassword"
+                            android:background="@null" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/testConnectionButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="42dp"
                         android:text="@string/test_connection"
+                        android:textColor="@color/neon_green"
+                        android:textSize="13sp"
+                        android:backgroundTint="@color/dark_surface_variant"
+                        app:cornerRadius="21dp"
+                        app:strokeColor="@color/neon_green"
+                        app:strokeWidth="1dp"
                         style="@style/Widget.Material3.Button.OutlinedButton" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Post Settings Section -->
+            <!-- POST CUSTOMIZATION Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="POST CUSTOMIZATION"
+                android:textColor="@color/text_tertiary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp" />
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="12dp">
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/dark_surface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Post Settings"
-                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                        android:layout_marginBottom="16dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/tone_label"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:layout_marginBottom="8dp" />
-
-                    <com.google.android.material.card.MaterialCardView
+                    <!-- Post Tone -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:strokeWidth="1dp"
-                        app:strokeColor="?attr/colorOutline"
-                        app:cardElevation="0dp">
+                        android:orientation="horizontal"
+                        android:padding="20dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/tone_label"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp" />
 
                         <RadioGroup
                             android:id="@+id/toneRadioGroup"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="8dp">
+                            android:orientation="horizontal">
 
                             <com.google.android.material.radiobutton.MaterialRadioButton
                                 android:id="@+id/toneFormal"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/tone_formal"
-                                android:checked="true" />
+                                android:text="Formal"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp"
+                                app:buttonTint="@color/neon_green"
+                                android:checked="true"
+                                android:layout_marginEnd="8dp" />
 
                             <com.google.android.material.radiobutton.MaterialRadioButton
                                 android:id="@+id/toneCasual"
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/tone_casual" />
+                                android:text="Casual"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp"
+                                app:buttonTint="@color/neon_green" />
 
                         </RadioGroup>
 
-                    </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
 
-                </LinearLayout>
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/divider" />
 
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Hashtag Settings Section -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/hashtags_section"
-                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                        android:layout_marginBottom="16dp" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/enableHashtagsSwitch"
+                    <!-- Default Hashtags -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/enable_hashtags"
-                        android:checked="true"
-                        android:layout_marginBottom="16dp" />
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/hashtags_label"
-                        app:boxBackgroundMode="outline"
-                        app:helperText="@string/hashtags_help">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/hashtagsInput"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="text"
-                            android:text="#BolaSepak #Football" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="12dp">
 
-                    </com.google.android.material.textfield.TextInputLayout>
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/hashtags_label"
+                                android:textColor="@color/text_primary"
+                                android:textSize="15sp" />
+
+                            <com.google.android.material.switchmaterial.SwitchMaterial
+                                android:id="@+id/enableHashtagsSwitch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                app:thumbTint="@color/pure_black"
+                                app:trackTint="@color/neon_green"
+                                app:trackDecorationTint="@color/dark_surface_variant" />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/hashtags_hint"
+                            app:boxBackgroundMode="none"
+                            app:hintTextColor="@color/text_tertiary">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/hashtagsInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/neon_green"
+                                android:textSize="14sp"
+                                android:inputType="text"
+                                android:text="#BolaSepak #Football"
+                                android:background="@null" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Advanced Settings Section -->
+            <!-- ADVANCED SETTINGS Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/advanced_settings"
+                android:textColor="@color/text_tertiary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp"
+                android:layout_marginTop="8dp" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="12dp">
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/dark_surface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/advanced_settings"
-                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                        android:layout_marginBottom="16dp" />
+                    android:padding="20dp">
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/api_endpoint_label"
-                        app:boxBackgroundMode="outline"
-                        android:layout_marginBottom="8dp">
+                        app:boxBackgroundMode="none"
+                        app:hintTextColor="@color/text_secondary"
+                        android:layout_marginBottom="12dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/endpointInput"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
                             android:inputType="textUri"
-                            android:text="@string/api_endpoint_default" />
+                            android:background="@null" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/resetEndpointButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="38dp"
                         android:text="@string/reset_to_default"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp"
+                        android:backgroundTint="@color/dark_surface_variant"
+                        app:cornerRadius="19dp"
                         style="@style/Widget.Material3.Button.TextButton" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- About Section -->
+            <!--GENERAL Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GENERAL"
+                android:textColor="@color/text_tertiary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp" />
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="12dp">
+                android:layout_marginBottom="32dp"
+                app:cardBackgroundColor="@color/dark_surface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp"
-                    android:gravity="center">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/app_description"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:textAlignment="center"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
                         android:layout_marginBottom="8dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/app_version"
-                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                        android:textColor="?android:attr/textColorSecondary" />
+                        android:text="@string/powered_by"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="16dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/powered_by"
-                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:layout_marginTop="4dp" />
+                        android:text="App Version 1.0.0"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="12sp" />
 
                 </LinearLayout>
 
@@ -292,8 +363,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="20dp"
         android:text="@string/save_settings"
-        app:icon="@android:drawable/ic_menu_save" />
+        android:textColor="@color/pure_black"
+        android:textStyle="bold"
+        app:backgroundTint="@color/neon_green"
+        app:icon="@android:drawable/ic_menu_save"
+        app:iconTint="@color/pure_black" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
