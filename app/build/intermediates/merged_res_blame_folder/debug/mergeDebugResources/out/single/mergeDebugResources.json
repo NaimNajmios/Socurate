@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.mycompany.oreamnos.app-debug-32:/layout_activity_share_receiver.xml.flat",
+        "source": "com.mycompany.oreamnos.app-main-34:/layout/activity_share_receiver.xml"
+    },
+    {
+        "merged": "com.mycompany.oreamnos.app-debug-32:/layout_activity_settings.xml.flat",
+        "source": "com.mycompany.oreamnos.app-main-34:/layout/activity_settings.xml"
+    },
+    {
+        "merged": "com.mycompany.oreamnos.app-debug-32:/menu_menu_main.xml.flat",
+        "source": "com.mycompany.oreamnos.app-main-34:/menu/menu_main.xml"
+    },
+    {
+        "merged": "com.mycompany.oreamnos.app-debug-32:/layout_activity_main.xml.flat",
+        "source": "com.mycompany.oreamnos.app-main-34:/layout/activity_main.xml"
+    }
+]

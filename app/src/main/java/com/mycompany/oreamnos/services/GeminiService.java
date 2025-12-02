@@ -29,7 +29,8 @@ public class GeminiService {
     // Retry configuration
     private static final int MAX_RETRIES = 4;
     private static final long BASE_DELAY_MS = 500L;
-    private static final long MAX_DELAY_MS = 8000L;
+    private static final long MAX_DELAY_MS = 60000L; // Increased to 60 seconds for rate limits
+    private static final long RATE_LIMIT_FALLBACK_DELAY_MS = 30000L; // 30 seconds if can't parse
 
     private final OkHttpClient client;
     private final Gson gson;
@@ -135,10 +136,25 @@ public class GeminiService {
 
                     // Check if transient error (retry)
                     if (code == 503 || code == 429 || (code >= 500 && code < 600)) {
-                        Log.w(TAG, "[" + requestId + "] Transient error " + code +
+                        String errorType = code == 429 ? "Rate limit (quota)" : "Server error";
+                        Log.w(TAG, "[" + requestId + "] " + errorType + " " + code +
                                 " - will retry (attempt " + attempt + ")");
-                        lastException = new Exception("Gemini transient error: " + code + ". " + errorBody);
-                    } else {
+
+                        // For 429, parse retry delay from API response
+                        long apiSuggestedDelay = 0;
+                        if (code == 429) {
+                            apiSuggestedDelay = parseRetryDelay(errorBody, requestId);
+                            if (apiSuggestedDelay > 0) {
+                                Log.i(TAG, "[" + requestId + "] API requests wait of " + apiSuggestedDelay + "ms");
+                            } else {
+                                Log.w(TAG, "[" + requestId + "] Could not parse retry delay, using default backoff");
+                            }
+                        }
+
+                        lastException = new RateLimitException(
+                                "Gemini " + errorType.toLowerCase() + ": " + code + ". " + errorBody,
+                                apiSuggestedDelay);
+                        } else {
                         // Permanent error
                         Log.e(TAG, "[" + requestId + "] Permanent error: " + code + " - " + errorBody);
                         throw new Exception("Gemini API error: " + code + ". " + errorBody);
@@ -165,12 +181,31 @@ public class GeminiService {
 
             // Exponential backoff if not last attempt
             if (attempt < MAX_RETRIES) {
-                long delay = Math.min(MAX_DELAY_MS, BASE_DELAY_MS * (1L << (attempt - 1)));
-                long jitter = (long) (rnd.nextDouble() * 500L);
-                long sleepMs = delay + jitter;
+                long delay;
 
-                Log.i(TAG, "[" + requestId + "] Sleeping " + sleepMs + "ms before retry");
-                Thread.sleep(sleepMs);
+                // If we have API-suggested delay from rate limit, use it
+                if (lastException instanceof RateLimitException) {
+                    RateLimitException rle = (RateLimitException) lastException;
+                    long apiDelay = rle.getRetryDelayMs();
+
+                    if (apiDelay > 0) {
+                        // Respect API's requested delay
+                        delay = Math.min(MAX_DELAY_MS, apiDelay);
+                        Log.i(TAG, "[" + requestId + "] Using API-suggested delay: " + delay + "ms");
+                    } else {
+                        // Fallback for rate limits
+                        delay = RATE_LIMIT_FALLBACK_DELAY_MS;
+                        Log.i(TAG, "[" + requestId + "] Using fallback delay for rate limit: " + delay + "ms");
+                    }
+                } else {
+                    // Standard exponential backoff for other errors
+                    delay = Math.min(MAX_DELAY_MS, BASE_DELAY_MS * (1L << (attempt - 1)));
+                    long jitter = (long) (rnd.nextDouble() * 500L);
+                    delay += jitter;
+                }
+
+                Log.i(TAG, "[" + requestId + "] Sleeping " + delay + "ms before retry");
+                Thread.sleep(delay);
             }
         }
 
@@ -178,7 +213,24 @@ public class GeminiService {
         if (rawResult == null) {
             long totalTime = System.currentTimeMillis() - startTime;
             Log.i(TAG, "[" + requestId + "] API exhausted retries after " + totalTime + "ms");
+
             if (lastException != null) {
+                // Provide user-friendly message for rate limits
+                if (lastException instanceof RateLimitException) {
+                    RateLimitException rle = (RateLimitException) lastException;
+                    String userMsg = "Rate limit exceeded. ";
+
+                    if (rle.getRetryDelayMs() > 0) {
+                        int waitSeconds = (int) (rle.getRetryDelayMs() / 1000);
+                        userMsg += "Please wait " + waitSeconds + " seconds and try again. ";
+                    } else {
+                        userMsg += "Please wait a minute and try again. ";
+                    }
+
+                    userMsg += "Tip: Use 'gemini-1.5-flash' model for better quotas.";
+                    throw new Exception(userMsg, lastException);
+                }
+
                 throw new Exception("Gemini API failed after retries: " + lastException.getMessage(), lastException);
             } else {
                 throw new Exception("Gemini API returned no result after retries");
@@ -360,5 +412,87 @@ public class GeminiService {
         }
 
         return cleaned;
+    }
+
+    /**
+     * Parses the retryDelay from Gemini API 429 error response.
+     * Looks for "retryDelay" field in the details section.
+     * 
+     * @param errorBody JSON error response from API
+     * @param requestId Request ID for logging
+     * @return Delay in milliseconds, or 0 if not found
+     */
+    private long parseRetryDelay(String errorBody, String requestId) {
+        try {
+            if (errorBody == null || errorBody.trim().isEmpty()) {
+                return 0;
+            }
+
+            JsonObject errorJson = gson.fromJson(errorBody, JsonObject.class);
+            if (errorJson == null || !errorJson.has("error")) {
+                return 0;
+            }
+
+            JsonObject error = errorJson.getAsJsonObject("error");
+            if (!error.has("details")) {
+                return 0;
+            }
+
+            JsonArray details = error.getAsJsonArray("details");
+            for (JsonElement detail : details) {
+                JsonObject detailObj = detail.getAsJsonObject();
+
+                // Look for RetryInfo type
+                if (detailObj.has("@type") &&
+                        detailObj.get("@type").getAsString().contains("RetryInfo")) {
+
+                    if (detailObj.has("retryDelay")) {
+                        String retryDelayStr = detailObj.get("retryDelay").getAsString();
+                        // Parse format like "46s" or "46.799s"
+                        return parseRetryDelayString(retryDelayStr);
+                    }
+                }
+            }
+
+            return 0;
+        } catch (Exception e) {
+            Log.w(TAG, "[" + requestId + "] Error parsing retry delay: " + e.getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Parses retry delay string like "46s" or "46.799675533s" to milliseconds.
+     */
+    private long parseRetryDelayString(String delayStr) {
+        if (delayStr == null || delayStr.isEmpty()) {
+            return 0;
+        }
+
+        try {
+            // Remove 's' suffix and parse as decimal seconds
+            String secondsStr = delayStr.replaceAll("[^0-9.]", "");
+            double seconds = Double.parseDouble(secondsStr);
+            return (long) (seconds * 1000);
+        } catch (Exception e) {
+            Log.w(TAG, "Could not parse delay string: " + delayStr);
+            return 0;
+        }
+    }
+
+    /**
+     * Custom exception for rate limit errors that includes the retry delay.
+     */
+    private static class RateLimitException extends Exception {
+        private final long retryDelayMs;
+
+        public RateLimitException(String message, long retryDelayMs) {
+            super(message);
+            this.retryDelayMs = retryDelayMs;
+        }
+
+        public long getRetryDelayMs() {
+            return retryDelayMs;
+        }
     }
 }

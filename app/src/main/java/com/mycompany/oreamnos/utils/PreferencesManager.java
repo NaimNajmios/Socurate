@@ -17,7 +17,7 @@ public class PreferencesManager {
     private static final String KEY_TONE = "post_tone";
     private static final String KEY_HASHTAGS = "default_hashtags";
     private static final String KEY_HASHTAGS_ENABLED = "hashtags_enabled";
-    private static final String DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
+    private static final String DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     private static final String DEFAULT_HASHTAGS = "#BolaSepak #Football";
 
     public static final String TONE_FORMAL = "formal";

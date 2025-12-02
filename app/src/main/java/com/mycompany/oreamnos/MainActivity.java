@@ -1,5 +1,7 @@
 package com.mycompany.oreamnos;
 
+import android.util.Log;
+
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -34,6 +36,8 @@ import java.util.concurrent.Executors;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
+
     private TextInputEditText inputText;
     private TextInputEditText outputText;
     private TextView editedIndicator;
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "=== MainActivity onCreate ===");
         setContentView(R.layout.activity_main);
 
         // Initialize preferences
@@ -113,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Check if API key is set
         if (!prefsManager.hasApiKey()) {
+            Log.w(TAG, "API key not configured");
             Toast.makeText(this, R.string.api_key_required, Toast.LENGTH_LONG).show();
         }
     }
@@ -137,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void toggleEditMode() {
         isEditMode = !isEditMode;
+        Log.d(TAG, "Toggle edit mode: " + (isEditMode ? "EDIT" : "VIEW"));
 
         if (isEditMode) {
             // Enable editing
@@ -163,16 +170,20 @@ public class MainActivity extends AppCompatActivity {
      * Handles the generate button click.
      */
     private void onGenerateClick() {
+        Log.i(TAG, ">>> Generate button clicked <<<");
         String input = inputText.getText() != null ? inputText.getText().toString().trim() : "";
-
+        Log.d(TAG, "Input length: " + input.length() + " characters");
         if (input.isEmpty()) {
+            Log.w(TAG, "Generation aborted: empty input");
             Toast.makeText(this, R.string.input_required, Toast.LENGTH_SHORT).show();
             return;
         }
 
         // Check if API key is configured
         if (!prefsManager.hasApiKey()) {
+            Log.w(TAG, "Generation aborted: API key not configured");
             Toast.makeText(this, R.string.api_key_required, Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Opening SettingsActivity");
             startActivity(new Intent(this, SettingsActivity.class));
             return;
         }
@@ -189,9 +200,13 @@ public class MainActivity extends AppCompatActivity {
 
                 // Check if input is a URL
                 if (WebContentExtractor.isUrl(finalInput)) {
+                    Log.i(TAG, "Input detected as URL, extracting content...");
                     mainHandler.post(() -> progressText.setText(R.string.extracting_content));
                     WebContentExtractor extractor = new WebContentExtractor();
                     content = extractor.extractContent(finalInput);
+                    Log.d(TAG, "Extracted content length: " + content.length());
+                } else {
+                    Log.i(TAG, "Input is plain text, using directly");
                 }
 
                 // Generate post with Gemini
@@ -199,13 +214,15 @@ public class MainActivity extends AppCompatActivity {
                 String apiKey = prefsManager.getApiKey();
                 String endpoint = prefsManager.getApiEndpoint();
                 String tone = prefsManager.getTone();
-
+                Log.d(TAG, "Using tone: " + tone);
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
                 String result = gemini.curatePost(content);
 
                 // Update UI on main thread
                 String finalResult = result;
                 mainHandler.post(() -> {
+                    Log.i(TAG, "Post generation SUCCESSFUL");
+                    Log.d(TAG, "Generated post length: " + finalResult.length());
                     originalGeneratedPost = finalResult;
                     setOutputText(finalResult);
                     outputCard.setVisibility(View.VISIBLE);
@@ -217,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
             } catch (Exception e) {
+                Log.e(TAG, "Post generation FAILED: " + e.getMessage(), e);
                 mainHandler.post(() -> {
                     showProgress(false);
                     String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown error";
@@ -267,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("Oreamnos Post", textToCopy);
         clipboard.setPrimaryClip(clip);
-
+        Log.i(TAG, "Text copied to clipboard");
         Toast.makeText(this, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
     }
 
@@ -284,6 +302,7 @@ public class MainActivity extends AppCompatActivity {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
+        Log.i(TAG, "Opening share chooser");
         startActivity(Intent.createChooser(shareIntent, getString(R.string.share_button)));
     }
 
@@ -296,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        Log.i(TAG, "=== MainActivity onDestroy ===");
         super.onDestroy();
         executor.shutdown();
     }

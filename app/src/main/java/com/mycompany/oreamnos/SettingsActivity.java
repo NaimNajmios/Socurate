@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ import java.util.concurrent.Executors;
  */
 public class SettingsActivity extends AppCompatActivity {
 
+    private static final String TAG = "SettingsActivity";
+
     private TextInputEditText apiKeyInput;
     private TextInputEditText endpointInput;
     private TextInputEditText hashtagsInput;
@@ -38,6 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "=== SettingsActivity onCreate ===");
         setContentView(R.layout.activity_settings);
 
         // Initialize preferences
@@ -73,6 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
      * Loads current settings from preferences.
      */
     private void loadSettings() {
+        Log.d(TAG, "Loading settings from preferences");
         // Load API key (if exists)
         String apiKey = prefsManager.getApiKey();
         if (apiKey != null) {
@@ -98,12 +103,15 @@ public class SettingsActivity extends AppCompatActivity {
         // Load hashtags enabled state
         boolean hashtagsEnabled = prefsManager.areHashtagsEnabled();
         enableHashtagsSwitch.setChecked(hashtagsEnabled);
+
+        Log.d(TAG, "Settings loaded - Tone: " + tone + ", Hashtags enabled: " + hashtagsEnabled);
     }
 
     /**
      * Saves settings to preferences.
      */
     private void onSaveClick() {
+        Log.i(TAG, ">>> Save settings clicked <<<");
         // Get values
         String apiKey = apiKeyInput.getText() != null ? apiKeyInput.getText().toString().trim() : "";
         String endpoint = endpointInput.getText() != null ? endpointInput.getText().toString().trim() : "";
@@ -135,6 +143,8 @@ public class SettingsActivity extends AppCompatActivity {
         prefsManager.saveHashtags(hashtags);
         prefsManager.setHashtagsEnabled(hashtagsEnabled);
 
+        Log.i(TAG, "Settings saved - Tone: " + tone + ", Hashtags: '" + hashtags + "', Enabled: " + hashtagsEnabled);
+
         Toast.makeText(this, R.string.settings_saved, Toast.LENGTH_SHORT).show();
         finish();
     }
@@ -143,6 +153,7 @@ public class SettingsActivity extends AppCompatActivity {
      * Tests the API connection.
      */
     private void onTestConnectionClick() {
+        Log.i(TAG, ">>> Test connection clicked <<<");
         String apiKey = apiKeyInput.getText() != null ? apiKeyInput.getText().toString().trim() : "";
         String endpoint = endpointInput.getText() != null ? endpointInput.getText().toString().trim() : "";
 
@@ -164,6 +175,7 @@ public class SettingsActivity extends AppCompatActivity {
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
                 String result = gemini.curatePost("Test connection: Manchester United won 3-0.");
 
+                Log.i(TAG, "Test connection SUCCESSFUL - Response received");
                 mainHandler.post(() -> {
                     testConnectionButton.setEnabled(true);
                     testConnectionButton.setText(R.string.test_connection);
@@ -173,6 +185,7 @@ public class SettingsActivity extends AppCompatActivity {
                 });
 
             } catch (Exception e) {
+                Log.e(TAG, "Test connection FAILED: " + e.getMessage(), e);
                 mainHandler.post(() -> {
                     testConnectionButton.setEnabled(true);
                     testConnectionButton.setText(R.string.test_connection);
@@ -187,6 +200,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        Log.i(TAG, "=== SettingsActivity onDestroy ===");
         super.onDestroy();
         executor.shutdown();
     }
