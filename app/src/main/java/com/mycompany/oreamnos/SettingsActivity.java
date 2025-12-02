@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.mycompany.oreamnos.services.GeminiService;
 import com.mycompany.oreamnos.utils.PreferencesManager;
@@ -23,7 +24,9 @@ public class SettingsActivity extends AppCompatActivity {
 
     private TextInputEditText apiKeyInput;
     private TextInputEditText endpointInput;
+    private TextInputEditText hashtagsInput;
     private RadioGroup toneRadioGroup;
+    private SwitchMaterial enableHashtagsSwitch;
     private MaterialButton testConnectionButton;
     private MaterialButton resetEndpointButton;
     private ExtendedFloatingActionButton saveFab;
@@ -48,7 +51,9 @@ public class SettingsActivity extends AppCompatActivity {
         // Initialize views
         apiKeyInput = findViewById(R.id.apiKeyInput);
         endpointInput = findViewById(R.id.endpointInput);
+        hashtagsInput = findViewById(R.id.hashtagsInput);
         toneRadioGroup = findViewById(R.id.toneRadioGroup);
+        enableHashtagsSwitch = findViewById(R.id.enableHashtagsSwitch);
         testConnectionButton = findViewById(R.id.testConnectionButton);
         resetEndpointButton = findViewById(R.id.resetEndpointButton);
         saveFab = findViewById(R.id.saveFab);
@@ -85,6 +90,14 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             toneRadioGroup.check(R.id.toneCasual);
         }
+
+        // Load hashtags
+        String hashtags = prefsManager.getHashtags();
+        hashtagsInput.setText(hashtags);
+
+        // Load hashtags enabled state
+        boolean hashtagsEnabled = prefsManager.areHashtagsEnabled();
+        enableHashtagsSwitch.setChecked(hashtagsEnabled);
     }
 
     /**
@@ -111,10 +124,16 @@ public class SettingsActivity extends AppCompatActivity {
                 ? PreferencesManager.TONE_FORMAL
                 : PreferencesManager.TONE_CASUAL;
 
+        // Get hashtags
+        String hashtags = hashtagsInput.getText() != null ? hashtagsInput.getText().toString().trim() : "";
+        boolean hashtagsEnabled = enableHashtagsSwitch.isChecked();
+
         // Save
         prefsManager.saveApiKey(apiKey);
         prefsManager.saveApiEndpoint(endpoint);
         prefsManager.saveTone(tone);
+        prefsManager.saveHashtags(hashtags);
+        prefsManager.setHashtagsEnabled(hashtagsEnabled);
 
         Toast.makeText(this, R.string.settings_saved, Toast.LENGTH_SHORT).show();
         finish();

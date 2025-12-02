@@ -15,7 +15,10 @@ public class PreferencesManager {
     private static final String KEY_API_KEY = "gemini_api_key";
     private static final String KEY_API_ENDPOINT = "api_endpoint";
     private static final String KEY_TONE = "post_tone";
+    private static final String KEY_HASHTAGS = "default_hashtags";
+    private static final String KEY_HASHTAGS_ENABLED = "hashtags_enabled";
     private static final String DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
+    private static final String DEFAULT_HASHTAGS = "#BolaSepak #Football";
 
     public static final String TONE_FORMAL = "formal";
     public static final String TONE_CASUAL = "casual";
@@ -155,6 +158,75 @@ public class PreferencesManager {
      */
     public boolean isFormalTone() {
         return TONE_FORMAL.equals(getTone());
+    }
+
+    /**
+     * Saves default hashtags.
+     * 
+     * @param hashtags Hashtags to append (space or comma separated)
+     */
+    public void saveHashtags(String hashtags) {
+        securePrefs.edit()
+                .putString(KEY_HASHTAGS, hashtags)
+                .apply();
+    }
+
+    /**
+     * Retrieves default hashtags.
+     * 
+     * @return The hashtags, or default if not set
+     */
+    public String getHashtags() {
+        return securePrefs.getString(KEY_HASHTAGS, DEFAULT_HASHTAGS);
+    }
+
+    /**
+     * Enables or disables hashtag auto-append.
+     * 
+     * @param enabled true to auto-append hashtags
+     */
+    public void setHashtagsEnabled(boolean enabled) {
+        securePrefs.edit()
+                .putBoolean(KEY_HASHTAGS_ENABLED, enabled)
+                .apply();
+    }
+
+    /**
+     * Checks if hashtags are enabled.
+     * 
+     * @return true if hashtags should be auto-appended
+     */
+    public boolean areHashtagsEnabled() {
+        return securePrefs.getBoolean(KEY_HASHTAGS_ENABLED, true); // Enabled by default
+    }
+
+    /**
+     * Formats hashtags for appending to posts.
+     * Ensures each hashtag starts with # and is space-separated.
+     * 
+     * @return Formatted hashtags ready to append
+     */
+    public String getFormattedHashtags() {
+        String hashtags = getHashtags();
+        if (hashtags == null || hashtags.trim().isEmpty()) {
+            return "";
+        }
+
+        // Clean and format hashtags
+        String[] tags = hashtags.split("[,\\s]+");
+        StringBuilder formatted = new StringBuilder();
+
+        for (String tag : tags) {
+            tag = tag.trim();
+            if (!tag.isEmpty()) {
+                if (!tag.startsWith("#")) {
+                    formatted.append("#");
+                }
+                formatted.append(tag).append(" ");
+            }
+        }
+
+        return formatted.toString().trim();
     }
 
     /**
