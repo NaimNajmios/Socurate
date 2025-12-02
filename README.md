@@ -4,13 +4,23 @@ A native Android application that transforms global football news into polished 
 
 ## 🎯 Features
 
+### Core Functionality
 - **Share Intent Integration**: Share articles directly from Chrome, Twitter, or any app
-- **Universal Football Coverage**: Works for any team or league, not just Arsenal
-- **AI-Powered Curation**: Uses Google Gemini to generate professional Malaysian Malay posts
-- **Tone Customization**: Choose between formal (professional) or casual (fan banter) styles
-- **URL Extraction**: Automatically extracts content from shared URLs
+- **Universal Football Coverage**: Works for any team or league worldwide
+- **AI-Powered Curation**: Uses Google Gemini 2.0 Flash for professional Malaysian Malay posts
 - **One-Tap Actions**: Copy to clipboard or share directly to X/Facebook
+
+### Customization & Productivity
+- **Tone Customization**: Choose between formal (professional) or casual (fan banter) styles
+- **Hashtag Manager**: Configure default hashtags that auto-append to all posts
+- **Quick Edit**: Edit generated posts inline before sharing
+- **URL Extraction**: Automatically extracts content from shared URLs
+
+### Technical Features
+- **Intelligent Retry Logic**: Automatically retries failed API calls with exponential backoff
+- **Rate Limit Handling**: Parses and respects API's requested retry delays
 - **Secure Storage**: API keys encrypted using Android's EncryptedSharedPreferences
+- **Comprehensive Logging**: Detailed logs for every user action and API call for debugging
 
 ## 📋 Requirements
 
@@ -53,14 +63,32 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Oream
 2. Tap the "Share" button
 3. Select "Oreamnos" from the share menu
 4. The app automatically processes and generates your post
-5. Copy or share the result
+5. **NEW**: Toggle "Include hashtags" to auto-append your default hashtags
+6. Copy or share the result
 
 ### Method 2: Direct Input
 
 1. Open the Oreamnos app
 2. Paste article text or URL into the input field
 3. Tap the "Generate Post" button
-4. Copy or share the generated post
+4. **NEW**: Tap "Edit" to modify the generated text
+5. **NEW**: Check "Include hashtags" box before copying
+6. Copy or share the generated post
+
+### NEW: Hashtag Management
+
+1. Go to Settings → Hashtag Settings
+2. Enter your default hashtags (e.g., `#BolaSepak #JDT #Football`)
+3. Toggle "Auto-append hashtags" on/off
+4. Hashtags automatically added when you copy or share posts
+
+### NEW: Quick Edit
+
+1. After generation, tap the "Edit" button
+2. Make inline changes to the post
+3. An "(Edited)" indicator appears
+4. Tap "Save" to lock your changes
+5. Copy/share the edited version
 
 ## 🏗️ Architecture
 
@@ -151,6 +179,35 @@ The website may be blocking automated access. Try copying the article text direc
 - Check your internet connection
 - Verify your API key is correct
 - Try the "Test Connection" button in Settings
+
+### Rate limit errors
+
+The app now handles rate limits intelligently:
+- Automatically retries with the exact delay requested by the API
+- Shows user-friendly messages: "Please wait X seconds and try again"
+- Logs all retry attempts in Logcat for debugging
+
+### Debugging with Logcat
+
+The app includes comprehensive logging for all actions:
+
+1. Open Android Studio → Logcat tab
+2. Filter by package: `com.mycompany.oreamnos`
+3. Look for these tags:
+   - `MainActivity` - UI interactions, button clicks
+   - `GeminiService` - API calls, retries, responses
+   - `WebContentExtractor` - URL parsing
+   - `SettingsActivity` - Configuration changes
+
+**Example logs:**
+```
+I/MainActivity: >>> Generate button clicked <<<
+I/GeminiService: === GEMINI API CALL START [abc123] ===
+I/GeminiService: [abc123] Response code: 200 (time: 1234ms)
+I/MainActivity: Post generation SUCCESSFUL
+```
+
+See the [Debugging Guide](debugging_guide.md) for complete log examples.
 
 ## 📝 License
 
