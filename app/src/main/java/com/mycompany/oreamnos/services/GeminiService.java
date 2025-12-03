@@ -301,7 +301,7 @@ public class GeminiService {
                 "---\n" +
                 inputText + "\n" +
                 "---\n\n" +
-                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline, paragraphs separated by blank lines, and hashtags at the end.";
+                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline, paragraphs separated by blank lines, and hashtags at the end. IMPORTANT: Hashtags must be listed vertically, one per line (e.g.,\n#Hashtag1\n#Hashtag2).";
     }
 
     /**

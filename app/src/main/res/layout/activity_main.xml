@@ -128,8 +128,7 @@
                             android:text="@string/generated_draft"
                             android:textColor="@color/neon_green"
                             android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textAllCaps="true" />
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/editedIndicator"
