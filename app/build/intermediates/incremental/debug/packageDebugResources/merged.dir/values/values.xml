@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="http://schemas.android.com/tools">
+    <color name="dark_surface">#1F1F1F</color>
+    <color name="dark_surface_variant">#2A2A2A</color>
+    <color name="destructive_red">#FF3B30</color>
+    <color name="divider">#333333</color>
+    <color name="info_blue">#007AFF</color>
+    <color name="md_theme_dark_background">#000000</color>
+    <color name="md_theme_dark_error">#FF3B30</color>
+    <color name="md_theme_dark_errorContainer">#5C1A1A</color>
+    <color name="md_theme_dark_inverseOnSurface">#000000</color>
+    <color name="md_theme_dark_inversePrimary">#00FF66</color>
+    <color name="md_theme_dark_inverseSurface">#FFFFFF</color>
+    <color name="md_theme_dark_onBackground">#FFFFFF</color>
+    <color name="md_theme_dark_onError">#FFFFFF</color>
+    <color name="md_theme_dark_onErrorContainer">#FFB4AB</color>
+    <color name="md_theme_dark_onPrimary">#000000</color>
+    <color name="md_theme_dark_onPrimaryContainer">#FFFFFF</color>
+    <color name="md_theme_dark_onSecondary">#000000</color>
+    <color name="md_theme_dark_onSecondaryContainer">#B0B0B0</color>
+    <color name="md_theme_dark_onSurface">#FFFFFF</color>
+    <color name="md_theme_dark_onSurfaceVariant">#B0B0B0</color>
+    <color name="md_theme_dark_onTertiary">#000000</color>
+    <color name="md_theme_dark_onTertiaryContainer">#FFFFFF</color>
+    <color name="md_theme_dark_outline">#333333</color>
+    <color name="md_theme_dark_primary">#00FF66</color>
+    <color name="md_theme_dark_primaryContainer">#00CC52</color>
+    <color name="md_theme_dark_secondary">#33FF85</color>
+    <color name="md_theme_dark_secondaryContainer">#1F1F1F</color>
+    <color name="md_theme_dark_surface">#1F1F1F</color>
+    <color name="md_theme_dark_surfaceVariant">#2A2A2A</color>
+    <color name="md_theme_dark_tertiary">#00FF66</color>
+    <color name="md_theme_dark_tertiaryContainer">#2A2A2A</color>
+    <color name="neon_green">#00FF66</color>
+    <color name="neon_green_dark">#00CC52</color>
+    <color name="neon_green_light">#33FF85</color>
+    <color name="pure_black">#000000</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="text_tertiary">#808080</color>
+    <color name="warning_orange">#FF9500</color>
+    <string name="advanced_settings">Advanced Settings</string>
+    <string name="api_endpoint_default">https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent</string>
+    <string name="api_endpoint_label">API Endpoint</string>
+    <string name="api_error">API error: %1$s</string>
+    <string name="api_key_help">Get your API key from https://ai.google.dev</string>
+    <string name="api_key_hint">Enter your Google Gemini API key</string>
+    <string name="api_key_label">Gemini API Key</string>
+    <string name="api_key_required">Please set your Gemini API key in Settings</string>
+    <string name="api_key_saved">API key saved securely</string>
+    <string name="app_description">Football news curator for Malaysian Malay content</string>
+    <string name="app_name">Oreamnos</string>
+    <string name="app_version">Version 1.0</string>
+    <string name="cancel_edit">Cancel</string>
+    <string name="connection_test_failed">Connection failed: %1$s</string>
+    <string name="connection_test_success">Connection successful!</string>
+    <string name="content_description_copy_icon">Copy to clipboard</string>
+    <string name="content_description_settings_icon">Settings</string>
+    <string name="content_description_share_icon">Share</string>
+    <string name="copied_to_clipboard">Copied to clipboard!</string>
+    <string name="copy_button">Copy to Clipboard</string>
+    <string name="edit_button">Edit</string>
+    <string name="edited_indicator">(Edited)</string>
+    <string name="enable_hashtags">Auto-append hashtags</string>
+    <string name="error_title">Error</string>
+    <string name="extracting_content">Extracting content from URL…</string>
+    <string name="generate_button">Generate Post</string>
+    <string name="generated_draft">Generated Draft</string>
+    <string name="generating_post">Generating post with AI…</string>
+    <string name="hashtags_help">Separate with spaces or commas</string>
+    <string name="hashtags_hint">e.g., #BolaSepak #Football #JDT</string>
+    <string name="hashtags_label">Default Hashtags</string>
+    <string name="hashtags_section">Hashtag Settings</string>
+    <string name="include_hashtags">Include hashtags</string>
+    <string name="input_hint">Paste article text or URL here…</string>
+    <string name="input_required">Please enter some text or URL</string>
+    <string name="invalid_url">Could not extract content from URL</string>
+    <string name="network_error">Network error. Please check your connection.</string>
+    <string name="open_in_app">Open in Main App</string>
+    <string name="original_post">Original Post</string>
+    <string name="output_label">Generated Post</string>
+    <string name="output_placeholder">Your Malaysian Malay post will appear here…</string>
+    <string name="powered_by">Powered by Google Gemini</string>
+    <string name="processing">Processing…</string>
+    <string name="processing_error">Error: %1$s</string>
+    <string name="reset_to_default">Reset to Default</string>
+    <string name="restore_original">Restore Original</string>
+    <string name="save_edit">Save</string>
+    <string name="save_settings">Save Settings</string>
+    <string name="settings">Settings</string>
+    <string name="settings_button">Settings</string>
+    <string name="settings_saved">Settings saved</string>
+    <string name="share_button">Share</string>
+    <string name="share_to_oreamnos">Share to Oreamnos</string>
+    <string name="success_title">Success</string>
+    <string name="test_connection">Test Connection</string>
+    <string name="tone_casual">Casual (Fan Banter)</string>
+    <string name="tone_formal">Formal (Professional)</string>
+    <string name="tone_label">Post Tone</string>
+    <string name="warning_title">Warning</string>
+    <style name="Theme.Oreamnos" parent="Theme.Material3.Dark.NoActionBar">
+        
+        <item name="colorPrimary">@color/neon_green</item>
+        <item name="colorOnPrimary">@color/pure_black</item>
+        <item name="colorPrimaryContainer">@color/neon_green_dark</item>
+        <item name="colorOnPrimaryContainer">@color/text_primary</item>
+        
+        
+        <item name="colorSecondary">@color/neon_green_light</item>
+        <item name="colorOnSecondary">@color/pure_black</item>
+        <item name="colorSecondaryContainer">@color/dark_surface</item>
+        <item name="colorOnSecondaryContainer">@color/text_secondary</item>
+        
+        
+        <item name="colorTertiary">@color/neon_green</item>
+        <item name="colorOnTertiary">@color/pure_black</item>
+        <item name="colorTertiaryContainer">@color/dark_surface_variant</item>
+        <item name="colorOnTertiaryContainer">@color/text_primary</item>
+        
+        
+        <item name="colorError">@color/destructive_red</item>
+        <item name="colorOnError">@color/text_primary</item>
+        <item name="colorErrorContainer">@color/dark_surface_variant</item>
+        <item name="colorOnErrorContainer">@color/destructive_red</item>
+        
+        
+        <item name="android:colorBackground">@color/pure_black</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/dark_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        
+        
+        <item name="colorOutline">@color/md_theme_dark_outline</item>
+        
+        
+        <item name="android:statusBarColor">@color/pure_black</item>
+        <item name="android:windowLightStatusBar" ns1:targetApi="m">false</item>
+        
+        
+        <item name="android:navigationBarColor">@color/pure_black</item>
+        <item name="android:windowLightNavigationBar" ns1:targetApi="o">false</item>
+    </style>
+</resources>

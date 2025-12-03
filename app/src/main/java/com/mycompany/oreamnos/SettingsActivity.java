@@ -177,10 +177,13 @@ public class SettingsActivity extends AppCompatActivity {
 
                 Log.i(TAG, "Test connection SUCCESSFUL - Response received");
                 mainHandler.post(() -> {
+                    // Save the working API key
+                    prefsManager.saveApiKey(apiKey);
+
                     testConnectionButton.setEnabled(true);
                     testConnectionButton.setText(R.string.test_connection);
                     Toast.makeText(SettingsActivity.this,
-                            R.string.connection_test_success,
+                            "Connection successful! API key saved.",
                             Toast.LENGTH_LONG).show();
                 });
 

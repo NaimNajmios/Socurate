@@ -154,7 +154,7 @@ public class GeminiService {
                         lastException = new RateLimitException(
                                 "Gemini " + errorType.toLowerCase() + ": " + code + ". " + errorBody,
                                 apiSuggestedDelay);
-                        } else {
+                    } else {
                         // Permanent error
                         Log.e(TAG, "[" + requestId + "] Permanent error: " + code + " - " + errorBody);
                         throw new Exception("Gemini API error: " + code + ". " + errorBody);
