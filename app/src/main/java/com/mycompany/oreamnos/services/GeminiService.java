@@ -86,8 +86,8 @@ public class GeminiService {
         }
 
         // Build the prompt based on tone
-        String prompt = buildPrompt(tone);
-        String sanitizedInput = inputText.replace("\"", "'");
+        // Build the prompt based on tone
+        String prompt = buildPrompt(tone, inputText);
 
         // Build request JSON
         JsonObject requestJson = new JsonObject();
@@ -95,7 +95,7 @@ public class GeminiService {
         JsonObject content = new JsonObject();
         JsonArray parts = new JsonArray();
         JsonObject part = new JsonObject();
-        part.addProperty("text", prompt + "\n\n" + sanitizedInput);
+        part.addProperty("text", prompt);
         parts.add(part);
         content.add("parts", parts);
         contents.add(content);
@@ -263,28 +263,45 @@ public class GeminiService {
     }
 
     /**
-     * Builds the prompt based on the selected tone.
+     * Builds the prompt based on the selected tone and input text.
      */
-    private String buildPrompt(String tone) {
-        String baseTone = "formal".equals(tone)
-                ? "Use a polished and respectful tone appropriate for official club communications or high-quality social media content."
-                : "Use an engaging, conversational tone suitable for fan communities and social media interaction while remaining respectful.";
+    private String buildPrompt(String tone, String inputText) {
+        int originalLength = inputText.length();
+        int targetMinLength = (int) (originalLength * 0.4);
+        int targetMaxLength = (int) (originalLength * 0.6);
 
-        return "Rewrite the following text into a " +
-                ("formal".equals(tone) ? "formal, professional" : "engaging, conversational") +
-                " social media post written in Malaysian Malay (Bahasa Malaysia). " + baseTone +
-                " Be length-aware: preserve the key information and nuance from the source and produce a substantive post — "
+        // Ensure reasonable defaults if text is short
+        if (targetMinLength < 50)
+            targetMinLength = 50;
+        if (targetMaxLength < 100)
+            targetMaxLength = 100;
+
+        String toneDesc = "formal".equals(tone) ? "formal, professional" : "engaging, conversational";
+        String toneInstruction = "formal".equals(tone)
+                ? "Maintain a formal, professional tone suitable for official club communication"
+                : "Maintain an engaging, conversational tone suitable for fan communities";
+
+        return "You are a professional social media content writer for a Malaysian football club. Your task is to transform the following English football news article into a "
+                + toneDesc + " social media post written in Malaysian Malay (Bahasa Malaysia).\n\n" +
+                "STRICT REQUIREMENTS:\n" +
+                "1. Write ONLY in Bahasa Malaysia (Malaysian Malay) - do not include any English text in your output\n"
                 +
-                "target approximately 40–60% of the original article's character length while ensuring a minimum of 200 characters "
+                "2. " + toneInstruction + "\n" +
+                "3. The output must be approximately 40-60% of the original content length (target: " + targetMinLength
+                + "-" + targetMaxLength + " characters)\n" +
+                "4. FORBIDDEN: Do not use personal commentary phrases like \"Saya cuba\", \"Saya rasa\", \"Pada pendapat saya\"\n"
                 +
-                "and a maximum of 800 characters. If the input article is shorter than 200 characters, produce a concise post "
-                +
-                "that fully conveys the content. Keep the message clear, well-structured, and engaging; include suitable football "
-                +
-                "terminology where relevant (e.g., 'hat-trick', 'clean sheet' → 'rekod bersih'). " +
-                "Do not add explanations, notes, headings, metadata, or any commentary. Do not include personal phrases such as "
-                +
-                "'Saya cuba' or 'Saya juga'. Do not use the em dash character (—). Provide only the final ready-to-post content.";
+                "5. FORBIDDEN: Do not use em-dashes (—) anywhere in the output\n" +
+                "6. FORBIDDEN: Do not include hashtags unless specifically relevant to the content\n" +
+                "7. STRUCTURE: Start with a clear, engaging Headline. Separate paragraphs with a blank line.\n" +
+                "8. Preserve key facts, names, dates, and statistics from the original\n" +
+                "9. Make the content engaging but maintain journalistic objectivity\n" +
+                "10. The tone should be that of an official club announcement or news update\n\n" +
+                "ORIGINAL ENGLISH TEXT:\n" +
+                "---\n" +
+                inputText + "\n" +
+                "---\n\n" +
+                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline, paragraphs separated by blank lines, and hashtags at the end.";
     }
 
     /**
@@ -400,9 +417,12 @@ public class GeminiService {
         cleaned = cleaned.replaceAll("\\*.*?\\*", "");
 
         // Clean up spacing
+        // Clean up spacing
+        // Normalize multiple newlines to max 2
         cleaned = cleaned.replaceAll("\\n\\s*\\n\\s*\\n+", "\n\n");
-        cleaned = cleaned.replaceAll("\\s+", " ");
-        cleaned = cleaned.replaceAll("\\n\\s+", "\n");
+        // Normalize horizontal whitespace (spaces, tabs) to single space, PRESERVING
+        // newlines
+        cleaned = cleaned.replaceAll("[ \\t]+", " ");
         cleaned = cleaned.trim();
 
         // If too short after cleaning, return original
