@@ -76,6 +76,7 @@ layout activity_main
 layout activity_settings
 layout activity_share_receiver
 menu menu_main
+mipmap oreamnos_white
 string advanced_settings
 string api_endpoint_default
 string api_endpoint_label
