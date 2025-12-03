@@ -292,7 +292,7 @@ public class GeminiService {
                 "4. FORBIDDEN: Do not use personal commentary phrases like \"Saya cuba\", \"Saya rasa\", \"Pada pendapat saya\"\n"
                 +
                 "5. FORBIDDEN: Do not use em-dashes (—) anywhere in the output\n" +
-                "6. FORBIDDEN: Do not include hashtags unless specifically relevant to the content\n" +
+                "6. FORBIDDEN: Do NOT include any hashtags in the output\n" +
                 "7. STRUCTURE: Start with a clear, engaging Headline. Separate paragraphs with a blank line.\n" +
                 "8. Preserve key facts, names, dates, and statistics from the original\n" +
                 "9. Make the content engaging but maintain journalistic objectivity\n" +
@@ -301,7 +301,7 @@ public class GeminiService {
                 "---\n" +
                 inputText + "\n" +
                 "---\n\n" +
-                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline, paragraphs separated by blank lines, and hashtags at the end. IMPORTANT: Hashtags must be listed vertically, one per line (e.g.,\n#Hashtag1\n#Hashtag2).";
+                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Do NOT include any hashtags.";
     }
 
     /**
