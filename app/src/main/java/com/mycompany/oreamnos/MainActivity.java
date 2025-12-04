@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private String originalGeneratedPost = "";
+    private String generatedSourceCitation = "";
     private String originalInputText = "";
     private boolean isEditMode = false;
 
@@ -139,16 +140,6 @@ public class MainActivity extends AppCompatActivity {
         clearInputButton.setOnClickListener(v -> onClearInputClick());
         regenerateButton.setOnClickListener(v -> onRegenerateClick());
 
-        // Load hashtags enabled state
-        includeHashtagsCheckbox.setChecked(prefsManager.areHashtagsEnabled());
-
-        // Load source enabled state
-        includeSourceCheckbox.setChecked(prefsManager.isSourceEnabled());
-
-        // Update hashtags checkbox visibility
-        includeHashtagsCheckbox.setVisibility(
-                !prefsManager.getHashtags().isEmpty() ? View.VISIBLE : View.GONE);
-
         // Watch for text changes to show edited indicator
         outputText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -174,6 +165,43 @@ public class MainActivity extends AppCompatActivity {
             Log.w(TAG, "API key not configured");
             Toast.makeText(this, R.string.api_key_required, Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload preferences when returning to activity
+
+        // Load hashtags enabled state
+        includeHashtagsCheckbox.setChecked(prefsManager.areHashtagsEnabled());
+
+        // Load source enabled state - Master Switch Logic
+        boolean isSourceFeatureEnabled = prefsManager.isSourceEnabled();
+        if (isSourceFeatureEnabled) {
+            includeSourceCheckbox.setVisibility(View.VISIBLE);
+            // Only set checked if it was previously unchecked (don't override user choice
+            // if they unchecked it manually)
+            // But for now, let's stick to the requirement: "When the source is toggled
+            // on... included"
+            // If we want to persist the user's checkbox choice across sessions, we'd need
+            // another pref.
+            // For now, let's default to TRUE if enabled, as per user implication.
+            if (!includeSourceCheckbox.isChecked()) {
+                includeSourceCheckbox.setChecked(true);
+            }
+
+            // Add listener for dynamic toggling
+            includeSourceCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                toggleSourceCitation(isChecked);
+            });
+        } else {
+            includeSourceCheckbox.setVisibility(View.GONE);
+            includeSourceCheckbox.setChecked(false);
+        }
+
+        // Update hashtags checkbox visibility
+        includeHashtagsCheckbox.setVisibility(
+                !prefsManager.getHashtags().isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -220,6 +248,58 @@ public class MainActivity extends AppCompatActivity {
             if (outputText.getText() != null) {
                 originalGeneratedPost = outputText.getText().toString();
             }
+        }
+    }
+
+    /**
+     * Toggles the source citation in the output text.
+     */
+    private void toggleSourceCitation(boolean show) {
+        if (generatedSourceCitation.isEmpty())
+            return;
+
+        String currentText = outputText.getText() != null ? outputText.getText().toString() : "";
+        if (show) {
+            // Append if not already present
+            if (!currentText.contains(generatedSourceCitation)) {
+                outputText.setText(currentText + "\n\n" + generatedSourceCitation);
+            }
+        } else {
+            // Remove if present
+            if (currentText.contains(generatedSourceCitation)) {
+                String newText = currentText.replace("\n\n" + generatedSourceCitation, "")
+                        .replace(generatedSourceCitation, "") // Fallback
+                        .trim();
+                outputText.setText(newText);
+            }
+        }
+    }
+
+    /**
+     * Extracts the source citation from the generated text.
+     * Returns the text WITHOUT the source citation.
+     */
+    private String extractSourceCitation(String fullResult) {
+        if (fullResult == null) {
+            generatedSourceCitation = "";
+            return "";
+        }
+
+        // Regex to find the source citation line
+        // Matches: "Sumber:", "*Sumber:*", "Source:", "Sumber :", etc.
+        String regex = "(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$";
+
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
+        java.util.regex.Matcher matcher = pattern.matcher(fullResult);
+
+        if (matcher.find()) {
+            generatedSourceCitation = matcher.group().trim();
+            String contentWithoutSource = fullResult.replaceAll(regex, "").trim();
+            // Clean up trailing newlines
+            return contentWithoutSource.replaceAll("\\n+$", "").trim();
+        } else {
+            generatedSourceCitation = "";
+            return fullResult;
         }
     }
 
@@ -276,16 +356,28 @@ public class MainActivity extends AppCompatActivity {
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
 
                 // Get source enabled state from UI
-                boolean includeSource = includeSourceCheckbox.isChecked();
+                // ALWAYS request source if feature is globally enabled, to allow dynamic
+                // toggling
+                boolean includeSource = prefsManager.isSourceEnabled();
                 String result = gemini.curatePost(content, includeSource);
 
                 // Update UI on main thread
                 String finalResult = result;
                 mainHandler.post(() -> {
                     Log.i(TAG, "Post generation SUCCESSFUL");
-                    Log.d(TAG, "Generated post length: " + finalResult.length());
-                    originalGeneratedPost = finalResult;
-                    setOutputText(finalResult);
+
+                    // Extract source citation
+                    String contentWithoutSource = extractSourceCitation(finalResult);
+                    Log.d(TAG, "Generated post length: " + contentWithoutSource.length());
+
+                    // Set initial text (append source if checked)
+                    String textToShow = contentWithoutSource;
+                    if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {
+                        textToShow += "\n\n" + generatedSourceCitation;
+                    }
+
+                    originalGeneratedPost = textToShow;
+                    setOutputText(textToShow);
                     showSkeletonLoading(false);
                     showOutputCard();
                     isEditMode = false;
@@ -490,14 +582,25 @@ public class MainActivity extends AppCompatActivity {
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
 
                 // Get source enabled state from UI
-                boolean includeSource = includeSourceCheckbox.isChecked();
+                // ALWAYS request source if feature is globally enabled
+                boolean includeSource = prefsManager.isSourceEnabled();
                 String refinedPost = gemini.refinePost(originalGeneratedPost, refinements, includeSource);
 
                 // Update UI on main thread
                 mainHandler.post(() -> {
                     Log.i(TAG, "Post refinement SUCCESSFUL");
-                    originalGeneratedPost = refinedPost;
-                    setOutputText(refinedPost);
+
+                    // Extract source citation
+                    String contentWithoutSource = extractSourceCitation(refinedPost);
+
+                    // Set initial text (append source if checked)
+                    String textToShow = contentWithoutSource;
+                    if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {
+                        textToShow += "\n\n" + generatedSourceCitation;
+                    }
+
+                    originalGeneratedPost = textToShow;
+                    setOutputText(textToShow);
                     showSkeletonLoading(false);
                     showOutputCard();
                     isEditMode = false;

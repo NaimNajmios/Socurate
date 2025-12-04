@@ -250,6 +250,11 @@ public class GeminiService {
                 curatedText = "Gagal mendapatkan hasil dari Gemini.";
             } else {
                 curatedText = cleanUpResponse(curatedText);
+
+                // Post-processing: Forcefully remove source if not requested
+                if (!includeSource) {
+                    curatedText = removeSourceCitation(curatedText);
+                }
             }
 
             long totalTime = System.currentTimeMillis() - startTime;
@@ -333,6 +338,11 @@ public class GeminiService {
                 refinedText = "Gagal mendapatkan hasil dari Gemini.";
             } else {
                 refinedText = cleanUpResponse(refinedText);
+
+                // Post-processing: Forcefully remove source if not requested
+                if (!includeSource) {
+                    refinedText = removeSourceCitation(refinedText);
+                }
             }
 
             long totalTime = System.currentTimeMillis() - startTime;
@@ -344,6 +354,48 @@ public class GeminiService {
             Log.e(TAG, "[" + requestId + "] Error parsing refinement response", e);
             return "Gagal mendapatkan hasil dari Gemini.";
         }
+    }
+
+    /**
+     * Removes any "Sumber:" citation from the text.
+     * Uses line-based parsing to safely identify and remove the citation line
+     * from the end of the content.
+     */
+    /**
+     * Removes any "Sumber:" citation from the text.
+     * Uses aggressive multiline regex to remove any line that looks like a source
+     * citation.
+     */
+    /**
+     * Removes any "Sumber:" citation from the text.
+     * Uses aggressive multiline regex to remove any line that looks like a source
+     * citation.
+     */
+    private String removeSourceCitation(String text) {
+        if (text == null || text.isEmpty())
+            return text;
+
+        // Regex explanation:
+        // (?i) : Case insensitive
+        // (?m) : Multiline mode (^ and $ match start/end of line)
+        // ^ : Start of line
+        // [\s\p{Z}]* : Optional whitespace (including non-breaking spaces)
+        // [*_]* : Optional markdown (bold/italic) start
+        // (?:Sumber|Source) : Match "Sumber" or "Source"
+        // [*_]* : Optional markdown end
+        // [\s\p{Z}]* : Optional whitespace
+        // [:：] : Colon (regular or full-width)
+        // .*$ : Rest of the line
+        String regex = "(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$";
+
+        String cleaned = text.replaceAll(regex, "");
+
+        if (!text.equals(cleaned)) {
+            Log.d(TAG, "Removed source citation via regex");
+        }
+
+        // Clean up any trailing newlines left behind
+        return cleaned.replaceAll("\\n+$", "").trim();
     }
 
     /**
@@ -388,7 +440,8 @@ public class GeminiService {
             prompt.append(
                     "\nEnsure the post ends with 'Sumber: [Source Name]' if the original post had one or if the source is known.");
         } else {
-            prompt.append("\nDo NOT include any 'Sumber:' citation in the output.");
+            prompt.append(
+                    "\nDo NOT include any 'Sumber:' citation in the output. Do NOT mention the source name, publication, or author anywhere in the post.");
         }
 
         return prompt.toString();
@@ -447,6 +500,10 @@ public class GeminiService {
             prompt.append("6. FORBIDDEN: Do NOT include any hashtags in the output\n");
         }
 
+        if (!includeSource) {
+            prompt.append("8. FORBIDDEN: Do NOT include any 'Sumber:' citation in the output\n");
+        }
+
         // Adapt structure based on content type
         if (isTechnicalArticle) {
             prompt.append(hasQuotes ? "8" : "7")
@@ -484,7 +541,8 @@ public class GeminiService {
             prompt.append(
                     "\n\nREMEMBER: End your post with a new line containing 'Sumber: [Source Name]' where Source Name is the website, publication, or journalist identified from the content.");
         } else {
-            prompt.append("\n\nREMEMBER: Do NOT include any 'Sumber:' citation in the output.");
+            prompt.append(
+                    "\n\nREMEMBER: Do NOT include any 'Sumber:' citation in the output. Do NOT mention the source name, publication, or author anywhere in the post.");
         }
 
         return prompt.toString();
