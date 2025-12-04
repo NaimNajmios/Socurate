@@ -6,7 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -20,26 +21,42 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Settings activity for configuring API key, tone, and endpoint.
+ * Settings activity for configuring API key, tone, and model selection.
  */
 public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG = "SettingsActivity";
 
+    // Available Gemini models
+    private static final String[] MODEL_NAMES = {
+            "Gemini 2.5 Flash Lite",
+            "Gemini 2.5 Flash",
+            "Gemini 2.5 Pro",
+            "Gemini 2.0 Flash"
+    };
+
+    private static final String[] MODEL_ENDPOINTS = {
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+    };
+
     private TextInputEditText apiKeyInput;
-    private TextInputEditText endpointInput;
+    private AutoCompleteTextView modelDropdown;
     private TextInputEditText hashtagsInput;
     private RadioGroup toneRadioGroup;
     private RadioGroup themeRadioGroup;
     private SwitchMaterial enableHashtagsSwitch;
     private SwitchMaterial sourceEnabledSwitch;
     private MaterialButton testConnectionButton;
-    private MaterialButton resetEndpointButton;
     private ExtendedFloatingActionButton saveFab;
 
     private PreferencesManager prefsManager;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+    private int selectedModelIndex = 3; // Default to Gemini 2.0 Flash
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,15 +78,17 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Initialize views
         apiKeyInput = findViewById(R.id.apiKeyInput);
-        endpointInput = findViewById(R.id.endpointInput);
+        modelDropdown = findViewById(R.id.modelDropdown);
         hashtagsInput = findViewById(R.id.hashtagsInput);
         toneRadioGroup = findViewById(R.id.toneRadioGroup);
         themeRadioGroup = findViewById(R.id.themeRadioGroup);
         enableHashtagsSwitch = findViewById(R.id.enableHashtagsSwitch);
         sourceEnabledSwitch = findViewById(R.id.sourceEnabledSwitch);
         testConnectionButton = findViewById(R.id.testConnectionButton);
-        resetEndpointButton = findViewById(R.id.resetEndpointButton);
         saveFab = findViewById(R.id.saveFab);
+
+        // Setup model dropdown
+        setupModelDropdown();
 
         // Load current settings
         loadSettings();
@@ -77,9 +96,6 @@ public class SettingsActivity extends AppCompatActivity {
         // Setup button listeners
         saveFab.setOnClickListener(v -> onSaveClick());
         testConnectionButton.setOnClickListener(v -> onTestConnectionClick());
-        resetEndpointButton.setOnClickListener(v -> {
-            endpointInput.setText(R.string.api_endpoint_default);
-        });
 
         // Setup theme radio group listener
         themeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -97,6 +113,23 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /**
+     * Sets up the model dropdown with available options.
+     */
+    private void setupModelDropdown() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                MODEL_NAMES);
+        modelDropdown.setAdapter(adapter);
+
+        // Handle selection
+        modelDropdown.setOnItemClickListener((parent, view, position, id) -> {
+            selectedModelIndex = position;
+            Log.d(TAG, "Selected model: " + MODEL_NAMES[position]);
+        });
+    }
+
+    /**
      * Loads current settings from preferences.
      */
     private void loadSettings() {
@@ -107,9 +140,16 @@ public class SettingsActivity extends AppCompatActivity {
             apiKeyInput.setText(apiKey);
         }
 
-        // Load endpoint
-        String endpoint = prefsManager.getApiEndpoint();
-        endpointInput.setText(endpoint);
+        // Load model - find matching endpoint
+        String savedEndpoint = prefsManager.getApiEndpoint();
+        selectedModelIndex = 3; // Default to Gemini 2.0 Flash
+        for (int i = 0; i < MODEL_ENDPOINTS.length; i++) {
+            if (MODEL_ENDPOINTS[i].equals(savedEndpoint)) {
+                selectedModelIndex = i;
+                break;
+            }
+        }
+        modelDropdown.setText(MODEL_NAMES[selectedModelIndex], false);
 
         // Load tone
         String tone = prefsManager.getTone();
@@ -141,8 +181,9 @@ public class SettingsActivity extends AppCompatActivity {
             themeRadioGroup.check(R.id.themeSystem);
         }
 
-        Log.d(TAG, "Settings loaded - Tone: " + tone + ", Theme: " + theme + ", Hashtags enabled: " + hashtagsEnabled
-                + ", Source enabled: " + sourceEnabled);
+        Log.d(TAG, "Settings loaded - Model: " + MODEL_NAMES[selectedModelIndex] + ", Tone: " + tone +
+                ", Theme: " + theme + ", Hashtags enabled: " + hashtagsEnabled +
+                ", Source enabled: " + sourceEnabled);
     }
 
     /**
@@ -152,16 +193,11 @@ public class SettingsActivity extends AppCompatActivity {
         Log.i(TAG, ">>> Save settings clicked <<<");
         // Get values
         String apiKey = apiKeyInput.getText() != null ? apiKeyInput.getText().toString().trim() : "";
-        String endpoint = endpointInput.getText() != null ? endpointInput.getText().toString().trim() : "";
+        String endpoint = MODEL_ENDPOINTS[selectedModelIndex];
 
         // Validate
         if (apiKey.isEmpty()) {
             Toast.makeText(this, "API key cannot be empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (endpoint.isEmpty()) {
-            Toast.makeText(this, "Endpoint cannot be empty", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -185,8 +221,9 @@ public class SettingsActivity extends AppCompatActivity {
         prefsManager.setHashtagsEnabled(hashtagsEnabled);
         prefsManager.saveSourceEnabled(sourceEnabled);
 
-        Log.i(TAG, "Settings saved - Tone: " + tone + ", Hashtags: '" + hashtags + "', Enabled: " + hashtagsEnabled
-                + ", Source enabled: " + sourceEnabled);
+        Log.i(TAG, "Settings saved - Model: " + MODEL_NAMES[selectedModelIndex] + ", Tone: " + tone +
+                ", Hashtags: '" + hashtags + "', Enabled: " + hashtagsEnabled +
+                ", Source enabled: " + sourceEnabled);
 
         Toast.makeText(this, R.string.settings_saved, Toast.LENGTH_SHORT).show();
         finish();
@@ -198,7 +235,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void onTestConnectionClick() {
         Log.i(TAG, ">>> Test connection clicked <<<");
         String apiKey = apiKeyInput.getText() != null ? apiKeyInput.getText().toString().trim() : "";
-        String endpoint = endpointInput.getText() != null ? endpointInput.getText().toString().trim() : "";
+        String endpoint = MODEL_ENDPOINTS[selectedModelIndex];
 
         if (apiKey.isEmpty()) {
             Toast.makeText(this, "Please enter an API key first", Toast.LENGTH_SHORT).show();

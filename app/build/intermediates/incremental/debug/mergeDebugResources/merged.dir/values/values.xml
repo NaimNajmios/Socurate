@@ -2098,6 +2098,11 @@
     <string description="Suffix for time in 12-hour standard, after noon. [CHAR_LIMIT=2]" name="material_timepicker_pm">PM</string>
     <string description="Title for the dialog with a time picker. [CHAR_LIMIT=32]" name="material_timepicker_select_time">Select time</string>
     <string name="material_timepicker_text_input_mode_description">Switch to text input mode for the time input.</string>
+    <string name="model_2_0_flash">Gemini 2.0 Flash</string>
+    <string name="model_2_5_flash">Gemini 2.5 Flash</string>
+    <string name="model_2_5_flash_lite">Gemini 2.5 Flash Lite</string>
+    <string name="model_2_5_pro">Gemini 2.5 Pro</string>
+    <string name="model_label">AI Model</string>
     <string description="Content description for new notification (no number count) [CHAR_LIMIT=NONE]" name="mtrl_badge_numberless_content_description">New notification</string>
     <string name="mtrl_checkbox_button_icon_path_checked" translatable="false">M14,18.2 11.4,15.6 10,17 14,21 22,13 20.6,11.6z</string>
     <string name="mtrl_checkbox_button_icon_path_group_name" translatable="false">icon</string>
@@ -2167,6 +2172,13 @@
     <string description="Button text to indicate that the widget will ignore the user&apos;s selection [CHAR_LIMIT=16]" name="mtrl_timepicker_cancel">Cancel</string>
     <string description="Button text to indicate that the widget will save the user&apos;s selection [CHAR_LIMIT=16]" name="mtrl_timepicker_confirm">OK</string>
     <string name="network_error">Network error. Please check your connection.</string>
+    <string name="notification_channel_desc">Shows progress when generating posts</string>
+    <string name="notification_channel_name">Content Generation</string>
+    <string name="notification_complete_message">Your post has been generated!</string>
+    <string name="notification_complete_title">Post Ready</string>
+    <string name="notification_error_title">Generation Failed</string>
+    <string name="notification_generating_message">Creating your curated content…</string>
+    <string name="notification_generating_title">Generating Post</string>
     <string name="open_in_app">Open in Main App</string>
     <string name="original_post">Original Post</string>
     <string name="output_label">Generated Post</string>

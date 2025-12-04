@@ -17,6 +17,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.mycompany.oreamnos.services.GeminiService;
 import com.mycompany.oreamnos.services.WebContentExtractor;
+import com.mycompany.oreamnos.utils.NotificationHelper;
 import com.mycompany.oreamnos.utils.PreferencesManager;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,6 +38,7 @@ public class ShareReceiverActivity extends AppCompatActivity {
     private MaterialButton openMainAppButton;
 
     private PreferencesManager prefsManager;
+    private NotificationHelper notificationHelper;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -47,6 +49,7 @@ public class ShareReceiverActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // Initialize preferences
         prefsManager = new PreferencesManager(this);
+        notificationHelper = new NotificationHelper(this);
 
         // Apply saved theme before setContentView
         applyTheme(prefsManager.getTheme());
@@ -131,6 +134,11 @@ public class ShareReceiverActivity extends AppCompatActivity {
         showSkeleton(true);
         skeletonLoadingText.setText(R.string.processing);
 
+        // Show progress notification
+        notificationHelper.showProgressNotification(
+                getString(R.string.notification_generating_title),
+                getString(R.string.notification_generating_message));
+
         executor.execute(() -> {
             try {
                 String textToProcess = content;
@@ -168,6 +176,11 @@ public class ShareReceiverActivity extends AppCompatActivity {
                     outputText.setText(postWithHashtags);
                     resultCard.setVisibility(View.VISIBLE);
                     showSkeleton(false);
+
+                    // Show completion notification
+                    notificationHelper.showCompletedNotification(
+                            getString(R.string.notification_complete_title),
+                            getString(R.string.notification_complete_message));
                 });
 
             } catch (Exception e) {
@@ -177,6 +190,11 @@ public class ShareReceiverActivity extends AppCompatActivity {
                     Toast.makeText(ShareReceiverActivity.this,
                             getString(R.string.processing_error, errorMsg),
                             Toast.LENGTH_LONG).show();
+
+                    // Show error notification
+                    notificationHelper.showErrorNotification(
+                            getString(R.string.notification_error_title),
+                            errorMsg);
                 });
             }
         });

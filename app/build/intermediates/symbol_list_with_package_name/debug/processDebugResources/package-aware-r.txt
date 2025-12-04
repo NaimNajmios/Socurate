@@ -3303,7 +3303,6 @@ id embed
 id enableHashtagsSwitch
 id end
 id endToStart
-id endpointInput
 id enterAlways
 id enterAlwaysCollapsed
 id exitUntilCollapsed
@@ -3400,6 +3399,8 @@ id matrix
 id message
 id middle
 id mini
+id modelDropdown
+id modelDropdownLayout
 id month_grid
 id month_navigation_bar
 id month_navigation_fragment_toggle
@@ -3500,7 +3501,6 @@ id rectangles
 id refinementCard
 id regenerateButton
 id report_drawn
-id resetEndpointButton
 id resultCard
 id reverseSawtooth
 id right
@@ -3975,6 +3975,11 @@ string material_timepicker_minute
 string material_timepicker_pm
 string material_timepicker_select_time
 string material_timepicker_text_input_mode_description
+string model_2_0_flash
+string model_2_5_flash
+string model_2_5_flash_lite
+string model_2_5_pro
+string model_label
 string mtrl_badge_numberless_content_description
 string mtrl_checkbox_button_icon_path_checked
 string mtrl_checkbox_button_icon_path_group_name
@@ -4038,6 +4043,13 @@ string mtrl_switch_track_path
 string mtrl_timepicker_cancel
 string mtrl_timepicker_confirm
 string network_error
+string notification_channel_desc
+string notification_channel_name
+string notification_complete_message
+string notification_complete_title
+string notification_error_title
+string notification_generating_message
+string notification_generating_title
 string open_in_app
 string original_post
 string output_label

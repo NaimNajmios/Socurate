@@ -389,35 +389,34 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/model_label"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="12dp" />
+
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/modelDropdownLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/api_endpoint_label"
-                        app:boxBackgroundMode="none"
-                        app:hintTextColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginBottom="12dp">
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxStrokeColor="?attr/colorPrimary">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/endpointInput"
+                        <AutoCompleteTextView
+                            android:id="@+id/modelDropdown"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:inputType="none"
                             android:textColor="?attr/colorOnSurface"
-                            android:textSize="13sp"
-                            android:inputType="textUri"
-                            android:background="@null" />
+                            android:textSize="14sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/resetEndpointButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="38dp"
-                        android:text="@string/reset_to_default"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="12sp"
-                        android:backgroundTint="?attr/colorSurfaceVariant"
-                        app:cornerRadius="19dp"
-                        style="@style/Widget.Material3.Button.TextButton" />
 
                 </LinearLayout>
 

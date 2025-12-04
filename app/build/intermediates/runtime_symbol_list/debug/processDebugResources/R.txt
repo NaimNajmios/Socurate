@@ -3302,7 +3302,6 @@ int id embed 0x7f0800b9
 int id enableHashtagsSwitch 0x7f0800ba
 int id end 0x7f0800bb
 int id endToStart 0x7f0800bc
-int id endpointInput 0x7f0800bd
 int id enterAlways 0x7f0800be
 int id enterAlwaysCollapsed 0x7f0800bf
 int id exitUntilCollapsed 0x7f0800c0
@@ -3399,6 +3398,8 @@ int id matrix 0x7f08011a
 int id message 0x7f08011b
 int id middle 0x7f08011c
 int id mini 0x7f08011d
+int id modelDropdown 0x7f08021c
+int id modelDropdownLayout 0x7f08021d
 int id month_grid 0x7f08011e
 int id month_navigation_bar 0x7f08011f
 int id month_navigation_fragment_toggle 0x7f080120
@@ -3499,7 +3500,6 @@ int id rectangles 0x7f08017e
 int id refinementCard 0x7f08017f
 int id regenerateButton 0x7f080180
 int id report_drawn 0x7f080181
-int id resetEndpointButton 0x7f080182
 int id resultCard 0x7f080183
 int id reverseSawtooth 0x7f080184
 int id right 0x7f080185
@@ -3974,6 +3974,11 @@ int string material_timepicker_minute 0x7f100078
 int string material_timepicker_pm 0x7f100079
 int string material_timepicker_select_time 0x7f10007a
 int string material_timepicker_text_input_mode_description 0x7f10007b
+int string model_2_0_flash 0x7f1000ef
+int string model_2_5_flash 0x7f1000f0
+int string model_2_5_flash_lite 0x7f1000f1
+int string model_2_5_pro 0x7f1000f2
+int string model_label 0x7f1000f3
 int string mtrl_badge_numberless_content_description 0x7f10007c
 int string mtrl_checkbox_button_icon_path_checked 0x7f10007d
 int string mtrl_checkbox_button_icon_path_group_name 0x7f10007e
@@ -4037,6 +4042,13 @@ int string mtrl_switch_track_path 0x7f1000b7
 int string mtrl_timepicker_cancel 0x7f1000b8
 int string mtrl_timepicker_confirm 0x7f1000b9
 int string network_error 0x7f1000ba
+int string notification_channel_desc 0x7f1000f4
+int string notification_channel_name 0x7f1000f5
+int string notification_complete_message 0x7f1000f6
+int string notification_complete_title 0x7f1000f7
+int string notification_error_title 0x7f1000f8
+int string notification_generating_message 0x7f1000f9
+int string notification_generating_title 0x7f1000fa
 int string open_in_app 0x7f1000bb
 int string original_post 0x7f1000bc
 int string output_label 0x7f1000bd

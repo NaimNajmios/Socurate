@@ -30,6 +30,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.textfield.TextInputEditText;
 import com.mycompany.oreamnos.services.GeminiService;
 import com.mycompany.oreamnos.services.WebContentExtractor;
+import com.mycompany.oreamnos.utils.NotificationHelper;
 import com.mycompany.oreamnos.utils.PreferencesManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton regenerateButton;
 
     private PreferencesManager prefsManager;
+    private NotificationHelper notificationHelper;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize preferences
         prefsManager = new PreferencesManager(this);
+        notificationHelper = new NotificationHelper(this);
 
         // Apply saved theme before setContentView
         applyTheme(prefsManager.getTheme());
@@ -328,6 +331,11 @@ public class MainActivity extends AppCompatActivity {
         hidePlaceholder();
         showSkeletonLoading(true);
 
+        // Show progress notification
+        notificationHelper.showProgressNotification(
+                getString(R.string.notification_generating_title),
+                getString(R.string.notification_generating_message));
+
         // Process in background
         String finalInput = input;
         originalInputText = input; // Store for potential regeneration
@@ -387,6 +395,11 @@ public class MainActivity extends AppCompatActivity {
                     // Show refinement section after successful generation
                     refinementCard.setVisibility(View.VISIBLE);
                     clearRefinementCheckboxes();
+
+                    // Show completion notification
+                    notificationHelper.showCompletedNotification(
+                            getString(R.string.notification_complete_title),
+                            getString(R.string.notification_complete_message));
                 });
 
             } catch (Exception e) {
@@ -398,6 +411,11 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this,
                             getString(R.string.processing_error, errorMsg),
                             Toast.LENGTH_LONG).show();
+
+                    // Show error notification
+                    notificationHelper.showErrorNotification(
+                            getString(R.string.notification_error_title),
+                            errorMsg);
                 });
             }
         });
@@ -571,6 +589,11 @@ public class MainActivity extends AppCompatActivity {
         outputCard.setVisibility(View.GONE);
         refinementCard.setVisibility(View.GONE);
 
+        // Show progress notification
+        notificationHelper.showProgressNotification(
+                getString(R.string.notification_generating_title),
+                getString(R.string.notification_generating_message));
+
         // Regenerate in background
         executor.execute(() -> {
             try {
@@ -610,6 +633,11 @@ public class MainActivity extends AppCompatActivity {
                     // Show refinement section again
                     refinementCard.setVisibility(View.VISIBLE);
                     clearRefinementCheckboxes();
+
+                    // Show completion notification
+                    notificationHelper.showCompletedNotification(
+                            getString(R.string.notification_complete_title),
+                            getString(R.string.notification_complete_message));
                 });
 
             } catch (Exception e) {
@@ -622,6 +650,11 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this,
                             "Refinement error: " + errorMsg,
                             Toast.LENGTH_LONG).show();
+
+                    // Show error notification
+                    notificationHelper.showErrorNotification(
+                            getString(R.string.notification_error_title),
+                            errorMsg);
                 });
             }
         });
