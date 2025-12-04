@@ -11,6 +11,19 @@ A sleek, modern Android application that transforms global football news into po
 - **Material Design 3**: Cards, pill-shaped buttons, and modern typography
 - **Glassy Effects**: Subtle translucency for a premium feel
 
+### 🔔 Progress Notifications
+- **Real-time Status**: Shows notification with progress bar during content generation
+- **Completion Alert**: Updates notification when post is ready
+- **Auto-dismiss**: Notifications clear automatically after a few seconds
+
+### 🤖 AI Model Selection
+- **Multiple Models**: Choose from available Gemini models in Settings:
+  - Gemini 2.5 Flash Lite (fastest)
+  - Gemini 2.5 Flash
+  - Gemini 2.5 Pro (highest quality)
+  - Gemini 2.0 Flash (default)
+- **Easy Switching**: Simple dropdown in Settings to change models
+
 ### 🔍 Source Citation
 - **Automatic Attribution**: AI detects and includes source information in generated posts
 - **Toggle Control**: Enable/disable source citation in settings
@@ -23,6 +36,7 @@ A sleek, modern Android application that transforms global football news into po
   - **Recheck Wording**: Enhance word choice and clarity
   - **Make Formal**: Adjust tone for official communication
   - **Make Conversational**: Shift tone for fan engagement
+  - **Shorten But Detailed**: Make more concise while keeping all important details
 - **One-Click Regeneration**: Apply selected refinements instantly
 
 ## 🎯 Core Features
@@ -77,8 +91,8 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 2. Tap the settings icon (⚙️) in the toolbar
 3. **API Configuration**:
    - Enter your Gemini API key
+   - Select AI Model from dropdown (Gemini 2.5 Flash Lite, Flash, Pro, or 2.0 Flash)
    - (Optional) Test the connection
-   - (Optional) Reset to default endpoint
 4. **Post Settings**:
    - Choose tone: Formal or Casual
    - Enable/disable source citation
@@ -125,6 +139,7 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
    - **Recheck Wording**: Enhance vocabulary and phrasing
    - **Make Formal**: Elevate tone for professional contexts
    - **Make Conversational**: Relax tone for fan communities
+   - **Shorten But Detailed**: Make concise while keeping key information
 3. Tap "Regenerate" to apply improvements
 4. Refinement checkboxes auto-clear after each regeneration
 5. Repeat as needed for perfect results
@@ -193,6 +208,7 @@ app/src/main/
 │   │   ├── GeminiService.java            # AI API integration with retry logic
 │   │   └── WebContentExtractor.java      # URL content extraction
 │   └── utils/
+│       ├── NotificationHelper.java       # Progress notifications
 │       └── PreferencesManager.java       # Secure settings storage
 ├── res/
 │   ├── anim/                             # Animations (fade, slide)
@@ -265,7 +281,11 @@ Change this in Settings → Post Settings → Tone
 
 ### Advanced Configuration
 
-For advanced users, you can customize the API endpoint in Settings → Advanced Settings → API Endpoint. Default uses Gemini 2.0 Flash model.
+In Settings → Advanced Settings → AI Model, select from available Gemini models:
+- **Gemini 2.5 Flash Lite**: Fastest response times
+- **Gemini 2.5 Flash**: Balanced speed and quality
+- **Gemini 2.5 Pro**: Highest quality outputs
+- **Gemini 2.0 Flash**: Default, reliable performance
 
 ## 🔒 Privacy & Security
 

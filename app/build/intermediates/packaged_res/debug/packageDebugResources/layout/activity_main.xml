@@ -530,7 +530,7 @@
                         android:id="@+id/regenerateButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
+                        android:layout_gravity="start"
                         android:text="@string/regenerate_button"
                         app:icon="@android:drawable/ic_menu_rotate"
                         style="@style/Widget.Material3.Button" />
