@@ -3232,6 +3232,7 @@ id checkFormal
 id checkRecheckFlow
 id checkRecheckWording
 id checkRephrase
+id checkShortenDetailed
 id checkbox
 id checked
 id chronometer
@@ -3468,8 +3469,8 @@ id open_search_view_toolbar
 id open_search_view_toolbar_container
 id outline
 id outputCard
+id outputScrollView
 id outputText
-id outputTextLayout
 id outward
 id overshoot
 id packed
@@ -4057,6 +4058,7 @@ string refine_recheck_flow
 string refine_recheck_wording
 string refine_rephrase
 string refine_section
+string refine_shorten_detailed
 string regenerate_button
 string reset_to_default
 string restore_original

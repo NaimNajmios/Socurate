@@ -62,6 +62,7 @@
     <string name="refine_recheck_wording">Recheck Wording</string>
     <string name="refine_formal">Formal</string>
     <string name="refine_conversational">Conversational</string>
+    <string name="refine_shorten_detailed">Shorten But Detailed</string>
     <string name="regenerate_button">Regenerate</string>
     
     <!-- Source citation -->

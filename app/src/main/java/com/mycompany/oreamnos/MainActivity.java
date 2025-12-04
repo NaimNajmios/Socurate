@@ -1,7 +1,6 @@
 package com.mycompany.oreamnos;
 
 import android.animation.ObjectAnimator;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -69,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialCheckBox checkRecheckWording;
     private MaterialCheckBox checkFormal;
     private MaterialCheckBox checkConversational;
+    private MaterialCheckBox checkShortenDetailed;
     private MaterialButton regenerateButton;
 
     private PreferencesManager prefsManager;
@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         checkRecheckWording = findViewById(R.id.checkRecheckWording);
         checkFormal = findViewById(R.id.checkFormal);
         checkConversational = findViewById(R.id.checkConversational);
+        checkShortenDetailed = findViewById(R.id.checkShortenDetailed);
         regenerateButton = findViewById(R.id.regenerateButton);
 
         // Setup button listeners
@@ -241,8 +242,6 @@ public class MainActivity extends AppCompatActivity {
             outputText.setFocusableInTouchMode(false);
             editButton.setText(R.string.edit_button);
             editButton.setIconResource(android.R.drawable.ic_menu_edit);
-            // Re-enable scrolling in view mode
-            outputText.setMovementMethod(new ScrollingMovementMethod());
 
             // Save edited version
             if (outputText.getText() != null) {
@@ -411,8 +410,6 @@ public class MainActivity extends AppCompatActivity {
         outputText.setText(text);
         outputText.setFocusable(false);
         outputText.setFocusableInTouchMode(false);
-        // Enable scrolling in view mode
-        outputText.setMovementMethod(new ScrollingMovementMethod());
     }
 
     /**
@@ -558,6 +555,8 @@ public class MainActivity extends AppCompatActivity {
             refinements.add("formal");
         if (checkConversational.isChecked())
             refinements.add("conversational");
+        if (checkShortenDetailed.isChecked())
+            refinements.add("shorten_detailed");
 
         // Ensure at least one option is selected
         if (refinements.isEmpty()) {
@@ -637,6 +636,7 @@ public class MainActivity extends AppCompatActivity {
         checkRecheckWording.setChecked(false);
         checkFormal.setChecked(false);
         checkConversational.setChecked(false);
+        checkShortenDetailed.setChecked(false);
     }
 
     /**

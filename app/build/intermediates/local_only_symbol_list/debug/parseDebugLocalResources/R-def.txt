@@ -56,6 +56,7 @@ id checkFormal
 id checkRecheckFlow
 id checkRecheckWording
 id checkRephrase
+id checkShortenDetailed
 id clearInputButton
 id copyButton
 id editButton
@@ -69,8 +70,8 @@ id includeSourceCheckbox
 id inputText
 id openMainAppButton
 id outputCard
+id outputScrollView
 id outputText
-id outputTextLayout
 id placeholderView
 id previewCard
 id progressOverlay
@@ -154,6 +155,7 @@ string refine_recheck_flow
 string refine_recheck_wording
 string refine_rephrase
 string refine_section
+string refine_shorten_detailed
 string regenerate_button
 string reset_to_default
 string restore_original

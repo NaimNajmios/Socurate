@@ -208,7 +208,7 @@ public class PreferencesManager {
 
     /**
      * Formats hashtags for appending to posts.
-     * Ensures each hashtag starts with # and is space-separated.
+     * Ensures each hashtag starts with # and is on its own line.
      * 
      * @return Formatted hashtags ready to append
      */
@@ -218,21 +218,24 @@ public class PreferencesManager {
             return "";
         }
 
-        // Clean and format hashtags
+        // Clean and format hashtags - each on its own line
         String[] tags = hashtags.split("[,\\s]+");
         StringBuilder formatted = new StringBuilder();
 
         for (String tag : tags) {
             tag = tag.trim();
             if (!tag.isEmpty()) {
+                if (formatted.length() > 0) {
+                    formatted.append("\n");
+                }
                 if (!tag.startsWith("#")) {
                     formatted.append("#");
                 }
-                formatted.append(tag).append(" ");
+                formatted.append(tag);
             }
         }
 
-        return formatted.toString().trim();
+        return formatted.toString();
     }
 
     /**

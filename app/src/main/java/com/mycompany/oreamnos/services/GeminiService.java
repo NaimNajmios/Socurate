@@ -426,6 +426,10 @@ public class GeminiService {
                     prompt.append(
                             "- Make it more Conversational: Use engaging, conversational tone suitable for fan communities\n");
                     break;
+                case "shorten_detailed":
+                    prompt.append(
+                            "- Shorten But Detailed: Make the post more concise while retaining all important details, facts, and key information. Remove redundant or filler words but keep the substance.\n");
+                    break;
             }
         }
 
