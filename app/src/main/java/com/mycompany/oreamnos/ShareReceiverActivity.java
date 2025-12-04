@@ -1,6 +1,7 @@
 package com.mycompany.oreamnos;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -44,10 +45,13 @@ public class ShareReceiverActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_share_receiver);
-
         // Initialize preferences
         prefsManager = new PreferencesManager(this);
+
+        // Apply saved theme before setContentView
+        applyTheme(prefsManager.getTheme());
+
+        setContentView(R.layout.activity_share_receiver);
 
         // Setup toolbar
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
@@ -150,8 +154,17 @@ public class ShareReceiverActivity extends AppCompatActivity {
                 // Update UI on main thread
                 String finalResult = result;
                 mainHandler.post(() -> {
-                    lastGeneratedPost = finalResult;
-                    outputText.setText(finalResult);
+                    // Add hashtags if enabled
+                    String postWithHashtags = finalResult;
+                    if (prefsManager.areHashtagsEnabled()) {
+                        String hashtags = prefsManager.getFormattedHashtags();
+                        if (!hashtags.isEmpty()) {
+                            postWithHashtags = finalResult + "\n\n" + hashtags;
+                        }
+                    }
+
+                    lastGeneratedPost = postWithHashtags;
+                    outputText.setText(postWithHashtags);
                     resultCard.setVisibility(View.VISIBLE);
                     showProgress(false);
                 });
@@ -202,6 +215,26 @@ public class ShareReceiverActivity extends AppCompatActivity {
      */
     private void showProgress(boolean show) {
         progressOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Applies the selected theme.
+     */
+    private void applyTheme(String theme) {
+        int mode;
+        switch (theme) {
+            case PreferencesManager.THEME_LIGHT:
+                mode = AppCompatDelegate.MODE_NIGHT_NO;
+                break;
+            case PreferencesManager.THEME_DARK:
+                mode = AppCompatDelegate.MODE_NIGHT_YES;
+                break;
+            case PreferencesManager.THEME_SYSTEM:
+            default:
+                mode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                break;
+        }
+        AppCompatDelegate.setDefaultNightMode(mode);
     }
 
     @Override
