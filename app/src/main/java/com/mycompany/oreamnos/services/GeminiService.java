@@ -11,6 +11,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -260,6 +261,127 @@ public class GeminiService {
             Log.e(TAG, "[" + requestId + "] Error parsing response", e);
             return "Gagal mendapatkan hasil dari Gemini.";
         }
+    }
+
+    /**
+     * Refines an existing post based on selected refinement options.
+     * 
+     * @param originalPost The post to refine
+     * @param refinements  List of refinement options
+     * @return The refined post
+     * @throws Exception if API call fails
+     */
+    public String refinePost(String originalPost, List<String> refinements) throws Exception {
+        long startTime = System.currentTimeMillis();
+        String requestId = UUID.randomUUID().toString().substring(0, 8);
+
+        Log.i(TAG, "=== GEMINI REFINEMENT START [" + requestId + "] ===");
+        Log.i(TAG, "[" + requestId + "] Refinements: " + refinements);
+
+        // Build refinement prompt
+        String prompt = buildRefinementPrompt(originalPost, refinements);
+
+        // Build request JSON
+        JsonObject requestJson = new JsonObject();
+        JsonArray contents = new JsonArray();
+        JsonObject content = new JsonObject();
+        JsonArray parts = new JsonArray();
+        JsonObject part = new JsonObject();
+        part.addProperty("text", prompt);
+        parts.add(part);
+        content.add("parts", parts);
+        contents.add(content);
+        requestJson.add("contents", contents);
+
+        String requestBodyString = gson.toJson(requestJson);
+
+        // Make API call (simplified - using only 1 retry for refinement)
+        String rawResult = null;
+        try {
+            String urlWithKey = endpoint + "?key=" + apiKey;
+            RequestBody body = RequestBody.create(requestBodyString, JSON);
+            Request request = new Request.Builder()
+                    .url(urlWithKey)
+                    .post(body)
+                    .addHeader("Content-Type", "application/json")
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            int code = response.code();
+
+            if (code >= 400) {
+                String errorBody = response.body() != null ? response.body().string() : "";
+                response.close();
+                throw new Exception("Gemini API error: " + code + ". " + errorBody);
+            }
+
+            rawResult = response.body().string();
+            response.close();
+        } catch (IOException ioe) {
+            throw new Exception("Network error: " + ioe.getMessage(), ioe);
+        }
+
+        // Parse response
+        try {
+            JsonObject root = gson.fromJson(rawResult, JsonObject.class);
+            String refinedText = extractTextFromJson(root);
+
+            if (refinedText == null || refinedText.trim().isEmpty()) {
+                refinedText = "Gagal mendapatkan hasil dari Gemini.";
+            } else {
+                refinedText = cleanUpResponse(refinedText);
+            }
+
+            long totalTime = System.currentTimeMillis() - startTime;
+            Log.i(TAG, "[" + requestId + "] Refinement success! (time: " + totalTime + "ms)");
+            Log.i(TAG, "=== GEMINI REFINEMENT END [" + requestId + "] ===");
+
+            return refinedText;
+        } catch (Exception e) {
+            Log.e(TAG, "[" + requestId + "] Error parsing refinement response", e);
+            return "Gagal mendapatkan hasil dari Gemini.";
+        }
+    }
+
+    /**
+     * Builds a refinement prompt based on selected options.
+     */
+    private String buildRefinementPrompt(String originalPost, List<String> refinements) {
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("You are refining a Malaysian Malay (Bahasa Malaysia) social media post about football. ");
+        prompt.append("Apply the following improvements to the post:\n\n");
+
+        for (String refinement : refinements) {
+            switch (refinement) {
+                case "rephrase":
+                    prompt.append(
+                            "- Rephrase: Rewrite the post with different wording while maintaining the same meaning and facts\n");
+                    break;
+                case "recheck_flow":
+                    prompt.append("- Recheck Flow: Improve the logical flow and structure of ideas\n");
+                    break;
+                case "recheck_wording":
+                    prompt.append("- Recheck Wording: Improve word choice and phrasing for better clarity\n");
+                    break;
+                case "formal":
+                    prompt.append(
+                            "- Make it more Formal: Use formal language suitable for official club communication\n");
+                    break;
+                case "conversational":
+                    prompt.append(
+                            "- Make it more Conversational: Use engaging, conversational tone suitable for fan communities\n");
+                    break;
+            }
+        }
+
+        prompt.append("\nORIGINAL POST:\n---\n");
+        prompt.append(originalPost);
+        prompt.append("\n---\n\n");
+        prompt.append("Provide ONLY the refined Bahasa Malaysia post. ");
+        prompt.append("Maintain the same length and structure. ");
+        prompt.append("Do NOT include any hashtags or explanations.");
+
+        return prompt.toString();
     }
 
     /**

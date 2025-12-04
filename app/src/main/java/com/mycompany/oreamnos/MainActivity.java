@@ -32,6 +32,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.mycompany.oreamnos.services.GeminiService;
 import com.mycompany.oreamnos.services.WebContentExtractor;
 import com.mycompany.oreamnos.utils.PreferencesManager;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,11 +61,21 @@ public class MainActivity extends AppCompatActivity {
     private MaterialCheckBox includeHashtagsCheckbox;
     private ExtendedFloatingActionButton generateFab;
 
+    // Refinement UI
+    private MaterialCardView refinementCard;
+    private MaterialCheckBox checkRephrase;
+    private MaterialCheckBox checkRecheckFlow;
+    private MaterialCheckBox checkRecheckWording;
+    private MaterialCheckBox checkFormal;
+    private MaterialCheckBox checkConversational;
+    private MaterialButton regenerateButton;
+
     private PreferencesManager prefsManager;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private String originalGeneratedPost = "";
+    private String originalInputText = "";
     private boolean isEditMode = false;
 
     @Override
@@ -99,6 +111,15 @@ public class MainActivity extends AppCompatActivity {
         includeHashtagsCheckbox = findViewById(R.id.includeHashtagsCheckbox);
         generateFab = findViewById(R.id.generateFab);
 
+        // Refinement UI
+        refinementCard = findViewById(R.id.refinementCard);
+        checkRephrase = findViewById(R.id.checkRephrase);
+        checkRecheckFlow = findViewById(R.id.checkRecheckFlow);
+        checkRecheckWording = findViewById(R.id.checkRecheckWording);
+        checkFormal = findViewById(R.id.checkFormal);
+        checkConversational = findViewById(R.id.checkConversational);
+        regenerateButton = findViewById(R.id.regenerateButton);
+
         // Setup button listeners
         generateFab.setOnClickListener(v -> {
             // Add scale animation to FAB
@@ -114,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
         copyButton.setOnClickListener(v -> onCopyClick());
         shareButton.setOnClickListener(v -> onShareClick());
         clearInputButton.setOnClickListener(v -> onClearInputClick());
+        regenerateButton.setOnClickListener(v -> onRegenerateClick());
 
         // Load hashtags enabled state
         includeHashtagsCheckbox.setChecked(prefsManager.areHashtagsEnabled());
@@ -224,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Process in background
         String finalInput = input;
+        originalInputText = input; // Store for potential regeneration
         executor.execute(() -> {
             try {
                 String content = finalInput;
@@ -261,6 +284,10 @@ public class MainActivity extends AppCompatActivity {
                     editButton.setText(R.string.edit_button);
                     editButton.setIconResource(android.R.drawable.ic_menu_edit);
                     editedIndicator.setVisibility(View.GONE);
+
+                    // Show refinement section after successful generation
+                    refinementCard.setVisibility(View.VISIBLE);
+                    clearRefinementCheckboxes();
                 });
 
             } catch (Exception e) {
@@ -411,6 +438,91 @@ public class MainActivity extends AppCompatActivity {
         outputCard.setVisibility(View.VISIBLE);
         Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
         outputCard.startAnimation(slideUp);
+    }
+
+    /**
+     * Handles the Regenerate button click.
+     * Collects selected refinement options and regenerates the draft.
+     */
+    private void onRegenerateClick() {
+        List<String> refinements = new ArrayList<>();
+
+        // Collect selected refinement options
+        if (checkRephrase.isChecked())
+            refinements.add("rephrase");
+        if (checkRecheckFlow.isChecked())
+            refinements.add("recheck_flow");
+        if (checkRecheckWording.isChecked())
+            refinements.add("recheck_wording");
+        if (checkFormal.isChecked())
+            refinements.add("formal");
+        if (checkConversational.isChecked())
+            refinements.add("conversational");
+
+        // Ensure at least one option is selected
+        if (refinements.isEmpty()) {
+            Toast.makeText(this, "Please select at least one refinement option", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.i(TAG, "Regenerating with refinements: " + refinements);
+
+        // Show skeleton loading
+        showSkeletonLoading(true);
+        outputCard.setVisibility(View.GONE);
+        refinementCard.setVisibility(View.GONE);
+
+        // Regenerate in background
+        executor.execute(() -> {
+            try {
+                String apiKey = prefsManager.getApiKey();
+                String endpoint = prefsManager.getApiEndpoint();
+                String tone = prefsManager.getTone();
+
+                GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
+                String refinedPost = gemini.refinePost(originalGeneratedPost, refinements);
+
+                // Update UI on main thread
+                mainHandler.post(() -> {
+                    Log.i(TAG, "Post refinement SUCCESSFUL");
+                    originalGeneratedPost = refinedPost;
+                    setOutputText(refinedPost);
+                    showSkeletonLoading(false);
+                    showOutputCard();
+                    isEditMode = false;
+                    editButton.setText(R.string.edit_button);
+                    editButton.setIconResource(android.R.drawable.ic_menu_edit);
+                    editedIndicator.setVisibility(View.GONE);
+
+                    // Show refinement section again
+                    refinementCard.setVisibility(View.VISIBLE);
+                    clearRefinementCheckboxes();
+                });
+
+            } catch (Exception e) {
+                Log.e(TAG, "Post refinement FAILED: " + e.getMessage(), e);
+                mainHandler.post(() -> {
+                    showSkeletonLoading(false);
+                    outputCard.setVisibility(View.VISIBLE);
+                    refinementCard.setVisibility(View.VISIBLE);
+                    String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown error";
+                    Toast.makeText(MainActivity.this,
+                            "Refinement error: " + errorMsg,
+                            Toast.LENGTH_LONG).show();
+                });
+            }
+        });
+    }
+
+    /**
+     * Clears all refinement checkboxes.
+     */
+    private void clearRefinementCheckboxes() {
+        checkRephrase.setChecked(false);
+        checkRecheckFlow.setChecked(false);
+        checkRecheckWording.setChecked(false);
+        checkFormal.setChecked(false);
+        checkConversational.setChecked(false);
     }
 
     /**
