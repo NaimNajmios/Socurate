@@ -3227,6 +3227,11 @@ id center_vertical
 id chain
 id chain2
 id chains
+id checkConversational
+id checkFormal
+id checkRecheckFlow
+id checkRecheckWording
+id checkRephrase
 id checkbox
 id checked
 id chronometer
@@ -3490,6 +3495,8 @@ id progress_horizontal
 id radio
 id ratio
 id rectangles
+id refinementCard
+id regenerateButton
 id report_drawn
 id resetEndpointButton
 id resultCard
@@ -4041,6 +4048,13 @@ string placeholder_title
 string powered_by
 string processing
 string processing_error
+string refine_conversational
+string refine_formal
+string refine_recheck_flow
+string refine_recheck_wording
+string refine_rephrase
+string refine_section
+string regenerate_button
 string reset_to_default
 string restore_original
 string save_edit

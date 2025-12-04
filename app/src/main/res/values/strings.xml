@@ -55,6 +55,15 @@
     <string name="theme_dark">Always Dark</string>
     <string name="theme_section">Appearance</string>
     
+    <!-- Refinement options -->
+    <string name="refine_section">Refine Draft</string>
+    <string name="refine_rephrase">Rephrase</string>
+    <string name="refine_recheck_flow">Recheck Flow</string>
+    <string name="refine_recheck_wording">Recheck Wording</string>
+    <string name="refine_formal">Formal</string>
+    <string name="refine_conversational">Conversational</string>
+    <string name="regenerate_button">Regenerate</string>
+    
     <!-- Dialog Titles -->
     <string name="error_title">Error</string>
     <string name="success_title">Success</string>
