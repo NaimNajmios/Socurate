@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/pure_black"
+    android:background="?android:attr/colorBackground"
     tools:context=".SettingsActivity">
 
     <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/pure_black"
+        android:background="?android:attr/colorBackground"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -19,9 +19,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="@string/settings"
-            app:titleTextColor="@color/text_primary"
+            app:titleTextColor="?attr/colorOnSurface"
             app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
-            app:navigationIconTint="@color/text_primary" />
+            app:navigationIconTint="?attr/colorOnSurface" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="API KEY"
-                android:textColor="@color/text_tertiary"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.1"
@@ -52,10 +52,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/dark_surface"
+                app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="16dp"
-                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeColor="?attr/colorOutline"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -70,15 +70,15 @@
                         android:hint="@string/api_key_label"
                         app:boxBackgroundMode="none"
                         app:endIconMode="password_toggle"
-                        app:endIconTint="@color/neon_green"
-                        app:hintTextColor="@color/text_secondary"
+                        app:endIconTint="?attr/colorPrimary"
+                        app:hintTextColor="?attr/colorOnSurfaceVariant"
                         android:layout_marginBottom="16dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/apiKeyInput"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/text_primary"
+                            android:textColor="?attr/colorOnSurface"
                             android:inputType="textPassword"
                             android:background="@null" />
 
@@ -89,11 +89,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="42dp"
                         android:text="@string/test_connection"
-                        android:textColor="@color/neon_green"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="13sp"
-                        android:backgroundTint="@color/dark_surface_variant"
+                        android:backgroundTint="?attr/colorSurfaceVariant"
                         app:cornerRadius="21dp"
-                        app:strokeColor="@color/neon_green"
+                        app:strokeColor="?attr/colorPrimary"
                         app:strokeWidth="1dp"
                         style="@style/Widget.Material3.Button.OutlinedButton" />
 
@@ -106,7 +106,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="POST CUSTOMIZATION"
-                android:textColor="@color/text_tertiary"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.1"
@@ -116,10 +116,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/dark_surface"
+                app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="16dp"
-                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeColor="?attr/colorOutline"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -140,7 +140,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/tone_label"
-                            android:textColor="@color/text_primary"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="15sp" />
 
                         <RadioGroup
@@ -154,9 +154,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Formal"
-                                android:textColor="@color/text_secondary"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="13sp"
-                                app:buttonTint="@color/neon_green"
+                                app:buttonTint="?attr/colorPrimary"
                                 android:checked="true"
                                 android:layout_marginEnd="8dp" />
 
@@ -165,9 +165,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Casual"
-                                android:textColor="@color/text_secondary"
+                                android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="13sp"
-                                app:buttonTint="@color/neon_green" />
+                                app:buttonTint="?attr/colorPrimary" />
 
                         </RadioGroup>
 
@@ -177,7 +177,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/divider" />
+                        android:background="?attr/colorOutline" />
 
                     <!-- Default Hashtags -->
                     <LinearLayout
@@ -198,7 +198,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="@string/hashtags_label"
-                                android:textColor="@color/text_primary"
+                                android:textColor="?attr/colorOnSurface"
                                 android:textSize="15sp" />
 
                             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -206,9 +206,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checked="true"
-                                app:thumbTint="@color/pure_black"
-                                app:trackTint="@color/neon_green"
-                                app:trackDecorationTint="@color/dark_surface_variant" />
+                                app:thumbTint="?android:attr/colorBackground"
+                                app:trackTint="?attr/colorPrimary"
+                                app:trackDecorationTint="?attr/colorSurfaceVariant" />
 
                         </LinearLayout>
 
@@ -217,13 +217,13 @@
                             android:layout_height="wrap_content"
                             android:hint="@string/hashtags_hint"
                             app:boxBackgroundMode="none"
-                            app:hintTextColor="@color/text_tertiary">
+                            app:hintTextColor="?attr/colorOnSurfaceVariant">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/hashtagsInput"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/neon_green"
+                                android:textColor="?attr/colorPrimary"
                                 android:textSize="14sp"
                                 android:inputType="text"
                                 android:text="#BolaSepak #Football"
@@ -242,7 +242,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/advanced_settings"
-                android:textColor="@color/text_tertiary"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.1"
@@ -253,10 +253,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/dark_surface"
+                app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="16dp"
-                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeColor="?attr/colorOutline"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -270,14 +270,14 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/api_endpoint_label"
                         app:boxBackgroundMode="none"
-                        app:hintTextColor="@color/text_secondary"
+                        app:hintTextColor="?attr/colorOnSurfaceVariant"
                         android:layout_marginBottom="12dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/endpointInput"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/text_primary"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="13sp"
                             android:inputType="textUri"
                             android:background="@null" />
@@ -289,9 +289,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="38dp"
                         android:text="@string/reset_to_default"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp"
-                        android:backgroundTint="@color/dark_surface_variant"
+                        android:backgroundTint="?attr/colorSurfaceVariant"
                         app:cornerRadius="19dp"
                         style="@style/Widget.Material3.Button.TextButton" />
 
@@ -304,7 +304,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="GENERAL"
-                android:textColor="@color/text_tertiary"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.1"
@@ -314,10 +314,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="32dp"
-                app:cardBackgroundColor="@color/dark_surface"
+                app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="16dp"
-                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeColor="?attr/colorOutline"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -330,7 +330,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/app_description"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="13sp"
                         android:layout_marginBottom="8dp" />
 
@@ -338,7 +338,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/powered_by"
-                        android:textColor="@color/text_tertiary"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp"
                         android:layout_marginBottom="16dp" />
 
@@ -346,7 +346,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="App Version 1.0.0"
-                        android:textColor="@color/text_tertiary"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -365,10 +365,10 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="20dp"
         android:text="@string/save_settings"
-        android:textColor="@color/pure_black"
+        android:textColor="?android:attr/colorBackground"
         android:textStyle="bold"
-        app:backgroundTint="@color/neon_green"
+        app:backgroundTint="?attr/colorPrimary"
         app:icon="@android:drawable/ic_menu_save"
-        app:iconTint="@color/pure_black" />
+        app:iconTint="?android:attr/colorBackground" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
