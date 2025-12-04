@@ -1,5 +1,8 @@
 R_DEF: Internal format may change without notice
 local
+anim fade_in
+anim fade_out
+anim slide_up
 color dark_surface
 color dark_surface_variant
 color destructive_red
@@ -42,10 +45,14 @@ color warning_orange
 drawable dark_card_bg
 drawable ic_document
 drawable ic_sparkle
+drawable ic_stadium
 drawable pill_button_dark
 drawable pill_button_green
+drawable skeleton_item
+drawable skeleton_shimmer
 id action_settings
 id apiKeyInput
+id clearInputButton
 id copyButton
 id editButton
 id editedIndicator
@@ -59,6 +66,7 @@ id openMainAppButton
 id outputCard
 id outputText
 id outputTextLayout
+id placeholderView
 id previewCard
 id progressOverlay
 id progressText
@@ -67,6 +75,7 @@ id resultCard
 id saveFab
 id shareButton
 id sharedText
+id skeletonCard
 id testConnectionButton
 id toneCasual
 id toneFormal
@@ -90,6 +99,7 @@ string app_description
 string app_name
 string app_version
 string cancel_edit
+string clear_input
 string connection_test_failed
 string connection_test_success
 string content_description_copy_icon
@@ -110,6 +120,7 @@ string hashtags_hint
 string hashtags_label
 string hashtags_section
 string include_hashtags
+string input_cleared
 string input_hint
 string input_required
 string invalid_url
@@ -118,6 +129,8 @@ string open_in_app
 string original_post
 string output_label
 string output_placeholder
+string placeholder_subtitle
+string placeholder_title
 string powered_by
 string processing
 string processing_error

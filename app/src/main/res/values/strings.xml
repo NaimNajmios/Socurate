@@ -75,6 +75,14 @@
     <string name="original_post">Original Post</string>
     <string name="generated_draft">Generated Draft</string>
     
+    <!-- Reset and Clear -->
+    <string name="clear_input">Clear input</string>
+    <string name="input_cleared">Input cleared</string>
+    
+    <!-- Placeholder -->
+    <string name="placeholder_title">Ready to curate. Paste a link to start.</string>
+    <string name="placeholder_subtitle">Share from your browser or paste a URL</string>
+    
     <!-- Accessibility -->
     <string name="content_description_settings_icon">Settings</string>
     <string name="content_description_copy_icon">Copy to clipboard</string>

@@ -1,0 +1,3 @@
+com.mycompany.oreamnos.test
+style WhiteBackgroundDialogTheme
+style WhiteBackgroundTheme

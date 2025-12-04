@@ -27,6 +27,8 @@ anim design_bottom_sheet_slide_in
 anim design_bottom_sheet_slide_out
 anim design_snackbar_in
 anim design_snackbar_out
+anim fade_in
+anim fade_out
 anim fragment_fast_out_extra_slow_in
 anim linear_indeterminate_line1_head_interpolator
 anim linear_indeterminate_line1_tail_interpolator
@@ -43,6 +45,7 @@ anim m3_side_sheet_exit_to_right
 anim mtrl_bottom_sheet_slide_in
 anim mtrl_bottom_sheet_slide_out
 anim mtrl_card_lowers_interpolator
+anim slide_up
 animator design_appbar_state_list_animator
 animator design_fab_hide_motion_spec
 animator design_fab_show_motion_spec
@@ -3033,6 +3036,7 @@ drawable ic_mtrl_chip_checked_circle
 drawable ic_mtrl_chip_close_circle
 drawable ic_search_black_24
 drawable ic_sparkle
+drawable ic_stadium
 drawable m3_avd_hide_password
 drawable m3_avd_show_password
 drawable m3_bottom_sheet_drag_handle
@@ -3106,6 +3110,8 @@ drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
 drawable pill_button_dark
 drawable pill_button_green
+drawable skeleton_item
+drawable skeleton_shimmer
 drawable test_level_drawable
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
@@ -3226,6 +3232,7 @@ id checkbox
 id checked
 id chronometer
 id circle_center
+id clearInputButton
 id clear_text
 id clip_horizontal
 id clip_vertical
@@ -3472,6 +3479,7 @@ id pathRelative
 id peekHeight
 id percent
 id pin
+id placeholderView
 id position
 id postLayout
 id pressed
@@ -3526,6 +3534,7 @@ id showCustom
 id showHome
 id showTitle
 id sin
+id skeletonCard
 id skipCollapsed
 id skipped
 id slide
@@ -3879,6 +3888,7 @@ string cancel_edit
 string character_counter_content_description
 string character_counter_overflowed_content_description
 string character_counter_pattern
+string clear_input
 string clear_text_end_icon_content_description
 string connection_test_failed
 string connection_test_success
@@ -3907,6 +3917,7 @@ string hashtags_section
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
 string include_hashtags
+string input_cleared
 string input_hint
 string input_required
 string invalid_url
@@ -4021,6 +4032,8 @@ string path_password_eye
 string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
+string placeholder_subtitle
+string placeholder_title
 string powered_by
 string processing
 string processing_error

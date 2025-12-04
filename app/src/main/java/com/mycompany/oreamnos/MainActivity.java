@@ -1,5 +1,7 @@
 package com.mycompany.oreamnos;
 
+import android.animation.ObjectAnimator;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +17,9 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -43,7 +48,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView editedIndicator;
     private TextView progressText;
     private MaterialCardView outputCard;
+    private MaterialCardView skeletonCard;
     private View progressOverlay;
+    private View placeholderView;
+    private ImageButton clearInputButton;
     private MaterialButton editButton;
     private MaterialButton copyButton;
     private MaterialButton shareButton;
@@ -75,8 +83,11 @@ public class MainActivity extends AppCompatActivity {
         outputText = findViewById(R.id.outputText);
         editedIndicator = findViewById(R.id.editedIndicator);
         outputCard = findViewById(R.id.outputCard);
+        skeletonCard = findViewById(R.id.skeletonCard);
+        placeholderView = findViewById(R.id.placeholderView);
         progressOverlay = findViewById(R.id.progressOverlay);
         progressText = findViewById(R.id.progressText);
+        clearInputButton = findViewById(R.id.clearInputButton);
         editButton = findViewById(R.id.editButton);
         copyButton = findViewById(R.id.copyButton);
         shareButton = findViewById(R.id.shareButton);
@@ -84,10 +95,20 @@ public class MainActivity extends AppCompatActivity {
         generateFab = findViewById(R.id.generateFab);
 
         // Setup button listeners
-        generateFab.setOnClickListener(v -> onGenerateClick());
+        generateFab.setOnClickListener(v -> {
+            // Add scale animation to FAB
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(v, "scaleX", 1f, 0.9f, 1f);
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(v, "scaleY", 1f, 0.9f, 1f);
+            scaleX.setDuration(150);
+            scaleY.setDuration(150);
+            scaleX.start();
+            scaleY.start();
+            onGenerateClick();
+        });
         editButton.setOnClickListener(v -> toggleEditMode());
         copyButton.setOnClickListener(v -> onCopyClick());
         shareButton.setOnClickListener(v -> onShareClick());
+        clearInputButton.setOnClickListener(v -> onClearInputClick());
 
         // Load hashtags enabled state
         includeHashtagsCheckbox.setChecked(prefsManager.areHashtagsEnabled());
@@ -152,12 +173,16 @@ public class MainActivity extends AppCompatActivity {
             outputText.requestFocus();
             editButton.setText(R.string.save_edit);
             editButton.setIconResource(android.R.drawable.ic_menu_save);
+            // Disable scrolling in edit mode to allow text selection
+            outputText.setMovementMethod(null);
         } else {
             // Disable editing
             outputText.setFocusable(false);
             outputText.setFocusableInTouchMode(false);
             editButton.setText(R.string.edit_button);
             editButton.setIconResource(android.R.drawable.ic_menu_edit);
+            // Re-enable scrolling in view mode
+            outputText.setMovementMethod(new ScrollingMovementMethod());
 
             // Save edited version
             if (outputText.getText() != null) {
@@ -188,9 +213,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Show progress
-        showProgress(true);
-        progressText.setText(R.string.processing);
+        // Hide placeholder and show skeleton loading
+        hidePlaceholder();
+        showSkeletonLoading(true);
 
         // Process in background
         String finalInput = input;
@@ -225,18 +250,19 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Generated post length: " + finalResult.length());
                     originalGeneratedPost = finalResult;
                     setOutputText(finalResult);
-                    outputCard.setVisibility(View.VISIBLE);
+                    showSkeletonLoading(false);
+                    showOutputCard();
                     isEditMode = false;
                     editButton.setText(R.string.edit_button);
                     editButton.setIconResource(android.R.drawable.ic_menu_edit);
                     editedIndicator.setVisibility(View.GONE);
-                    showProgress(false);
                 });
 
             } catch (Exception e) {
                 Log.e(TAG, "Post generation FAILED: " + e.getMessage(), e);
                 mainHandler.post(() -> {
-                    showProgress(false);
+                    showSkeletonLoading(false);
+                    showPlaceholder();
                     String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown error";
                     Toast.makeText(MainActivity.this,
                             getString(R.string.processing_error, errorMsg),
@@ -253,6 +279,8 @@ public class MainActivity extends AppCompatActivity {
         outputText.setText(text);
         outputText.setFocusable(false);
         outputText.setFocusableInTouchMode(false);
+        // Enable scrolling in view mode
+        outputText.setMovementMethod(new ScrollingMovementMethod());
     }
 
     /**
@@ -311,6 +339,73 @@ public class MainActivity extends AppCompatActivity {
      */
     private void showProgress(boolean show) {
         progressOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Clears the input text field.
+     */
+    private void onClearInputClick() {
+        if (inputText.getText() != null && !inputText.getText().toString().isEmpty()) {
+            inputText.setText("");
+            Toast.makeText(this, R.string.input_cleared, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Shows or hides the skeleton loading animation.
+     */
+    private void showSkeletonLoading(boolean show) {
+        if (show) {
+            skeletonCard.setVisibility(View.VISIBLE);
+            Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+            skeletonCard.startAnimation(slideUp);
+        } else {
+            skeletonCard.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Shows the placeholder illustration with fade in animation.
+     */
+    private void showPlaceholder() {
+        if (placeholderView.getVisibility() != View.VISIBLE) {
+            placeholderView.setVisibility(View.VISIBLE);
+            Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+            placeholderView.startAnimation(fadeIn);
+        }
+    }
+
+    /**
+     * Hides the placeholder illustration with fade out animation.
+     */
+    private void hidePlaceholder() {
+        if (placeholderView.getVisibility() == View.VISIBLE) {
+            Animation fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
+            fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    placeholderView.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+            placeholderView.startAnimation(fadeOut);
+        }
+    }
+
+    /**
+     * Shows the output card with slide up animation.
+     */
+    private void showOutputCard() {
+        outputCard.setVisibility(View.VISIBLE);
+        Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+        outputCard.startAnimation(slideUp);
     }
 
     @Override

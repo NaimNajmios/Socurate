@@ -34,7 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="20dp"
+            android:animateLayoutChanges="true">
 
             <!-- Input Section -->
             <com.google.android.material.card.MaterialCardView
@@ -53,14 +54,34 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Input Header with Reset Button -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Input"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Input"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <ImageButton
+                            android:id="@+id/clearInputButton"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@android:drawable/ic_menu_close_clear_cancel"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/clear_input"
+                            android:tint="@color/text_secondary"
+                            android:padding="4dp" />
+
+                    </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
@@ -82,6 +103,173 @@
                             android:background="@null" />
 
                     </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Placeholder Illustration (shown when no output) -->
+            <LinearLayout
+                android:id="@+id/placeholderView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="40dp"
+                android:layout_marginBottom="20dp"
+                android:visibility="visible">
+
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/ic_stadium"
+                    android:contentDescription="@string/placeholder_title"
+                    android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/placeholder_title"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/placeholder_subtitle"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="14sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <!-- Skeleton Loading (shown while processing) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/skeletonCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/dark_surface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/md_theme_dark_outline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Skeleton Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <View
+                            android:layout_width="100dp"
+                            android:layout_height="20dp"
+                            android:background="@drawable/skeleton_item" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <View
+                            android:layout_width="80dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/skeleton_item" />
+
+                    </LinearLayout>
+
+                    <!-- Skeleton Lines -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/skeleton_item" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/skeleton_item" />
+
+                    <!-- Skeleton Line 3 (80% width) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="16dp"
+                            android:layout_weight="0.8"
+                            android:background="@drawable/skeleton_item" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="0.2" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/skeleton_item" />
+
+                    <!-- Skeleton Line 5 (60% width) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="16dp"
+                            android:layout_weight="0.6"
+                            android:background="@drawable/skeleton_item" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="0.4" />
+
+                    </LinearLayout>
+
+                    <!-- Skeleton Buttons -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/skeleton_item" />
+
+                        <View
+                            android:layout_width="12dp"
+                            android:layout_height="1dp" />
+
+                        <View
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/skeleton_item" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -184,6 +372,10 @@
                             android:background="@null"
                             android:focusable="false"
                             android:focusableInTouchMode="false"
+                            android:scrollbars="vertical"
+                            android:scrollHorizontally="false"
+                            android:overScrollMode="always"
+                            android:fadeScrollbars="false"
                             android:layout_marginBottom="16dp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
