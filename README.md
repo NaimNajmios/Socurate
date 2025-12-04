@@ -1,228 +1,374 @@
-  # Oreamnos (Android Edition)
-
-  A native Android application that transforms global football news into polished Malaysian Malay social media posts using AI. Perfect for football enthusiasts managing social media pages or community groups.
-
-  ## 🎯 Features
-
-  ### Core Functionality
-  - **Share Intent Integration**: Share articles directly from Chrome, Twitter, or any app
-  - **Universal Football Coverage**: Works for any team or league worldwide
-  - **AI-Powered Curation**: Uses Google Gemini 2.0 Flash for professional Malaysian Malay posts
-  - **One-Tap Actions**: Copy to clipboard or share directly to X/Facebook
-
-  ### Customization & Productivity
-  - **Tone Customization**: Choose between formal (professional) or casual (fan banter) styles
-  - **Hashtag Manager**: Configure default hashtags that auto-append to all posts
-  - **Quick Edit**: Edit generated posts inline before sharing
-  - **URL Extraction**: Automatically extracts content from shared URLs
-
-  ### Technical Features
-  - **Intelligent Retry Logic**: Automatically retries failed API calls with exponential backoff
-  - **Rate Limit Handling**: Parses and respects API's requested retry delays
-  - **Secure Storage**: API keys encrypted using Android's EncryptedSharedPreferences
-  - **Comprehensive Logging**: Detailed logs for every user action and API call for debugging
-
-  ## 📋 Requirements
-
-  - Android 7.0 (API 24) or higher
-  - Google Gemini API key ([Get one here](https://ai.google.dev))
-  - Internet connection
-
-  ## 🚀 Installation
-
-  ### Option 1: Build from Source
-
-  1. Clone the repository:
-    ```bash
-    git clone https://github.com/NaimNajmios/Oreamnos-Android.git
-    cd Oreamnos-Android
-    ```
-
-  2. Open the project in Android Studio
-
-  3. Build and run on your device or emulator
-
-  ### Option 2: Install APK
-
-  Download the latest APK from the [Releases](https://github.com/NaimNajmios/Oreamnos-Android/releases) page.
-
-  ## ⚙️ Setup
-
-  1. Launch the app
-  2. Tap the settings icon (⚙️)
-  3. Enter your Gemini API key
-  4. (Optional) Test the connection
-  5. (Optional) Choose your preferred tone (Formal/Casual)
-  6. Tap "Save Settings"
-
-  ## 💡 Usage
-
-  ### Method 1: Share from Other Apps
-
-  1. Open a football article in Chrome, Twitter, or any browser
-  2. Tap the "Share" button
-  3. Select "Oreamnos" from the share menu
-  4. The app automatically processes and generates your post
-  5. **NEW**: Toggle "Include hashtags" to auto-append your default hashtags
-  6. Copy or share the result
-
-  ### Method 2: Direct Input
-
-  1. Open the Oreamnos app
-  2. Paste article text or URL into the input field
-  3. Tap the "Generate Post" button
-  4. **NEW**: Tap "Edit" to modify the generated text
-  5. **NEW**: Check "Include hashtags" box before copying
-  6. Copy or share the generated post
-
-  ### NEW: Hashtag Management
-
-  1. Go to Settings → Hashtag Settings
-  2. Enter your default hashtags (e.g., `#BolaSepak #JDT #Football`)
-  3. Toggle "Auto-append hashtags" on/off
-  4. Hashtags automatically added when you copy or share posts
-
-  ### NEW: Quick Edit
-
-  1. After generation, tap the "Edit" button
-  2. Make inline changes to the post
-  3. An "(Edited)" indicator appears
-  4. Tap "Save" to lock your changes
-  5. Copy/share the edited version
-
-  ## 🏗️ Architecture
-
-  ### Core Components
-
-  - **GeminiService**: Handles API communication with retry logic and exponential backoff
-  - **WebContentExtractor**: Extracts main content from URLs using Jsoup
-  - **PreferencesManager**: Securely manages API keys and app settings
-
-  ### Activities
-
-  - **MainActivity**: Primary interface for manual input and generation
-  - **ShareReceiverActivity**: Handles share intents from other apps
-  - **SettingsActivity**: Configuration and API key management
-
-  ## 🛠️ Technology Stack
-
-  - **Language**: Java
-  - **Minimum SDK**: API 24 (Android 7.0)
-  - **Target SDK**: API 34 (Android 14)
-  - **Libraries**:
-    - AndroidX (AppCompat, Material Design 3)
-    - OkHttp (Networking)
-    - Gson (JSON parsing)
-    - Jsoup (HTML parsing)
-    - Security Crypto (Encrypted preferences)
-
-  ## 📁 Project Structure
-
-  ```
-  app/src/main/
-  ├── java/com/mycompany/oreamnos/
-  │   ├── MainActivity.java
-  │   ├── ShareReceiverActivity.java
-  │   ├── SettingsActivity.java
-  │   ├── services/
-  │   │   ├── GeminiService.java
-  │   │   └── WebContentExtractor.java
-  │   └── utils/
-  │       └── PreferencesManager.java
-  ├── res/
-  │   ├── layout/
-  │   │   ├── activity_main.xml
-  │   │   ├── activity_share_receiver.xml
-  │   │   └── activity_settings.xml
-  │   ├── values/
-  │   │   ├── strings.xml
-  │   │   ├── colors.xml
-  │   │   └── themes.xml
-  │   └── menu/
-  │       └── menu_main.xml
-  └── AndroidManifest.xml
-  ```
-
-  ## 🎨 Customization
-
-  ### Changing the Tone
-
-  The app supports two tone styles:
-
-  - **Formal**: Professional, suitable for official club communications
-  - **Casual**: Engaging, conversational for fan communities
-
-  Change this in Settings → Post Settings → Tone
-
-  ### Advanced Configuration
-
-  For advanced users, you can customize the API endpoint in Settings → Advanced Settings.
-
-  ## 🔒 Privacy & Security
-
-  - API keys are stored using Android's EncryptedSharedPreferences
-  - No data is collected or sent to third parties
-  - All processing happens on-device except API calls to Google Gemini
-
-  ## 🐛 Troubleshooting
-
-  ### "API key required" error
-
-  Go to Settings and enter a valid Gemini API key.
-
-  ### "Could not extract content from URL"
-
-  The website may be blocking automated access. Try copying the article text directly instead.
-
-  ### Connection errors
-
-  - Check your internet connection
-  - Verify your API key is correct
-  - Try the "Test Connection" button in Settings
-
-  ### Rate limit errors
-
-  The app now handles rate limits intelligently:
-  - Automatically retries with the exact delay requested by the API
-  - Shows user-friendly messages: "Please wait X seconds and try again"
-  - Logs all retry attempts in Logcat for debugging
-
-  ### Debugging with Logcat
-
-  The app includes comprehensive logging for all actions:
-
-  1. Open Android Studio → Logcat tab
-  2. Filter by package: `com.mycompany.oreamnos`
-  3. Look for these tags:
-    - `MainActivity` - UI interactions, button clicks
-    - `GeminiService` - API calls, retries, responses
-    - `WebContentExtractor` - URL parsing
-    - `SettingsActivity` - Configuration changes
-
-  **Example logs:**
-  ```
-  I/MainActivity: >>> Generate button clicked <<<
-  I/GeminiService: === GEMINI API CALL START [abc123] ===
-  I/GeminiService: [abc123] Response code: 200 (time: 1234ms)
-  I/MainActivity: Post generation SUCCESSFUL
-  ```
-
-  See the [Debugging Guide](debugging_guide.md) for complete log examples.
-
-  ## 📝 License
-
-  This project is licensed under the MIT License - see the LICENSE file for details.
-
-  ## 🙏 Acknowledgments
-
-  - Original web app: [Oreamnos](https://github.com/NaimNajmios/Oreamnos)
-  - Powered by [Google Gemini API](https://ai.google.dev)
-  - Built with [Material Design 3](https://m3.material.io/)
-
-  ## 📧 Contact
-
-  For issues or questions, please open an issue on GitHub or contact the maintainer.
-
-  ---
-
-  **Made with ⚽ for the football community**
+# Socurate (Oreamnos Android Edition)
+
+A sleek, modern Android application that transforms global football news into polished Malaysian Malay social media posts using AI. Built with a premium dark theme for an exceptional user experience.
+
+## ✨ What's New
+
+### 🎨 Modern UI/UX Redesign
+- **Premium Dark Theme**: Sleek dark interface with sophisticated Blue Grey accents
+- **Theme Toggle**: Switch between Light, Dark, or System (auto) themes
+- **Smooth Animations**: Fade-in/fade-out transitions and skeleton loading states
+- **Material Design 3**: Cards, pill-shaped buttons, and modern typography
+- **Glassy Effects**: Subtle translucency for a premium feel
+
+### 🔍 Source Citation
+- **Automatic Attribution**: AI detects and includes source information in generated posts
+- **Toggle Control**: Enable/disable source citation in settings
+- **Format**: Posts end with "Sumber: [Source Name]" when enabled
+
+### ⚡ Post Refinement
+- **Multiple Refinement Options**: Improve generated posts with targeted adjustments
+  - **Rephrase**: Rewrite with different wording while maintaining meaning
+  - **Recheck Flow**: Improve logical flow and structure
+  - **Recheck Wording**: Enhance word choice and clarity
+  - **Make Formal**: Adjust tone for official communication
+  - **Make Conversational**: Shift tone for fan engagement
+- **One-Click Regeneration**: Apply selected refinements instantly
+
+## 🎯 Core Features
+
+### Content Generation
+- **Share Intent Integration**: Share articles directly from Chrome, Twitter, or any app
+- **Universal Football Coverage**: Works for any team or league worldwide
+- **AI-Powered Curation**: Uses Google Gemini 2.0 Flash for professional Malaysian Malay posts
+- **Smart Context Detection**: Adapts to quotes, tactical analysis, and different content types
+- **One-Tap Actions**: Copy to clipboard or share directly to social media
+
+### Customization & Productivity
+- **Dual Tone Modes**: Choose between formal (professional) or casual (fan banter) styles
+- **Hashtag Manager**: Configure default hashtags that auto-append to all posts
+- **Quick Edit**: Edit generated posts inline before sharing with visual indicators
+- **URL Extraction**: Automatically extracts and processes content from shared URLs
+
+### Technical Excellence
+- **Intelligent Retry Logic**: Automatically retries failed API calls with exponential backoff
+- **Rate Limit Handling**: Parses and respects API's requested retry delays (up to 60s)
+- **Secure Storage**: API keys encrypted using Android's EncryptedSharedPreferences
+- **Comprehensive Logging**: Detailed logs with unique request IDs for debugging
+- **Error Recovery**: User-friendly error messages with actionable suggestions
+
+## 📋 Requirements
+
+- Android 7.0 (API 24) or higher
+- Google Gemini API key ([Get one here](https://ai.google.dev))
+- Internet connection
+
+## 🚀 Installation
+
+### Option 1: Build from Source
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/NaimNajmios/Socurate.git
+   cd Socurate
+   ```
+
+2. Open the project in Android Studio
+
+3. Build and run on your device or emulator
+
+### Option 2: Install APK
+
+Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socurate/releases) page.
+
+## ⚙️ Setup
+
+1. Launch the app
+2. Tap the settings icon (⚙️) in the toolbar
+3. **API Configuration**:
+   - Enter your Gemini API key
+   - (Optional) Test the connection
+   - (Optional) Reset to default endpoint
+4. **Post Settings**:
+   - Choose tone: Formal or Casual
+   - Enable/disable source citation
+5. **Hashtag Settings**:
+   - Enter default hashtags (e.g., `#BolaSepak #JDT #Football`)
+   - Toggle auto-append on/off
+6. **Appearance**:
+   - Choose theme: Light, Dark, or System
+7. Tap "Save Settings"
+
+## 💡 Usage
+
+### Method 1: Share from Other Apps
+
+1. Open a football article in Chrome, Twitter, or any browser
+2. Tap the "Share" button
+3. Select "Socurate" from the share menu
+4. The app automatically processes and generates your post
+5. Review the generated content
+6. **Refine (Optional)**: Select refinement options and tap "Regenerate"
+7. **Edit (Optional)**: Tap "Edit" to modify the text manually
+8. **Include Hashtags**: Toggle on to append your default hashtags
+9. **Include Source**: Toggle on to show source attribution
+10. Copy or share the final result
+
+### Method 2: Direct Input
+
+1. Open the Socurate app
+2. Paste article text or URL into the input field
+3. Tap the glowing "Generate Post" FAB button
+4. Wait for the AI to process (skeleton loading animation)
+5. Review the generated content
+6. **Refine (Optional)**: Use refinement options to improve the post
+7. **Edit (Optional)**: Tap "Edit" for manual adjustments
+8. Toggle hashtags and source as needed
+9. Copy or share the generated post
+
+### Post Refinement Workflow
+
+1. After initial generation, the refinement card appears below the output
+2. Select one or more refinement options:
+   - **Rephrase**: Get a fresh take on the same content
+   - **Recheck Flow**: Improve paragraph structure and transitions
+   - **Recheck Wording**: Enhance vocabulary and phrasing
+   - **Make Formal**: Elevate tone for professional contexts
+   - **Make Conversational**: Relax tone for fan communities
+3. Tap "Regenerate" to apply improvements
+4. Refinement checkboxes auto-clear after each regeneration
+5. Repeat as needed for perfect results
+
+### Quick Edit Mode
+
+1. After generation, tap the "Edit" button
+2. The output field becomes editable
+3. Make inline changes to the post
+4. An "(Edited)" indicator appears to show modifications
+5. Tap "Save" (button changes to checkmark icon)
+6. Changes are locked in
+7. Copy/share the edited version
+
+### Hashtag Management
+
+1. Go to Settings → Hashtag Settings
+2. Enter comma or space-separated hashtags (e.g., `#BolaSepak, #JDT, #Football`)
+3. Toggle "Auto-append hashtags" on/off
+4. Hashtags are automatically formatted (# added if missing)
+5. Use the checkbox on the main screen to include/exclude hashtags per post
+
+## 🏗️ Architecture
+
+### Core Components
+
+- **GeminiService**: Handles API communication with intelligent retry logic, exponential backoff, source detection, and post refinement
+- **WebContentExtractor**: Extracts main content from URLs using Jsoup with robust error handling
+- **PreferencesManager**: Securely manages API keys, settings, and user preferences using encrypted storage
+
+### Activities
+
+- **MainActivity**: Primary interface for manual input, generation, editing, and refinement
+- **ShareReceiverActivity**: Handles share intents from other apps with seamless processing
+- **SettingsActivity**: Configuration hub for API, tone, hashtags, source, and theme management
+
+### UI Components
+
+- **Animations**: Fade in/out, slide up, skeleton shimmer for smooth transitions
+- **Cards**: Material CardView with elevation and rounded corners
+- **Buttons**: Pill-shaped buttons and Extended FAB with scale animations
+- **Themes**: Dark and Light themes with consistent color schemes
+
+## 🛠️ Technology Stack
+
+- **Language**: Java
+- **Minimum SDK**: API 24 (Android 7.0)
+- **Target SDK**: API 34 (Android 14)
+- **Design**: Material Design 3 with custom dark theme
+- **Libraries**:
+  - AndroidX (AppCompat, Material Design 3)
+  - OkHttp 4.12.0 (Networking with timeout configuration)
+  - Gson 2.10.1 (JSON parsing with custom error handling)
+  - Jsoup 1.16.1 (HTML parsing and content extraction)
+  - Security Crypto 1.1.0-alpha06 (Encrypted preferences with AES256)
+
+## 📁 Project Structure
+
+```
+app/src/main/
+├── java/com/mycompany/oreamnos/
+│   ├── MainActivity.java                  # Main content generation activity
+│   ├── ShareReceiverActivity.java        # Share intent handler
+│   ├── SettingsActivity.java             # Settings and configuration
+│   ├── services/
+│   │   ├── GeminiService.java            # AI API integration with retry logic
+│   │   └── WebContentExtractor.java      # URL content extraction
+│   └── utils/
+│       └── PreferencesManager.java       # Secure settings storage
+├── res/
+│   ├── anim/                             # Animations (fade, slide)
+│   │   ├── fade_in.xml
+│   │   ├── fade_out.xml
+│   │   └── slide_up.xml
+│   ├── drawable/                         # Custom drawables
+│   │   ├── pill_button.xml              # Pill-shaped button background
+│   │   ├── pill_button_dark.xml         # Dark theme variant
+│   │   └── skeleton_shimmer.xml         # Loading animation
+│   ├── layout/
+│   │   ├── activity_main.xml            # Main screen layout
+│   │   ├── activity_share_receiver.xml  # Share receiver layout
+│   │   └── activity_settings.xml        # Settings screen layout
+│   ├── values/
+│   │   ├── strings.xml                  # App strings
+│   │   ├── colors.xml                   # Color palette
+│   │   └── themes.xml                   # Light theme
+│   ├── values-night/
+│   │   ├── colors.xml                   # Dark theme colors
+│   │   └── themes.xml                   # Dark theme
+│   ├── mipmap-*/                        # App icons (all densities)
+│   └── menu/
+│       └── menu_main.xml                # Toolbar menu
+└── AndroidManifest.xml
+```
+
+## 🎨 Design System
+
+### Color Palette
+
+#### Dark Theme
+- **Primary**: Blue Grey (#90A4AE) - Accents and CTAs
+- **Background**: Dark Gray (#121212) - Main background
+- **Surface**: Darker Gray (#1E2326) - Cards and elevated surfaces
+- **Text**: Light Gray (#ECEFF1) - Primary text
+- **Text Secondary**: Blue Gray (#B0BEC5) - Secondary text
+
+#### Light Theme
+- **Primary**: Blue Grey (#455A64) - Accents and CTAs
+- **Background**: White (#FFFFFF) - Main background
+- **Surface**: Light Gray (#F5F7F8) - Cards and elevated surfaces
+- **Text**: Dark Gray (#1C2326) - Primary text
+- **Text Secondary**: Blue Gray (#546E7A) - Secondary text
+
+### Typography
+- **Headlines**: Medium weight, 20-24sp
+- **Body**: Regular weight, 14-16sp
+- **Buttons**: Medium weight, 14sp, all caps
+
+## 🎭 Theme Customization
+
+### Changing the Theme
+
+1. Go to Settings → Appearance
+2. Select your preferred theme:
+   - **Light**: Clean, bright interface
+   - **Dark**: Modern dark theme with neon accents (default)
+   - **System**: Automatically follows device theme
+3. Theme applies immediately
+
+### Changing the Tone
+
+The app supports two tone styles for generated content:
+
+- **Formal**: Professional, suitable for official club communications
+- **Casual**: Engaging, conversational for fan communities
+
+Change this in Settings → Post Settings → Tone
+
+### Advanced Configuration
+
+For advanced users, you can customize the API endpoint in Settings → Advanced Settings → API Endpoint. Default uses Gemini 2.0 Flash model.
+
+## 🔒 Privacy & Security
+
+- **Encrypted Storage**: API keys stored using Android's EncryptedSharedPreferences with AES256-GCM
+- **No Data Collection**: Zero telemetry, analytics, or third-party tracking
+- **Local Processing**: All processing happens on-device except necessary API calls to Google Gemini
+- **Secure Communication**: HTTPS-only API communication with timeout protection
+- **No Permissions**: App requires only internet permission, no access to contacts, storage, or location
+
+## 🐛 Troubleshooting
+
+### "API key required" error
+
+**Cause**: No API key configured or key was cleared.
+
+**Solution**: Go to Settings and enter a valid Gemini API key. Use "Test Connection" to verify.
+
+### "Could not extract content from URL"
+
+**Cause**: Website blocking automated access or poor connectivity.
+
+**Solutions**:
+- Try copying the article text directly instead
+- Check if the URL is accessible in a browser
+- Verify internet connection
+
+### Connection errors
+
+**Symptoms**: "Network error", "Connection timeout", "Unknown error"
+
+**Solutions**:
+- Check your internet connection
+- Verify your API key is correct in Settings
+- Try the "Test Connection" button in Settings
+- Check if Google services are accessible in your region
+- Reset endpoint to default in Advanced Settings
+
+### Rate limit errors
+
+**Cause**: Exceeded Gemini API quota (requests per minute/day).
+
+The app now handles rate limits intelligently:
+- Automatically retries with the exact delay requested by the API (up to 60 seconds)
+- Shows user-friendly messages: "Please wait X seconds and try again"
+- Logs all retry attempts with unique IDs in Logcat for debugging
+- Suggests using `gemini-1.5-flash` model for better quotas
+
+**Solutions**:
+- Wait for the suggested time period before retrying
+- Check your API quota at [Google AI Studio](https://ai.google.dev)
+- Consider upgrading your API plan for higher limits
+
+### Theme not applying
+
+**Solution**: Ensure you've saved settings after changing theme. Theme applies immediately on save.
+
+### Generated text too short/long
+
+The app automatically adapts output length to 40-60% of input length. For better control:
+- Provide clearer, more structured input
+- Use formal tone for concise output
+- Edit the generated text manually if needed
+
+### Debugging with Logcat
+
+The app includes comprehensive logging with unique request IDs for all actions:
+
+1. Open Android Studio → Logcat tab
+2. Filter by package: `com.mycompany.oreamnos`
+3. Look for these tags:
+   - `MainActivity` - UI interactions, button clicks, refinement requests
+   - `GeminiService` - API calls, retries, responses, source detection
+   - `WebContentExtractor` - URL parsing, content extraction
+   - `SettingsActivity` - Configuration changes, theme switches
+   - `PreferencesManager` - Settings storage and retrieval
+
+**Example logs:**
+```
+I/MainActivity: === MainActivity onCreate ===
+I/MainActivity: >>> Generate button clicked <<<
+I/GeminiService: === GEMINI API CALL START [a1b2c3d4] ===
+I/GeminiService: [a1b2c3d4] Input text length: 2456 characters
+I/GeminiService: [a1b2c3d4] Gemini attempt 1/4
+I/GeminiService: [a1b2c3d4] Response code: 200 (time: 1834ms) on attempt 1
+I/GeminiService: [a1b2c3d4] Success! Output: 892 chars (total time: 1842ms)
+I/MainActivity: Post generation SUCCESSFUL
+```
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Original web app: [Oreamnos](https://github.com/NaimNajmios/Oreamnos)
+- Powered by [Google Gemini API](https://ai.google.dev)
+- Built with [Material Design 3](https://m3.material.io/)
+- Icons from Material Design Icons
+
+## 📧 Contact
+
+For issues or questions, please open an issue on [GitHub](https://github.com/NaimNajmios/Socurate/issues).
+
+---
+
+**Made with ⚽ for the Malaysian football community**
