@@ -1,6 +1,7 @@
 package com.mycompany.oreamnos;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,6 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
     private TextInputEditText endpointInput;
     private TextInputEditText hashtagsInput;
     private RadioGroup toneRadioGroup;
+    private RadioGroup themeRadioGroup;
     private SwitchMaterial enableHashtagsSwitch;
     private MaterialButton testConnectionButton;
     private MaterialButton resetEndpointButton;
@@ -42,10 +44,14 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "=== SettingsActivity onCreate ===");
-        setContentView(R.layout.activity_settings);
 
         // Initialize preferences
         prefsManager = new PreferencesManager(this);
+
+        // Apply saved theme before setContentView
+        applyTheme(prefsManager.getTheme());
+
+        setContentView(R.layout.activity_settings);
 
         // Setup toolbar
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
@@ -57,6 +63,7 @@ public class SettingsActivity extends AppCompatActivity {
         endpointInput = findViewById(R.id.endpointInput);
         hashtagsInput = findViewById(R.id.hashtagsInput);
         toneRadioGroup = findViewById(R.id.toneRadioGroup);
+        themeRadioGroup = findViewById(R.id.themeRadioGroup);
         enableHashtagsSwitch = findViewById(R.id.enableHashtagsSwitch);
         testConnectionButton = findViewById(R.id.testConnectionButton);
         resetEndpointButton = findViewById(R.id.resetEndpointButton);
@@ -70,6 +77,20 @@ public class SettingsActivity extends AppCompatActivity {
         testConnectionButton.setOnClickListener(v -> onTestConnectionClick());
         resetEndpointButton.setOnClickListener(v -> {
             endpointInput.setText(R.string.api_endpoint_default);
+        });
+
+        // Setup theme radio group listener
+        themeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            String theme;
+            if (checkedId == R.id.themeLight) {
+                theme = PreferencesManager.THEME_LIGHT;
+            } else if (checkedId == R.id.themeDark) {
+                theme = PreferencesManager.THEME_DARK;
+            } else {
+                theme = PreferencesManager.THEME_SYSTEM;
+            }
+            prefsManager.saveTheme(theme);
+            applyTheme(theme);
         });
     }
 
@@ -104,7 +125,17 @@ public class SettingsActivity extends AppCompatActivity {
         boolean hashtagsEnabled = prefsManager.areHashtagsEnabled();
         enableHashtagsSwitch.setChecked(hashtagsEnabled);
 
-        Log.d(TAG, "Settings loaded - Tone: " + tone + ", Hashtags enabled: " + hashtagsEnabled);
+        // Load theme
+        String theme = prefsManager.getTheme();
+        if (PreferencesManager.THEME_LIGHT.equals(theme)) {
+            themeRadioGroup.check(R.id.themeLight);
+        } else if (PreferencesManager.THEME_DARK.equals(theme)) {
+            themeRadioGroup.check(R.id.themeDark);
+        } else {
+            themeRadioGroup.check(R.id.themeSystem);
+        }
+
+        Log.d(TAG, "Settings loaded - Tone: " + tone + ", Theme: " + theme + ", Hashtags enabled: " + hashtagsEnabled);
     }
 
     /**
@@ -199,6 +230,26 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    /**
+     * Applies the selected theme.
+     */
+    private void applyTheme(String theme) {
+        int mode;
+        switch (theme) {
+            case PreferencesManager.THEME_LIGHT:
+                mode = AppCompatDelegate.MODE_NIGHT_NO;
+                break;
+            case PreferencesManager.THEME_DARK:
+                mode = AppCompatDelegate.MODE_NIGHT_YES;
+                break;
+            case PreferencesManager.THEME_SYSTEM:
+            default:
+                mode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                break;
+        }
+        AppCompatDelegate.setDefaultNightMode(mode);
     }
 
     @Override

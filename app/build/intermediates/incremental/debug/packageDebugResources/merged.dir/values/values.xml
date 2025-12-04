@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="http://schemas.android.com/tools">
+    <color name="background_light">#FFFFFF</color>
+    <color name="divider_light">#ECEFF1</color>
+    <color name="error_light">#B00020</color>
+    <color name="md_theme_light_background">#FFFFFF</color>
+    <color name="md_theme_light_error">#B00020</color>
+    <color name="md_theme_light_errorContainer">#FDECEA</color>
+    <color name="md_theme_light_inverseOnSurface">#F5F7F8</color>
+    <color name="md_theme_light_inversePrimary">#90A4AE</color>
+    <color name="md_theme_light_inverseSurface">#1C2326</color>
+    <color name="md_theme_light_onBackground">#1C2326</color>
+    <color name="md_theme_light_onError">#FFFFFF</color>
+    <color name="md_theme_light_onErrorContainer">#B00020</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_onPrimaryContainer">#1C2326</color>
+    <color name="md_theme_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_light_onSecondaryContainer">#1C2326</color>
+    <color name="md_theme_light_onSurface">#1C2326</color>
+    <color name="md_theme_light_onSurfaceVariant">#546E7A</color>
+    <color name="md_theme_light_onTertiary">#FFFFFF</color>
+    <color name="md_theme_light_onTertiaryContainer">#1C2326</color>
+    <color name="md_theme_light_outline">#CFD8DC</color>
+    <color name="md_theme_light_primary">#455A64</color>
+    <color name="md_theme_light_primaryContainer">#CFD8DC</color>
+    <color name="md_theme_light_secondary">#8D7B6F</color>
+    <color name="md_theme_light_secondaryContainer">#F5F7F8</color>
+    <color name="md_theme_light_surface">#F5F7F8</color>
+    <color name="md_theme_light_surfaceVariant">#ECEFF1</color>
+    <color name="md_theme_light_tertiary">#546E7A</color>
+    <color name="md_theme_light_tertiaryContainer">#CFD8DC</color>
+    <color name="on_error_light">#FFFFFF</color>
+    <color name="outline_light">#CFD8DC</color>
+    <color name="primary_light">#455A64</color>
+    <color name="primary_variant_light">#37474F</color>
+    <color name="secondary_light">#8D7B6F</color>
+    <color name="secondary_variant_light">#6D5D51</color>
+    <color name="surface_light">#F5F7F8</color>
+    <color name="text_primary_light">#1C2326</color>
+    <color name="text_secondary_light">#546E7A</color>
+    <string name="advanced_settings">Advanced Settings</string>
+    <string name="api_endpoint_default">https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent</string>
+    <string name="api_endpoint_label">API Endpoint</string>
+    <string name="api_error">API error: %1$s</string>
+    <string name="api_key_help">Get your API key from https://ai.google.dev</string>
+    <string name="api_key_hint">Enter your Google Gemini API key</string>
+    <string name="api_key_label">Gemini API Key</string>
+    <string name="api_key_required">Please set your Gemini API key in Settings</string>
+    <string name="api_key_saved">API key saved securely</string>
+    <string name="app_description">Football news curator for Malaysian Malay content</string>
+    <string name="app_name">Oreamnos</string>
+    <string name="app_version">Version 1.0</string>
+    <string name="cancel_edit">Cancel</string>
+    <string name="clear_input">Clear input</string>
+    <string name="connection_test_failed">Connection failed: %1$s</string>
+    <string name="connection_test_success">Connection successful!</string>
+    <string name="content_description_copy_icon">Copy to clipboard</string>
+    <string name="content_description_settings_icon">Settings</string>
+    <string name="content_description_share_icon">Share</string>
+    <string name="copied_to_clipboard">Copied to clipboard!</string>
+    <string name="copy_button">Copy to Clipboard</string>
+    <string name="edit_button">Edit</string>
+    <string name="edited_indicator">(Edited)</string>
+    <string name="enable_hashtags">Auto-append hashtags</string>
+    <string name="error_title">Error</string>
+    <string name="extracting_content">Extracting content from URL…</string>
+    <string name="generate_button">Generate Post</string>
+    <string name="generated_draft">Generated Draft</string>
+    <string name="generating_post">Generating post with AI…</string>
+    <string name="hashtags_help">Separate with spaces or commas</string>
+    <string name="hashtags_hint">e.g., #BolaSepak #Football #JDT</string>
+    <string name="hashtags_label">Default Hashtags</string>
+    <string name="hashtags_section">Hashtag Settings</string>
+    <string name="include_hashtags">Include hashtags</string>
+    <string name="input_cleared">Input cleared</string>
+    <string name="input_hint">Paste article text or URL here…</string>
+    <string name="input_required">Please enter some text or URL</string>
+    <string name="invalid_url">Could not extract content from URL</string>
+    <string name="network_error">Network error. Please check your connection.</string>
+    <string name="open_in_app">Open in Main App</string>
+    <string name="original_post">Original Post</string>
+    <string name="output_label">Generated Post</string>
+    <string name="output_placeholder">Your Malaysian Malay post will appear here…</string>
+    <string name="placeholder_subtitle">Share from your browser or paste a URL</string>
+    <string name="placeholder_title">Ready to curate. Paste a link to start.</string>
+    <string name="powered_by">Powered by Google Gemini</string>
+    <string name="processing">Processing…</string>
+    <string name="processing_error">Error: %1$s</string>
+    <string name="reset_to_default">Reset to Default</string>
+    <string name="restore_original">Restore Original</string>
+    <string name="save_edit">Save</string>
+    <string name="save_settings">Save Settings</string>
+    <string name="settings">Settings</string>
+    <string name="settings_button">Settings</string>
+    <string name="settings_saved">Settings saved</string>
+    <string name="share_button">Share</string>
+    <string name="share_to_oreamnos">Share to Oreamnos</string>
+    <string name="success_title">Success</string>
+    <string name="test_connection">Test Connection</string>
+    <string name="theme_dark">Always Dark</string>
+    <string name="theme_label">App Theme</string>
+    <string name="theme_light">Always Light</string>
+    <string name="theme_section">Appearance</string>
+    <string name="theme_system">Follow System</string>
+    <string name="tone_casual">Casual (Fan Banter)</string>
+    <string name="tone_formal">Formal (Professional)</string>
+    <string name="tone_label">Post Tone</string>
+    <string name="warning_title">Warning</string>
+    <style name="Theme.Oreamnos" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
+        
+        
+        <item name="colorSecondary">@color/md_theme_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        
+        
+        <item name="colorTertiary">@color/md_theme_light_tertiary</item>
+        <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
+        
+        
+        <item name="colorError">@color/md_theme_light_error</item>
+        <item name="colorOnError">@color/md_theme_light_onError</item>
+        <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
+        <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
+        
+        
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
+        
+        
+        <item name="colorOutline">@color/md_theme_light_outline</item>
+        
+        
+        <item name="android:statusBarColor">@color/md_theme_light_background</item>
+        <item name="android:windowLightStatusBar" ns1:targetApi="m">true</item>
+        
+        
+        <item name="android:navigationBarColor">@color/md_theme_light_background</item>
+        <item name="android:windowLightNavigationBar" ns1:targetApi="o">true</item>
+        
+        
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+</resources>

@@ -17,11 +17,16 @@ public class PreferencesManager {
     private static final String KEY_TONE = "post_tone";
     private static final String KEY_HASHTAGS = "default_hashtags";
     private static final String KEY_HASHTAGS_ENABLED = "hashtags_enabled";
+    private static final String KEY_THEME = "app_theme";
     private static final String DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     private static final String DEFAULT_HASHTAGS = "#BolaSepak #Football";
 
     public static final String TONE_FORMAL = "formal";
     public static final String TONE_CASUAL = "casual";
+
+    public static final String THEME_SYSTEM = "system";
+    public static final String THEME_LIGHT = "light";
+    public static final String THEME_DARK = "dark";
 
     private final SharedPreferences securePrefs;
     private final Context context;
@@ -227,6 +232,26 @@ public class PreferencesManager {
         }
 
         return formatted.toString().trim();
+    }
+
+    /**
+     * Saves the theme preference.
+     * 
+     * @param theme One of THEME_SYSTEM, THEME_LIGHT, or THEME_DARK
+     */
+    public void saveTheme(String theme) {
+        securePrefs.edit()
+                .putString(KEY_THEME, theme)
+                .apply();
+    }
+
+    /**
+     * Retrieves the theme preference.
+     * 
+     * @return The theme preference, defaults to THEME_SYSTEM
+     */
+    public String getTheme() {
+        return securePrefs.getString(KEY_THEME, THEME_SYSTEM);
     }
 
     /**

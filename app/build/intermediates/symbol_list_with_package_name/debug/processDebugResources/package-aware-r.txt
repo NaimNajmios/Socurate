@@ -3596,6 +3596,10 @@ id textinput_helper_text
 id textinput_placeholder
 id textinput_prefix_text
 id textinput_suffix_text
+id themeDark
+id themeLight
+id themeRadioGroup
+id themeSystem
 id time
 id title
 id titleDividerNoCustom
@@ -4054,6 +4058,11 @@ string side_sheet_behavior
 string status_bar_notification_info_overflow
 string success_title
 string test_connection
+string theme_dark
+string theme_label
+string theme_light
+string theme_section
+string theme_system
 string tone_casual
 string tone_formal
 string tone_label

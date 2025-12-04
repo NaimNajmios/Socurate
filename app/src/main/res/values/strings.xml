@@ -48,6 +48,13 @@
     <string name="invalid_url">Could not extract content from URL</string>
     <string name="api_error">API error: %1$s</string>
     
+    <!-- Theme Settings -->
+    <string name="theme_label">App Theme</string>
+    <string name="theme_system">Follow System</string>
+    <string name="theme_light">Always Light</string>
+    <string name="theme_dark">Always Dark</string>
+    <string name="theme_section">Appearance</string>
+    
     <!-- Dialog Titles -->
     <string name="error_title">Error</string>
     <string name="success_title">Success</string>

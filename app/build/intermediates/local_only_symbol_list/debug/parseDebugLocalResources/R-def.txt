@@ -76,6 +76,10 @@ id shareButton
 id sharedText
 id skeletonCard
 id testConnectionButton
+id themeDark
+id themeLight
+id themeRadioGroup
+id themeSystem
 id toneCasual
 id toneFormal
 id toneRadioGroup
@@ -144,6 +148,11 @@ string share_button
 string share_to_oreamnos
 string success_title
 string test_connection
+string theme_dark
+string theme_label
+string theme_light
+string theme_section
+string theme_system
 string tone_casual
 string tone_formal
 string tone_label

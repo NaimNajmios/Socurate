@@ -97,6 +97,11 @@
     <string name="share_to_oreamnos">Share to Oreamnos</string>
     <string name="success_title">Success</string>
     <string name="test_connection">Test Connection</string>
+    <string name="theme_dark">Always Dark</string>
+    <string name="theme_label">App Theme</string>
+    <string name="theme_light">Always Light</string>
+    <string name="theme_section">Appearance</string>
+    <string name="theme_system">Follow System</string>
     <string name="tone_casual">Casual (Fan Banter)</string>
     <string name="tone_formal">Formal (Professional)</string>
     <string name="tone_label">Post Tone</string>

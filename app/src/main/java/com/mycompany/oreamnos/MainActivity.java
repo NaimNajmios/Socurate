@@ -5,6 +5,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -69,10 +70,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "=== MainActivity onCreate ===");
-        setContentView(R.layout.activity_main);
 
         // Initialize preferences
         prefsManager = new PreferencesManager(this);
+
+        // Apply saved theme before setContentView
+        applyTheme(prefsManager.getTheme());
+
+        setContentView(R.layout.activity_main);
 
         // Setup toolbar
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
@@ -406,6 +411,26 @@ public class MainActivity extends AppCompatActivity {
         outputCard.setVisibility(View.VISIBLE);
         Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
         outputCard.startAnimation(slideUp);
+    }
+
+    /**
+     * Applies the selected theme.
+     */
+    private void applyTheme(String theme) {
+        int mode;
+        switch (theme) {
+            case PreferencesManager.THEME_LIGHT:
+                mode = AppCompatDelegate.MODE_NIGHT_NO;
+                break;
+            case PreferencesManager.THEME_DARK:
+                mode = AppCompatDelegate.MODE_NIGHT_YES;
+                break;
+            case PreferencesManager.THEME_SYSTEM:
+            default:
+                mode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                break;
+        }
+        AppCompatDelegate.setDefaultNightMode(mode);
     }
 
     @Override
