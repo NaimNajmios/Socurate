@@ -64,6 +64,12 @@
     <string name="refine_conversational">Conversational</string>
     <string name="regenerate_button">Regenerate</string>
     
+    <!-- Source citation -->
+    <string name="source_citation">Source Citation</string>
+    <string name="source_citation_desc">Automatically detect and cite the source</string>
+    <string name="include_source">Include Source</string>
+    <string name="source_format">Sumber: [%1$s]</string>
+    
     <!-- Dialog Titles -->
     <string name="error_title">Error</string>
     <string name="success_title">Success</string>

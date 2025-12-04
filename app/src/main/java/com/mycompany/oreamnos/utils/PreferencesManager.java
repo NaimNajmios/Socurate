@@ -17,6 +17,7 @@ public class PreferencesManager {
     private static final String KEY_TONE = "post_tone";
     private static final String KEY_HASHTAGS = "default_hashtags";
     private static final String KEY_HASHTAGS_ENABLED = "hashtags_enabled";
+    private static final String KEY_SOURCE_ENABLED = "source_enabled";
     private static final String KEY_THEME = "app_theme";
     private static final String DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     private static final String DEFAULT_HASHTAGS = "#BolaSepak #Football";
@@ -252,6 +253,20 @@ public class PreferencesManager {
      */
     public String getTheme() {
         return securePrefs.getString(KEY_THEME, THEME_SYSTEM);
+    }
+
+    /**
+     * Saves the source citation enabled state.
+     */
+    public void saveSourceEnabled(boolean enabled) {
+        securePrefs.edit().putBoolean(KEY_SOURCE_ENABLED, enabled).apply();
+    }
+
+    /**
+     * Gets the source citation enabled state.
+     */
+    public boolean isSourceEnabled() {
+        return securePrefs.getBoolean(KEY_SOURCE_ENABLED, true); // Enabled by default
     }
 
     /**

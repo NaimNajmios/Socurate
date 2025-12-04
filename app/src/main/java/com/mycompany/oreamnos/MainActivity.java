@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton copyButton;
     private MaterialButton shareButton;
     private MaterialCheckBox includeHashtagsCheckbox;
+    private MaterialCheckBox includeSourceCheckbox;
     private ExtendedFloatingActionButton generateFab;
 
     // Refinement UI
@@ -109,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         copyButton = findViewById(R.id.copyButton);
         shareButton = findViewById(R.id.shareButton);
         includeHashtagsCheckbox = findViewById(R.id.includeHashtagsCheckbox);
+        includeSourceCheckbox = findViewById(R.id.includeSourceCheckbox);
         generateFab = findViewById(R.id.generateFab);
 
         // Refinement UI
@@ -139,6 +141,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Load hashtags enabled state
         includeHashtagsCheckbox.setChecked(prefsManager.areHashtagsEnabled());
+
+        // Load source enabled state
+        includeSourceCheckbox.setChecked(prefsManager.isSourceEnabled());
 
         // Update hashtags checkbox visibility
         includeHashtagsCheckbox.setVisibility(

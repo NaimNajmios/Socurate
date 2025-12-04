@@ -470,6 +470,9 @@ public class GeminiService {
                     "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Do NOT include any hashtags.");
         }
 
+        prompt.append(
+                "\n\nREMEMBER: End your post with a new line containing 'Sumber: [Source Name]' where Source Name is the website, publication, or journalist identified from the content.");
+
         return prompt.toString();
     }
 

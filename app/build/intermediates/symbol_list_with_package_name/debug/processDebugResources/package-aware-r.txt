@@ -3349,6 +3349,7 @@ id ignoreRequest
 id image
 id immediateStop
 id includeHashtagsCheckbox
+id includeSourceCheckbox
 id included
 id indeterminate
 id info
@@ -3549,6 +3550,7 @@ id snackbar_action
 id snackbar_text
 id snap
 id snapMargins
+id sourceEnabledSwitch
 id south
 id spacer
 id special_effects_controller_view_tag
@@ -3928,6 +3930,7 @@ string hashtags_section
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
 string include_hashtags
+string include_source
 string input_cleared
 string input_hint
 string input_required
@@ -4070,6 +4073,9 @@ string share_button
 string share_to_oreamnos
 string side_sheet_accessibility_pane_title
 string side_sheet_behavior
+string source_citation
+string source_citation_desc
+string source_format
 string status_bar_notification_info_overflow
 string success_title
 string test_connection

@@ -32,6 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
     private RadioGroup toneRadioGroup;
     private RadioGroup themeRadioGroup;
     private SwitchMaterial enableHashtagsSwitch;
+    private SwitchMaterial sourceEnabledSwitch;
     private MaterialButton testConnectionButton;
     private MaterialButton resetEndpointButton;
     private ExtendedFloatingActionButton saveFab;
@@ -65,6 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
         toneRadioGroup = findViewById(R.id.toneRadioGroup);
         themeRadioGroup = findViewById(R.id.themeRadioGroup);
         enableHashtagsSwitch = findViewById(R.id.enableHashtagsSwitch);
+        sourceEnabledSwitch = findViewById(R.id.sourceEnabledSwitch);
         testConnectionButton = findViewById(R.id.testConnectionButton);
         resetEndpointButton = findViewById(R.id.resetEndpointButton);
         saveFab = findViewById(R.id.saveFab);

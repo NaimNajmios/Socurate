@@ -72,6 +72,7 @@
     <string name="hashtags_label">Default Hashtags</string>
     <string name="hashtags_section">Hashtag Settings</string>
     <string name="include_hashtags">Include hashtags</string>
+    <string name="include_source">Include Source</string>
     <string name="input_cleared">Input cleared</string>
     <string name="input_hint">Paste article text or URL here…</string>
     <string name="input_required">Please enter some text or URL</string>
@@ -102,6 +103,9 @@
     <string name="settings_saved">Settings saved</string>
     <string name="share_button">Share</string>
     <string name="share_to_oreamnos">Share to Oreamnos</string>
+    <string name="source_citation">Source Citation</string>
+    <string name="source_citation_desc">Automatically detect and cite the source</string>
+    <string name="source_format">Sumber: [%1$s]</string>
     <string name="success_title">Success</string>
     <string name="test_connection">Test Connection</string>
     <string name="theme_dark">Always Dark</string>
