@@ -29,9 +29,9 @@ public class ShareReceiverActivity extends AppCompatActivity {
 
     private TextView sharedText;
     private TextView outputText;
-    private TextView progressText;
+    private TextView skeletonLoadingText;
     private MaterialCardView resultCard;
-    private View progressOverlay;
+    private MaterialCardView skeletonCard;
     private MaterialButton copyButton;
     private MaterialButton shareButton;
     private MaterialButton openMainAppButton;
@@ -62,8 +62,8 @@ public class ShareReceiverActivity extends AppCompatActivity {
         sharedText = findViewById(R.id.sharedText);
         outputText = findViewById(R.id.outputText);
         resultCard = findViewById(R.id.resultCard);
-        progressOverlay = findViewById(R.id.progressOverlay);
-        progressText = findViewById(R.id.progressText);
+        skeletonCard = findViewById(R.id.skeletonCard);
+        skeletonLoadingText = findViewById(R.id.skeletonLoadingText);
         copyButton = findViewById(R.id.copyButton);
         shareButton = findViewById(R.id.shareButton);
         openMainAppButton = findViewById(R.id.openMainAppButton);
@@ -128,8 +128,8 @@ public class ShareReceiverActivity extends AppCompatActivity {
      * Processes the content using Gemini API.
      */
     private void processContent(String content) {
-        showProgress(true);
-        progressText.setText(R.string.processing);
+        showSkeleton(true);
+        skeletonLoadingText.setText(R.string.processing);
 
         executor.execute(() -> {
             try {
@@ -137,13 +137,13 @@ public class ShareReceiverActivity extends AppCompatActivity {
 
                 // Check if content is a URL
                 if (WebContentExtractor.isUrl(content)) {
-                    mainHandler.post(() -> progressText.setText(R.string.extracting_content));
+                    mainHandler.post(() -> skeletonLoadingText.setText(R.string.extracting_content));
                     WebContentExtractor extractor = new WebContentExtractor();
                     textToProcess = extractor.extractContent(content);
                 }
 
                 // Generate post with Gemini
-                mainHandler.post(() -> progressText.setText(R.string.generating_post));
+                mainHandler.post(() -> skeletonLoadingText.setText(R.string.generating_post));
                 String apiKey = prefsManager.getApiKey();
                 String endpoint = prefsManager.getApiEndpoint();
                 String tone = prefsManager.getTone();
@@ -166,12 +166,12 @@ public class ShareReceiverActivity extends AppCompatActivity {
                     lastGeneratedPost = postWithHashtags;
                     outputText.setText(postWithHashtags);
                     resultCard.setVisibility(View.VISIBLE);
-                    showProgress(false);
+                    showSkeleton(false);
                 });
 
             } catch (Exception e) {
                 mainHandler.post(() -> {
-                    showProgress(false);
+                    showSkeleton(false);
                     String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown error";
                     Toast.makeText(ShareReceiverActivity.this,
                             getString(R.string.processing_error, errorMsg),
@@ -211,10 +211,10 @@ public class ShareReceiverActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows or hides the progress overlay.
+     * Shows or hides the skeleton loading.
      */
-    private void showProgress(boolean show) {
-        progressOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
+    private void showSkeleton(boolean show) {
+        skeletonCard.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     /**

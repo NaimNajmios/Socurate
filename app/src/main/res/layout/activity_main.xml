@@ -165,6 +165,17 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
+                    <!-- Loading Text -->
+                    <TextView
+                        android:id="@+id/skeletonLoadingText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/generating_post"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp" />
+
                     <!-- Skeleton Header -->
                     <LinearLayout
                         android:layout_width="match_parent"

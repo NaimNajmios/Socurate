@@ -75,6 +75,7 @@ id saveFab
 id shareButton
 id sharedText
 id skeletonCard
+id skeletonLoadingText
 id testConnectionButton
 id themeDark
 id themeLight
