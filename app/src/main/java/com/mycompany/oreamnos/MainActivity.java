@@ -274,7 +274,10 @@ public class MainActivity extends AppCompatActivity {
                 String tone = prefsManager.getTone();
                 Log.d(TAG, "Using tone: " + tone);
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
-                String result = gemini.curatePost(content);
+
+                // Get source enabled state from UI
+                boolean includeSource = includeSourceCheckbox.isChecked();
+                String result = gemini.curatePost(content, includeSource);
 
                 // Update UI on main thread
                 String finalResult = result;
@@ -485,7 +488,10 @@ public class MainActivity extends AppCompatActivity {
                 String tone = prefsManager.getTone();
 
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
-                String refinedPost = gemini.refinePost(originalGeneratedPost, refinements);
+
+                // Get source enabled state from UI
+                boolean includeSource = includeSourceCheckbox.isChecked();
+                String refinedPost = gemini.refinePost(originalGeneratedPost, refinements, includeSource);
 
                 // Update UI on main thread
                 mainHandler.post(() -> {

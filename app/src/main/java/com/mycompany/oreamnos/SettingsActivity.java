@@ -127,6 +127,10 @@ public class SettingsActivity extends AppCompatActivity {
         boolean hashtagsEnabled = prefsManager.areHashtagsEnabled();
         enableHashtagsSwitch.setChecked(hashtagsEnabled);
 
+        // Load source citation enabled state
+        boolean sourceEnabled = prefsManager.isSourceEnabled();
+        sourceEnabledSwitch.setChecked(sourceEnabled);
+
         // Load theme
         String theme = prefsManager.getTheme();
         if (PreferencesManager.THEME_LIGHT.equals(theme)) {
@@ -137,7 +141,8 @@ public class SettingsActivity extends AppCompatActivity {
             themeRadioGroup.check(R.id.themeSystem);
         }
 
-        Log.d(TAG, "Settings loaded - Tone: " + tone + ", Theme: " + theme + ", Hashtags enabled: " + hashtagsEnabled);
+        Log.d(TAG, "Settings loaded - Tone: " + tone + ", Theme: " + theme + ", Hashtags enabled: " + hashtagsEnabled
+                + ", Source enabled: " + sourceEnabled);
     }
 
     /**
@@ -169,14 +174,19 @@ public class SettingsActivity extends AppCompatActivity {
         String hashtags = hashtagsInput.getText() != null ? hashtagsInput.getText().toString().trim() : "";
         boolean hashtagsEnabled = enableHashtagsSwitch.isChecked();
 
+        // Get source enabled
+        boolean sourceEnabled = sourceEnabledSwitch.isChecked();
+
         // Save
         prefsManager.saveApiKey(apiKey);
         prefsManager.saveApiEndpoint(endpoint);
         prefsManager.saveTone(tone);
         prefsManager.saveHashtags(hashtags);
         prefsManager.setHashtagsEnabled(hashtagsEnabled);
+        prefsManager.saveSourceEnabled(sourceEnabled);
 
-        Log.i(TAG, "Settings saved - Tone: " + tone + ", Hashtags: '" + hashtags + "', Enabled: " + hashtagsEnabled);
+        Log.i(TAG, "Settings saved - Tone: " + tone + ", Hashtags: '" + hashtags + "', Enabled: " + hashtagsEnabled
+                + ", Source enabled: " + sourceEnabled);
 
         Toast.makeText(this, R.string.settings_saved, Toast.LENGTH_SHORT).show();
         finish();
@@ -206,7 +216,7 @@ public class SettingsActivity extends AppCompatActivity {
                         : PreferencesManager.TONE_CASUAL;
 
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
-                String result = gemini.curatePost("Test connection: Manchester United won 3-0.");
+                String result = gemini.curatePost("Test connection: Manchester United won 3-0.", true);
 
                 Log.i(TAG, "Test connection SUCCESSFUL - Response received");
                 mainHandler.post(() -> {

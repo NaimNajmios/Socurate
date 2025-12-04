@@ -64,16 +64,18 @@ public class GeminiService {
      * Curates the input text into a football social media post in Malaysian Malay.
      * Implements retry logic with exponential backoff for transient errors.
      * 
-     * @param inputText The text to curate
+     * @param inputText     The text to curate
+     * @param includeSource Whether to include source citation
      * @return The curated post
      * @throws Exception if API call fails after retries
      */
-    public String curatePost(String inputText) throws Exception {
+    public String curatePost(String inputText, boolean includeSource) throws Exception {
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString().substring(0, 8);
 
         Log.i(TAG, "=== GEMINI API CALL START [" + requestId + "] ===");
         Log.i(TAG, "[" + requestId + "] Input text length: " + (inputText != null ? inputText.length() : 0));
+        Log.i(TAG, "[" + requestId + "] Include source: " + includeSource);
 
         // Validate inputs
         if (apiKey == null || apiKey.trim().isEmpty()) {
@@ -87,8 +89,7 @@ public class GeminiService {
         }
 
         // Build the prompt based on tone
-        // Build the prompt based on tone
-        String prompt = buildPrompt(tone, inputText);
+        String prompt = buildPrompt(tone, inputText, includeSource);
 
         // Build request JSON
         JsonObject requestJson = new JsonObject();
@@ -266,20 +267,22 @@ public class GeminiService {
     /**
      * Refines an existing post based on selected refinement options.
      * 
-     * @param originalPost The post to refine
-     * @param refinements  List of refinement options
+     * @param originalPost  The post to refine
+     * @param refinements   List of refinement options
+     * @param includeSource Whether to include source citation
      * @return The refined post
      * @throws Exception if API call fails
      */
-    public String refinePost(String originalPost, List<String> refinements) throws Exception {
+    public String refinePost(String originalPost, List<String> refinements, boolean includeSource) throws Exception {
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString().substring(0, 8);
 
         Log.i(TAG, "=== GEMINI REFINEMENT START [" + requestId + "] ===");
         Log.i(TAG, "[" + requestId + "] Refinements: " + refinements);
+        Log.i(TAG, "[" + requestId + "] Include source: " + includeSource);
 
         // Build refinement prompt
-        String prompt = buildRefinementPrompt(originalPost, refinements);
+        String prompt = buildRefinementPrompt(originalPost, refinements, includeSource);
 
         // Build request JSON
         JsonObject requestJson = new JsonObject();
@@ -346,7 +349,7 @@ public class GeminiService {
     /**
      * Builds a refinement prompt based on selected options.
      */
-    private String buildRefinementPrompt(String originalPost, List<String> refinements) {
+    private String buildRefinementPrompt(String originalPost, List<String> refinements, boolean includeSource) {
         StringBuilder prompt = new StringBuilder();
         prompt.append("You are refining a Malaysian Malay (Bahasa Malaysia) social media post about football. ");
         prompt.append("Apply the following improvements to the post:\n\n");
@@ -381,6 +384,13 @@ public class GeminiService {
         prompt.append("Maintain the same length and structure. ");
         prompt.append("Do NOT include any hashtags or explanations.");
 
+        if (includeSource) {
+            prompt.append(
+                    "\nEnsure the post ends with 'Sumber: [Source Name]' if the original post had one or if the source is known.");
+        } else {
+            prompt.append("\nDo NOT include any 'Sumber:' citation in the output.");
+        }
+
         return prompt.toString();
     }
 
@@ -388,7 +398,7 @@ public class GeminiService {
      * Builds the prompt based on the selected tone and input text.
      * Detects quotes and long/technical content to adapt the prompt.
      */
-    private String buildPrompt(String tone, String inputText) {
+    private String buildPrompt(String tone, String inputText, boolean includeSource) {
         int originalLength = inputText.length();
         int targetMinLength = (int) (originalLength * 0.4);
         int targetMaxLength = (int) (originalLength * 0.6);
@@ -470,8 +480,12 @@ public class GeminiService {
                     "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Do NOT include any hashtags.");
         }
 
-        prompt.append(
-                "\n\nREMEMBER: End your post with a new line containing 'Sumber: [Source Name]' where Source Name is the website, publication, or journalist identified from the content.");
+        if (includeSource) {
+            prompt.append(
+                    "\n\nREMEMBER: End your post with a new line containing 'Sumber: [Source Name]' where Source Name is the website, publication, or journalist identified from the content.");
+        } else {
+            prompt.append("\n\nREMEMBER: Do NOT include any 'Sumber:' citation in the output.");
+        }
 
         return prompt.toString();
     }

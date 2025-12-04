@@ -149,7 +149,8 @@ public class ShareReceiverActivity extends AppCompatActivity {
                 String tone = prefsManager.getTone();
 
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
-                String result = gemini.curatePost(textToProcess);
+                boolean includeSource = prefsManager.isSourceEnabled();
+                String result = gemini.curatePost(textToProcess, includeSource);
 
                 // Update UI on main thread
                 String finalResult = result;
