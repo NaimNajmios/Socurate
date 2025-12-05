@@ -2024,10 +2024,13 @@
     <string name="character_counter_content_description">Characters entered %1$d of %2$d</string>
     <string name="character_counter_overflowed_content_description">Character limit exceeded %1$d of %2$d</string>
     <string name="character_counter_pattern" translatable="false">%1$d/%2$d</string>
+    <string name="chip_casual">Casual</string>
+    <string name="chip_formal">Formal</string>
     <string name="clear_input">Clear input</string>
     <string name="clear_text_end_icon_content_description">Clear text</string>
     <string name="connection_test_failed">Connection failed: %1$s</string>
     <string name="connection_test_success">Connection successful!</string>
+    <string name="content_copied_notification">Content copied!</string>
     <string name="content_description_copy_icon">Copy to clipboard</string>
     <string name="content_description_settings_icon">Settings</string>
     <string name="content_description_share_icon">Share</string>
@@ -2046,6 +2049,7 @@
     <string name="extracting_content">Extracting content from URL…</string>
     <string name="fab_transformation_scrim_behavior" translatable="false">com.google.android.material.transformation.FabTransformationScrimBehavior</string>
     <string name="fab_transformation_sheet_behavior" translatable="false">com.google.android.material.transformation.FabTransformationSheetBehavior</string>
+    <string name="generate_background">Generate in background</string>
     <string name="generate_button">Generate Post</string>
     <string name="generated_draft">Generated Draft</string>
     <string name="generating_button">Generating…</string>
@@ -2176,6 +2180,8 @@
     <string description="Button text to indicate that the widget will ignore the user&apos;s selection [CHAR_LIMIT=16]" name="mtrl_timepicker_cancel">Cancel</string>
     <string description="Button text to indicate that the widget will save the user&apos;s selection [CHAR_LIMIT=16]" name="mtrl_timepicker_confirm">OK</string>
     <string name="network_error">Network error. Please check your connection.</string>
+    <string name="notification_action_copy">Copy</string>
+    <string name="notification_action_open">Open</string>
     <string name="notification_channel_desc">Shows progress when generating posts</string>
     <string name="notification_channel_name">Content Generation</string>
     <string name="notification_complete_message">Your post has been generated!</string>
@@ -2198,6 +2204,8 @@
     <string name="powered_by">Powered by Google Gemini</string>
     <string name="processing">Processing…</string>
     <string name="processing_error">Error: %1$s</string>
+    <string name="progress_extracting">Extracting content…</string>
+    <string name="progress_generating">Generating with AI…</string>
     <string name="refine_conversational">Conversational</string>
     <string name="refine_formal">Formal</string>
     <string name="refine_recheck_flow">Recheck Flow</string>
@@ -2229,6 +2237,8 @@
     <string name="source_format">Sumber: [%1$s]</string>
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="success_title">Success</string>
+    <string name="tap_to_collapse">Tap to collapse</string>
+    <string name="tap_to_expand">Tap to expand</string>
     <string name="test_connection">Test Connection</string>
     <string name="text_pasted">Text pasted</string>
     <string name="theme_dark">Always Dark</string>
@@ -2239,6 +2249,7 @@
     <string name="tone_casual">Casual (Fan Banter)</string>
     <string name="tone_formal">Formal (Professional)</string>
     <string name="tone_label">Post Tone</string>
+    <string name="tone_quick_toggle">Tone</string>
     <string name="warning_title">Warning</string>
     <style name="AlertDialog.AppCompat" parent="Base.AlertDialog.AppCompat"/>
     <style name="AlertDialog.AppCompat.Light" parent="Base.AlertDialog.AppCompat.Light"/>
@@ -6045,6 +6056,13 @@
     <item name="cornerFamily">rounded</item>
     <item name="cornerSize">4dp</item>
   </style>
+    <style name="ShapeAppearance.Oreamnos.BottomSheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeTopRight">20dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
     <style name="ShapeAppearanceOverlay.Material3.Button" parent="">
     <item name="cornerSize">50%</item>
   </style>
@@ -6683,6 +6701,18 @@
         
         <item name="fontFamily">sans-serif</item>
         <item name="android:fontFamily">sans-serif</item>
+    </style>
+    <style name="Theme.Oreamnos.BottomSheet" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Oreamnos.BottomSheet</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+    <style name="Theme.Oreamnos.Transparent" parent="Theme.Oreamnos">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
     </style>
     <style name="ThemeOverlay.AppCompat" parent="Base.ThemeOverlay.AppCompat"/>
     <style name="ThemeOverlay.AppCompat.ActionBar" parent="Base.ThemeOverlay.AppCompat.ActionBar"/>
@@ -9318,6 +9348,10 @@
     <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Tooltip</item>
     <item name="shapeAppearance">@style/ShapeAppearance.MaterialComponents.Tooltip</item>
   </style>
+    <style name="Widget.Oreamnos.BottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="shapeAppearance">@style/ShapeAppearance.Oreamnos.BottomSheet</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
+    </style>
     <style name="Widget.Support.CoordinatorLayout" parent="android:Widget">
         <item name="statusBarBackground">#000000</item>
     </style>

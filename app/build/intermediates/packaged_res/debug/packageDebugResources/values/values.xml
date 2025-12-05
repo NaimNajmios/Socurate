@@ -52,9 +52,12 @@
     <string name="app_name">Oreamnos</string>
     <string name="app_version">Version 1.0</string>
     <string name="cancel_edit">Cancel</string>
+    <string name="chip_casual">Casual</string>
+    <string name="chip_formal">Formal</string>
     <string name="clear_input">Clear input</string>
     <string name="connection_test_failed">Connection failed: %1$s</string>
     <string name="connection_test_success">Connection successful!</string>
+    <string name="content_copied_notification">Content copied!</string>
     <string name="content_description_copy_icon">Copy to clipboard</string>
     <string name="content_description_settings_icon">Settings</string>
     <string name="content_description_share_icon">Share</string>
@@ -66,6 +69,7 @@
     <string name="enable_hashtags">Auto-append hashtags</string>
     <string name="error_title">Error</string>
     <string name="extracting_content">Extracting content from URL…</string>
+    <string name="generate_background">Generate in background</string>
     <string name="generate_button">Generate Post</string>
     <string name="generated_draft">Generated Draft</string>
     <string name="generating_button">Generating…</string>
@@ -87,6 +91,8 @@
     <string name="model_2_5_pro">Gemini 2.5 Pro</string>
     <string name="model_label">AI Model</string>
     <string name="network_error">Network error. Please check your connection.</string>
+    <string name="notification_action_copy">Copy</string>
+    <string name="notification_action_open">Open</string>
     <string name="notification_channel_desc">Shows progress when generating posts</string>
     <string name="notification_channel_name">Content Generation</string>
     <string name="notification_complete_message">Your post has been generated!</string>
@@ -104,6 +110,8 @@
     <string name="powered_by">Powered by Google Gemini</string>
     <string name="processing">Processing…</string>
     <string name="processing_error">Error: %1$s</string>
+    <string name="progress_extracting">Extracting content…</string>
+    <string name="progress_generating">Generating with AI…</string>
     <string name="refine_conversational">Conversational</string>
     <string name="refine_formal">Formal</string>
     <string name="refine_recheck_flow">Recheck Flow</string>
@@ -126,6 +134,8 @@
     <string name="source_citation_desc">Automatically detect and cite the source</string>
     <string name="source_format">Sumber: [%1$s]</string>
     <string name="success_title">Success</string>
+    <string name="tap_to_collapse">Tap to collapse</string>
+    <string name="tap_to_expand">Tap to expand</string>
     <string name="test_connection">Test Connection</string>
     <string name="text_pasted">Text pasted</string>
     <string name="theme_dark">Always Dark</string>
@@ -136,7 +146,15 @@
     <string name="tone_casual">Casual (Fan Banter)</string>
     <string name="tone_formal">Formal (Professional)</string>
     <string name="tone_label">Post Tone</string>
+    <string name="tone_quick_toggle">Tone</string>
     <string name="warning_title">Warning</string>
+    <style name="ShapeAppearance.Oreamnos.BottomSheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeTopRight">20dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
     <style name="Theme.Oreamnos" parent="Theme.Material3.DayNight.NoActionBar">
         
         <item name="colorPrimary">@color/md_theme_light_primary</item>
@@ -184,5 +202,21 @@
         
         <item name="fontFamily">sans-serif</item>
         <item name="android:fontFamily">sans-serif</item>
+    </style>
+    <style name="Theme.Oreamnos.BottomSheet" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Oreamnos.BottomSheet</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+    <style name="Theme.Oreamnos.Transparent" parent="Theme.Oreamnos">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+    <style name="Widget.Oreamnos.BottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="shapeAppearance">@style/ShapeAppearance.Oreamnos.BottomSheet</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
     </style>
 </resources>

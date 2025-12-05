@@ -4,18 +4,6 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\mipmap-xxhdpi\\oreamnos_white.png"
     },
     {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\color_chip_text_color_selector.xml.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\color\\chip_text_color_selector.xml"
-    },
-    {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_ic_document.xml.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\ic_document.xml"
-    },
-    {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\menu_menu_main.xml.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\menu\\menu_main.xml"
-    },
-    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_pill_button_dark.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\pill_button_dark.xml"
     },
@@ -40,16 +28,16 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\layout\\activity_share_receiver.xml"
     },
     {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_dark_card_bg.xml.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\dark_card_bg.xml"
-    },
-    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\anim_fade_out.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\anim\\fade_out.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\anim_slide_up.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\anim\\slide_up.xml"
+    },
+    {
+        "merged": "com.mycompany.oreamnos.app-debug-33:/drawable_bottom_sheet_handle.xml.flat",
+        "source": "com.mycompany.oreamnos.app-main-35:/drawable/bottom_sheet_handle.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\mipmap-mdpi_oreamnos_white.png.flat",
@@ -64,20 +52,40 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\color\\chip_background_selector.xml"
     },
     {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_skeleton_item.xml.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\skeleton_item.xml"
-    },
-    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_pill_button_green.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\pill_button_green.xml"
     },
     {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\mipmap-hdpi_oreamnos_white.png.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\mipmap-hdpi\\oreamnos_white.png"
-    },
-    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_skeleton_shimmer.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\skeleton_shimmer.xml"
+    },
+    {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\color_chip_text_color_selector.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\color\\chip_text_color_selector.xml"
+    },
+    {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_ic_document.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\ic_document.xml"
+    },
+    {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\menu_menu_main.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\menu\\menu_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_dark_card_bg.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\dark_card_bg.xml"
+    },
+    {
+        "merged": "com.mycompany.oreamnos.app-debug-33:/layout_fragment_share_bottom_sheet.xml.flat",
+        "source": "com.mycompany.oreamnos.app-main-35:/layout/fragment_share_bottom_sheet.xml"
+    },
+    {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_skeleton_item.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\skeleton_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\mipmap-hdpi_oreamnos_white.png.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\mipmap-hdpi\\oreamnos_white.png"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_ic_stadium.xml.flat",
@@ -86,9 +94,5 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\anim_fade_in.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\anim\\fade_in.xml"
-    },
-    {
-        "merged": "com.mycompany.oreamnos.app-debug-33:/layout_activity_share_receiver.xml.flat",
-        "source": "com.mycompany.oreamnos.app-main-35:/layout/activity_share_receiver.xml"
     }
 ]

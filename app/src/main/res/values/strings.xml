@@ -133,4 +133,17 @@
     <string name="model_2_5_flash">Gemini 2.5 Flash</string>
     <string name="model_2_5_pro">Gemini 2.5 Pro</string>
     <string name="model_2_0_flash">Gemini 2.0 Flash</string>
+    
+    <!-- Bottom Sheet Share -->
+    <string name="progress_extracting">Extracting content…</string>
+    <string name="progress_generating">Generating with AI…</string>
+    <string name="generate_background">Generate in background</string>
+    <string name="tap_to_expand">Tap to expand</string>
+    <string name="tap_to_collapse">Tap to collapse</string>
+    <string name="tone_quick_toggle">Tone</string>
+    <string name="chip_formal">Formal</string>
+    <string name="chip_casual">Casual</string>
+    <string name="notification_action_copy">Copy</string>
+    <string name="notification_action_open">Open</string>
+    <string name="content_copied_notification">Content copied!</string>
 </resources>

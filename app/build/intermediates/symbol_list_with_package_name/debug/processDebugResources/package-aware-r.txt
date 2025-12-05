@@ -3029,6 +3029,7 @@ drawable abc_textfield_search_material
 drawable abc_vector_test
 drawable avd_hide_password
 drawable avd_show_password
+drawable bottom_sheet_handle
 drawable btn_checkbox_checked_mtrl
 drawable btn_checkbox_checked_to_unchecked_mtrl_animation
 drawable btn_checkbox_unchecked_mtrl
@@ -3225,6 +3226,7 @@ id auto
 id autoComplete
 id autoCompleteToEnd
 id autoCompleteToStart
+id backgroundButton
 id barrier
 id baseline
 id beginOnFirstDraw
@@ -3258,6 +3260,8 @@ id checkRephrase
 id checkShortenDetailed
 id checkbox
 id checked
+id chipCasual
+id chipFormal
 id chronometer
 id circle_center
 id clearInputButton
@@ -3265,6 +3269,7 @@ id clear_text
 id clip_horizontal
 id clip_vertical
 id clockwise
+id closeButton
 id closest
 id collapseActionView
 id compress
@@ -3274,6 +3279,7 @@ id container
 id content
 id contentPanel
 id contiguous
+id continueButton
 id continuousVelocity
 id coordinator
 id copyButton
@@ -3329,6 +3335,7 @@ id endToStart
 id enterAlways
 id enterAlwaysCollapsed
 id exitUntilCollapsed
+id expandArrow
 id expand_activities_button
 id expanded_menu
 id fade
@@ -3377,7 +3384,9 @@ id includeTitleCheckbox
 id included
 id indeterminate
 id info
+id inputCard
 id inputCharCount
+id inputHeader
 id inputText
 id invisible
 id inward
@@ -3519,7 +3528,10 @@ id position
 id postLayout
 id pressed
 id previewCard
+id progressBar
+id progressCard
 id progressOverlay
+id progressStatusText
 id progressText
 id progress_circular
 id progress_horizontal
@@ -3651,8 +3663,10 @@ id titleDividerNoCustom
 id title_template
 id toggle
 id toneCasual
+id toneChipGroup
 id toneFormal
 id toneRadioGroup
+id toneToggleContainer
 id toolbar
 id top
 id topPanel
@@ -3822,6 +3836,7 @@ layout design_navigation_menu
 layout design_navigation_menu_item
 layout design_text_input_end_icon
 layout design_text_input_start_icon
+layout fragment_share_bottom_sheet
 layout m3_alert_dialog
 layout m3_alert_dialog_actions
 layout m3_alert_dialog_title
@@ -3938,10 +3953,13 @@ string cancel_edit
 string character_counter_content_description
 string character_counter_overflowed_content_description
 string character_counter_pattern
+string chip_casual
+string chip_formal
 string clear_input
 string clear_text_end_icon_content_description
 string connection_test_failed
 string connection_test_success
+string content_copied_notification
 string content_description_copy_icon
 string content_description_settings_icon
 string content_description_share_icon
@@ -3958,6 +3976,7 @@ string exposed_dropdown_menu_content_description
 string extracting_content
 string fab_transformation_scrim_behavior
 string fab_transformation_sheet_behavior
+string generate_background
 string generate_button
 string generated_draft
 string generating_button
@@ -4082,6 +4101,8 @@ string mtrl_switch_track_path
 string mtrl_timepicker_cancel
 string mtrl_timepicker_confirm
 string network_error
+string notification_action_copy
+string notification_action_open
 string notification_channel_desc
 string notification_channel_name
 string notification_complete_message
@@ -4104,6 +4125,8 @@ string placeholder_title
 string powered_by
 string processing
 string processing_error
+string progress_extracting
+string progress_generating
 string refine_conversational
 string refine_formal
 string refine_recheck_flow
@@ -4133,6 +4156,8 @@ string source_citation_desc
 string source_format
 string status_bar_notification_info_overflow
 string success_title
+string tap_to_collapse
+string tap_to_expand
 string test_connection
 string text_pasted
 string theme_dark
@@ -4143,6 +4168,7 @@ string theme_system
 string tone_casual
 string tone_formal
 string tone_label
+string tone_quick_toggle
 string warning_title
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light
@@ -4528,6 +4554,7 @@ style ShapeAppearance_MaterialComponents_LargeComponent
 style ShapeAppearance_MaterialComponents_MediumComponent
 style ShapeAppearance_MaterialComponents_SmallComponent
 style ShapeAppearance_MaterialComponents_Tooltip
+style ShapeAppearance_Oreamnos_BottomSheet
 style ShapeAppearanceOverlay_Material3_Button
 style ShapeAppearanceOverlay_Material3_Chip
 style ShapeAppearanceOverlay_Material3_Corner_Bottom
@@ -4770,6 +4797,8 @@ style Theme_MaterialComponents_Light_NoActionBar_Bridge
 style Theme_MaterialComponents_NoActionBar
 style Theme_MaterialComponents_NoActionBar_Bridge
 style Theme_Oreamnos
+style Theme_Oreamnos_BottomSheet
+style Theme_Oreamnos_Transparent
 style ThemeOverlay_AppCompat
 style ThemeOverlay_AppCompat_ActionBar
 style ThemeOverlay_AppCompat_Dark
@@ -5260,6 +5289,7 @@ style Widget_MaterialComponents_Toolbar_Primary
 style Widget_MaterialComponents_Toolbar_PrimarySurface
 style Widget_MaterialComponents_Toolbar_Surface
 style Widget_MaterialComponents_Tooltip
+style Widget_Oreamnos_BottomSheet
 style Widget_Support_CoordinatorLayout
 styleable ActionBar background backgroundSplit backgroundStacked contentInsetEnd contentInsetEndWithActions contentInsetLeft contentInsetRight contentInsetStart contentInsetStartWithNavigation customNavigationLayout displayOptions divider elevation height hideOnContentScroll homeAsUpIndicator homeLayout icon indeterminateProgressStyle itemPadding logo navigationMode popupTheme progressBarPadding progressBarStyle subtitle subtitleTextStyle title titleTextStyle
 styleable ActionBarLayout android_layout_gravity
