@@ -95,6 +95,7 @@
     <string name="original_post">Original Post</string>
     <string name="output_label">Generated Post</string>
     <string name="output_placeholder">Your Malaysian Malay post will appear here…</string>
+    <string name="paste_input">Paste</string>
     <string name="placeholder_subtitle">Share from your browser or paste a URL</string>
     <string name="placeholder_title">Ready to curate. Paste a link to start.</string>
     <string name="powered_by">Powered by Google Gemini</string>
@@ -123,6 +124,7 @@
     <string name="source_format">Sumber: [%1$s]</string>
     <string name="success_title">Success</string>
     <string name="test_connection">Test Connection</string>
+    <string name="text_pasted">Text pasted</string>
     <string name="theme_dark">Always Dark</string>
     <string name="theme_label">App Theme</string>
     <string name="theme_light">Always Light</string>

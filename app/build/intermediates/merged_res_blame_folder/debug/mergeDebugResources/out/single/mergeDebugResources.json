@@ -76,6 +76,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-34:\\drawable\\ic_sparkle.xml"
     },
     {
+        "merged": "com.mycompany.oreamnos.app-debug-32:/color_chip_background_selector.xml.flat",
+        "source": "com.mycompany.oreamnos.app-main-34:/color/chip_background_selector.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-32:\\layout_activity_settings.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-34:\\layout\\activity_settings.xml"
     },

@@ -1370,6 +1370,7 @@ color cardview_dark_background
 color cardview_light_background
 color cardview_shadow_end_color
 color cardview_shadow_start_color
+color chip_background_selector
 color design_bottom_navigation_shadow_color
 color design_box_stroke_color
 color design_dark_default_color_background
@@ -3481,6 +3482,7 @@ id parentPanel
 id parentRelative
 id parent_matrix
 id password_toggle
+id pasteButton
 id path
 id pathRelative
 id peekHeight
@@ -4057,6 +4059,7 @@ string original_post
 string output_label
 string output_placeholder
 string password_toggle_content_description
+string paste_input
 string path_password_eye
 string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
@@ -4096,6 +4099,7 @@ string source_format
 string status_bar_notification_info_overflow
 string success_title
 string test_connection
+string text_pasted
 string theme_dark
 string theme_label
 string theme_light

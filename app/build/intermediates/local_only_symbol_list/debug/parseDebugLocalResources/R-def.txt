@@ -4,6 +4,7 @@ anim fade_in
 anim fade_out
 anim slide_up
 color background_light
+color chip_background_selector
 color divider_light
 color error_light
 color md_theme_light_background
@@ -73,6 +74,7 @@ id openMainAppButton
 id outputCard
 id outputScrollView
 id outputText
+id pasteButton
 id placeholderView
 id previewCard
 id progressOverlay
@@ -158,6 +160,7 @@ string open_in_app
 string original_post
 string output_label
 string output_placeholder
+string paste_input
 string placeholder_subtitle
 string placeholder_title
 string powered_by
@@ -186,6 +189,7 @@ string source_citation_desc
 string source_format
 string success_title
 string test_connection
+string text_pasted
 string theme_dark
 string theme_label
 string theme_light

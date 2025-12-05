@@ -1369,6 +1369,7 @@ int color cardview_dark_background 0x7f05002a
 int color cardview_light_background 0x7f05002b
 int color cardview_shadow_end_color 0x7f05002c
 int color cardview_shadow_start_color 0x7f05002d
+int color chip_background_selector 0x7f050326
 int color design_bottom_navigation_shadow_color 0x7f05002e
 int color design_box_stroke_color 0x7f05002f
 int color design_dark_default_color_background 0x7f050030
@@ -3480,6 +3481,7 @@ int id parentPanel 0x7f08016b
 int id parentRelative 0x7f08016c
 int id parent_matrix 0x7f08016d
 int id password_toggle 0x7f08016e
+int id pasteButton 0x7f08021d
 int id path 0x7f08016f
 int id pathRelative 0x7f080170
 int id peekHeight 0x7f080171
@@ -4056,6 +4058,7 @@ int string original_post 0x7f1000c8
 int string output_label 0x7f1000c9
 int string output_placeholder 0x7f1000ca
 int string password_toggle_content_description 0x7f1000cb
+int string paste_input 0x7f1000fd
 int string path_password_eye 0x7f1000cc
 int string path_password_eye_mask_strike_through 0x7f1000cd
 int string path_password_eye_mask_visible 0x7f1000ce
@@ -4095,6 +4098,7 @@ int string source_format 0x7f1000ee
 int string status_bar_notification_info_overflow 0x7f1000ef
 int string success_title 0x7f1000f0
 int string test_connection 0x7f1000f1
+int string text_pasted 0x7f1000fe
 int string theme_dark 0x7f1000f2
 int string theme_label 0x7f1000f3
 int string theme_light 0x7f1000f4

@@ -29,6 +29,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.mycompany.oreamnos.services.ContentGenerationService;
@@ -56,11 +57,12 @@ public class MainActivity extends AppCompatActivity {
     private View placeholderView;
     private ImageButton clearInputButton;
     private ImageButton resetAllButton;
+    private ImageButton pasteButton;
     private MaterialButton editButton;
     private MaterialButton copyButton;
     private MaterialButton shareButton;
-    private MaterialCheckBox includeHashtagsCheckbox;
-    private MaterialCheckBox includeSourceCheckbox;
+    private Chip includeHashtagsCheckbox;
+    private Chip includeSourceCheckbox;
     private ExtendedFloatingActionButton generateFab;
 
     // Refinement UI
@@ -129,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
         progressText = findViewById(R.id.progressText);
         clearInputButton = findViewById(R.id.clearInputButton);
         resetAllButton = findViewById(R.id.resetAllButton);
+        pasteButton = findViewById(R.id.pasteButton);
         editButton = findViewById(R.id.editButton);
         copyButton = findViewById(R.id.copyButton);
         shareButton = findViewById(R.id.shareButton);
@@ -162,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
         shareButton.setOnClickListener(v -> onShareClick());
         clearInputButton.setOnClickListener(v -> onClearInputClick());
         resetAllButton.setOnClickListener(v -> onResetAllClick());
+        pasteButton.setOnClickListener(v -> onPasteClick());
         regenerateButton.setOnClickListener(v -> onRegenerateClick());
 
         // Watch for text changes to show edited indicator
@@ -490,6 +494,27 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(this, R.string.all_reset, Toast.LENGTH_SHORT).show();
         Log.i(TAG, "UI reset to initial state");
+    }
+
+    /**
+     * Pastes text from clipboard into the input field.
+     */
+    private void onPasteClick() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard != null && clipboard.hasPrimaryClip()) {
+            ClipData clip = clipboard.getPrimaryClip();
+            if (clip != null && clip.getItemCount() > 0) {
+                CharSequence pastedText = clip.getItemAt(0).getText();
+                if (pastedText != null && pastedText.length() > 0) {
+                    inputText.setText(pastedText);
+                    inputText.setSelection(pastedText.length()); // Move cursor to end
+                    Toast.makeText(this, R.string.text_pasted, Toast.LENGTH_SHORT).show();
+                    Log.i(TAG, "Text pasted from clipboard");
+                    return;
+                }
+            }
+        }
+        Toast.makeText(this, "Clipboard is empty", Toast.LENGTH_SHORT).show();
     }
 
     /**

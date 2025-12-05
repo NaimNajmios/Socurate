@@ -54,7 +54,7 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Input Header with Clear and Reset Buttons -->
+                    <!-- Input Header with Paste, Clear and Reset Buttons -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -70,6 +70,18 @@
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="16sp"
                             android:textStyle="bold" />
+
+                        <!-- Paste Button -->
+                        <ImageButton
+                            android:id="@+id/pasteButton"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@android:drawable/ic_menu_edit"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/paste_input"
+                            android:tint="?attr/colorOnSurfaceVariant"
+                            android:padding="4dp"
+                            android:layout_marginEnd="8dp" />
 
                         <!-- Clear Input Button -->
                         <ImageButton
@@ -402,27 +414,40 @@
 
                     </ScrollView>
 
-                    <!-- Hashtag Checkbox -->
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/includeHashtagsCheckbox"
+                    <!-- Pill Checkboxes (Chips) -->
+                    <com.google.android.material.chip.ChipGroup
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/include_hashtags"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:checked="true"
-                        app:buttonTint="?attr/colorPrimary"
-                        android:layout_marginBottom="8dp" />
-                    
-                    <!-- Source Checkbox -->
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/includeSourceCheckbox"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/include_source"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:checked="true"
-                        app:buttonTint="?attr/colorPrimary"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="16dp"
+                        app:singleLine="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/includeHashtagsCheckbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/include_hashtags"
+                            android:checked="true"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/includeSourceCheckbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/include_source"
+                            android:checked="true"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
+
+                    </com.google.android.material.chip.ChipGroup>
 
                     <!-- Action Buttons -->
                     <LinearLayout
