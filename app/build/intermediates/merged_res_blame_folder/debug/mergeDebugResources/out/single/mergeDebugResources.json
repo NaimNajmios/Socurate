@@ -48,10 +48,6 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-34:\\drawable\\skeleton_shimmer.xml"
     },
     {
-        "merged": "com.mycompany.oreamnos.app-debug-32:/layout_activity_share_receiver.xml.flat",
-        "source": "com.mycompany.oreamnos.app-main-34:/layout/activity_share_receiver.xml"
-    },
-    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-32:\\mipmap-mdpi_oreamnos_white.png.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-34:\\mipmap-mdpi\\oreamnos_white.png"
     },
@@ -70,6 +66,10 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-32:\\mipmap-hdpi_oreamnos_white.png.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-34:\\mipmap-hdpi\\oreamnos_white.png"
+    },
+    {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-32:\\font_inter.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-34:\\font\\inter.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-32:\\drawable_ic_sparkle.xml.flat",

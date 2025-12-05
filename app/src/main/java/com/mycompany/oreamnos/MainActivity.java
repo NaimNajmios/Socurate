@@ -1,19 +1,17 @@
 package com.mycompany.oreamnos;
 
 import android.animation.ObjectAnimator;
-import android.util.Log;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,20 +20,22 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.mycompany.oreamnos.services.GeminiService;
-import com.mycompany.oreamnos.services.WebContentExtractor;
+import com.mycompany.oreamnos.services.ContentGenerationService;
 import com.mycompany.oreamnos.utils.NotificationHelper;
 import com.mycompany.oreamnos.utils.PreferencesManager;
+
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Main activity for the Oreamnos app with Quick Edit and Hashtag Manager.
@@ -74,13 +74,30 @@ public class MainActivity extends AppCompatActivity {
 
     private PreferencesManager prefsManager;
     private NotificationHelper notificationHelper;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private String originalGeneratedPost = "";
     private String generatedSourceCitation = "";
     private String originalInputText = "";
     private boolean isEditMode = false;
+
+    /**
+     * BroadcastReceiver for handling results from ContentGenerationService.
+     */
+    private final BroadcastReceiver serviceResultReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean success = intent.getBooleanExtra(ContentGenerationService.EXTRA_SUCCESS, false);
+            boolean isRefinement = intent.getBooleanExtra(ContentGenerationService.EXTRA_IS_REFINEMENT, false);
+
+            if (success) {
+                String result = intent.getStringExtra(ContentGenerationService.EXTRA_RESULT);
+                handleGenerationSuccess(result, isRefinement);
+            } else {
+                String error = intent.getStringExtra(ContentGenerationService.EXTRA_ERROR);
+                handleGenerationError(error, isRefinement);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +191,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Register broadcast receiver for service results
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                serviceResultReceiver,
+                new IntentFilter(ContentGenerationService.BROADCAST_RESULT));
+
         // Reload preferences when returning to activity
 
         // Load hashtags enabled state
@@ -206,6 +229,13 @@ public class MainActivity extends AppCompatActivity {
         // Update hashtags checkbox visibility
         includeHashtagsCheckbox.setVisibility(
                 !prefsManager.getHashtags().isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Unregister broadcast receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceResultReceiver);
     }
 
     @Override
@@ -331,94 +361,22 @@ public class MainActivity extends AppCompatActivity {
         hidePlaceholder();
         showSkeletonLoading(true);
 
-        // Show progress notification
-        notificationHelper.showProgressNotification(
-                getString(R.string.notification_generating_title),
-                getString(R.string.notification_generating_message));
+        // Store for potential regeneration
+        originalInputText = input;
 
-        // Process in background
-        String finalInput = input;
-        originalInputText = input; // Store for potential regeneration
-        executor.execute(() -> {
-            try {
-                String content = finalInput;
+        // Start the Foreground Service for generation
+        boolean includeSource = prefsManager.isSourceEnabled();
+        Intent serviceIntent = new Intent(this, ContentGenerationService.class);
+        serviceIntent.setAction(ContentGenerationService.ACTION_GENERATE);
+        serviceIntent.putExtra(ContentGenerationService.EXTRA_INPUT_TEXT, input);
+        serviceIntent.putExtra(ContentGenerationService.EXTRA_INCLUDE_SOURCE, includeSource);
 
-                // Check if input is a URL
-                if (WebContentExtractor.isUrl(finalInput)) {
-                    Log.i(TAG, "Input detected as URL, extracting content...");
-                    mainHandler.post(() -> progressText.setText(R.string.extracting_content));
-                    WebContentExtractor extractor = new WebContentExtractor();
-                    content = extractor.extractContent(finalInput);
-                    Log.d(TAG, "Extracted content length: " + content.length());
-                } else {
-                    Log.i(TAG, "Input is plain text, using directly");
-                }
-
-                // Generate post with Gemini
-                mainHandler.post(() -> progressText.setText(R.string.generating_post));
-                String apiKey = prefsManager.getApiKey();
-                String endpoint = prefsManager.getApiEndpoint();
-                String tone = prefsManager.getTone();
-                Log.d(TAG, "Using tone: " + tone);
-                GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
-
-                // Get source enabled state from UI
-                // ALWAYS request source if feature is globally enabled, to allow dynamic
-                // toggling
-                boolean includeSource = prefsManager.isSourceEnabled();
-                String result = gemini.curatePost(content, includeSource);
-
-                // Update UI on main thread
-                String finalResult = result;
-                mainHandler.post(() -> {
-                    Log.i(TAG, "Post generation SUCCESSFUL");
-
-                    // Extract source citation
-                    String contentWithoutSource = extractSourceCitation(finalResult);
-                    Log.d(TAG, "Generated post length: " + contentWithoutSource.length());
-
-                    // Set initial text (append source if checked)
-                    String textToShow = contentWithoutSource;
-                    if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {
-                        textToShow += "\n\n" + generatedSourceCitation;
-                    }
-
-                    originalGeneratedPost = textToShow;
-                    setOutputText(textToShow);
-                    showSkeletonLoading(false);
-                    showOutputCard();
-                    isEditMode = false;
-                    editButton.setText(R.string.edit_button);
-                    editButton.setIconResource(android.R.drawable.ic_menu_edit);
-                    editedIndicator.setVisibility(View.GONE);
-
-                    // Show refinement section after successful generation
-                    refinementCard.setVisibility(View.VISIBLE);
-                    clearRefinementCheckboxes();
-
-                    // Show completion notification
-                    notificationHelper.showCompletedNotification(
-                            getString(R.string.notification_complete_title),
-                            getString(R.string.notification_complete_message));
-                });
-
-            } catch (Exception e) {
-                Log.e(TAG, "Post generation FAILED: " + e.getMessage(), e);
-                mainHandler.post(() -> {
-                    showSkeletonLoading(false);
-                    showPlaceholder();
-                    String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown error";
-                    Toast.makeText(MainActivity.this,
-                            getString(R.string.processing_error, errorMsg),
-                            Toast.LENGTH_LONG).show();
-
-                    // Show error notification
-                    notificationHelper.showErrorNotification(
-                            getString(R.string.notification_error_title),
-                            errorMsg);
-                });
-            }
-        });
+        Log.i(TAG, "Starting ContentGenerationService for generation");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
     }
 
     /**
@@ -560,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
      * Collects selected refinement options and regenerates the draft.
      */
     private void onRegenerateClick() {
-        List<String> refinements = new ArrayList<>();
+        ArrayList<String> refinements = new ArrayList<>();
 
         // Collect selected refinement options
         if (checkRephrase.isChecked())
@@ -589,75 +547,67 @@ public class MainActivity extends AppCompatActivity {
         outputCard.setVisibility(View.GONE);
         refinementCard.setVisibility(View.GONE);
 
-        // Show progress notification
-        notificationHelper.showProgressNotification(
-                getString(R.string.notification_generating_title),
-                getString(R.string.notification_generating_message));
+        // Start the Foreground Service for refinement
+        boolean includeSource = prefsManager.isSourceEnabled();
+        Intent serviceIntent = new Intent(this, ContentGenerationService.class);
+        serviceIntent.setAction(ContentGenerationService.ACTION_REFINE);
+        serviceIntent.putExtra(ContentGenerationService.EXTRA_ORIGINAL_POST, originalGeneratedPost);
+        serviceIntent.putStringArrayListExtra(ContentGenerationService.EXTRA_REFINEMENTS, refinements);
+        serviceIntent.putExtra(ContentGenerationService.EXTRA_INCLUDE_SOURCE, includeSource);
 
-        // Regenerate in background
-        executor.execute(() -> {
-            try {
-                String apiKey = prefsManager.getApiKey();
-                String endpoint = prefsManager.getApiEndpoint();
-                String tone = prefsManager.getTone();
+        Log.i(TAG, "Starting ContentGenerationService for refinement");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
+    }
 
-                GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
+    /**
+     * Handles successful generation/refinement result from the service.
+     */
+    private void handleGenerationSuccess(String result, boolean isRefinement) {
+        Log.i(TAG, "Handling " + (isRefinement ? "refinement" : "generation") + " success");
 
-                // Get source enabled state from UI
-                // ALWAYS request source if feature is globally enabled
-                boolean includeSource = prefsManager.isSourceEnabled();
-                String refinedPost = gemini.refinePost(originalGeneratedPost, refinements, includeSource);
+        // Extract source citation
+        String contentWithoutSource = extractSourceCitation(result);
 
-                // Update UI on main thread
-                mainHandler.post(() -> {
-                    Log.i(TAG, "Post refinement SUCCESSFUL");
+        // Set initial text (append source if checked)
+        String textToShow = contentWithoutSource;
+        if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {
+            textToShow += "\n\n" + generatedSourceCitation;
+        }
 
-                    // Extract source citation
-                    String contentWithoutSource = extractSourceCitation(refinedPost);
+        originalGeneratedPost = textToShow;
+        setOutputText(textToShow);
+        showSkeletonLoading(false);
+        showOutputCard();
+        isEditMode = false;
+        editButton.setText(R.string.edit_button);
+        editButton.setIconResource(android.R.drawable.ic_menu_edit);
+        editedIndicator.setVisibility(View.GONE);
 
-                    // Set initial text (append source if checked)
-                    String textToShow = contentWithoutSource;
-                    if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {
-                        textToShow += "\n\n" + generatedSourceCitation;
-                    }
+        // Show refinement section
+        refinementCard.setVisibility(View.VISIBLE);
+        clearRefinementCheckboxes();
+    }
 
-                    originalGeneratedPost = textToShow;
-                    setOutputText(textToShow);
-                    showSkeletonLoading(false);
-                    showOutputCard();
-                    isEditMode = false;
-                    editButton.setText(R.string.edit_button);
-                    editButton.setIconResource(android.R.drawable.ic_menu_edit);
-                    editedIndicator.setVisibility(View.GONE);
+    /**
+     * Handles error result from the service.
+     */
+    private void handleGenerationError(String error, boolean isRefinement) {
+        Log.e(TAG, "Handling " + (isRefinement ? "refinement" : "generation") + " error: " + error);
 
-                    // Show refinement section again
-                    refinementCard.setVisibility(View.VISIBLE);
-                    clearRefinementCheckboxes();
+        showSkeletonLoading(false);
 
-                    // Show completion notification
-                    notificationHelper.showCompletedNotification(
-                            getString(R.string.notification_complete_title),
-                            getString(R.string.notification_complete_message));
-                });
-
-            } catch (Exception e) {
-                Log.e(TAG, "Post refinement FAILED: " + e.getMessage(), e);
-                mainHandler.post(() -> {
-                    showSkeletonLoading(false);
-                    outputCard.setVisibility(View.VISIBLE);
-                    refinementCard.setVisibility(View.VISIBLE);
-                    String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown error";
-                    Toast.makeText(MainActivity.this,
-                            "Refinement error: " + errorMsg,
-                            Toast.LENGTH_LONG).show();
-
-                    // Show error notification
-                    notificationHelper.showErrorNotification(
-                            getString(R.string.notification_error_title),
-                            errorMsg);
-                });
-            }
-        });
+        if (isRefinement) {
+            outputCard.setVisibility(View.VISIBLE);
+            refinementCard.setVisibility(View.VISIBLE);
+            Toast.makeText(this, "Refinement error: " + error, Toast.LENGTH_LONG).show();
+        } else {
+            showPlaceholder();
+            Toast.makeText(this, getString(R.string.processing_error, error), Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -696,6 +646,5 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.i(TAG, "=== MainActivity onDestroy ===");
         super.onDestroy();
-        executor.shutdown();
     }
 }

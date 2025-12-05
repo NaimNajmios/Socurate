@@ -1,5 +1,6 @@
 package com.mycompany.oreamnos.utils;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -18,6 +19,7 @@ public class NotificationHelper {
 
     private static final String CHANNEL_ID = "oreamnos_generation_channel";
     private static final int NOTIFICATION_ID = 1001;
+    public static final int FOREGROUND_NOTIFICATION_ID = 1002;
     private static final int AUTO_DISMISS_DELAY_MS = 3000;
 
     private final Context context;
@@ -112,5 +114,31 @@ public class NotificationHelper {
      */
     public void dismissNotification() {
         notificationManager.cancel(NOTIFICATION_ID);
+    }
+
+    /**
+     * Dismisses the foreground service notification.
+     */
+    public void dismissForegroundNotification() {
+        notificationManager.cancel(FOREGROUND_NOTIFICATION_ID);
+    }
+
+    /**
+     * Builds a notification suitable for Foreground Service.
+     * This notification will be shown while content generation is in progress.
+     *
+     * @param title   Notification title
+     * @param message Notification message
+     * @return Built Notification object
+     */
+    public Notification buildForegroundNotification(String title, String message) {
+        return new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_popup_sync)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setOngoing(true)
+                .setProgress(0, 0, true)
+                .build();
     }
 }

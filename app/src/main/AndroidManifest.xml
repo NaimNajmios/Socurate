@@ -4,6 +4,8 @@
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <application
         android:allowBackup="true"
@@ -45,6 +47,12 @@
             android:label="@string/settings"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.Oreamnos" />
+
+        <!-- Content Generation Foreground Service -->
+        <service
+            android:name=".services.ContentGenerationService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
     </application>
 
