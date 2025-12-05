@@ -129,6 +129,17 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Character Count -->
+                    <TextView
+                        android:id="@+id/inputCharCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:text="0 characters"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
@@ -201,111 +212,131 @@
                         android:textStyle="bold"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- Skeleton Header -->
-                    <LinearLayout
+                    <!-- Shimmer Container -->
+                    <com.facebook.shimmer.ShimmerFrameLayout
+                        android:id="@+id/shimmerLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
+                        app:shimmer_auto_start="true"
+                        app:shimmer_duration="1200"
+                        app:shimmer_base_alpha="0.7"
+                        app:shimmer_highlight_alpha="1.0"
+                        app:shimmer_direction="left_to_right">
 
-                        <View
-                            android:layout_width="100dp"
-                            android:layout_height="20dp"
-                            android:background="@drawable/skeleton_item" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_weight="1" />
+                            <!-- Skeleton Header -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="16dp">
 
-                        <View
-                            android:layout_width="80dp"
-                            android:layout_height="36dp"
-                            android:background="@drawable/skeleton_item" />
+                                <View
+                                    android:layout_width="100dp"
+                                    android:layout_height="20dp"
+                                    android:background="@drawable/skeleton_item" />
 
-                    </LinearLayout>
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="1" />
 
-                    <!-- Skeleton Lines -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="16dp"
-                        android:layout_marginBottom="8dp"
-                        android:background="@drawable/skeleton_item" />
+                                <View
+                                    android:layout_width="80dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/skeleton_item" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="16dp"
-                        android:layout_marginBottom="8dp"
-                        android:background="@drawable/skeleton_item" />
+                            </LinearLayout>
 
-                    <!-- Skeleton Line 3 (80% width) -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:orientation="horizontal">
+                            <!-- Skeleton Lines -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@drawable/skeleton_item" />
 
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="16dp"
-                            android:layout_weight="0.8"
-                            android:background="@drawable/skeleton_item" />
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@drawable/skeleton_item" />
 
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_weight="0.2" />
+                            <!-- Skeleton Line 3 (80% width) -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:orientation="horizontal">
 
-                    </LinearLayout>
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="16dp"
+                                    android:layout_weight="0.8"
+                                    android:background="@drawable/skeleton_item" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="16dp"
-                        android:layout_marginBottom="8dp"
-                        android:background="@drawable/skeleton_item" />
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="0.2" />
 
-                    <!-- Skeleton Line 5 (60% width) -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
-                        android:orientation="horizontal">
+                            </LinearLayout>
 
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="16dp"
-                            android:layout_weight="0.6"
-                            android:background="@drawable/skeleton_item" />
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@drawable/skeleton_item" />
 
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_weight="0.4" />
+                            <!-- Skeleton Line 5 (60% width) -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="20dp"
+                                android:orientation="horizontal">
 
-                    </LinearLayout>
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="16dp"
+                                    android:layout_weight="0.6"
+                                    android:background="@drawable/skeleton_item" />
 
-                    <!-- Skeleton Buttons -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="0.4" />
 
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/skeleton_item" />
+                            </LinearLayout>
 
-                        <View
-                            android:layout_width="12dp"
-                            android:layout_height="1dp" />
+                            <!-- Skeleton Buttons -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
 
-                        <View
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="@drawable/skeleton_item" />
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="48dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/skeleton_item" />
 
-                    </LinearLayout>
+                                <View
+                                    android:layout_width="12dp"
+                                    android:layout_height="1dp" />
+
+                                <View
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"
+                                    android:background="@drawable/skeleton_item" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </com.facebook.shimmer.ShimmerFrameLayout>
 
                 </LinearLayout>
 
@@ -413,6 +444,17 @@
                             android:focusableInTouchMode="false" />
 
                     </ScrollView>
+
+                    <!-- Word Count -->
+                    <TextView
+                        android:id="@+id/outputWordCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:text="0 words"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="12dp" />
 
                     <!-- Pill Checkboxes (Chips) -->
                     <com.google.android.material.chip.ChipGroup
@@ -534,48 +576,87 @@
                         android:textStyle="bold"
                         android:layout_marginBottom="12dp" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkRephrase"
+                    <!-- Refinement Chips -->
+                    <com.google.android.material.chip.ChipGroup
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/refine_rephrase"
-                        android:textColor="?attr/colorOnSurface" />
+                        android:layout_marginBottom="16dp"
+                        app:singleLine="false"
+                        app:chipSpacingVertical="8dp">
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkRecheckFlow"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/refine_recheck_flow"
-                        android:textColor="?attr/colorOnSurface" />
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/checkRephrase"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/refine_rephrase"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkRecheckWording"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/refine_recheck_wording"
-                        android:textColor="?attr/colorOnSurface" />
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/checkRecheckFlow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/refine_recheck_flow"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkFormal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/refine_formal"
-                        android:textColor="?attr/colorOnSurface" />
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/checkRecheckWording"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/refine_recheck_wording"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkConversational"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/refine_conversational"
-                        android:textColor="?attr/colorOnSurface" />
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/checkFormal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/refine_formal"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkShortenDetailed"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/refine_shorten_detailed"
-                        android:textColor="?attr/colorOnSurface"
-                        android:layout_marginBottom="16dp" />
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/checkConversational"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/refine_conversational"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/checkShortenDetailed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/refine_shorten_detailed"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
+
+                    </com.google.android.material.chip.ChipGroup>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/regenerateButton"

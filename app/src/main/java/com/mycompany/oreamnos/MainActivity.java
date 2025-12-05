@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private TextInputEditText outputText;
     private TextView editedIndicator;
     private TextView progressText;
+    private TextView inputCharCount;
+    private TextView outputWordCount;
     private MaterialCardView outputCard;
     private MaterialCardView skeletonCard;
     private View progressOverlay;
@@ -68,12 +70,12 @@ public class MainActivity extends AppCompatActivity {
 
     // Refinement UI
     private MaterialCardView refinementCard;
-    private MaterialCheckBox checkRephrase;
-    private MaterialCheckBox checkRecheckFlow;
-    private MaterialCheckBox checkRecheckWording;
-    private MaterialCheckBox checkFormal;
-    private MaterialCheckBox checkConversational;
-    private MaterialCheckBox checkShortenDetailed;
+    private Chip checkRephrase;
+    private Chip checkRecheckFlow;
+    private Chip checkRecheckWording;
+    private Chip checkFormal;
+    private Chip checkConversational;
+    private Chip checkShortenDetailed;
     private MaterialButton regenerateButton;
 
     private PreferencesManager prefsManager;
@@ -132,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
         placeholderView = findViewById(R.id.placeholderView);
         progressOverlay = findViewById(R.id.progressOverlay);
         progressText = findViewById(R.id.progressText);
+        inputCharCount = findViewById(R.id.inputCharCount);
+        outputWordCount = findViewById(R.id.outputWordCount);
         clearInputButton = findViewById(R.id.clearInputButton);
         resetAllButton = findViewById(R.id.resetAllButton);
         pasteButton = findViewById(R.id.pasteButton);
@@ -172,7 +176,24 @@ public class MainActivity extends AppCompatActivity {
         pasteButton.setOnClickListener(v -> onPasteClick());
         regenerateButton.setOnClickListener(v -> onRegenerateClick());
 
-        // Watch for text changes to show edited indicator
+        // Watch for text changes to update character count
+        inputText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                int charCount = s.length();
+                inputCharCount.setText(charCount + " characters");
+            }
+        });
+
+        // Watch for text changes to show edited indicator and update word count
         outputText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -189,6 +210,11 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     editedIndicator.setVisibility(View.GONE);
                 }
+
+                // Update word count
+                String text = s.toString().trim();
+                int wordCount = text.isEmpty() ? 0 : text.split("\\s+").length;
+                outputWordCount.setText(wordCount + " words");
             }
         });
 
@@ -575,14 +601,25 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Shows or hides the skeleton loading animation.
+     * Also updates FAB state to show loading indicator.
      */
     private void showSkeletonLoading(boolean show) {
         if (show) {
             skeletonCard.setVisibility(View.VISIBLE);
             Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
             skeletonCard.startAnimation(slideUp);
+
+            // Update FAB to loading state
+            generateFab.setText(R.string.generating_button);
+            generateFab.setIcon(null); // Remove icon while loading
+            generateFab.setEnabled(false);
         } else {
             skeletonCard.setVisibility(View.GONE);
+
+            // Reset FAB to normal state
+            generateFab.setText(R.string.generate_button);
+            generateFab.setIconResource(android.R.drawable.ic_menu_send);
+            generateFab.setEnabled(true);
         }
     }
 

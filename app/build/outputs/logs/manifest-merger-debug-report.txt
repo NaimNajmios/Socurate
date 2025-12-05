@@ -9,6 +9,7 @@ MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\NAIM\.gr
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\NAIM\.gradle\caches\transforms-4\8956cb79e03d9a762c3888244085c813\transformed\appcompat-resources-1.6.1\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.appcompat:appcompat:1.6.1] C:\Users\NAIM\.gradle\caches\transforms-4\dd9d6c8aa0b9b93cf8d27be101e4af4d\transformed\appcompat-1.6.1\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.security:security-crypto:1.1.0-alpha06] C:\Users\NAIM\.gradle\caches\transforms-4\89c6c8d2c25553b1e64bddef1978979d\transformed\security-crypto-1.1.0-alpha06\AndroidManifest.xml:17:1-22:12
+MERGED from [com.facebook.shimmer:shimmer:0.5.0] C:\Users\NAIM\.gradle\caches\transforms-4\0a111523cd850fd9ad455b833f44a52d\transformed\shimmer-0.5.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\NAIM\.gradle\caches\transforms-4\aefd1f7690c0677ac5a6bb9582391737\transformed\viewpager2-1.0.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.fragment:fragment:1.3.6] C:\Users\NAIM\.gradle\caches\transforms-4\c9d744be461ec2420d20ff6fb96ce254\transformed\fragment-1.3.6\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.activity:activity:1.8.0] C:\Users\NAIM\.gradle\caches\transforms-4\df9c85a7e25476948b1fbc56ade9461a\transformed\activity-1.8.0\AndroidManifest.xml:17:1-22:12
@@ -183,6 +184,8 @@ MERGED from [androidx.appcompat:appcompat:1.6.1] C:\Users\NAIM\.gradle\caches\tr
 MERGED from [androidx.appcompat:appcompat:1.6.1] C:\Users\NAIM\.gradle\caches\transforms-4\dd9d6c8aa0b9b93cf8d27be101e4af4d\transformed\appcompat-1.6.1\AndroidManifest.xml:20:5-44
 MERGED from [androidx.security:security-crypto:1.1.0-alpha06] C:\Users\NAIM\.gradle\caches\transforms-4\89c6c8d2c25553b1e64bddef1978979d\transformed\security-crypto-1.1.0-alpha06\AndroidManifest.xml:20:5-44
 MERGED from [androidx.security:security-crypto:1.1.0-alpha06] C:\Users\NAIM\.gradle\caches\transforms-4\89c6c8d2c25553b1e64bddef1978979d\transformed\security-crypto-1.1.0-alpha06\AndroidManifest.xml:20:5-44
+MERGED from [com.facebook.shimmer:shimmer:0.5.0] C:\Users\NAIM\.gradle\caches\transforms-4\0a111523cd850fd9ad455b833f44a52d\transformed\shimmer-0.5.0\AndroidManifest.xml:5:5-44
+MERGED from [com.facebook.shimmer:shimmer:0.5.0] C:\Users\NAIM\.gradle\caches\transforms-4\0a111523cd850fd9ad455b833f44a52d\transformed\shimmer-0.5.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\NAIM\.gradle\caches\transforms-4\aefd1f7690c0677ac5a6bb9582391737\transformed\viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\NAIM\.gradle\caches\transforms-4\aefd1f7690c0677ac5a6bb9582391737\transformed\viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.fragment:fragment:1.3.6] C:\Users\NAIM\.gradle\caches\transforms-4\c9d744be461ec2420d20ff6fb96ce254\transformed\fragment-1.3.6\AndroidManifest.xml:20:5-22:41

@@ -67,6 +67,7 @@
     <string name="extracting_content">Extracting content from URL…</string>
     <string name="generate_button">Generate Post</string>
     <string name="generated_draft">Generated Draft</string>
+    <string name="generating_button">Generating…</string>
     <string name="generating_post">Generating post with AI…</string>
     <string name="hashtags_help">Separate with spaces or commas</string>
     <string name="hashtags_hint">e.g., #BolaSepak #Football #JDT</string>

@@ -68,6 +68,7 @@ id hashtagsInput
 id includeHashtagsCheckbox
 id includeSourceCheckbox
 id includeTitleCheckbox
+id inputCharCount
 id inputText
 id modelDropdown
 id modelDropdownLayout
@@ -75,6 +76,7 @@ id openMainAppButton
 id outputCard
 id outputScrollView
 id outputText
+id outputWordCount
 id pasteButton
 id placeholderView
 id previewCard
@@ -87,6 +89,7 @@ id resultCard
 id saveFab
 id shareButton
 id sharedText
+id shimmerLayout
 id skeletonCard
 id skeletonLoadingText
 id sourceEnabledSwitch
@@ -133,6 +136,7 @@ string error_title
 string extracting_content
 string generate_button
 string generated_draft
+string generating_button
 string generating_post
 string hashtags_help
 string hashtags_hint
