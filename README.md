@@ -7,9 +7,16 @@ A sleek, modern Android application that transforms global football news into po
 ### 🎨 Modern UI/UX Redesign
 - **Premium Dark Theme**: Sleek dark interface with sophisticated Blue Grey accents
 - **Theme Toggle**: Switch between Light, Dark, or System (auto) themes
-- **Smooth Animations**: Fade-in/fade-out transitions and skeleton loading states
-- **Material Design 3**: Cards, pill-shaped buttons, and modern typography
+- **Smooth Animations**: Fade-in/fade-out transitions and shimmer skeleton loading states
+- **Material Design 3**: Cards, pill-shaped buttons, filter chips, and modern typography
 - **Glassy Effects**: Subtle translucency for a premium feel
+
+### 🔘 Dynamic Output Toggles
+- **Title Toggle**: Show or hide the post title with a single tap
+- **Hashtags Toggle**: Include or exclude hashtags on demand
+- **Source Toggle**: Control source citation visibility dynamically
+- **Filter Chips**: Beautiful, accessible chip-based toggle controls
+- **Live Preview**: See changes instantly as you toggle options
 
 ### 🔔 Progress Notifications
 - **Real-time Status**: Shows notification with progress bar during content generation
@@ -26,7 +33,7 @@ A sleek, modern Android application that transforms global football news into po
 
 ### 🔍 Source Citation
 - **Automatic Attribution**: AI detects and includes source information in generated posts
-- **Toggle Control**: Enable/disable source citation in settings
+- **Toggle Control**: Enable/disable source citation in settings and dynamically per post
 - **Format**: Posts end with "Sumber: [Source Name]" when enabled
 
 ### ⚡ Post Refinement
@@ -112,22 +119,24 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 3. Select "Socurate" from the share menu
 4. The app automatically processes and generates your post
 5. Review the generated content
-6. **Refine (Optional)**: Select refinement options and tap "Regenerate"
-7. **Edit (Optional)**: Tap "Edit" to modify the text manually
-8. **Include Hashtags**: Toggle on to append your default hashtags
-9. **Include Source**: Toggle on to show source attribution
-10. Copy or share the final result
+6. **Toggle Options**: Use the filter chips to include/exclude:
+   - **Title**: Toggle the post title on/off
+   - **Hashtags**: Toggle your default hashtags
+   - **Source**: Toggle source attribution
+7. **Refine (Optional)**: Select refinement options and tap "Regenerate"
+8. **Edit (Optional)**: Tap "Edit" to modify the text manually
+9. Copy or share the final result
 
 ### Method 2: Direct Input
 
 1. Open the Socurate app
 2. Paste article text or URL into the input field
 3. Tap the glowing "Generate Post" FAB button
-4. Wait for the AI to process (skeleton loading animation)
+4. Wait for the AI to process (shimmer loading animation)
 5. Review the generated content
-6. **Refine (Optional)**: Use refinement options to improve the post
-7. **Edit (Optional)**: Tap "Edit" for manual adjustments
-8. Toggle hashtags and source as needed
+6. **Toggle Options**: Adjust title, hashtags, and source using chips
+7. **Refine (Optional)**: Use refinement options to improve the post
+8. **Edit (Optional)**: Tap "Edit" for manual adjustments
 9. Copy or share the generated post
 
 ### Post Refinement Workflow
@@ -160,25 +169,27 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 2. Enter comma or space-separated hashtags (e.g., `#BolaSepak, #JDT, #Football`)
 3. Toggle "Auto-append hashtags" on/off
 4. Hashtags are automatically formatted (# added if missing)
-5. Use the checkbox on the main screen to include/exclude hashtags per post
+5. Use the Hashtags chip on the main screen to include/exclude hashtags per post
 
 ## 🏗️ Architecture
 
 ### Core Components
 
 - **GeminiService**: Handles API communication with intelligent retry logic, exponential backoff, source detection, and post refinement
+- **ContentGenerationService**: Background service for non-blocking content generation
 - **WebContentExtractor**: Extracts main content from URLs using Jsoup with robust error handling
 - **PreferencesManager**: Securely manages API keys, settings, and user preferences using encrypted storage
 
 ### Activities
 
-- **MainActivity**: Primary interface for manual input, generation, editing, and refinement
+- **MainActivity**: Primary interface for manual input, generation, editing, and refinement with dynamic toggle chips
 - **ShareReceiverActivity**: Handles share intents from other apps with seamless processing
 - **SettingsActivity**: Configuration hub for API, tone, hashtags, source, and theme management
 
 ### UI Components
 
-- **Animations**: Fade in/out, slide up, skeleton shimmer for smooth transitions
+- **Shimmer Loading**: Facebook Shimmer library for elegant skeleton loading animations
+- **Filter Chips**: Material Design 3 chips for Title, Hashtags, and Source toggles
 - **Cards**: Material CardView with elevation and rounded corners
 - **Buttons**: Pill-shaped buttons and Extended FAB with scale animations
 - **Themes**: Dark and Light themes with consistent color schemes
@@ -193,8 +204,9 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
   - AndroidX (AppCompat, Material Design 3)
   - OkHttp 4.12.0 (Networking with timeout configuration)
   - Gson 2.10.1 (JSON parsing with custom error handling)
-  - Jsoup 1.16.1 (HTML parsing and content extraction)
+  - Jsoup 1.17.2 (HTML parsing and content extraction)
   - Security Crypto 1.1.0-alpha06 (Encrypted preferences with AES256)
+  - Facebook Shimmer 0.5.0 (Skeleton loading animations)
 
 ## 📁 Project Structure
 
@@ -206,6 +218,7 @@ app/src/main/
 │   ├── SettingsActivity.java             # Settings and configuration
 │   ├── services/
 │   │   ├── GeminiService.java            # AI API integration with retry logic
+│   │   ├── ContentGenerationService.java # Background generation service
 │   │   └── WebContentExtractor.java      # URL content extraction
 │   └── utils/
 │       ├── NotificationHelper.java       # Progress notifications
@@ -215,12 +228,16 @@ app/src/main/
 │   │   ├── fade_in.xml
 │   │   ├── fade_out.xml
 │   │   └── slide_up.xml
+│   ├── color/                            # Color state selectors
+│   │   ├── chip_background_selector.xml  # Chip background states
+│   │   └── chip_text_color_selector.xml  # Chip text color states
 │   ├── drawable/                         # Custom drawables
 │   │   ├── pill_button.xml              # Pill-shaped button background
 │   │   ├── pill_button_dark.xml         # Dark theme variant
-│   │   └── skeleton_shimmer.xml         # Loading animation
+│   │   ├── skeleton_item.xml            # Skeleton loading item
+│   │   └── ic_stadium.xml               # Placeholder illustration
 │   ├── layout/
-│   │   ├── activity_main.xml            # Main screen layout
+│   │   ├── activity_main.xml            # Main screen with filter chips
 │   │   ├── activity_share_receiver.xml  # Share receiver layout
 │   │   └── activity_settings.xml        # Settings screen layout
 │   ├── values/
@@ -259,6 +276,11 @@ app/src/main/
 - **Body**: Regular weight, 14-16sp
 - **Buttons**: Medium weight, 14sp, all caps
 
+### Filter Chips
+- **Unchecked**: Transparent background with outline
+- **Checked**: Primary color background with white text
+- **States**: Proper color contrast for accessibility in both themes
+
 ## 🎭 Theme Customization
 
 ### Changing the Theme
@@ -266,7 +288,7 @@ app/src/main/
 1. Go to Settings → Appearance
 2. Select your preferred theme:
    - **Light**: Clean, bright interface
-   - **Dark**: Modern dark theme with neon accents (default)
+   - **Dark**: Modern dark theme with Blue Grey accents (default)
    - **System**: Automatically follows device theme
 3. Theme applies immediately
 
@@ -356,8 +378,9 @@ The app includes comprehensive logging with unique request IDs for all actions:
 1. Open Android Studio → Logcat tab
 2. Filter by package: `com.mycompany.oreamnos`
 3. Look for these tags:
-   - `MainActivity` - UI interactions, button clicks, refinement requests
+   - `MainActivity` - UI interactions, button clicks, toggle changes
    - `GeminiService` - API calls, retries, responses, source detection
+   - `ContentGenerationService` - Background processing events
    - `WebContentExtractor` - URL parsing, content extraction
    - `SettingsActivity` - Configuration changes, theme switches
    - `PreferencesManager` - Settings storage and retrieval
@@ -383,6 +406,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Original web app: [Oreamnos](https://github.com/NaimNajmios/Oreamnos)
 - Powered by [Google Gemini API](https://ai.google.dev)
 - Built with [Material Design 3](https://m3.material.io/)
+- Shimmer effect by [Facebook Shimmer](https://github.com/facebook/shimmer-android)
 - Icons from Material Design Icons
 
 ## 📧 Contact
