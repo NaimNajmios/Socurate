@@ -101,6 +101,8 @@
     <!-- Reset and Clear -->
     <string name="clear_input">Clear input</string>
     <string name="input_cleared">Input cleared</string>
+    <string name="reset_all">Reset all</string>
+    <string name="all_reset">Everything has been reset</string>
     
     <!-- Placeholder -->
     <string name="placeholder_title">Ready to curate. Paste a link to start.</string>

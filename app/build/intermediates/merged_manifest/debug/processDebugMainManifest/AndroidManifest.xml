@@ -11,6 +11,8 @@
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <permission
         android:name="com.mycompany.oreamnos.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
@@ -65,6 +67,12 @@
             android:label="@string/settings"
             android:parentActivityName="com.mycompany.oreamnos.MainActivity"
             android:theme="@style/Theme.Oreamnos" />
+
+        <!-- Content Generation Foreground Service -->
+        <service
+            android:name="com.mycompany.oreamnos.services.ContentGenerationService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

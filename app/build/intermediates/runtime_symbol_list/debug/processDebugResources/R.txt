@@ -3500,6 +3500,7 @@ int id rectangles 0x7f08017f
 int id refinementCard 0x7f080180
 int id regenerateButton 0x7f080181
 int id report_drawn 0x7f080182
+int id resetAllButton 0x7f08021c
 int id resultCard 0x7f080183
 int id reverseSawtooth 0x7f080184
 int id right 0x7f080185
@@ -3878,6 +3879,7 @@ int string abc_shareactionprovider_share_with 0x7f100018
 int string abc_shareactionprovider_share_with_application 0x7f100019
 int string abc_toolbar_collapse_description 0x7f10001a
 int string advanced_settings 0x7f10001b
+int string all_reset 0x7f1000fb
 int string androidx_startup 0x7f10001c
 int string api_endpoint_default 0x7f10001d
 int string api_endpoint_label 0x7f10001e
@@ -4071,6 +4073,7 @@ int string refine_rephrase 0x7f1000d9
 int string refine_section 0x7f1000da
 int string refine_shorten_detailed 0x7f1000db
 int string regenerate_button 0x7f1000dc
+int string reset_all 0x7f1000fc
 int string reset_to_default 0x7f1000dd
 int string restore_original 0x7f1000de
 int string save_edit 0x7f1000df

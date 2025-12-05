@@ -79,6 +79,7 @@ id progressOverlay
 id progressText
 id refinementCard
 id regenerateButton
+id resetAllButton
 id resultCard
 id saveFab
 id shareButton
@@ -101,6 +102,7 @@ layout activity_share_receiver
 menu menu_main
 mipmap oreamnos_white
 string advanced_settings
+string all_reset
 string api_endpoint_default
 string api_endpoint_label
 string api_error
@@ -169,6 +171,7 @@ string refine_rephrase
 string refine_section
 string refine_shorten_detailed
 string regenerate_button
+string reset_all
 string reset_to_default
 string restore_original
 string save_edit

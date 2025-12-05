@@ -2000,6 +2000,7 @@
     <string name="abc_shareactionprovider_share_with_application">Share with <ns2:g example="Mail" id="application_name">%s</ns2:g></string>
     <string name="abc_toolbar_collapse_description">Collapse</string>
     <string name="advanced_settings">Advanced Settings</string>
+    <string name="all_reset">Everything has been reset</string>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
     <string name="api_endpoint_default">https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent</string>
     <string name="api_endpoint_label">API Endpoint</string>
@@ -2201,6 +2202,7 @@
     <string name="refine_section">Refine Draft</string>
     <string name="refine_shorten_detailed">Shorten But Detailed</string>
     <string name="regenerate_button">Regenerate</string>
+    <string name="reset_all">Reset all</string>
     <string name="reset_to_default">Reset to Default</string>
     <string name="restore_original">Restore Original</string>
     <string name="save_edit">Save</string>

@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private View progressOverlay;
     private View placeholderView;
     private ImageButton clearInputButton;
+    private ImageButton resetAllButton;
     private MaterialButton editButton;
     private MaterialButton copyButton;
     private MaterialButton shareButton;
@@ -127,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         progressOverlay = findViewById(R.id.progressOverlay);
         progressText = findViewById(R.id.progressText);
         clearInputButton = findViewById(R.id.clearInputButton);
+        resetAllButton = findViewById(R.id.resetAllButton);
         editButton = findViewById(R.id.editButton);
         copyButton = findViewById(R.id.copyButton);
         shareButton = findViewById(R.id.shareButton);
@@ -159,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
         copyButton.setOnClickListener(v -> onCopyClick());
         shareButton.setOnClickListener(v -> onShareClick());
         clearInputButton.setOnClickListener(v -> onClearInputClick());
+        resetAllButton.setOnClickListener(v -> onResetAllClick());
         regenerateButton.setOnClickListener(v -> onRegenerateClick());
 
         // Watch for text changes to show edited indicator
@@ -454,6 +457,39 @@ public class MainActivity extends AppCompatActivity {
             inputText.setText("");
             Toast.makeText(this, R.string.input_cleared, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Resets the entire UI to initial state.
+     * Clears input, output, refinement options, and shows placeholder.
+     */
+    private void onResetAllClick() {
+        // Clear input
+        if (inputText.getText() != null) {
+            inputText.setText("");
+        }
+
+        // Hide output card
+        outputCard.setVisibility(View.GONE);
+
+        // Hide refinement card
+        refinementCard.setVisibility(View.GONE);
+        clearRefinementCheckboxes();
+
+        // Show placeholder
+        showPlaceholder();
+
+        // Reset internal state
+        originalGeneratedPost = "";
+        generatedSourceCitation = "";
+        originalInputText = "";
+        isEditMode = false;
+        editButton.setText(R.string.edit_button);
+        editButton.setIconResource(android.R.drawable.ic_menu_edit);
+        editedIndicator.setVisibility(View.GONE);
+
+        Toast.makeText(this, R.string.all_reset, Toast.LENGTH_SHORT).show();
+        Log.i(TAG, "UI reset to initial state");
     }
 
     /**
