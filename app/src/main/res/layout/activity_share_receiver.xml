@@ -35,14 +35,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="20dp"
+            android:animateLayoutChanges="true">
 
-            <!-- Shared Content Preview Card -->
+            <!-- Shared Content Preview Card (Input Section) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/previewCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="20dp"
                 app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="16dp"
@@ -55,14 +56,24 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Input Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/input_hint"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Input"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/sharedText"
@@ -70,20 +81,31 @@
                         android:layout_height="wrap_content"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="14sp"
-                        android:maxLines="5"
+                        android:maxLines="8"
                         android:ellipsize="end" />
+
+                    <!-- Character Count -->
+                    <TextView
+                        android:id="@+id/inputCharCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:text="0 characters"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Result Card -->
+            <!-- Skeleton Loading (shown while processing) -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/resultCard"
+                android:id="@+id/skeletonCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:visibility="gone"
-                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="16dp"
@@ -96,7 +118,167 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Header Row -->
+                    <!-- Loading Text -->
+                    <TextView
+                        android:id="@+id/skeletonLoadingText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/generating_post"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Shimmer Container -->
+                    <com.facebook.shimmer.ShimmerFrameLayout
+                        android:id="@+id/shimmerLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:shimmer_auto_start="true"
+                        app:shimmer_duration="1200"
+                        app:shimmer_base_alpha="0.7"
+                        app:shimmer_highlight_alpha="1.0"
+                        app:shimmer_direction="left_to_right">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <!-- Skeleton Header -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="16dp">
+
+                                <View
+                                    android:layout_width="100dp"
+                                    android:layout_height="20dp"
+                                    android:background="@drawable/skeleton_item" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="1" />
+
+                                <View
+                                    android:layout_width="80dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/skeleton_item" />
+
+                            </LinearLayout>
+
+                            <!-- Skeleton Lines -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@drawable/skeleton_item" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@drawable/skeleton_item" />
+
+                            <!-- Skeleton Line 3 (80% width) -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="16dp"
+                                    android:layout_weight="0.8"
+                                    android:background="@drawable/skeleton_item" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="0.2" />
+
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@drawable/skeleton_item" />
+
+                            <!-- Skeleton Line 5 (60% width) -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="20dp"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="16dp"
+                                    android:layout_weight="0.6"
+                                    android:background="@drawable/skeleton_item" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="0.4" />
+
+                            </LinearLayout>
+
+                            <!-- Skeleton Buttons -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="48dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/skeleton_item" />
+
+                                <View
+                                    android:layout_width="12dp"
+                                    android:layout_height="1dp" />
+
+                                <View
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"
+                                    android:background="@drawable/skeleton_item" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </com.facebook.shimmer.ShimmerFrameLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Generated Draft Section (matches main interface) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/resultCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Header with Sparkle Icon -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -104,19 +286,56 @@
                         android:gravity="center_vertical"
                         android:layout_marginBottom="16dp">
 
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_sparkle"
+                            android:contentDescription="@string/generated_draft"
+                            android:layout_marginEnd="8dp" />
+
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/output_label"
+                            android:text="@string/generated_draft"
                             android:textColor="?attr/colorPrimary"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/editedIndicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/edited_indicator"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="11sp"
+                            android:visibility="gone"
+                            android:layout_marginEnd="8dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/editButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="@string/edit_button"
+                            android:textColor="?attr/colorOnPrimary"
+                            android:textSize="12sp"
+                            android:minWidth="0dp"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:backgroundTint="?attr/colorPrimary"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            app:cornerRadius="18dp"
+                            app:icon="@android:drawable/ic_menu_edit"
+                            app:iconSize="16dp"
+                            app:iconTint="?attr/colorOnPrimary"
+                            style="@style/Widget.Material3.Button" />
 
                     </LinearLayout>
 
                     <!-- Output Text with Scrollable Container -->
                     <ScrollView
+                        android:id="@+id/outputScrollView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:maxHeight="300dp"
@@ -126,44 +345,122 @@
                         android:fadeScrollbars="false"
                         android:layout_marginBottom="16dp">
 
-                        <TextView
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/outputText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:text="@string/output_placeholder"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="15sp"
                             android:lineSpacingExtra="4dp"
                             android:minLines="4"
-                            android:textIsSelectable="true" />
+                            android:gravity="top|start"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:background="@null"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false" />
 
                     </ScrollView>
 
-                    <!-- Action Buttons Row -->
+                    <!-- Word Count -->
+                    <TextView
+                        android:id="@+id/outputWordCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:text="0 words"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Pill Checkboxes (Chips) -->
+                    <com.google.android.material.chip.ChipGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:singleLine="false"
+                        app:chipSpacingVertical="4dp">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/includeTitleCheckbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/include_title"
+                            android:textColor="@color/chip_text_color_selector"
+                            android:checked="true"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/includeHashtagsCheckbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/include_hashtags"
+                            android:textColor="@color/chip_text_color_selector"
+                            android:checked="true"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/includeSourceCheckbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/include_source"
+                            android:textColor="@color/chip_text_color_selector"
+                            android:checked="true"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <!-- Action Buttons -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="start">
+                        android:gravity="center">
 
+                        <!-- Copy Button -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/copyButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="42dp"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
                             android:text="@string/copy_button"
-                            android:textSize="13sp"
-                            android:layout_marginEnd="8dp"
+                            android:textColor="?attr/colorOnPrimary"
+                            android:textStyle="bold"
+                            android:backgroundTint="?attr/colorPrimary"
+                            app:cornerRadius="24dp"
                             app:icon="@android:drawable/ic_menu_save"
-                            app:cornerRadius="21dp"
-                            style="@style/Widget.Material3.Button.OutlinedButton" />
+                            app:iconTint="?attr/colorOnPrimary"
+                            style="@style/Widget.Material3.Button" />
 
+                        <!-- Share Button -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/shareButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="42dp"
-                            android:text="@string/share_button"
-                            android:textSize="13sp"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="12dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:backgroundTint="?attr/colorSurfaceVariant"
+                            app:cornerRadius="24dp"
                             app:icon="@android:drawable/ic_menu_share"
-                            app:cornerRadius="21dp"
+                            app:iconTint="?attr/colorOnSurface"
+                            app:iconGravity="textStart"
+                            app:iconPadding="0dp"
                             style="@style/Widget.Material3.Button" />
 
                     </LinearLayout>
@@ -172,77 +469,18 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Open in Main App Button -->
+            <!-- Continue in Main App Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/openMainAppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
-                android:text="@string/open_in_app"
+                android:text="@string/continue_in_app"
                 style="@style/Widget.Material3.Button.TextButton" />
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
-
-    <!-- Skeleton Loading Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/skeletonCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:visibility="gone"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:cardBackgroundColor="?attr/colorSurface"
-        app:cardElevation="0dp"
-        app:cardCornerRadius="16dp"
-        app:strokeColor="?attr/colorOutline"
-        app:strokeWidth="1dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <!-- Loading Text -->
-            <TextView
-                android:id="@+id/skeletonLoadingText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/generating_post"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Skeleton Lines -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/skeleton_item" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/skeleton_item" />
-
-            <View
-                android:layout_width="200dp"
-                android:layout_height="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/skeleton_item" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="16dp"
-                android:background="@drawable/skeleton_item" />
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

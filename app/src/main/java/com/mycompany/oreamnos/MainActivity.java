@@ -223,6 +223,56 @@ public class MainActivity extends AppCompatActivity {
             Log.w(TAG, "API key not configured");
             Toast.makeText(this, R.string.api_key_required, Toast.LENGTH_LONG).show();
         }
+
+        // Handle incoming intent from ShareReceiverActivity
+        handleIncomingIntent(getIntent());
+    }
+
+    /**
+     * Handles the incoming intent to continue work from ShareReceiverActivity.
+     */
+    private void handleIncomingIntent(Intent intent) {
+        if (intent == null) {
+            return;
+        }
+
+        // Check if this is a "continue in main app" intent
+        String sharedText = intent.getStringExtra("shared_text");
+        String generatedContent = intent.getStringExtra("generated_content");
+        String intentTitle = intent.getStringExtra("generated_title");
+        String intentBody = intent.getStringExtra("generated_body");
+        String intentSource = intent.getStringExtra("generated_source");
+
+        if (sharedText != null && !sharedText.isEmpty()) {
+            inputText.setText(sharedText);
+            originalInputText = sharedText;
+            Log.i(TAG, "Received shared text from ShareReceiverActivity");
+        }
+
+        if (generatedContent != null && !generatedContent.isEmpty()) {
+            // Set the generated content parts
+            if (intentTitle != null) {
+                generatedTitle = intentTitle;
+            }
+            if (intentBody != null) {
+                generatedBody = intentBody;
+            }
+            if (intentSource != null) {
+                generatedSourceCitation = intentSource;
+            }
+
+            // Rebuild and display the output
+            rebuildOutputText();
+
+            // Show the output card and hide placeholder
+            hidePlaceholder();
+            showOutputCard();
+
+            // Show refinement section
+            refinementCard.setVisibility(View.VISIBLE);
+
+            Log.i(TAG, "Loaded generated content from ShareReceiverActivity");
+        }
     }
 
     @Override

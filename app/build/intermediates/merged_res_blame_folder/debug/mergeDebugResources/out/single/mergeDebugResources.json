@@ -4,6 +4,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\mipmap-xxhdpi\\oreamnos_white.png"
     },
     {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\color_chip_text_color_selector.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\color\\chip_text_color_selector.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_ic_document.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\ic_document.xml"
     },
@@ -26,10 +30,6 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\layout_activity_settings.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\layout\\activity_settings.xml"
-    },
-    {
-        "merged": "com.mycompany.oreamnos.app-debug-33:/color_chip_text_color_selector.xml.flat",
-        "source": "com.mycompany.oreamnos.app-main-35:/color/chip_text_color_selector.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\layout_activity_main.xml.flat",
@@ -68,10 +68,6 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\skeleton_item.xml"
     },
     {
-        "merged": "com.mycompany.oreamnos.app-debug-33:/layout_activity_main.xml.flat",
-        "source": "com.mycompany.oreamnos.app-main-35:/layout/activity_main.xml"
-    },
-    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\drawable_pill_button_green.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\drawable\\pill_button_green.xml"
     },
@@ -90,5 +86,9 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\anim_fade_in.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\anim\\fade_in.xml"
+    },
+    {
+        "merged": "com.mycompany.oreamnos.app-debug-33:/layout_activity_share_receiver.xml.flat",
+        "source": "com.mycompany.oreamnos.app-main-35:/layout/activity_share_receiver.xml"
     }
 ]

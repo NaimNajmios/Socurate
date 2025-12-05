@@ -20,6 +20,7 @@
     <string name="extracting_content">Extracting content from URL…</string>
     <string name="generating_post">Generating post with AI…</string>
     <string name="open_in_app">Open in Main App</string>
+    <string name="continue_in_app">Continue in Main App</string>
     
     <!-- Settings Activity -->
     <string name="api_key_label">Gemini API Key</string>

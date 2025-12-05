@@ -58,6 +58,7 @@
     <string name="content_description_copy_icon">Copy to clipboard</string>
     <string name="content_description_settings_icon">Settings</string>
     <string name="content_description_share_icon">Share</string>
+    <string name="continue_in_app">Continue in Main App</string>
     <string name="copied_to_clipboard">Copied to clipboard!</string>
     <string name="copy_button">Copy to Clipboard</string>
     <string name="edit_button">Edit</string>

@@ -3945,6 +3945,7 @@ string connection_test_success
 string content_description_copy_icon
 string content_description_settings_icon
 string content_description_share_icon
+string continue_in_app
 string copied_to_clipboard
 string copy_button
 string edit_button
