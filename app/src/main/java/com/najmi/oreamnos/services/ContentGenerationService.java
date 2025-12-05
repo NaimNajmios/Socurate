@@ -1,22 +1,18 @@
-package com.mycompany.oreamnos.services;
+package com.najmi.oreamnos.services;
 
-import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.mycompany.oreamnos.R;
-import com.mycompany.oreamnos.utils.NotificationHelper;
-import com.mycompany.oreamnos.utils.PreferencesManager;
+import com.najmi.oreamnos.R;
+import com.najmi.oreamnos.utils.NotificationHelper;
+import com.najmi.oreamnos.utils.PreferencesManager;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,11 +25,11 @@ public class ContentGenerationService extends Service {
     private static final String TAG = "ContentGenService";
 
     // Intent actions
-    public static final String ACTION_GENERATE = "com.mycompany.oreamnos.ACTION_GENERATE";
-    public static final String ACTION_REFINE = "com.mycompany.oreamnos.ACTION_REFINE";
+    public static final String ACTION_GENERATE = "com.najmi.oreamnos.ACTION_GENERATE";
+    public static final String ACTION_REFINE = "com.najmi.oreamnos.ACTION_REFINE";
 
     // Broadcast actions for results
-    public static final String BROADCAST_RESULT = "com.mycompany.oreamnos.BROADCAST_RESULT";
+    public static final String BROADCAST_RESULT = "com.najmi.oreamnos.BROADCAST_RESULT";
 
     // Intent extras
     public static final String EXTRA_INPUT_TEXT = "extra_input_text";

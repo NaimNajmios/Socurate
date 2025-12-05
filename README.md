@@ -23,6 +23,14 @@ A sleek, modern Android application that transforms global football news into po
 - **Completion Alert**: Updates notification when post is ready
 - **Auto-dismiss**: Notifications clear automatically after a few seconds
 
+### 📱 Enhanced Share Intent Experience
+- **Modern Bottom Sheet**: Sleek slide-up overlay instead of full-screen activity
+- **Animated Progress Bar**: Horizontal progress with stage labels ("Extracting..." → "Generating...")
+- **Collapsible Input**: Auto-collapses after generation, tap to expand/collapse
+- **Haptic Feedback**: Vibration feedback on generation start, completion, and copy actions
+- **Tone Quick Toggle**: Switch between Formal/Casual tone without going to Settings
+- **Background Processing**: Generate in background and continue using other apps
+
 ### 🤖 AI Model Selection
 - **Multiple Models**: Choose from available Gemini models in Settings:
   - Gemini 2.5 Flash Lite (fastest)
@@ -117,15 +125,17 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 1. Open a football article in Chrome, Twitter, or any browser
 2. Tap the "Share" button
 3. Select "Socurate" from the share menu
-4. The app automatically processes and generates your post
-5. Review the generated content
-6. **Toggle Options**: Use the filter chips to include/exclude:
+4. A **bottom sheet** slides up showing your shared content
+5. **Tone Quick Toggle**: Choose Formal or Casual before generation starts
+6. Watch the **animated progress bar** as content is extracted and generated
+7. Review the generated content (input card auto-collapses)
+8. **Toggle Options**: Use the filter chips to include/exclude:
    - **Title**: Toggle the post title on/off
    - **Hashtags**: Toggle your default hashtags
    - **Source**: Toggle source attribution
-7. **Refine (Optional)**: Select refinement options and tap "Regenerate"
-8. **Edit (Optional)**: Tap "Edit" to modify the text manually
-9. Copy or share the final result
+9. **Background Processing**: Tap "Generate in background" to continue in other apps
+10. **Continue in Main App**: Tap to open full app with refinement options
+11. Copy or share the final result
 
 ### Method 2: Direct Input
 
@@ -183,7 +193,8 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 ### Activities
 
 - **MainActivity**: Primary interface for manual input, generation, editing, and refinement with dynamic toggle chips
-- **ShareReceiverActivity**: Handles share intents from other apps with seamless processing
+- **ShareReceiverActivity**: Transparent host for the share bottom sheet
+- **ShareBottomSheetFragment**: Modern bottom sheet with progress bar, tone toggle, and haptic feedback
 - **SettingsActivity**: Configuration hub for API, tone, hashtags, source, and theme management
 
 ### UI Components
@@ -222,6 +233,7 @@ app/src/main/
 │   │   └── WebContentExtractor.java      # URL content extraction
 │   └── utils/
 │       ├── NotificationHelper.java       # Progress notifications
+│       ├── HapticHelper.java             # Vibration feedback utility
 │       └── PreferencesManager.java       # Secure settings storage
 ├── res/
 │   ├── anim/                             # Animations (fade, slide)
@@ -376,7 +388,7 @@ The app automatically adapts output length to 40-60% of input length. For better
 The app includes comprehensive logging with unique request IDs for all actions:
 
 1. Open Android Studio → Logcat tab
-2. Filter by package: `com.mycompany.oreamnos`
+2. Filter by package: `com.najmi.oreamnos`
 3. Look for these tags:
    - `MainActivity` - UI interactions, button clicks, toggle changes
    - `GeminiService` - API calls, retries, responses, source detection

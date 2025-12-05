@@ -4,7 +4,7 @@
     "type": "PACKAGED_MANIFESTS",
     "kind": "Directory"
   },
-  "applicationId": "com.mycompany.oreamnos",
+  "applicationId": "com.najmi.oreamnos",
   "variantName": "debug",
   "elements": [
     {

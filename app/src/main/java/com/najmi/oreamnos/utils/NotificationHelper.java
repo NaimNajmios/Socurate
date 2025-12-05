@@ -1,4 +1,4 @@
-package com.mycompany.oreamnos.utils;
+package com.najmi.oreamnos.utils;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -10,7 +10,7 @@ import android.os.Looper;
 
 import androidx.core.app.NotificationCompat;
 
-import com.mycompany.oreamnos.R;
+import com.najmi.oreamnos.R;
 
 /**
  * Helper class for managing notifications during content generation.

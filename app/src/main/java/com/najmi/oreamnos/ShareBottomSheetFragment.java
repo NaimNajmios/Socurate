@@ -1,6 +1,5 @@
-package com.mycompany.oreamnos;
+package com.najmi.oreamnos;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
@@ -28,19 +27,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
-import com.mycompany.oreamnos.services.ContentGenerationService;
-import com.mycompany.oreamnos.services.GeminiService;
-import com.mycompany.oreamnos.services.WebContentExtractor;
-import com.mycompany.oreamnos.utils.HapticHelper;
-import com.mycompany.oreamnos.utils.NotificationHelper;
-import com.mycompany.oreamnos.utils.PreferencesManager;
+import com.najmi.oreamnos.services.ContentGenerationService;
+import com.najmi.oreamnos.services.GeminiService;
+import com.najmi.oreamnos.services.WebContentExtractor;
+import com.najmi.oreamnos.utils.HapticHelper;
+import com.najmi.oreamnos.utils.NotificationHelper;
+import com.najmi.oreamnos.utils.PreferencesManager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

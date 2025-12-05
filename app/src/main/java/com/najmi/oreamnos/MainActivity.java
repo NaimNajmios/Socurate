@@ -1,4 +1,4 @@
-package com.mycompany.oreamnos;
+package com.najmi.oreamnos;
 
 import android.animation.ObjectAnimator;
 import android.content.BroadcastReceiver;
@@ -28,13 +28,12 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.mycompany.oreamnos.services.ContentGenerationService;
-import com.mycompany.oreamnos.utils.NotificationHelper;
-import com.mycompany.oreamnos.utils.PreferencesManager;
+import com.najmi.oreamnos.services.ContentGenerationService;
+import com.najmi.oreamnos.utils.NotificationHelper;
+import com.najmi.oreamnos.utils.PreferencesManager;
 
 import java.util.ArrayList;
 

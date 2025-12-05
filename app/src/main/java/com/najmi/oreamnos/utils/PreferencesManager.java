@@ -1,4 +1,4 @@
-package com.mycompany.oreamnos.utils;
+package com.najmi.oreamnos.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

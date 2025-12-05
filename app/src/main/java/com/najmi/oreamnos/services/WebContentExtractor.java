@@ -1,4 +1,4 @@
-package com.mycompany.oreamnos.services;
+package com.najmi.oreamnos.services;
 
 import android.util.Log;
 import okhttp3.OkHttpClient;

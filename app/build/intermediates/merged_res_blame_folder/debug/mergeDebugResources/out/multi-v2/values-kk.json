@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mycompany.oreamnos.app-mergeDebugResources-31:/values-kk/values-kk.xml",
+            "outputFile": "com.najmi.oreamnos.app-mergeDebugResources-31:/values-kk/values-kk.xml",
             "map": [
                 {
                     "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\dd9d6c8aa0b9b93cf8d27be101e4af4d\\transformed\\appcompat-1.6.1\\res\\values-kk\\values-kk.xml",

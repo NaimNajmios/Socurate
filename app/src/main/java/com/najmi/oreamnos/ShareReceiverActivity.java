@@ -1,4 +1,4 @@
-package com.mycompany.oreamnos;
+package com.najmi.oreamnos;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,7 +6,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
-import com.mycompany.oreamnos.utils.PreferencesManager;
+import com.najmi.oreamnos.utils.PreferencesManager;
 
 /**
  * Activity that receives shared content and displays it in a bottom sheet.

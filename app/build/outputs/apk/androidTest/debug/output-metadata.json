@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.mycompany.oreamnos.test",
+  "applicationId": "com.najmi.oreamnos.test",
   "variantName": "debugAndroidTest",
   "elements": [
     {

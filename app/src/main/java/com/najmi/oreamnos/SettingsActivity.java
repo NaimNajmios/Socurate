@@ -1,4 +1,4 @@
-package com.mycompany.oreamnos;
+package com.najmi.oreamnos;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -15,8 +15,8 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
-import com.mycompany.oreamnos.services.GeminiService;
-import com.mycompany.oreamnos.utils.PreferencesManager;
+import com.najmi.oreamnos.services.GeminiService;
+import com.najmi.oreamnos.utils.PreferencesManager;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

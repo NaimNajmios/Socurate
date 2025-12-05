@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.mycompany.oreamnos'
+    namespace 'com.najmi.oreamnos'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.mycompany.oreamnos"
+        applicationId "com.najmi.oreamnos"
         minSdk 24
         targetSdk 34
         versionCode 1

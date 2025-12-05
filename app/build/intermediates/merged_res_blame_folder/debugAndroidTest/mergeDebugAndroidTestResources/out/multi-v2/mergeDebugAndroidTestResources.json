@@ -1,31 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.mycompany.oreamnos.test.app-debugAndroidTest-5:/values-v21_values-v21.arsc.flat",
-            "map": [
-                {
-                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\597c660499ddfb50a0aae731c792872f\\transformed\\core-1.5.0\\res\\values-v21\\values.xml",
-                    "from": {
-                        "startLines": "4,13",
-                        "startColumns": "0,0",
-                        "startOffsets": "180,655",
-                        "endLines": "12,21",
-                        "endColumns": "8,8",
-                        "endOffsets": "654,1127"
-                    },
-                    "to": {
-                        "startLines": "2,11",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,534",
-                        "endLines": "10,19",
-                        "endColumns": "8,8",
-                        "endOffsets": "529,1006"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "com.mycompany.oreamnos.test.app-debugAndroidTest-5:/values-v18_values-v18.arsc.flat",
+            "outputFile": "com.najmi.oreamnos.test.app-debugAndroidTest-5:/values-v18_values-v18.arsc.flat",
             "map": [
                 {
                     "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\597c660499ddfb50a0aae731c792872f\\transformed\\core-1.5.0\\res\\values-v18\\values.xml",
@@ -49,7 +25,7 @@
             ]
         },
         {
-            "outputFile": "com.mycompany.oreamnos.test.app-debugAndroidTest-5:/values_values.arsc.flat",
+            "outputFile": "com.najmi.oreamnos.test.app-debugAndroidTest-5:/values_values.arsc.flat",
             "map": [
                 {
                     "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\597c660499ddfb50a0aae731c792872f\\transformed\\core-1.5.0\\res\\values\\values.xml",
@@ -73,7 +49,31 @@
             ]
         },
         {
-            "outputFile": "com.mycompany.oreamnos.test.app-debugAndroidTest-5:/values-v28_values-v28.arsc.flat",
+            "outputFile": "com.najmi.oreamnos.test.app-debugAndroidTest-5:/values-v21_values-v21.arsc.flat",
+            "map": [
+                {
+                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\597c660499ddfb50a0aae731c792872f\\transformed\\core-1.5.0\\res\\values-v21\\values.xml",
+                    "from": {
+                        "startLines": "4,13",
+                        "startColumns": "0,0",
+                        "startOffsets": "180,655",
+                        "endLines": "12,21",
+                        "endColumns": "8,8",
+                        "endOffsets": "654,1127"
+                    },
+                    "to": {
+                        "startLines": "2,11",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,534",
+                        "endLines": "10,19",
+                        "endColumns": "8,8",
+                        "endOffsets": "529,1006"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "com.najmi.oreamnos.test.app-debugAndroidTest-5:/values-v28_values-v28.arsc.flat",
             "map": [
                 {
                     "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\597c660499ddfb50a0aae731c792872f\\transformed\\core-1.5.0\\res\\values-v28\\values.xml",

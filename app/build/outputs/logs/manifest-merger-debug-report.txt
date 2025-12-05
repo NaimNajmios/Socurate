@@ -110,7 +110,7 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\NAIM\.gradle\cache
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:16:9-46
 	android:usesCleartextTraffic
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:17:9-45
-activity#com.mycompany.oreamnos.MainActivity
+activity#com.najmi.oreamnos.MainActivity
 ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:20:9-29:20
 	android:label
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:23:13-45
@@ -130,7 +130,7 @@ category#android.intent.category.LAUNCHER
 ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:27:17-77
 	android:name
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:27:27-74
-activity#com.mycompany.oreamnos.ShareReceiverActivity
+activity#com.najmi.oreamnos.ShareReceiverActivity
 ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:32:9-42:20
 	android:label
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:35:13-54
@@ -154,7 +154,7 @@ data
 ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:40:17-55
 	android:mimeType
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:40:23-52
-activity#com.mycompany.oreamnos.SettingsActivity
+activity#com.najmi.oreamnos.SettingsActivity
 ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:45:9-50:53
 	android:parentActivityName
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:49:13-55
@@ -166,7 +166,7 @@ ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\Androi
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:50:13-50
 	android:name
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:46:13-45
-service#com.mycompany.oreamnos.services.ContentGenerationService
+service#com.najmi.oreamnos.services.ContentGenerationService
 ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:53:9-56:56
 	android:exported
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:55:13-37
@@ -302,7 +302,7 @@ ADDED from [androidx.core:core:1.9.0] C:\Users\NAIM\.gradle\caches\transforms-4\
 		ADDED from [androidx.core:core:1.9.0] C:\Users\NAIM\.gradle\caches\transforms-4\766f3bb77a9602d5b18720e866ffb26d\transformed\core-1.9.0\AndroidManifest.xml:24:9-44
 	android:name
 		ADDED from [androidx.core:core:1.9.0] C:\Users\NAIM\.gradle\caches\transforms-4\766f3bb77a9602d5b18720e866ffb26d\transformed\core-1.9.0\AndroidManifest.xml:23:9-81
-permission#com.mycompany.oreamnos.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+permission#com.najmi.oreamnos.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.9.0] C:\Users\NAIM\.gradle\caches\transforms-4\766f3bb77a9602d5b18720e866ffb26d\transformed\core-1.9.0\AndroidManifest.xml:22:5-24:47
 	android:protectionLevel
 		ADDED from [androidx.core:core:1.9.0] C:\Users\NAIM\.gradle\caches\transforms-4\766f3bb77a9602d5b18720e866ffb26d\transformed\core-1.9.0\AndroidManifest.xml:24:9-44
@@ -312,7 +312,7 @@ uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.9.0] C:\Users\NAIM\.gradle\caches\transforms-4\766f3bb77a9602d5b18720e866ffb26d\transformed\core-1.9.0\AndroidManifest.xml:26:5-97
 	android:name
 		ADDED from [androidx.core:core:1.9.0] C:\Users\NAIM\.gradle\caches\transforms-4\766f3bb77a9602d5b18720e866ffb26d\transformed\core-1.9.0\AndroidManifest.xml:26:22-94
-uses-permission#com.mycompany.oreamnos.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission#com.najmi.oreamnos.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.9.0] C:\Users\NAIM\.gradle\caches\transforms-4\766f3bb77a9602d5b18720e866ffb26d\transformed\core-1.9.0\AndroidManifest.xml:26:5-97
 	android:name
 		ADDED from [androidx.core:core:1.9.0] C:\Users\NAIM\.gradle\caches\transforms-4\766f3bb77a9602d5b18720e866ffb26d\transformed\core-1.9.0\AndroidManifest.xml:26:22-94

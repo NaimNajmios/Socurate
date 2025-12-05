@@ -1,4 +1,4 @@
-package com.mycompany.oreamnos.services;
+package com.najmi.oreamnos.services;
 
 import android.util.Log;
 import com.google.gson.Gson;
@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 /**
  * Handles communication with the Google Gemini API for content curation.
