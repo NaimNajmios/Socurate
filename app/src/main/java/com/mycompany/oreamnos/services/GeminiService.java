@@ -684,6 +684,10 @@ public class GeminiService {
 
         String cleaned = response.trim();
 
+        // Remove horizontal rule markers (---, ----, ----------, etc.)
+        // These sometimes appear at the beginning/end of AI-generated content
+        cleaned = cleaned.replaceAll("(?m)^-{3,}\\s*$", "");
+
         // Remove unwanted explanatory phrases
         String[] unwantedPhrases = {
                 "Okay, ini percubaan untuk mengubah teks tersebut",
