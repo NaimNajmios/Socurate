@@ -74,6 +74,7 @@
     <string name="hashtags_section">Hashtag Settings</string>
     <string name="include_hashtags">Include hashtags</string>
     <string name="include_source">Include Source</string>
+    <string name="include_title">Include title</string>
     <string name="input_cleared">Input cleared</string>
     <string name="input_hint">Paste article text or URL here…</string>
     <string name="input_required">Please enter some text or URL</string>

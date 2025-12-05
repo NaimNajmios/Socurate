@@ -67,6 +67,7 @@ id generateFab
 id hashtagsInput
 id includeHashtagsCheckbox
 id includeSourceCheckbox
+id includeTitleCheckbox
 id inputText
 id modelDropdown
 id modelDropdownLayout
@@ -139,6 +140,7 @@ string hashtags_label
 string hashtags_section
 string include_hashtags
 string include_source
+string include_title
 string input_cleared
 string input_hint
 string input_required

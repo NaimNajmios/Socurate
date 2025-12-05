@@ -2056,6 +2056,7 @@
     <string description="Content description for an icon that appears in the title area of a dialog" name="icon_content_description">Dialog Icon</string>
     <string name="include_hashtags">Include hashtags</string>
     <string name="include_source">Include Source</string>
+    <string name="include_title">Include title</string>
     <string name="input_cleared">Input cleared</string>
     <string name="input_hint">Paste article text or URL here…</string>
     <string name="input_required">Please enter some text or URL</string>

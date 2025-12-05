@@ -3350,6 +3350,7 @@ int id image 0x7f0800e8
 int id immediateStop 0x7f0800e9
 int id includeHashtagsCheckbox 0x7f0800ea
 int id includeSourceCheckbox 0x7f0800eb
+int id includeTitleCheckbox 0x7f08021e
 int id included 0x7f0800ec
 int id indeterminate 0x7f0800ed
 int id info 0x7f0800ee
@@ -3935,6 +3936,7 @@ int string hide_bottom_view_on_scroll_behavior 0x7f10004d
 int string icon_content_description 0x7f10004e
 int string include_hashtags 0x7f10004f
 int string include_source 0x7f100050
+int string include_title 0x7f1000ff
 int string input_cleared 0x7f100051
 int string input_hint 0x7f100052
 int string input_required 0x7f100053

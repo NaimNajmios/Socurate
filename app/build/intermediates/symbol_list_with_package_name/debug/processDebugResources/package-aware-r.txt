@@ -3351,6 +3351,7 @@ id image
 id immediateStop
 id includeHashtagsCheckbox
 id includeSourceCheckbox
+id includeTitleCheckbox
 id included
 id indeterminate
 id info
@@ -3936,6 +3937,7 @@ string hide_bottom_view_on_scroll_behavior
 string icon_content_description
 string include_hashtags
 string include_source
+string include_title
 string input_cleared
 string input_hint
 string input_required

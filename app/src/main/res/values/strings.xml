@@ -88,6 +88,7 @@
     <string name="enable_hashtags">Auto-append hashtags</string>
     <string name="include_hashtags">Include hashtags</string>
     <string name="hashtags_section">Hashtag Settings</string>
+    <string name="include_title">Include title</string>
     
     <!-- Quick Edit -->
     <string name="edit_button">Edit</string>

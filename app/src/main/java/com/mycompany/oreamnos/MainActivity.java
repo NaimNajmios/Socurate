@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton editButton;
     private MaterialButton copyButton;
     private MaterialButton shareButton;
+    private Chip includeTitleCheckbox;
     private Chip includeHashtagsCheckbox;
     private Chip includeSourceCheckbox;
     private ExtendedFloatingActionButton generateFab;
@@ -80,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
 
     private String originalGeneratedPost = "";
     private String generatedSourceCitation = "";
+    private String generatedTitle = "";
+    private String generatedBody = "";
     private String originalInputText = "";
     private boolean isEditMode = false;
 
@@ -135,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         editButton = findViewById(R.id.editButton);
         copyButton = findViewById(R.id.copyButton);
         shareButton = findViewById(R.id.shareButton);
+        includeTitleCheckbox = findViewById(R.id.includeTitleCheckbox);
         includeHashtagsCheckbox = findViewById(R.id.includeHashtagsCheckbox);
         includeSourceCheckbox = findViewById(R.id.includeSourceCheckbox);
         generateFab = findViewById(R.id.generateFab);
@@ -233,6 +237,11 @@ public class MainActivity extends AppCompatActivity {
             includeSourceCheckbox.setChecked(false);
         }
 
+        // Add listener for title toggling
+        includeTitleCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            toggleTitle(isChecked);
+        });
+
         // Update hashtags checkbox visibility
         includeHashtagsCheckbox.setVisibility(
                 !prefsManager.getHashtags().isEmpty() ? View.VISIBLE : View.GONE);
@@ -294,24 +303,14 @@ public class MainActivity extends AppCompatActivity {
      * Toggles the source citation in the output text.
      */
     private void toggleSourceCitation(boolean show) {
-        if (generatedSourceCitation.isEmpty())
-            return;
+        rebuildOutputText();
+    }
 
-        String currentText = outputText.getText() != null ? outputText.getText().toString() : "";
-        if (show) {
-            // Append if not already present
-            if (!currentText.contains(generatedSourceCitation)) {
-                outputText.setText(currentText + "\n\n" + generatedSourceCitation);
-            }
-        } else {
-            // Remove if present
-            if (currentText.contains(generatedSourceCitation)) {
-                String newText = currentText.replace("\n\n" + generatedSourceCitation, "")
-                        .replace(generatedSourceCitation, "") // Fallback
-                        .trim();
-                outputText.setText(newText);
-            }
-        }
+    /**
+     * Toggles the title in the output text.
+     */
+    private void toggleTitle(boolean show) {
+        rebuildOutputText();
     }
 
     /**
@@ -340,6 +339,61 @@ public class MainActivity extends AppCompatActivity {
             generatedSourceCitation = "";
             return fullResult;
         }
+    }
+
+    /**
+     * Extracts the title (first line) and body from the content.
+     * Stores them separately for dynamic toggling.
+     */
+    private void extractTitleAndBody(String content) {
+        if (content == null || content.isEmpty()) {
+            generatedTitle = "";
+            generatedBody = "";
+            return;
+        }
+
+        // Split by first double newline or single newline
+        String[] parts = content.split("\\n\\n", 2);
+        if (parts.length >= 2 && parts[0].length() < 150) {
+            // First part is title (if reasonably short)
+            generatedTitle = parts[0].trim();
+            generatedBody = parts[1].trim();
+        } else {
+            // Try single newline
+            parts = content.split("\\n", 2);
+            if (parts.length >= 2 && parts[0].length() < 150) {
+                generatedTitle = parts[0].trim();
+                generatedBody = parts[1].trim();
+            } else {
+                // No clear title separation, treat all as body
+                generatedTitle = "";
+                generatedBody = content.trim();
+            }
+        }
+    }
+
+    /**
+     * Rebuilds the output text based on current checkbox states.
+     */
+    private void rebuildOutputText() {
+        StringBuilder textBuilder = new StringBuilder();
+
+        // Add title if checked and available
+        if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
+            textBuilder.append(generatedTitle).append("\n\n");
+        }
+
+        // Add body
+        textBuilder.append(generatedBody);
+
+        // Add source if checked and available
+        if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {
+            textBuilder.append("\n\n").append(generatedSourceCitation);
+        }
+
+        String finalText = textBuilder.toString().trim();
+        originalGeneratedPost = finalText;
+        outputText.setText(finalText);
     }
 
     /**
@@ -486,6 +540,8 @@ public class MainActivity extends AppCompatActivity {
         // Reset internal state
         originalGeneratedPost = "";
         generatedSourceCitation = "";
+        generatedTitle = "";
+        generatedBody = "";
         originalInputText = "";
         isEditMode = false;
         editButton.setText(R.string.edit_button);
@@ -630,17 +686,15 @@ public class MainActivity extends AppCompatActivity {
     private void handleGenerationSuccess(String result, boolean isRefinement) {
         Log.i(TAG, "Handling " + (isRefinement ? "refinement" : "generation") + " success");
 
-        // Extract source citation
+        // Extract source citation first
         String contentWithoutSource = extractSourceCitation(result);
 
-        // Set initial text (append source if checked)
-        String textToShow = contentWithoutSource;
-        if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {
-            textToShow += "\n\n" + generatedSourceCitation;
-        }
+        // Extract title and body
+        extractTitleAndBody(contentWithoutSource);
 
-        originalGeneratedPost = textToShow;
-        setOutputText(textToShow);
+        // Rebuild text based on checkbox states
+        rebuildOutputText();
+
         showSkeletonLoading(false);
         showOutputCard();
         isEditMode = false;
