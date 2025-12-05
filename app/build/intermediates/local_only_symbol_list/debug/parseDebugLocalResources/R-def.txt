@@ -5,6 +5,7 @@ anim fade_out
 anim slide_up
 color background_light
 color chip_background_selector
+color chip_text_color_selector
 color divider_light
 color error_light
 color md_theme_light_background

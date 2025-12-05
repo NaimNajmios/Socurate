@@ -28,6 +28,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\layout\\activity_settings.xml"
     },
     {
+        "merged": "com.mycompany.oreamnos.app-debug-33:/color_chip_text_color_selector.xml.flat",
+        "source": "com.mycompany.oreamnos.app-main-35:/color/chip_text_color_selector.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-debug-33:\\layout_activity_main.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.mycompany.oreamnos.app-main-35:\\layout\\activity_main.xml"
     },
