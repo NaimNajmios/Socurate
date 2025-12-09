@@ -451,21 +451,25 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
     private void rebuildOutputText() {
         StringBuilder textBuilder = new StringBuilder();
 
+        // 1. Title (if enabled)
         if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
             textBuilder.append(generatedTitle).append("\n\n");
         }
 
+        // 2. Body
         textBuilder.append(generatedBody);
 
+        // 3. Source (before hashtags)
+        if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {
+            textBuilder.append("\n\n").append(generatedSourceCitation);
+        }
+
+        // 4. Hashtags (last)
         if (includeHashtagsCheckbox.isChecked() && prefsManager.areHashtagsEnabled()) {
             String hashtags = prefsManager.getFormattedHashtags();
             if (!hashtags.isEmpty()) {
                 textBuilder.append("\n\n").append(hashtags);
             }
-        }
-
-        if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {
-            textBuilder.append("\n\n").append(generatedSourceCitation);
         }
 
         String finalText = textBuilder.toString().trim();
