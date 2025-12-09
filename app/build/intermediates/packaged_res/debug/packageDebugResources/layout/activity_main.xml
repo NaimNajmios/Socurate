@@ -735,12 +735,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="80dp"
         android:text="@string/generate_button"
         android:textColor="?attr/colorOnPrimary"
         android:textStyle="bold"
         app:backgroundTint="?attr/colorPrimary"
-        app:icon="@android:drawable/ic_menu_send"
+        app:icon="@drawable/ic_generate"
         app:iconTint="?attr/colorOnPrimary" />
 
     <!-- Progress Overlay -->
