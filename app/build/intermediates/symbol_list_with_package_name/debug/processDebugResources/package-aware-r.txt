@@ -3207,8 +3207,10 @@ id action_mode_close_button
 id action_settings
 id action_text
 id actions
+id activeChip
 id activity_chooser_view_content
 id add
+id addPillButton
 id alertTitle
 id aligned
 id all
@@ -3219,6 +3221,7 @@ id animateToStart
 id antiClockwise
 id anticipate
 id apiKeyInput
+id applyPillButton
 id arc
 id asConfigured
 id async
@@ -3242,6 +3245,7 @@ id bounceStart
 id buttonPanel
 id cache_measures
 id callMeasure
+id cancelButton
 id cancel_button
 id carryVelocity
 id center
@@ -3262,6 +3266,10 @@ id checkbox
 id checked
 id chipCasual
 id chipFormal
+id chipRecheckFlow
+id chipRecheckWording
+id chipRephrase
+id chipShortenDetailed
 id chronometer
 id circle_center
 id clearInputButton
@@ -3288,6 +3296,7 @@ id counterclockwise
 id cradle
 id currentState
 id custom
+id customInstructionInput
 id customPanel
 id cut
 id date_picker_actions
@@ -3295,6 +3304,7 @@ id decelerate
 id decelerateAndComplete
 id decor_content_parent
 id default_activity_button
+id deletePillButton
 id deltaRelative
 id dependency_ordering
 id design_bottom_sheet
@@ -3302,6 +3312,7 @@ id design_menu_item_action_area
 id design_menu_item_action_area_stub
 id design_menu_item_text
 id design_navigation_view
+id dialogTitle
 id dialog_button
 id dimensions
 id direct
@@ -3325,10 +3336,12 @@ id easeOut
 id east
 id edge
 id editButton
+id editPillButton
 id edit_query
 id editedIndicator
 id elastic
 id embed
+id emptyPillsText
 id enableHashtagsSwitch
 id end
 id endToStart
@@ -3522,6 +3535,14 @@ id path
 id pathRelative
 id peekHeight
 id percent
+id pillCard
+id pillChipGroup
+id pillName
+id pillNameInput
+id pillSelectorChip
+id pillSummary
+id pillsEmptyText
+id pillsRecyclerView
 id pin
 id placeholderView
 id position
@@ -3540,6 +3561,7 @@ id radio
 id ratio
 id rectangles
 id refinementCard
+id refinementsChipGroup
 id regenerateButton
 id report_drawn
 id resetAllButton
@@ -3554,6 +3576,7 @@ id right_side
 id right_to_left
 id rounded
 id row_index_key
+id saveButton
 id saveFab
 id save_non_transition_alpha
 id save_overlay_view
@@ -3663,6 +3686,7 @@ id titleDividerNoCustom
 id title_template
 id toggle
 id toneCasual
+id toneChip
 id toneChipGroup
 id toneFormal
 id toneRadioGroup
@@ -3820,6 +3844,7 @@ layout abc_tooltip
 layout activity_main
 layout activity_settings
 layout activity_share_receiver
+layout bottom_sheet_pill_selector
 layout custom_dialog
 layout design_bottom_navigation_item
 layout design_bottom_sheet_dialog
@@ -3836,7 +3861,9 @@ layout design_navigation_menu
 layout design_navigation_menu_item
 layout design_text_input_end_icon
 layout design_text_input_start_icon
+layout dialog_create_pill
 layout fragment_share_bottom_sheet
+layout item_pill_settings
 layout m3_alert_dialog
 layout m3_alert_dialog_actions
 layout m3_alert_dialog_title
@@ -3928,6 +3955,7 @@ string abc_searchview_description_voice
 string abc_shareactionprovider_share_with
 string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
+string add_pill
 string advanced_settings
 string all_reset
 string androidx_startup
@@ -3943,6 +3971,7 @@ string app_description
 string app_name
 string app_version
 string appbar_scrolling_view_behavior
+string apply_pill
 string bottom_sheet_behavior
 string bottomsheet_action_collapse
 string bottomsheet_action_expand
@@ -3966,7 +3995,9 @@ string content_description_share_icon
 string continue_in_app
 string copied_to_clipboard
 string copy_button
+string create_pill
 string edit_button
+string edit_pill
 string edited_indicator
 string enable_hashtags
 string error_a11y_label
@@ -4101,6 +4132,7 @@ string mtrl_switch_track_path
 string mtrl_timepicker_cancel
 string mtrl_timepicker_confirm
 string network_error
+string no_active_pill
 string notification_action_copy
 string notification_action_open
 string notification_channel_desc
@@ -4120,6 +4152,17 @@ string path_password_eye
 string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
+string pill_active
+string pill_applied
+string pill_cleared
+string pill_custom_instruction_hint
+string pill_deleted
+string pill_name_hint
+string pill_refinements
+string pill_saved
+string pill_set_active
+string pills_empty
+string pills_section
 string placeholder_subtitle
 string placeholder_title
 string powered_by
@@ -4144,6 +4187,7 @@ string search_menu_title
 string searchbar_scrolling_view_behavior
 string searchview_clear_text_content_description
 string searchview_navigation_content_description
+string select_pill
 string settings
 string settings_button
 string settings_saved

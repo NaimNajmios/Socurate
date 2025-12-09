@@ -38,6 +38,7 @@
     <color name="surface_light">#F5F7F8</color>
     <color name="text_primary_light">#1C2326</color>
     <color name="text_secondary_light">#546E7A</color>
+    <string name="add_pill">Add Pill</string>
     <string name="advanced_settings">Advanced Settings</string>
     <string name="all_reset">Everything has been reset</string>
     <string name="api_endpoint_default">https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent</string>
@@ -51,6 +52,7 @@
     <string name="app_description">Football news curator for Malaysian Malay content</string>
     <string name="app_name">Oreamnos</string>
     <string name="app_version">Version 1.0</string>
+    <string name="apply_pill">Apply Pill</string>
     <string name="cancel_edit">Cancel</string>
     <string name="chip_casual">Casual</string>
     <string name="chip_formal">Formal</string>
@@ -64,7 +66,9 @@
     <string name="continue_in_app">Continue in Main App</string>
     <string name="copied_to_clipboard">Copied to clipboard!</string>
     <string name="copy_button">Copy to Clipboard</string>
+    <string name="create_pill">Create Pill</string>
     <string name="edit_button">Edit</string>
+    <string name="edit_pill">Edit Pill</string>
     <string name="edited_indicator">(Edited)</string>
     <string name="enable_hashtags">Auto-append hashtags</string>
     <string name="error_title">Error</string>
@@ -91,6 +95,7 @@
     <string name="model_2_5_pro">Gemini 2.5 Pro</string>
     <string name="model_label">AI Model</string>
     <string name="network_error">Network error. Please check your connection.</string>
+    <string name="no_active_pill">No pill selected</string>
     <string name="notification_action_copy">Copy</string>
     <string name="notification_action_open">Open</string>
     <string name="notification_channel_desc">Shows progress when generating posts</string>
@@ -105,6 +110,17 @@
     <string name="output_label">Generated Post</string>
     <string name="output_placeholder">Your Malaysian Malay post will appear here…</string>
     <string name="paste_input">Paste</string>
+    <string name="pill_active">Active</string>
+    <string name="pill_applied">Pill settings applied</string>
+    <string name="pill_cleared">Pill deactivated</string>
+    <string name="pill_custom_instruction_hint">Custom instruction (optional)</string>
+    <string name="pill_deleted">Pill deleted</string>
+    <string name="pill_name_hint">Pill name (e.g., Match Day Post)</string>
+    <string name="pill_refinements">Refinements</string>
+    <string name="pill_saved">Pill saved</string>
+    <string name="pill_set_active">Pill set as active</string>
+    <string name="pills_empty">No pills created yet</string>
+    <string name="pills_section">GENERATION PILLS</string>
     <string name="placeholder_subtitle">Share from your browser or paste a URL</string>
     <string name="placeholder_title">Ready to curate. Paste a link to start.</string>
     <string name="powered_by">Powered by Google Gemini</string>
@@ -125,6 +141,7 @@
     <string name="restore_original">Restore Original</string>
     <string name="save_edit">Save</string>
     <string name="save_settings">Save Settings</string>
+    <string name="select_pill">Select Pill</string>
     <string name="settings">Settings</string>
     <string name="settings_button">Settings</string>
     <string name="settings_saved">Settings saved</string>

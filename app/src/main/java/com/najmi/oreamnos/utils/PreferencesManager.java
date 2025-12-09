@@ -272,6 +272,117 @@ public class PreferencesManager {
         return securePrefs.getBoolean(KEY_SOURCE_ENABLED, true); // Enabled by default
     }
 
+    // ==================== GENERATION PILLS ====================
+
+    private static final String KEY_PILLS = "generation_pills";
+    private static final String KEY_ACTIVE_PILL_ID = "active_pill_id";
+
+    /**
+     * Saves all generation pills.
+     * 
+     * @param pills List of pills to save
+     */
+    public void savePills(java.util.List<com.najmi.oreamnos.model.GenerationPill> pills) {
+        String json = com.najmi.oreamnos.model.GenerationPill.toJson(pills);
+        securePrefs.edit()
+                .putString(KEY_PILLS, json)
+                .apply();
+    }
+
+    /**
+     * Retrieves all saved generation pills.
+     * 
+     * @return List of pills, empty list if none saved
+     */
+    public java.util.List<com.najmi.oreamnos.model.GenerationPill> getPills() {
+        String json = securePrefs.getString(KEY_PILLS, null);
+        return com.najmi.oreamnos.model.GenerationPill.fromJson(json);
+    }
+
+    /**
+     * Adds a new pill or updates existing one.
+     * 
+     * @param pill The pill to add or update
+     */
+    public void savePill(com.najmi.oreamnos.model.GenerationPill pill) {
+        java.util.List<com.najmi.oreamnos.model.GenerationPill> pills = getPills();
+
+        // Check if pill exists and update it
+        boolean found = false;
+        for (int i = 0; i < pills.size(); i++) {
+            if (pills.get(i).getId().equals(pill.getId())) {
+                pills.set(i, pill);
+                found = true;
+                break;
+            }
+        }
+
+        // Add new pill if not found
+        if (!found) {
+            pills.add(pill);
+        }
+
+        savePills(pills);
+    }
+
+    /**
+     * Deletes a pill by ID.
+     * 
+     * @param pillId ID of the pill to delete
+     */
+    public void deletePill(String pillId) {
+        java.util.List<com.najmi.oreamnos.model.GenerationPill> pills = getPills();
+        pills.removeIf(p -> p.getId().equals(pillId));
+        savePills(pills);
+
+        // Clear active pill if it was deleted
+        String activePillId = getActivePillId();
+        if (pillId.equals(activePillId)) {
+            saveActivePillId(null);
+        }
+    }
+
+    /**
+     * Saves the currently active pill ID.
+     * 
+     * @param pillId ID of active pill, or null to clear
+     */
+    public void saveActivePillId(String pillId) {
+        securePrefs.edit()
+                .putString(KEY_ACTIVE_PILL_ID, pillId)
+                .apply();
+    }
+
+    /**
+     * Gets the currently active pill ID.
+     * 
+     * @return Active pill ID, or null if none
+     */
+    public String getActivePillId() {
+        return securePrefs.getString(KEY_ACTIVE_PILL_ID, null);
+    }
+
+    /**
+     * Gets the currently active pill.
+     * 
+     * @return Active pill, or null if none
+     */
+    public com.najmi.oreamnos.model.GenerationPill getActivePill() {
+        String activePillId = getActivePillId();
+        if (activePillId == null) {
+            return null;
+        }
+
+        java.util.List<com.najmi.oreamnos.model.GenerationPill> pills = getPills();
+        for (com.najmi.oreamnos.model.GenerationPill pill : pills) {
+            if (pill.getId().equals(activePillId)) {
+                return pill;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Clears all stored preferences.
      */

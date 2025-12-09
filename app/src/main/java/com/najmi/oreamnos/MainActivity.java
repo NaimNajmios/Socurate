@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,16 +27,20 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.najmi.oreamnos.model.GenerationPill;
 import com.najmi.oreamnos.services.ContentGenerationService;
 import com.najmi.oreamnos.utils.NotificationHelper;
 import com.najmi.oreamnos.utils.PreferencesManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Main activity for the Oreamnos app with Quick Edit and Hashtag Manager.
@@ -76,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
     private Chip checkConversational;
     private Chip checkShortenDetailed;
     private MaterialButton regenerateButton;
+    private MaterialButton applyPillButton;
+
+    // Pill selector
+    private Chip pillSelectorChip;
 
     private PreferencesManager prefsManager;
     private NotificationHelper notificationHelper;
@@ -155,6 +164,14 @@ public class MainActivity extends AppCompatActivity {
         checkConversational = findViewById(R.id.checkConversational);
         checkShortenDetailed = findViewById(R.id.checkShortenDetailed);
         regenerateButton = findViewById(R.id.regenerateButton);
+        applyPillButton = findViewById(R.id.applyPillButton);
+
+        // Pill selector
+        pillSelectorChip = findViewById(R.id.pillSelectorChip);
+        pillSelectorChip.setOnClickListener(v -> showPillSelectorBottomSheet());
+
+        // Apply Pill button
+        applyPillButton.setOnClickListener(v -> applyPillToRefinements());
 
         // Setup button listeners
         generateFab.setOnClickListener(v -> {
@@ -320,6 +337,9 @@ public class MainActivity extends AppCompatActivity {
         // Update hashtags checkbox visibility
         includeHashtagsCheckbox.setVisibility(
                 !prefsManager.getHashtags().isEmpty() ? View.VISIBLE : View.GONE);
+
+        // Update pill selector chip display
+        updatePillChipDisplay();
     }
 
     @Override
@@ -841,6 +861,128 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         AppCompatDelegate.setDefaultNightMode(mode);
+    }
+
+    // ==================== PILL SELECTOR ====================
+
+    /**
+     * Updates the pill selector chip to display the active pill.
+     */
+    private void updatePillChipDisplay() {
+        GenerationPill activePill = prefsManager.getActivePill();
+        if (activePill != null) {
+            pillSelectorChip.setText(activePill.getName());
+            // Use a tinted background to indicate active pill
+            pillSelectorChip.setChipBackgroundColorResource(android.R.color.holo_green_dark);
+            pillSelectorChip.setTextColor(getResources().getColor(android.R.color.white, getTheme()));
+            // Show Apply Pill button in refinement section
+            applyPillButton.setVisibility(View.VISIBLE);
+            applyPillButton.setText(getString(R.string.apply_pill) + ": " + activePill.getName());
+        } else {
+            pillSelectorChip.setText(R.string.no_active_pill);
+            pillSelectorChip.setChipBackgroundColorResource(android.R.color.transparent);
+            pillSelectorChip.setTextColor(getResources().getColor(android.R.color.darker_gray, getTheme()));
+            // Hide Apply Pill button when no active pill
+            applyPillButton.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Applies the active pill's refinements to the refinement chips.
+     */
+    private void applyPillToRefinements() {
+        GenerationPill activePill = prefsManager.getActivePill();
+        if (activePill == null) {
+            Toast.makeText(this, R.string.no_active_pill, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Clear current selections
+        clearRefinementCheckboxes();
+
+        // Apply pill refinements
+        List<String> refinements = activePill.getRefinements();
+        for (String refinement : refinements) {
+            switch (refinement) {
+                case "rephrase":
+                    checkRephrase.setChecked(true);
+                    break;
+                case "recheck_flow":
+                    checkRecheckFlow.setChecked(true);
+                    break;
+                case "recheck_wording":
+                    checkRecheckWording.setChecked(true);
+                    break;
+                case "shorten_detailed":
+                    checkShortenDetailed.setChecked(true);
+                    break;
+            }
+        }
+
+        // Apply tone-based refinements
+        String tone = activePill.getTone();
+        if ("formal".equals(tone)) {
+            checkFormal.setChecked(true);
+        } else if ("casual".equals(tone)) {
+            checkConversational.setChecked(true);
+        }
+
+        Toast.makeText(this, R.string.pill_applied, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Shows the bottom sheet for pill selection.
+     */
+    private void showPillSelectorBottomSheet() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View sheetView = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_pill_selector, null);
+        dialog.setContentView(sheetView);
+
+        ChipGroup pillChipGroup = sheetView.findViewById(R.id.pillChipGroup);
+        TextView emptyText = sheetView.findViewById(R.id.emptyPillsText);
+
+        List<GenerationPill> pills = prefsManager.getPills();
+        String activePillId = prefsManager.getActivePillId();
+
+        if (pills.isEmpty()) {
+            emptyText.setVisibility(View.VISIBLE);
+            pillChipGroup.setVisibility(View.GONE);
+        } else {
+            emptyText.setVisibility(View.GONE);
+            pillChipGroup.setVisibility(View.VISIBLE);
+
+            // Add "None" chip
+            Chip noneChip = new Chip(this);
+            noneChip.setText(R.string.no_active_pill);
+            noneChip.setCheckable(true);
+            noneChip.setChecked(activePillId == null);
+            noneChip.setOnClickListener(v -> {
+                prefsManager.saveActivePillId(null);
+                Toast.makeText(this, R.string.pill_cleared, Toast.LENGTH_SHORT).show();
+                updatePillChipDisplay();
+                dialog.dismiss();
+            });
+            pillChipGroup.addView(noneChip);
+
+            // Add pill chips
+            for (GenerationPill pill : pills) {
+                Chip chip = new Chip(this);
+                chip.setText(pill.getName());
+                chip.setCheckable(true);
+                chip.setChecked(pill.getId().equals(activePillId));
+
+                chip.setOnClickListener(v -> {
+                    prefsManager.saveActivePillId(pill.getId());
+                    Toast.makeText(this, R.string.pill_set_active, Toast.LENGTH_SHORT).show();
+                    updatePillChipDisplay();
+                    dialog.dismiss();
+                });
+
+                pillChipGroup.addView(chip);
+            }
+        }
+
+        dialog.show();
     }
 
     @Override

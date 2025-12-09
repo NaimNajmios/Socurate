@@ -146,4 +146,24 @@
     <string name="notification_action_copy">Copy</string>
     <string name="notification_action_open">Open</string>
     <string name="content_copied_notification">Content copied!</string>
+    
+    <!-- Generation Pills -->
+    <string name="pills_section">GENERATION PILLS</string>
+    <string name="pills_empty">No pills created yet</string>
+    <string name="create_pill">Create Pill</string>
+    <string name="edit_pill">Edit Pill</string>
+    <string name="add_pill">Add Pill</string>
+    <string name="pill_name_hint">Pill name (e.g., Match Day Post)</string>
+    <string name="pill_refinements">Refinements</string>
+    <string name="pill_custom_instruction_hint">Custom instruction (optional)</string>
+    <string name="pill_saved">Pill saved</string>
+    <string name="pill_deleted">Pill deleted</string>
+    <string name="pill_active">Active</string>
+    <string name="pill_set_active">Pill set as active</string>
+    <string name="pill_cleared">Pill deactivated</string>
+    <string name="no_active_pill">No pill selected</string>
+    <string name="select_pill">Select Pill</string>
+    <string name="apply_pill">Apply Pill</string>
+    <string name="pill_applied">Pill settings applied</string>
 </resources>
+

@@ -63,13 +63,36 @@
                         android:layout_marginBottom="12dp">
 
                         <TextView
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:text="Input"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="16sp"
                             android:textStyle="bold" />
+
+                        <!-- Active Pill Indicator -->
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/pillSelectorChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginStart="12dp"
+                            android:text="@string/no_active_pill"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp"
+                            app:chipBackgroundColor="?attr/colorSurfaceVariant"
+                            app:chipCornerRadius="16dp"
+                            app:chipIcon="@android:drawable/ic_menu_preferences"
+                            app:chipIconSize="14dp"
+                            app:chipIconTint="?attr/colorOnSurfaceVariant"
+                            app:chipMinHeight="28dp"
+                            app:chipMinTouchTargetSize="0dp"
+                            app:chipStrokeWidth="0dp"
+                            app:ensureMinTouchTargetSize="false" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
 
                         <!-- Paste Button -->
                         <ImageButton
@@ -571,14 +594,36 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Refine Draft Header with Apply Pill Button -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/refine_section"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/refine_section"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/applyPillButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:text="@string/apply_pill"
+                            android:textSize="11sp"
+                            android:visibility="gone"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            app:cornerRadius="16dp"
+                            app:icon="@android:drawable/ic_menu_preferences"
+                            app:iconSize="14dp" />
+
+                    </LinearLayout>
 
                     <!-- Refinement Chips -->
                     <com.google.android.material.chip.ChipGroup
