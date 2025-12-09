@@ -125,11 +125,18 @@ public class ContentGenerationService extends Service {
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
                 String result = gemini.curatePost(content, includeSource);
 
+                // Record token usage
+                prefsManager.recordApiSuccess(
+                        gemini.getLastPromptTokens(),
+                        gemini.getLastCandidateTokens(),
+                        gemini.getLastTotalTokens());
+
                 Log.i(TAG, "Content generation successful");
                 broadcastSuccess(result, false);
 
             } catch (Exception e) {
                 Log.e(TAG, "Content generation failed: " + e.getMessage(), e);
+                prefsManager.recordApiFailure();
                 broadcastError(e.getMessage(), false);
             } finally {
                 // Show completion notification and stop service
@@ -172,11 +179,18 @@ public class ContentGenerationService extends Service {
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
                 String result = gemini.refinePost(originalPost, refinements, includeSource);
 
+                // Record token usage
+                prefsManager.recordApiSuccess(
+                        gemini.getLastPromptTokens(),
+                        gemini.getLastCandidateTokens(),
+                        gemini.getLastTotalTokens());
+
                 Log.i(TAG, "Content refinement successful");
                 broadcastSuccess(result, true);
 
             } catch (Exception e) {
                 Log.e(TAG, "Content refinement failed: " + e.getMessage(), e);
+                prefsManager.recordApiFailure();
                 broadcastError(e.getMessage(), true);
             } finally {
                 // Show completion notification and stop service

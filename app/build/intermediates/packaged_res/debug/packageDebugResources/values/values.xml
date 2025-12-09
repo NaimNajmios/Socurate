@@ -49,6 +49,7 @@
     <string name="api_key_label">Gemini API Key</string>
     <string name="api_key_required">Please set your Gemini API key in Settings</string>
     <string name="api_key_saved">API key saved securely</string>
+    <string name="api_requests">API Requests</string>
     <string name="app_description">Football news curator for Malaysian Malay content</string>
     <string name="app_name">Oreamnos</string>
     <string name="app_version">Version 1.0</string>
@@ -128,6 +129,7 @@
     <string name="processing_error">Error: %1$s</string>
     <string name="progress_extracting">Extracting content…</string>
     <string name="progress_generating">Generating with AI…</string>
+    <string name="prompt_tokens">Prompt Tokens</string>
     <string name="refine_conversational">Conversational</string>
     <string name="refine_formal">Formal</string>
     <string name="refine_recheck_flow">Recheck Flow</string>
@@ -137,7 +139,9 @@
     <string name="refine_shorten_detailed">Shorten But Detailed</string>
     <string name="regenerate_button">Regenerate</string>
     <string name="reset_all">Reset all</string>
+    <string name="reset_stats">Reset Statistics</string>
     <string name="reset_to_default">Reset to Default</string>
+    <string name="response_tokens">Response Tokens</string>
     <string name="restore_original">Restore Original</string>
     <string name="save_edit">Save</string>
     <string name="save_settings">Save Settings</string>
@@ -150,6 +154,7 @@
     <string name="source_citation">Source Citation</string>
     <string name="source_citation_desc">Automatically detect and cite the source</string>
     <string name="source_format">Sumber: [%1$s]</string>
+    <string name="stats_reset">Usage statistics reset</string>
     <string name="success_title">Success</string>
     <string name="tap_to_collapse">Tap to collapse</string>
     <string name="tap_to_expand">Tap to expand</string>
@@ -164,6 +169,7 @@
     <string name="tone_formal">Formal (Professional)</string>
     <string name="tone_label">Post Tone</string>
     <string name="tone_quick_toggle">Tone</string>
+    <string name="total_tokens">Total Tokens Used</string>
     <string name="warning_title">Warning</string>
     <style name="ShapeAppearance.Oreamnos.BottomSheet" parent="">
         <item name="cornerFamily">rounded</item>

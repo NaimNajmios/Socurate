@@ -389,4 +389,50 @@ public class PreferencesManager {
     public void clearAll() {
         securePrefs.edit().clear().apply();
     }
+
+    // ==================== USAGE STATS ====================
+
+    private static final String KEY_USAGE_STATS = "usage_stats";
+
+    /**
+     * Gets the current usage statistics.
+     */
+    public com.najmi.oreamnos.model.UsageStats getUsageStats() {
+        String json = securePrefs.getString(KEY_USAGE_STATS, null);
+        return com.najmi.oreamnos.model.UsageStats.fromJson(json);
+    }
+
+    /**
+     * Saves usage statistics.
+     */
+    public void saveUsageStats(com.najmi.oreamnos.model.UsageStats stats) {
+        securePrefs.edit()
+                .putString(KEY_USAGE_STATS, stats.toJson())
+                .apply();
+    }
+
+    /**
+     * Records a successful API call with token usage.
+     */
+    public void recordApiSuccess(int promptTokens, int candidateTokens, int totalTokens) {
+        com.najmi.oreamnos.model.UsageStats stats = getUsageStats();
+        stats.recordSuccess(promptTokens, candidateTokens, totalTokens);
+        saveUsageStats(stats);
+    }
+
+    /**
+     * Records a failed API call.
+     */
+    public void recordApiFailure() {
+        com.najmi.oreamnos.model.UsageStats stats = getUsageStats();
+        stats.recordFailure();
+        saveUsageStats(stats);
+    }
+
+    /**
+     * Resets all usage statistics.
+     */
+    public void resetUsageStats() {
+        saveUsageStats(new com.najmi.oreamnos.model.UsageStats());
+    }
 }

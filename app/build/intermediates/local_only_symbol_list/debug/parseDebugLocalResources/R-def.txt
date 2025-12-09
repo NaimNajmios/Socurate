@@ -116,10 +116,14 @@ id progressCard
 id progressOverlay
 id progressStatusText
 id progressText
+id promptTokensValue
 id refinementCard
 id refinementsChipGroup
 id regenerateButton
+id requestsCountValue
 id resetAllButton
+id resetStatsButton
+id responseTokensValue
 id resultCard
 id saveButton
 id saveFab
@@ -141,6 +145,7 @@ id toneFormal
 id toneRadioGroup
 id toneToggleContainer
 id toolbar
+id totalTokensValue
 layout activity_main
 layout activity_settings
 layout activity_share_receiver
@@ -161,6 +166,7 @@ string api_key_hint
 string api_key_label
 string api_key_required
 string api_key_saved
+string api_requests
 string app_description
 string app_name
 string app_version
@@ -240,6 +246,7 @@ string processing
 string processing_error
 string progress_extracting
 string progress_generating
+string prompt_tokens
 string refine_conversational
 string refine_formal
 string refine_recheck_flow
@@ -249,7 +256,9 @@ string refine_section
 string refine_shorten_detailed
 string regenerate_button
 string reset_all
+string reset_stats
 string reset_to_default
+string response_tokens
 string restore_original
 string save_edit
 string save_settings
@@ -262,6 +271,7 @@ string share_to_oreamnos
 string source_citation
 string source_citation_desc
 string source_format
+string stats_reset
 string success_title
 string tap_to_collapse
 string tap_to_expand
@@ -276,6 +286,7 @@ string tone_casual
 string tone_formal
 string tone_label
 string tone_quick_toggle
+string total_tokens
 string warning_title
 style ShapeAppearance.Oreamnos.BottomSheet
 style Theme.Oreamnos

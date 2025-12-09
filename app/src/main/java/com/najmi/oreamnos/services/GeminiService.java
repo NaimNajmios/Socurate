@@ -38,6 +38,11 @@ public class GeminiService {
     private final String endpoint;
     private final String tone; // "formal" or "casual"
 
+    // Last request usage metadata
+    private int lastPromptTokens = 0;
+    private int lastCandidateTokens = 0;
+    private int lastTotalTokens = 0;
+
     /**
      * Creates a new GeminiService instance.
      * 
@@ -255,6 +260,9 @@ public class GeminiService {
                     curatedText = removeSourceCitation(curatedText);
                 }
             }
+
+            // Extract usage metadata
+            extractUsageMetadata(root);
 
             long totalTime = System.currentTimeMillis() - startTime;
             Log.i(TAG, "[" + requestId + "] Success! Output: " + curatedText.length() +
@@ -796,6 +804,56 @@ public class GeminiService {
             Log.w(TAG, "Could not parse delay string: " + delayStr);
             return 0;
         }
+    }
+
+    // ==================== USAGE METADATA ====================
+
+    /**
+     * Extracts usage metadata from the API response.
+     */
+    private void extractUsageMetadata(JsonObject root) {
+        try {
+            if (root.has("usageMetadata")) {
+                JsonObject usage = root.getAsJsonObject("usageMetadata");
+
+                if (usage.has("promptTokenCount")) {
+                    lastPromptTokens = usage.get("promptTokenCount").getAsInt();
+                }
+                if (usage.has("candidatesTokenCount")) {
+                    lastCandidateTokens = usage.get("candidatesTokenCount").getAsInt();
+                }
+                if (usage.has("totalTokenCount")) {
+                    lastTotalTokens = usage.get("totalTokenCount").getAsInt();
+                }
+
+                Log.i(TAG, "Token usage - Prompt: " + lastPromptTokens +
+                        ", Response: " + lastCandidateTokens +
+                        ", Total: " + lastTotalTokens);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Error extracting usage metadata: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Gets the last prompt token count.
+     */
+    public int getLastPromptTokens() {
+        return lastPromptTokens;
+    }
+
+    /**
+     * Gets the last candidate (response) token count.
+     */
+    public int getLastCandidateTokens() {
+        return lastCandidateTokens;
+    }
+
+    /**
+     * Gets the last total token count.
+     */
+    public int getLastTotalTokens() {
+        return lastTotalTokens;
     }
 
     /**

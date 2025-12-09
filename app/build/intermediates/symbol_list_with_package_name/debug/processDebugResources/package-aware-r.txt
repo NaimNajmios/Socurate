@@ -3556,6 +3556,7 @@ id progressStatusText
 id progressText
 id progress_circular
 id progress_horizontal
+id promptTokensValue
 id radial
 id radio
 id ratio
@@ -3564,7 +3565,10 @@ id refinementCard
 id refinementsChipGroup
 id regenerateButton
 id report_drawn
+id requestsCountValue
 id resetAllButton
+id resetStatsButton
+id responseTokensValue
 id restart
 id resultCard
 id reverse
@@ -3695,6 +3699,7 @@ id toolbar
 id top
 id topPanel
 id top_to_bottom
+id totalTokensValue
 id touch_outside
 id transitionToEnd
 id transitionToStart
@@ -3967,6 +3972,7 @@ string api_key_hint
 string api_key_label
 string api_key_required
 string api_key_saved
+string api_requests
 string app_description
 string app_name
 string app_version
@@ -4170,6 +4176,7 @@ string processing
 string processing_error
 string progress_extracting
 string progress_generating
+string prompt_tokens
 string refine_conversational
 string refine_formal
 string refine_recheck_flow
@@ -4179,7 +4186,9 @@ string refine_section
 string refine_shorten_detailed
 string regenerate_button
 string reset_all
+string reset_stats
 string reset_to_default
+string response_tokens
 string restore_original
 string save_edit
 string save_settings
@@ -4198,6 +4207,7 @@ string side_sheet_behavior
 string source_citation
 string source_citation_desc
 string source_format
+string stats_reset
 string status_bar_notification_info_overflow
 string success_title
 string tap_to_collapse
@@ -4213,6 +4223,7 @@ string tone_casual
 string tone_formal
 string tone_label
 string tone_quick_toggle
+string total_tokens
 string warning_title
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light

@@ -165,5 +165,13 @@
     <string name="select_pill">Select Pill</string>
     <string name="apply_pill">Apply Pill</string>
     <string name="pill_applied">Pill settings applied</string>
+
+    <!-- Usage Stats -->
+    <string name="total_tokens">Total Tokens Used</string>
+    <string name="prompt_tokens">Prompt Tokens</string>
+    <string name="response_tokens">Response Tokens</string>
+    <string name="api_requests">API Requests</string>
+    <string name="reset_stats">Reset Statistics</string>
+    <string name="stats_reset">Usage statistics reset</string>
 </resources>
 
