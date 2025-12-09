@@ -532,20 +532,13 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Total Tokens Row -->
+                    <!-- Total Tokens Header with Icon -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/total_tokens"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="14sp" />
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
 
                         <TextView
                             android:id="@+id/totalTokensValue"
@@ -553,94 +546,192 @@
                             android:layout_height="wrap_content"
                             android:text="0"
                             android:textColor="?attr/colorPrimary"
-                            android:textSize="14sp"
+                            android:textSize="32sp"
                             android:textStyle="bold" />
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/total_tokens_label"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp"
+                            android:layout_marginStart="8dp" />
+
                     </LinearLayout>
 
-                    <!-- Prompt Tokens Row -->
+                    <!-- Token Breakdown Visual Bar -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
+                        android:orientation="vertical"
+                        android:layout_marginBottom="16dp">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/prompt_tokens"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="13sp" />
-
-                        <TextView
-                            android:id="@+id/promptTokensValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0"
+                            android:text="@string/token_breakdown"
                             android:textColor="?attr/colorOnSurface"
-                            android:textSize="13sp" />
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp" />
+
+                        <!-- Stacked Bar Container -->
+                        <LinearLayout
+                            android:id="@+id/tokenBarContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="24dp"
+                            android:orientation="horizontal"
+                            android:background="@drawable/token_bar_background"
+                            android:clipChildren="true"
+                            android:clipToPadding="true">
+
+                            <!-- Prompt Tokens Bar (Blue) -->
+                            <View
+                                android:id="@+id/promptTokensBar"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:background="#4285F4" />
+
+                            <!-- Response Tokens Bar (Green) -->
+                            <View
+                                android:id="@+id/responseTokensBar"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:background="#34A853" />
+
+                        </LinearLayout>
+
+                        <!-- Legend -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp">
+
+                            <!-- Prompt Legend -->
+                            <View
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:background="#4285F4" />
+
+                            <TextView
+                                android:id="@+id/promptTokensValue"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Prompt: 0"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="11sp"
+                                android:layout_marginStart="6dp" />
+
+                            <!-- Response Legend -->
+                            <View
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:background="#34A853" />
+
+                            <TextView
+                                android:id="@+id/responseTokensValue"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Response: 0"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="11sp"
+                                android:layout_marginStart="6dp" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
-                    <!-- Response Tokens Row -->
-                    <LinearLayout
+                    <!-- Divider -->
+                    <View
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
+                        android:layout_height="1dp"
+                        android:background="?attr/colorOutline"
+                        android:alpha="0.3"
+                        android:layout_marginBottom="16dp" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/response_tokens"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="13sp" />
-
-                        <TextView
-                            android:id="@+id/responseTokensValue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="13sp" />
-
-                    </LinearLayout>
-
-                    <!-- Requests Row -->
+                    <!-- Requests Stats -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginBottom="16dp">
 
-                        <TextView
+                        <!-- Successful Requests -->
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/api_requests"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="13sp" />
+                            android:orientation="vertical"
+                            android:gravity="center">
 
-                        <TextView
-                            android:id="@+id/requestsCountValue"
-                            android:layout_width="wrap_content"
+                            <TextView
+                                android:id="@+id/successfulRequestsValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#34A853"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/successful_requests"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="11sp"
+                                android:gravity="center" />
+
+                        </LinearLayout>
+
+                        <!-- Divider -->
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="40dp"
+                            android:background="?attr/colorOutline"
+                            android:alpha="0.3" />
+
+                        <!-- Failed Requests -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="13sp" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/failedRequestsValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#EA4335"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/failed_requests"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="11sp"
+                                android:gravity="center" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/resetStatsButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="42dp"
                         android:text="@string/reset_stats"
                         android:textSize="12sp"
                         style="@style/Widget.Material3.Button.TonalButton"
-                        app:cornerRadius="18dp" />
+                        app:cornerRadius="21dp" />
 
                 </LinearLayout>
 

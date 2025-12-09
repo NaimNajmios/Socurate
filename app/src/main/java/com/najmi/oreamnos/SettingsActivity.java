@@ -77,7 +77,10 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView totalTokensValue;
     private TextView promptTokensValue;
     private TextView responseTokensValue;
-    private TextView requestsCountValue;
+    private View promptTokensBar;
+    private View responseTokensBar;
+    private TextView successfulRequestsValue;
+    private TextView failedRequestsValue;
     private MaterialButton resetStatsButton;
 
     private PreferencesManager prefsManager;
@@ -396,7 +399,10 @@ public class SettingsActivity extends AppCompatActivity {
         totalTokensValue = findViewById(R.id.totalTokensValue);
         promptTokensValue = findViewById(R.id.promptTokensValue);
         responseTokensValue = findViewById(R.id.responseTokensValue);
-        requestsCountValue = findViewById(R.id.requestsCountValue);
+        promptTokensBar = findViewById(R.id.promptTokensBar);
+        responseTokensBar = findViewById(R.id.responseTokensBar);
+        successfulRequestsValue = findViewById(R.id.successfulRequestsValue);
+        failedRequestsValue = findViewById(R.id.failedRequestsValue);
         resetStatsButton = findViewById(R.id.resetStatsButton);
 
         // Load current stats
@@ -422,11 +428,48 @@ public class SettingsActivity extends AppCompatActivity {
      */
     private void refreshUsageStats() {
         UsageStats stats = prefsManager.getUsageStats();
+
+        // Update total tokens (large display)
         totalTokensValue.setText(String.format("%,d", stats.getTotalTokens()));
-        promptTokensValue.setText(String.format("%,d", stats.getTotalPromptTokens()));
-        responseTokensValue.setText(String.format("%,d", stats.getTotalCandidateTokens()));
-        requestsCountValue.setText(String.format("%d successful, %d failed",
-                stats.getSuccessfulRequests(), stats.getFailedRequests()));
+
+        // Update legend text
+        promptTokensValue.setText(String.format("Prompt: %,d", stats.getTotalPromptTokens()));
+        responseTokensValue.setText(String.format("Response: %,d", stats.getTotalCandidateTokens()));
+
+        // Update bar weights for visualization
+        long promptTokens = stats.getTotalPromptTokens();
+        long responseTokens = stats.getTotalCandidateTokens();
+        long totalTokens = promptTokens + responseTokens;
+
+        if (totalTokens > 0) {
+            float promptWeight = (float) promptTokens / totalTokens;
+            float responseWeight = (float) responseTokens / totalTokens;
+
+            android.widget.LinearLayout.LayoutParams promptParams = (android.widget.LinearLayout.LayoutParams) promptTokensBar
+                    .getLayoutParams();
+            promptParams.weight = promptWeight;
+            promptTokensBar.setLayoutParams(promptParams);
+
+            android.widget.LinearLayout.LayoutParams responseParams = (android.widget.LinearLayout.LayoutParams) responseTokensBar
+                    .getLayoutParams();
+            responseParams.weight = responseWeight;
+            responseTokensBar.setLayoutParams(responseParams);
+        } else {
+            // Equal weights when no data
+            android.widget.LinearLayout.LayoutParams promptParams = (android.widget.LinearLayout.LayoutParams) promptTokensBar
+                    .getLayoutParams();
+            promptParams.weight = 0.5f;
+            promptTokensBar.setLayoutParams(promptParams);
+
+            android.widget.LinearLayout.LayoutParams responseParams = (android.widget.LinearLayout.LayoutParams) responseTokensBar
+                    .getLayoutParams();
+            responseParams.weight = 0.5f;
+            responseTokensBar.setLayoutParams(responseParams);
+        }
+
+        // Update request counters
+        successfulRequestsValue.setText(String.valueOf(stats.getSuccessfulRequests()));
+        failedRequestsValue.setText(String.valueOf(stats.getFailedRequests()));
     }
 
     /**

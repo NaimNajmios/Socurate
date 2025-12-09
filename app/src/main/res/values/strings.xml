@@ -168,9 +168,13 @@
 
     <!-- Usage Stats -->
     <string name="total_tokens">Total Tokens Used</string>
+    <string name="total_tokens_label">tokens used</string>
+    <string name="token_breakdown">Token Breakdown</string>
     <string name="prompt_tokens">Prompt Tokens</string>
     <string name="response_tokens">Response Tokens</string>
     <string name="api_requests">API Requests</string>
+    <string name="successful_requests">Successful</string>
+    <string name="failed_requests">Failed</string>
     <string name="reset_stats">Reset Statistics</string>
     <string name="stats_reset">Usage statistics reset</string>
 </resources>

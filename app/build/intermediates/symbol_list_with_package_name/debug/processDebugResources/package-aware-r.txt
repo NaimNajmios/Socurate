@@ -3135,6 +3135,7 @@ drawable pill_button_green
 drawable skeleton_item
 drawable skeleton_shimmer
 drawable test_level_drawable
+drawable token_bar_background
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
 id ALT
@@ -3352,6 +3353,7 @@ id expandArrow
 id expand_activities_button
 id expanded_menu
 id fade
+id failedRequestsValue
 id fill
 id fill_horizontal
 id fill_vertical
@@ -3556,6 +3558,7 @@ id progressStatusText
 id progressText
 id progress_circular
 id progress_horizontal
+id promptTokensBar
 id promptTokensValue
 id radial
 id radio
@@ -3565,9 +3568,9 @@ id refinementCard
 id refinementsChipGroup
 id regenerateButton
 id report_drawn
-id requestsCountValue
 id resetAllButton
 id resetStatsButton
+id responseTokensBar
 id responseTokensValue
 id restart
 id resultCard
@@ -3648,6 +3651,7 @@ id stop
 id stretch
 id submenuarrow
 id submit_area
+id successfulRequestsValue
 id supportScrollUp
 id tabMode
 id tag_accessibility_actions
@@ -3689,6 +3693,7 @@ id title
 id titleDividerNoCustom
 id title_template
 id toggle
+id tokenBarContainer
 id toneCasual
 id toneChip
 id toneChipGroup
@@ -4013,6 +4018,7 @@ string exposed_dropdown_menu_content_description
 string extracting_content
 string fab_transformation_scrim_behavior
 string fab_transformation_sheet_behavior
+string failed_requests
 string generate_background
 string generate_button
 string generated_draft
@@ -4210,6 +4216,7 @@ string source_format
 string stats_reset
 string status_bar_notification_info_overflow
 string success_title
+string successful_requests
 string tap_to_collapse
 string tap_to_expand
 string test_connection
@@ -4219,11 +4226,13 @@ string theme_label
 string theme_light
 string theme_section
 string theme_system
+string token_breakdown
 string tone_casual
 string tone_formal
 string tone_label
 string tone_quick_toggle
 string total_tokens
+string total_tokens_label
 string warning_title
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light

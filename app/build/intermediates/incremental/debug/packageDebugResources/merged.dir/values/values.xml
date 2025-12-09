@@ -74,6 +74,7 @@
     <string name="enable_hashtags">Auto-append hashtags</string>
     <string name="error_title">Error</string>
     <string name="extracting_content">Extracting content from URL…</string>
+    <string name="failed_requests">Failed</string>
     <string name="generate_background">Generate in background</string>
     <string name="generate_button">Generate Post</string>
     <string name="generated_draft">Generated Draft</string>
@@ -156,6 +157,7 @@
     <string name="source_format">Sumber: [%1$s]</string>
     <string name="stats_reset">Usage statistics reset</string>
     <string name="success_title">Success</string>
+    <string name="successful_requests">Successful</string>
     <string name="tap_to_collapse">Tap to collapse</string>
     <string name="tap_to_expand">Tap to expand</string>
     <string name="test_connection">Test Connection</string>
@@ -165,11 +167,13 @@
     <string name="theme_light">Always Light</string>
     <string name="theme_section">Appearance</string>
     <string name="theme_system">Follow System</string>
+    <string name="token_breakdown">Token Breakdown</string>
     <string name="tone_casual">Casual (Fan Banter)</string>
     <string name="tone_formal">Formal (Professional)</string>
     <string name="tone_label">Post Tone</string>
     <string name="tone_quick_toggle">Tone</string>
     <string name="total_tokens">Total Tokens Used</string>
+    <string name="total_tokens_label">tokens used</string>
     <string name="warning_title">Warning</string>
     <style name="ShapeAppearance.Oreamnos.BottomSheet" parent="">
         <item name="cornerFamily">rounded</item>

@@ -4,6 +4,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-35:\\mipmap-hdpi\\oreamnos_white.png"
     },
     {
+        "merged": "com.najmi.oreamnos.app-debug-33:/drawable_token_bar_background.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-35:/drawable/token_bar_background.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-33:\\mipmap-xxhdpi_oreamnos_white.png.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-35:\\mipmap-xxhdpi\\oreamnos_white.png"
     },
@@ -12,12 +16,12 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-35:\\layout\\fragment_share_bottom_sheet.xml"
     },
     {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-33:\\color_chip_text_color_selector.xml.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-35:\\color\\chip_text_color_selector.xml"
-    },
-    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-33:\\drawable_pill_button_dark.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-35:\\drawable\\pill_button_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-33:\\color_chip_text_color_selector.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-35:\\color\\chip_text_color_selector.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-33:\\layout_activity_share_receiver.xml.flat",
