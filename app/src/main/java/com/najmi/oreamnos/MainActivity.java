@@ -32,6 +32,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.najmi.oreamnos.model.GenerationPill;
@@ -132,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
         // Setup toolbar
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Setup bottom navigation
+        setupBottomNavigation();
 
         // Initialize views
         inputText = findViewById(R.id.inputText);
@@ -983,6 +987,40 @@ public class MainActivity extends AppCompatActivity {
         }
 
         dialog.show();
+    }
+
+    /**
+     * Sets up the bottom navigation with click listeners.
+     */
+    private void setupBottomNavigation() {
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
+
+        // Set Generate as the default selected item
+        bottomNav.setSelectedItemId(R.id.nav_generate);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_generate) {
+                // Already on Generate screen - do nothing
+                return true;
+            } else if (itemId == R.id.nav_history) {
+                // History feature - show toast for now
+                Toast.makeText(this, "History feature coming soon!", Toast.LENGTH_SHORT).show();
+                // Keep Generate selected since we're not navigating
+                bottomNav.setSelectedItemId(R.id.nav_generate);
+                return false;
+            } else if (itemId == R.id.nav_settings) {
+                // Open Settings activity
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                // Keep Generate selected since Settings is a separate activity
+                bottomNav.setSelectedItemId(R.id.nav_generate);
+                return false;
+            }
+
+            return false;
+        });
     }
 
     @Override
