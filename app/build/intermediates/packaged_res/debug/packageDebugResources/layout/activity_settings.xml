@@ -581,25 +581,24 @@
                             android:layout_width="match_parent"
                             android:layout_height="24dp"
                             android:orientation="horizontal"
-                            android:background="@drawable/token_bar_background"
-                            android:clipChildren="true"
-                            android:clipToPadding="true">
+                            android:clipChildren="false"
+                            android:clipToPadding="false">
 
-                            <!-- Prompt Tokens Bar (Blue) -->
+                            <!-- Prompt Tokens Bar (Blue with left rounded) -->
                             <View
                                 android:id="@+id/promptTokensBar"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:background="#4285F4" />
+                                android:background="@drawable/token_bar_prompt" />
 
-                            <!-- Response Tokens Bar (Green) -->
+                            <!-- Response Tokens Bar (Green with right rounded) -->
                             <View
                                 android:id="@+id/responseTokensBar"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:background="#34A853" />
+                                android:background="@drawable/token_bar_response" />
 
                         </LinearLayout>
 

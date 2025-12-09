@@ -1,3 +1,0 @@
-com.najmi.oreamnos.test
-style WhiteBackgroundDialogTheme
-style WhiteBackgroundTheme

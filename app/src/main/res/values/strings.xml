@@ -177,5 +177,16 @@
     <string name="failed_requests">Failed</string>
     <string name="reset_stats">Reset Statistics</string>
     <string name="stats_reset">Usage statistics reset</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_generate">Generate</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Empty States -->
+    <string name="empty_state_title">Ready to Create</string>
+    <string name="empty_state_message">Paste a URL or enter text to generate a curated social media post</string>
+    <string name="empty_history_title">No History Yet</string>
+    <string name="empty_history_message">Your generated posts will appear here</string>
 </resources>
 

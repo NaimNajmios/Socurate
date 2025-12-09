@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Typography Styles for better hierarchy -->
+    <!-- Using system sans-serif font which is clean and modern -->
+    
+    <!-- Display Large - App Title -->
+    <style name="TextAppearance.Socurate.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+    
+    <!-- Headline Large - Section Headers -->
+    <style name="TextAppearance.Socurate.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+    
+    <!-- Headline Medium - Card Headers -->
+    <style name="TextAppearance.Socurate.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <!-- Title Large - Toolbar Title -->
+    <style name="TextAppearance.Socurate.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+    
+    <!-- Title Medium - Subsection Headers -->
+    <style name="TextAppearance.Socurate.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <!-- Title Small - Labels -->
+    <style name="TextAppearance.Socurate.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <!-- Body Large - Main Text -->
+    <style name="TextAppearance.Socurate.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineHeight">24sp</item>
+    </style>
+    
+    <!-- Body Medium - Secondary Text -->
+    <style name="TextAppearance.Socurate.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineHeight">20sp</item>
+    </style>
+    
+    <!-- Body Small - Tertiary Text -->
+    <style name="TextAppearance.Socurate.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineHeight">16sp</item>
+    </style>
+    
+    <!-- Label Large - Buttons -->
+    <style name="TextAppearance.Socurate.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    
+    <!-- Label Medium - Chips -->
+    <style name="TextAppearance.Socurate.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">12sp</item>
+    </style>
+    
+    <!-- Label Small - Caption -->
+    <style name="TextAppearance.Socurate.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+</resources>
