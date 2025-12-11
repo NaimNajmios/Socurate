@@ -34,8 +34,10 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.najmi.oreamnos.curator.CuratorFactory;
 import com.najmi.oreamnos.model.GenerationPill;
 import com.najmi.oreamnos.services.ContentGenerationService;
 import com.najmi.oreamnos.utils.NotificationHelper;
@@ -119,11 +121,17 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             boolean success = intent.getBooleanExtra(ContentGenerationService.EXTRA_SUCCESS, false);
             boolean isRefinement = intent.getBooleanExtra(ContentGenerationService.EXTRA_IS_REFINEMENT, false);
+            boolean isRateLimit = intent.getBooleanExtra(ContentGenerationService.EXTRA_IS_RATE_LIMIT, false);
 
             if (success) {
                 String result = intent.getStringExtra(ContentGenerationService.EXTRA_RESULT);
                 // Update ViewModel state - it will survive rotation
                 handleGenerationSuccess(result, isRefinement);
+            } else if (isRateLimit) {
+                // Rate limit hit - show fallback dialog
+                String provider = intent.getStringExtra(ContentGenerationService.EXTRA_RATE_LIMIT_PROVIDER);
+                long retryDelayMs = intent.getLongExtra(ContentGenerationService.EXTRA_RETRY_DELAY_MS, 0);
+                showRateLimitFallbackDialog(provider, retryDelayMs, isRefinement);
             } else {
                 String error = intent.getStringExtra(ContentGenerationService.EXTRA_ERROR);
                 // Update ViewModel state
@@ -838,6 +846,107 @@ public class MainActivity extends AppCompatActivity {
         outputCard.setVisibility(View.VISIBLE);
         Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
         outputCard.startAnimation(slideUp);
+    }
+
+    /**
+     * Shows a dialog when rate limit is hit, offering to switch to an alternative
+     * provider.
+     *
+     * @param currentProvider The provider that hit the rate limit
+     * @param retryDelayMs    Suggested retry delay in milliseconds
+     * @param isRefinement    Whether this was a refinement operation
+     */
+    private void showRateLimitFallbackDialog(String currentProvider, long retryDelayMs, boolean isRefinement) {
+        // Hide skeleton loading
+        showSkeletonLoading(false);
+
+        // Determine fallback provider
+        String fallbackProvider;
+        String fallbackDisplayName;
+
+        if (PreferencesManager.PROVIDER_GEMINI.equals(currentProvider)) {
+            fallbackProvider = PreferencesManager.PROVIDER_GROQ;
+            fallbackDisplayName = "Groq (Llama 3.3)";
+        } else if (PreferencesManager.PROVIDER_GROQ.equals(currentProvider)) {
+            fallbackProvider = PreferencesManager.PROVIDER_OPENROUTER;
+            fallbackDisplayName = "OpenRouter";
+        } else {
+            fallbackProvider = PreferencesManager.PROVIDER_GEMINI;
+            fallbackDisplayName = "Gemini";
+        }
+
+        // Check if fallback provider has API key
+        boolean hasFallbackKey = false;
+        switch (fallbackProvider) {
+            case PreferencesManager.PROVIDER_GROQ:
+                hasFallbackKey = prefsManager.getGroqApiKey() != null && !prefsManager.getGroqApiKey().isEmpty();
+                break;
+            case PreferencesManager.PROVIDER_OPENROUTER:
+                hasFallbackKey = prefsManager.getOpenRouterApiKey() != null
+                        && !prefsManager.getOpenRouterApiKey().isEmpty();
+                break;
+            case PreferencesManager.PROVIDER_GEMINI:
+                hasFallbackKey = prefsManager.getApiKey() != null && !prefsManager.getApiKey().isEmpty();
+                break;
+        }
+
+        String waitTimeMessage = "";
+        if (retryDelayMs > 0) {
+            int waitSeconds = (int) (retryDelayMs / 1000);
+            if (waitSeconds > 60) {
+                int minutes = waitSeconds / 60;
+                waitTimeMessage = "Wait time: ~" + minutes + " minute" + (minutes > 1 ? "s" : "") + ".\n\n";
+            } else {
+                waitTimeMessage = "Wait time: ~" + waitSeconds + " second" + (waitSeconds > 1 ? "s" : "") + ".\n\n";
+            }
+        }
+
+        String currentDisplayName = CuratorFactory.getProviderDisplayName(currentProvider);
+        String message = currentDisplayName + " is rate limited (too many requests).\n\n" + waitTimeMessage;
+
+        if (hasFallbackKey) {
+            message += "Switch to " + fallbackDisplayName + " and retry immediately?";
+        } else {
+            message += "To use " + fallbackDisplayName + " as fallback, please configure its API key in Settings.";
+        }
+
+        final String finalFallbackProvider = fallbackProvider;
+        final String finalFallbackDisplayName = fallbackDisplayName;
+        final boolean finalHasFallbackKey = hasFallbackKey;
+        final boolean finalIsRefinement = isRefinement;
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.rate_limit_title)
+                .setMessage(message)
+                .setPositiveButton(hasFallbackKey ? R.string.switch_and_retry : R.string.go_to_settings,
+                        (dialog, which) -> {
+                            if (finalHasFallbackKey) {
+                                // Switch provider and retry
+                                prefsManager.saveProvider(finalFallbackProvider);
+                                Toast.makeText(this, "Switched to " + finalFallbackDisplayName, Toast.LENGTH_SHORT)
+                                        .show();
+
+                                // Retry the operation
+                                if (finalIsRefinement) {
+                                    onRegenerateClick();
+                                } else {
+                                    onGenerateClick();
+                                }
+                            } else {
+                                // Go to settings
+                                startActivity(new Intent(this, SettingsActivity.class));
+                            }
+                        })
+                .setNegativeButton(R.string.wait_button, (dialog, which) -> {
+                    dialog.dismiss();
+                    // Show placeholder or error state
+                    showPlaceholder();
+                    Toast.makeText(this, "You can try again in a moment", Toast.LENGTH_SHORT).show();
+                })
+                .setCancelable(false)
+                .show();
+
+        Log.i(TAG, "Rate limit dialog shown. Current: " + currentProvider + ", Fallback: " + fallbackProvider);
     }
 
     /**

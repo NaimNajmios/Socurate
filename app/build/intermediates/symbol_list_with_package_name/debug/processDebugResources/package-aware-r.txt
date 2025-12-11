@@ -4071,6 +4071,7 @@ string generate_button
 string generated_draft
 string generating_button
 string generating_post
+string go_to_settings
 string groq_api_key_hint
 string groq_api_key_label
 string hashtags_help
@@ -4244,6 +4245,7 @@ string provider_help_openrouter
 string provider_label
 string provider_openrouter
 string provider_section
+string rate_limit_title
 string refine_conversational
 string refine_formal
 string refine_recheck_flow
@@ -4278,6 +4280,7 @@ string stats_reset
 string status_bar_notification_info_overflow
 string success_title
 string successful_requests
+string switch_and_retry
 string tap_to_collapse
 string tap_to_expand
 string test_connection
@@ -4295,6 +4298,7 @@ string tone_quick_toggle
 string total_tokens
 string total_tokens_label
 string try_again_button
+string wait_button
 string warning_title
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light

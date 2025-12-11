@@ -15,6 +15,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import com.najmi.oreamnos.exceptions.RateLimitException;
+
 /**
  * OpenAI-compatible API curator that works with both Groq and OpenRouter.
  * These providers use the same OpenAI chat completions format.
@@ -85,11 +87,16 @@ public class OpenAICompatibleCurator implements IContentCurator {
     private String callApi(String systemPrompt, String userPrompt) throws Exception {
         int retryCount = 0;
         int delayMs = INITIAL_RETRY_DELAY_MS;
+        Exception lastException = null;
 
         while (retryCount < MAX_RETRIES) {
             try {
                 return executeRequest(systemPrompt, userPrompt);
+            } catch (RateLimitException rle) {
+                // Rate limit exceptions should be thrown immediately for fallback handling
+                throw rle;
             } catch (Exception e) {
+                lastException = e;
                 retryCount++;
                 Log.w(TAG, "API call failed (attempt " + retryCount + "/" + MAX_RETRIES + "): " + e.getMessage());
 
@@ -103,7 +110,7 @@ public class OpenAICompatibleCurator implements IContentCurator {
             }
         }
 
-        throw new Exception("Max retries exceeded");
+        throw lastException != null ? lastException : new Exception("Max retries exceeded");
     }
 
     /**
@@ -167,6 +174,16 @@ public class OpenAICompatibleCurator implements IContentCurator {
                 }
 
                 Log.e(TAG, "API Error: " + errorResponse);
+
+                // Check for rate limit (429)
+                if (responseCode == 429) {
+                    String providerName = isOpenRouter ? "openrouter" : "groq";
+                    throw new RateLimitException(
+                            "Rate limit exceeded for " + providerName,
+                            0, // OpenAI-compatible APIs don't always provide retry delay
+                            providerName);
+                }
+
                 throw new Exception("API error (" + responseCode + "): " + parseErrorMessage(errorResponse.toString()));
             }
         } finally {

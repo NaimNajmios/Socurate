@@ -16,6 +16,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import com.najmi.oreamnos.exceptions.RateLimitException;
+
 /**
  * Handles communication with the Google Gemini API for content curation.
  * Ported from the original web application with Android-specific optimizations.
@@ -159,7 +161,8 @@ public class GeminiService {
 
                         lastException = new RateLimitException(
                                 "Gemini " + errorType.toLowerCase() + ": " + code + ". " + errorBody,
-                                apiSuggestedDelay);
+                                apiSuggestedDelay,
+                                "gemini");
                     } else {
                         // Permanent error
                         Log.e(TAG, "[" + requestId + "] Permanent error: " + code + " - " + errorBody);
@@ -234,7 +237,7 @@ public class GeminiService {
                     }
 
                     userMsg += "Tip: Use 'gemini-1.5-flash' model for better quotas.";
-                    throw new Exception(userMsg, lastException);
+                    throw rle; // Throw the RateLimitException directly for fallback handling
                 }
 
                 throw new Exception("Gemini API failed after retries: " + lastException.getMessage(), lastException);
@@ -856,19 +859,4 @@ public class GeminiService {
         return lastTotalTokens;
     }
 
-    /**
-     * Custom exception for rate limit errors that includes the retry delay.
-     */
-    private static class RateLimitException extends Exception {
-        private final long retryDelayMs;
-
-        public RateLimitException(String message, long retryDelayMs) {
-            super(message);
-            this.retryDelayMs = retryDelayMs;
-        }
-
-        public long getRetryDelayMs() {
-            return retryDelayMs;
-        }
-    }
 }

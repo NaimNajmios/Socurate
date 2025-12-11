@@ -207,5 +207,11 @@
     <string name="empty_state_message">Paste a URL or enter text to generate a curated social media post</string>
     <string name="empty_history_title">No History Yet</string>
     <string name="empty_history_message">Your generated posts will appear here</string>
+    
+    <!-- Rate Limit Fallback -->
+    <string name="rate_limit_title">Traffic Overload</string>
+    <string name="switch_and_retry">Switch &amp; Retry</string>
+    <string name="wait_button">Wait</string>
+    <string name="go_to_settings">Go to Settings</string>
 </resources>
 

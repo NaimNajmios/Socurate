@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.najmi.oreamnos.exceptions.RateLimitException;
+
 /**
  * Foreground Service for generating AI content in the background.
  * This service continues running even when the app is minimized.
@@ -44,6 +46,9 @@ public class ContentGenerationService extends Service {
     public static final String EXTRA_RESULT = "extra_result";
     public static final String EXTRA_ERROR = "extra_error";
     public static final String EXTRA_IS_REFINEMENT = "extra_is_refinement";
+    public static final String EXTRA_IS_RATE_LIMIT = "extra_is_rate_limit";
+    public static final String EXTRA_RATE_LIMIT_PROVIDER = "extra_rate_limit_provider";
+    public static final String EXTRA_RETRY_DELAY_MS = "extra_retry_delay_ms";
 
     private ExecutorService executor;
     private NotificationHelper notificationHelper;
@@ -132,6 +137,10 @@ public class ContentGenerationService extends Service {
                 Log.i(TAG, "Content generation successful");
                 broadcastSuccess(result, false);
 
+            } catch (RateLimitException rle) {
+                Log.w(TAG, "Rate limit hit: " + rle.getMessage());
+                prefsManager.recordApiFailure();
+                broadcastRateLimit(rle, false);
             } catch (Exception e) {
                 Log.e(TAG, "Content generation failed: " + e.getMessage(), e);
                 prefsManager.recordApiFailure();
@@ -183,6 +192,10 @@ public class ContentGenerationService extends Service {
                 Log.i(TAG, "Content refinement successful");
                 broadcastSuccess(result, true);
 
+            } catch (RateLimitException rle) {
+                Log.w(TAG, "Rate limit hit during refinement: " + rle.getMessage());
+                prefsManager.recordApiFailure();
+                broadcastRateLimit(rle, true);
             } catch (Exception e) {
                 Log.e(TAG, "Content refinement failed: " + e.getMessage(), e);
                 prefsManager.recordApiFailure();
@@ -222,6 +235,23 @@ public class ContentGenerationService extends Service {
         notificationHelper.showErrorNotification(
                 getString(R.string.notification_error_title),
                 error != null ? error : "Unknown error");
+    }
+
+    /**
+     * Broadcasts rate limit error to MainActivity for fallback handling.
+     */
+    private void broadcastRateLimit(RateLimitException rle, boolean isRefinement) {
+        Intent broadcast = new Intent(BROADCAST_RESULT);
+        broadcast.putExtra(EXTRA_SUCCESS, false);
+        broadcast.putExtra(EXTRA_IS_RATE_LIMIT, true);
+        broadcast.putExtra(EXTRA_RATE_LIMIT_PROVIDER, rle.getProviderName());
+        broadcast.putExtra(EXTRA_RETRY_DELAY_MS, rle.getRetryDelayMs());
+        broadcast.putExtra(EXTRA_ERROR, rle.getMessage());
+        broadcast.putExtra(EXTRA_IS_REFINEMENT, isRefinement);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
+
+        // Don't show error notification for rate limits - let MainActivity handle it
+        Log.i(TAG, "Rate limit broadcast sent for provider: " + rle.getProviderName());
     }
 
     @Nullable
