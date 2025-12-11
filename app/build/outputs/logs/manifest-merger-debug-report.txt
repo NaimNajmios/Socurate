@@ -36,6 +36,7 @@ MERGED from [androidx.lifecycle:lifecycle-livedata:2.7.0] C:\Users\NAIM\.gradle\
 MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] C:\Users\NAIM\.gradle\caches\transforms-4\29af0e05563184b3b865df87c2819b75\transformed\lifecycle-viewmodel-2.7.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.security:security-crypto:1.1.0-alpha06] C:\Users\NAIM\.gradle\caches\transforms-4\89c6c8d2c25553b1e64bddef1978979d\transformed\security-crypto-1.1.0-alpha06\AndroidManifest.xml:17:1-22:12
 MERGED from [com.facebook.shimmer:shimmer:0.5.0] C:\Users\NAIM\.gradle\caches\transforms-4\0a111523cd850fd9ad455b833f44a52d\transformed\shimmer-0.5.0\AndroidManifest.xml:2:1-7:12
+MERGED from [io.noties.markwon:core:4.6.2] C:\Users\NAIM\.gradle\caches\transforms-4\c75f2b653b63bb3a3f21a9244e5e4ee9\transformed\core-4.6.2\AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\NAIM\.gradle\caches\transforms-4\4e541d5b1188d20d1ec0de4687f06349\transformed\cursoradapter-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\NAIM\.gradle\caches\transforms-4\af7847a3528c796c74d72f5a18f663b3\transformed\cardview-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\NAIM\.gradle\caches\transforms-4\78fb8ca92abaa623a871505d7da13773\transformed\core-runtime-2.2.0\AndroidManifest.xml:17:1-22:12
@@ -243,6 +244,8 @@ MERGED from [androidx.security:security-crypto:1.1.0-alpha06] C:\Users\NAIM\.gra
 MERGED from [androidx.security:security-crypto:1.1.0-alpha06] C:\Users\NAIM\.gradle\caches\transforms-4\89c6c8d2c25553b1e64bddef1978979d\transformed\security-crypto-1.1.0-alpha06\AndroidManifest.xml:20:5-44
 MERGED from [com.facebook.shimmer:shimmer:0.5.0] C:\Users\NAIM\.gradle\caches\transforms-4\0a111523cd850fd9ad455b833f44a52d\transformed\shimmer-0.5.0\AndroidManifest.xml:5:5-44
 MERGED from [com.facebook.shimmer:shimmer:0.5.0] C:\Users\NAIM\.gradle\caches\transforms-4\0a111523cd850fd9ad455b833f44a52d\transformed\shimmer-0.5.0\AndroidManifest.xml:5:5-44
+MERGED from [io.noties.markwon:core:4.6.2] C:\Users\NAIM\.gradle\caches\transforms-4\c75f2b653b63bb3a3f21a9244e5e4ee9\transformed\core-4.6.2\AndroidManifest.xml:7:5-9:41
+MERGED from [io.noties.markwon:core:4.6.2] C:\Users\NAIM\.gradle\caches\transforms-4\c75f2b653b63bb3a3f21a9244e5e4ee9\transformed\core-4.6.2\AndroidManifest.xml:7:5-9:41
 MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\NAIM\.gradle\caches\transforms-4\4e541d5b1188d20d1ec0de4687f06349\transformed\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\NAIM\.gradle\caches\transforms-4\4e541d5b1188d20d1ec0de4687f06349\transformed\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\NAIM\.gradle\caches\transforms-4\af7847a3528c796c74d72f5a18f663b3\transformed\cardview-1.0.0\AndroidManifest.xml:20:5-44

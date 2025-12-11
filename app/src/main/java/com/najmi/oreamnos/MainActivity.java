@@ -20,6 +20,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.noties.markwon.Markwon;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.ViewModelProvider;
@@ -105,6 +107,10 @@ public class MainActivity extends AppCompatActivity {
     private String originalInputText = "";
     private boolean isEditMode = false;
 
+    // Markwon for markdown rendering
+    private Markwon markwon;
+    private String rawOutputText = ""; // Store raw markdown text for editing
+
     /**
      * BroadcastReceiver for handling results from ContentGenerationService.
      */
@@ -137,6 +143,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize ViewModel (survives configuration changes)
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+        // Initialize Markwon for markdown rendering
+        markwon = Markwon.create(this);
 
         // Apply saved theme before setContentView
         applyTheme(prefsManager.getTheme());
@@ -453,7 +462,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Toggle edit mode: " + (isEditMode ? "EDIT" : "VIEW"));
 
         if (isEditMode) {
-            // Enable editing
+            // Enable editing - show raw markdown text
+            outputText.setText(rawOutputText);
             outputText.setFocusable(true);
             outputText.setFocusableInTouchMode(true);
             outputText.requestFocus();
@@ -462,7 +472,7 @@ public class MainActivity extends AppCompatActivity {
             // Disable scrolling in edit mode to allow text selection
             outputText.setMovementMethod(null);
         } else {
-            // Disable editing
+            // Disable editing - render markdown
             outputText.setFocusable(false);
             outputText.setFocusableInTouchMode(false);
             editButton.setText(R.string.edit_button);
@@ -470,7 +480,10 @@ public class MainActivity extends AppCompatActivity {
 
             // Save edited version
             if (outputText.getText() != null) {
-                originalGeneratedPost = outputText.getText().toString();
+                rawOutputText = outputText.getText().toString();
+                originalGeneratedPost = rawOutputText;
+                // Re-render markdown
+                markwon.setMarkdown(outputText, rawOutputText);
             }
         }
     }
@@ -569,7 +582,14 @@ public class MainActivity extends AppCompatActivity {
 
         String finalText = textBuilder.toString().trim();
         originalGeneratedPost = finalText;
-        outputText.setText(finalText);
+        rawOutputText = finalText;
+
+        // Render markdown if not in edit mode
+        if (!isEditMode) {
+            markwon.setMarkdown(outputText, finalText);
+        } else {
+            outputText.setText(finalText);
+        }
     }
 
     /**
@@ -630,7 +650,9 @@ public class MainActivity extends AppCompatActivity {
      * Gets the final text to copy/share (with hashtags if enabled).
      */
     private String getFinalText() {
-        String text = outputText.getText() != null ? outputText.getText().toString() : "";
+        // Use raw text for copy/share (not rendered markdown)
+        String text = rawOutputText.isEmpty() ? (outputText.getText() != null ? outputText.getText().toString() : "")
+                : rawOutputText;
 
         // Add hashtags if enabled
         if (includeHashtagsCheckbox.isChecked() && prefsManager.areHashtagsEnabled()) {
