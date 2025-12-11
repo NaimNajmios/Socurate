@@ -4,6 +4,24 @@ A sleek, modern Android application that transforms global football news into po
 
 ## ✨ What's New
 
+### 🔄 Multi-Provider AI Support
+- **Gemini (Google)**: Default provider with multiple model options
+- **Groq (Llama 3.3)**: Fast inference alternative
+- **OpenRouter**: Access to free models
+- **Dynamic Model Selection**: Each provider shows its available models in the dropdown
+
+### 🛡️ Interactive Rate Limit Recovery
+- **Smart Fallback**: When rate limited, a dialog offers to switch providers automatically
+- **Fallback Chain**: Gemini → Groq → OpenRouter → Gemini
+- **Seamless Retry**: Switch providers and retry with one tap
+- **API Key Check**: Only offers fallback if alternative provider is configured
+
+### 📝 Markdown Rendering (Markwon)
+- **Rich Text Display**: AI output now renders with proper formatting
+- **Bold Text**: `**text**` displays as actual bold
+- **Headers**: `## Header` displays as large/bold text
+- **Edit Mode**: Shows raw markdown for editing, rendered markdown for viewing
+
 ### 📊 Usage Statistics & Token Tracking
 - **Token Tracking**: Monitor total tokens used (prompt + response)
 - **Visual Breakdown**: Stacked bar chart showing token distribution
@@ -34,13 +52,13 @@ A sleek, modern Android application that transforms global football news into po
 - **Tone Quick Toggle**: Switch between Formal/Casual tone without going to Settings
 - **Background Processing**: Generate in background and continue using other apps
 
-### 🤖 AI Model Selection
-- **Multiple Models**: Choose from available Gemini models in Settings:
-  - Gemini 2.5 Flash Lite (fastest)
-  - Gemini 2.5 Flash
-  - Gemini 2.5 Pro (highest quality)
-  - Gemini 2.0 Flash (default)
-- **Easy Switching**: Simple dropdown in Settings to change models
+### 🤖 AI Provider & Model Selection
+- **Multiple Providers**: Choose between Gemini, Groq, or OpenRouter
+- **Provider-Specific Models**: Each provider shows its available models
+- **Gemini Models**: 2.5 Flash Lite, 2.5 Flash, 2.5 Pro, 2.0 Flash
+- **Groq Models**: Llama 3.3 70B, Llama 4 Scout, Qwen QWQ
+- **OpenRouter Models**: DeepSeek V3, Meta Llama 3.3, and more free models
+- **Easy Switching**: Dropdown in Settings with per-provider API key fields
 
 ### 🔍 Source Citation
 - **Automatic Attribution**: AI detects and includes source information in generated posts
@@ -75,14 +93,19 @@ A sleek, modern Android application that transforms global football news into po
 ### Technical Excellence
 - **Intelligent Retry Logic**: Automatically retries failed API calls with exponential backoff
 - **Rate Limit Handling**: Parses and respects API's requested retry delays (up to 60s)
+- **Interactive Fallback**: Prompts to switch providers when rate limited
 - **Secure Storage**: API keys encrypted using Android's EncryptedSharedPreferences
+- **Markdown Rendering**: Uses Markwon library for rich text display
 - **Comprehensive Logging**: Detailed logs with unique request IDs for debugging
 - **Error Recovery**: User-friendly error messages with actionable suggestions
 
 ## 📋 Requirements
 
 - Android 7.0 (API 24) or higher
-- Google Gemini API key ([Get one here](https://ai.google.dev))
+- At least one AI provider API key:
+  - Google Gemini: [Get one here](https://ai.google.dev)
+  - Groq: [Get one here](https://console.groq.com)
+  - OpenRouter: [Get one here](https://openrouter.ai)
 - Internet connection
 
 ## 🚀 Installation
@@ -107,9 +130,10 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 
 1. Launch the app
 2. Tap the settings icon (⚙️) in the toolbar
-3. **API Configuration**:
-   - Enter your Gemini API key
-   - Select AI Model from dropdown (Gemini 2.5 Flash Lite, Flash, Pro, or 2.0 Flash)
+3. **AI Provider Setup**:
+   - Select your preferred provider (Gemini, Groq, or OpenRouter)
+   - Enter the API key for your selected provider
+   - Select AI Model from the dropdown (shows models for current provider)
    - (Optional) Test the connection
 4. **Post Settings**:
    - Choose tone: Formal or Casual
@@ -119,7 +143,6 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
    - Toggle auto-append on/off
 6. **Appearance**:
    - Choose theme: Light, Dark, or System
-7. Tap "Save Settings"
 
 ## 💡 Usage
 
@@ -221,6 +244,7 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
   - Jsoup 1.17.2 (HTML parsing and content extraction)
   - Security Crypto 1.1.0-alpha06 (Encrypted preferences with AES256)
   - Facebook Shimmer 0.5.0 (Skeleton loading animations)
+  - Markwon 4.6.2 (Markdown rendering for AI output)
 
 ## 📁 Project Structure
 
@@ -380,18 +404,24 @@ In Settings → Advanced Settings → AI Model, select from available Gemini mod
 
 ### Rate limit errors
 
-**Cause**: Exceeded Gemini API quota (requests per minute/day).
+**Cause**: Exceeded AI provider's API quota (requests per minute/day).
 
-The app now handles rate limits intelligently:
+The app now handles rate limits with **Interactive Recovery**:
+- Shows a dialog when rate limit is hit
+- Offers to switch to an alternative provider (e.g., Gemini → Groq)
+- One-tap retry with the new provider
+- Falls back gracefully through the provider chain
+
+Legacy handling still works:
 - Automatically retries with the exact delay requested by the API (up to 60 seconds)
 - Shows user-friendly messages: "Please wait X seconds and try again"
-- Logs all retry attempts with unique IDs in Logcat for debugging
-- Suggests using `gemini-1.5-flash` model for better quotas
+- Logs all retry attempts with unique IDs in Logcat
 
 **Solutions**:
+- Accept the fallback suggestion to switch providers
 - Wait for the suggested time period before retrying
-- Check your API quota at [Google AI Studio](https://ai.google.dev)
-- Consider upgrading your API plan for higher limits
+- Configure multiple provider API keys for seamless fallback
+- Check your API quota at your provider's dashboard
 
 ### Theme not applying
 
