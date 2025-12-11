@@ -2067,6 +2067,8 @@
     <string name="generated_draft">Generated Draft</string>
     <string name="generating_button">Generating…</string>
     <string name="generating_post">Generating post with AI…</string>
+    <string name="groq_api_key_hint">Enter your Groq API key</string>
+    <string name="groq_api_key_label">Groq API Key</string>
     <string name="hashtags_help">Separate with spaces or commas</string>
     <string name="hashtags_hint">e.g., #BolaSepak #Football #JDT</string>
     <string name="hashtags_label">Default Hashtags</string>
@@ -2207,6 +2209,8 @@
     <string name="notification_generating_message">Creating your curated content…</string>
     <string name="notification_generating_title">Generating Post</string>
     <string name="open_in_app">Open in Main App</string>
+    <string name="openrouter_api_key_hint">Enter your OpenRouter API key</string>
+    <string name="openrouter_api_key_label">OpenRouter API Key</string>
     <string name="original_post">Original Post</string>
     <string name="output_label">Generated Post</string>
     <string name="output_placeholder">Your Malaysian Malay post will appear here…</string>
@@ -2235,6 +2239,13 @@
     <string name="progress_extracting">Extracting content…</string>
     <string name="progress_generating">Generating with AI…</string>
     <string name="prompt_tokens">Prompt Tokens</string>
+    <string name="provider_gemini">Gemini (Google)</string>
+    <string name="provider_groq">Groq (Llama 3.3)</string>
+    <string name="provider_help_groq">Get your key at console.groq.com</string>
+    <string name="provider_help_openrouter">Get your key at openrouter.ai</string>
+    <string name="provider_label">AI Provider</string>
+    <string name="provider_openrouter">OpenRouter (Free Models)</string>
+    <string name="provider_section">AI PROVIDER</string>
     <string name="refine_conversational">Conversational</string>
     <string name="refine_formal">Formal</string>
     <string name="refine_recheck_flow">Recheck Flow</string>

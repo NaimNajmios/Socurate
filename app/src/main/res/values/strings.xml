@@ -140,6 +140,19 @@
     <string name="model_2_5_pro">Gemini 2.5 Pro</string>
     <string name="model_2_0_flash">Gemini 2.0 Flash</string>
     
+    <!-- AI Providers -->
+    <string name="provider_section">AI PROVIDER</string>
+    <string name="provider_label">AI Provider</string>
+    <string name="provider_gemini">Gemini (Google)</string>
+    <string name="provider_groq">Groq (Llama 3.3)</string>
+    <string name="provider_openrouter">OpenRouter (Free Models)</string>
+    <string name="groq_api_key_label">Groq API Key</string>
+    <string name="groq_api_key_hint">Enter your Groq API key</string>
+    <string name="openrouter_api_key_label">OpenRouter API Key</string>
+    <string name="openrouter_api_key_hint">Enter your OpenRouter API key</string>
+    <string name="provider_help_groq">Get your key at console.groq.com</string>
+    <string name="provider_help_openrouter">Get your key at openrouter.ai</string>
+    
     <!-- Bottom Sheet Share -->
     <string name="progress_extracting">Extracting content…</string>
     <string name="progress_generating">Generating with AI…</string>

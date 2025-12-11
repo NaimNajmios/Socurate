@@ -111,7 +111,10 @@ id errorMessage
 id errorTitle
 id expandArrow
 id failedRequestsValue
+id geminiKeyContainer
 id generateFab
+id groqApiKeyInput
+id groqKeyContainer
 id hashtagsInput
 id includeHashtagsCheckbox
 id includeSourceCheckbox
@@ -126,6 +129,8 @@ id nav_generate
 id nav_history
 id nav_settings
 id openMainAppButton
+id openRouterApiKeyInput
+id openRouterKeyContainer
 id outputCard
 id outputScrollView
 id outputText
@@ -148,6 +153,8 @@ id progressStatusText
 id progressText
 id promptTokensBar
 id promptTokensValue
+id providerDropdown
+id providerDropdownLayout
 id refinementCard
 id refinementsChipGroup
 id regenerateButton
@@ -240,6 +247,8 @@ string generate_button
 string generated_draft
 string generating_button
 string generating_post
+string groq_api_key_hint
+string groq_api_key_label
 string hashtags_help
 string hashtags_hint
 string hashtags_label
@@ -271,6 +280,8 @@ string notification_error_title
 string notification_generating_message
 string notification_generating_title
 string open_in_app
+string openrouter_api_key_hint
+string openrouter_api_key_label
 string original_post
 string output_label
 string output_placeholder
@@ -294,6 +305,13 @@ string processing_error
 string progress_extracting
 string progress_generating
 string prompt_tokens
+string provider_gemini
+string provider_groq
+string provider_help_groq
+string provider_help_openrouter
+string provider_label
+string provider_openrouter
+string provider_section
 string refine_conversational
 string refine_formal
 string refine_recheck_flow

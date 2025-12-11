@@ -3395,12 +3395,15 @@ id forever
 id fragment_container_view_tag
 id frost
 id fullscreen_header
+id geminiKeyContainer
 id generateFab
 id ghost_view
 id ghost_view_holder
 id gone
 id graph
 id graph_wrap
+id groqApiKeyInput
+id groqKeyContainer
 id group_divider
 id grouping
 id groups
@@ -3532,6 +3535,8 @@ id off
 id on
 id onInterceptTouchReturnSwipe
 id openMainAppButton
+id openRouterApiKeyInput
+id openRouterKeyContainer
 id open_search_bar_text_view
 id open_search_view_background
 id open_search_view_clear_button
@@ -3588,6 +3593,8 @@ id progress_circular
 id progress_horizontal
 id promptTokensBar
 id promptTokensValue
+id providerDropdown
+id providerDropdownLayout
 id radial
 id radio
 id ratio
@@ -4062,6 +4069,8 @@ string generate_button
 string generated_draft
 string generating_button
 string generating_post
+string groq_api_key_hint
+string groq_api_key_label
 string hashtags_help
 string hashtags_hint
 string hashtags_label
@@ -4196,6 +4205,8 @@ string notification_error_title
 string notification_generating_message
 string notification_generating_title
 string open_in_app
+string openrouter_api_key_hint
+string openrouter_api_key_label
 string original_post
 string output_label
 string output_placeholder
@@ -4224,6 +4235,13 @@ string processing_error
 string progress_extracting
 string progress_generating
 string prompt_tokens
+string provider_gemini
+string provider_groq
+string provider_help_groq
+string provider_help_openrouter
+string provider_label
+string provider_openrouter
+string provider_section
 string refine_conversational
 string refine_formal
 string refine_recheck_flow

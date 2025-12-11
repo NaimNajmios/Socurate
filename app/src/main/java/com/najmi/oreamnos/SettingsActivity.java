@@ -44,29 +44,96 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG = "SettingsActivity";
 
-    // Available Gemini models
-    private static final String[] MODEL_NAMES = {
+    // Available Gemini models (free tier)
+    private static final String[] GEMINI_MODEL_NAMES = {
             "Gemini 2.5 Flash Lite",
             "Gemini 2.5 Flash",
-            "Gemini 2.5 Pro",
-            "Gemini 2.0 Flash"
+            "Gemini 2.0 Flash",
+            "Gemini 2.0 Flash Lite",
+            "Gemini 1.5 Flash",
+            "Gemini 1.5 Flash-8B"
     };
 
-    private static final String[] MODEL_ENDPOINTS = {
+    private static final String[] GEMINI_MODEL_ENDPOINTS = {
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent",
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent"
     };
 
+    // Available Groq models (free tier)
+    private static final String[] GROQ_MODEL_NAMES = {
+            "Llama 3.3 70B Versatile",
+            "Llama 3.1 8B Instant",
+            "Llama 3 70B",
+            "Llama 3 8B",
+            "Gemma 2 9B",
+            "Mixtral 8x7B"
+    };
+
+    private static final String[] GROQ_MODEL_IDS = {
+            "llama-3.3-70b-versatile",
+            "llama-3.1-8b-instant",
+            "llama3-70b-8192",
+            "llama3-8b-8192",
+            "gemma2-9b-it",
+            "mixtral-8x7b-32768"
+    };
+
+    // Available OpenRouter free models
+    private static final String[] OPENROUTER_MODEL_NAMES = {
+            "DeepSeek R1 (Free)",
+            "DeepSeek Chat V3 (Free)",
+            "Llama 3.3 70B (Free)",
+            "Llama 3.2 3B (Free)",
+            "Llama 3.2 1B (Free)",
+            "Llama 3.1 8B (Free)",
+            "Qwen 2.5 72B (Free)",
+            "Qwen 2.5 7B (Free)",
+            "Gemma 2 9B (Free)",
+            "Phi-3 Mini 128K (Free)",
+            "Mistral 7B (Free)"
+    };
+
+    private static final String[] OPENROUTER_MODEL_IDS = {
+            "deepseek/deepseek-r1:free",
+            "deepseek/deepseek-chat-v3-0324:free",
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "meta-llama/llama-3.2-3b-instruct:free",
+            "meta-llama/llama-3.2-1b-instruct:free",
+            "meta-llama/llama-3.1-8b-instruct:free",
+            "qwen/qwen-2.5-72b-instruct:free",
+            "qwen/qwen-2.5-7b-instruct:free",
+            "google/gemma-2-9b-it:free",
+            "microsoft/phi-3-mini-128k-instruct:free",
+            "mistralai/mistral-7b-instruct:free"
+    };
+
+    // Current model arrays (dynamically updated based on provider)
+    private String[] currentModelNames = GEMINI_MODEL_NAMES;
+    private String[] currentModelIds = GEMINI_MODEL_ENDPOINTS;
+
     private TextInputEditText apiKeyInput;
+    private TextInputEditText groqApiKeyInput;
+    private TextInputEditText openRouterApiKeyInput;
     private AutoCompleteTextView modelDropdown;
+    private AutoCompleteTextView providerDropdown;
+    private View geminiKeyContainer;
+    private View groqKeyContainer;
+    private View openRouterKeyContainer;
     private TextInputEditText hashtagsInput;
     private RadioGroup toneRadioGroup;
     private RadioGroup themeRadioGroup;
     private SwitchMaterial enableHashtagsSwitch;
     private SwitchMaterial sourceEnabledSwitch;
     private MaterialButton testConnectionButton;
+
+    // Provider constants (must match PreferencesManager)
+    private static final String[] PROVIDER_NAMES = { "Gemini (Google)", "Groq (Llama 3.3)",
+            "OpenRouter (Free Models)" };
+    private static final String[] PROVIDER_VALUES = { "gemini", "groq", "openrouter" };
 
     // Flag to prevent auto-save during initial load
     private boolean isLoading = true;
@@ -91,7 +158,7 @@ public class SettingsActivity extends AppCompatActivity {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    private int selectedModelIndex = 3; // Default to Gemini 2.0 Flash
+    private int selectedModelIndex = 0; // Default to first model
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +180,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Initialize views
         apiKeyInput = findViewById(R.id.apiKeyInput);
+        groqApiKeyInput = findViewById(R.id.groqApiKeyInput);
+        openRouterApiKeyInput = findViewById(R.id.openRouterApiKeyInput);
         modelDropdown = findViewById(R.id.modelDropdown);
+        providerDropdown = findViewById(R.id.providerDropdown);
+        geminiKeyContainer = findViewById(R.id.geminiKeyContainer);
+        groqKeyContainer = findViewById(R.id.groqKeyContainer);
+        openRouterKeyContainer = findViewById(R.id.openRouterKeyContainer);
         hashtagsInput = findViewById(R.id.hashtagsInput);
         toneRadioGroup = findViewById(R.id.toneRadioGroup);
         themeRadioGroup = findViewById(R.id.themeRadioGroup);
@@ -126,7 +199,8 @@ public class SettingsActivity extends AppCompatActivity {
         pillsEmptyText = findViewById(R.id.pillsEmptyText);
         addPillButton = findViewById(R.id.addPillButton);
 
-        // Setup model dropdown
+        // Setup dropdowns
+        setupProviderDropdown();
         setupModelDropdown();
 
         // Setup pills section
@@ -166,19 +240,34 @@ public class SettingsActivity extends AppCompatActivity {
      * Sets up auto-save listeners for all input fields.
      */
     private void setupAutoSaveListeners() {
-        // API Key - save on focus lost
+        // Gemini API Key - save on focus lost
         apiKeyInput.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus && !isLoading) {
-                saveApiKey();
+                saveGeminiApiKey();
+            }
+        });
+
+        // Groq API Key - save on focus lost
+        groqApiKeyInput.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus && !isLoading) {
+                saveGroqApiKey();
+            }
+        });
+
+        // OpenRouter API Key - save on focus lost
+        openRouterApiKeyInput.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus && !isLoading) {
+                saveOpenRouterApiKey();
             }
         });
 
         // Model dropdown - save on selection
         modelDropdown.setOnItemClickListener((parent, view, position, id) -> {
             selectedModelIndex = position;
-            Log.d(TAG, "Selected model: " + MODEL_NAMES[position]);
+            Log.d(TAG, "Selected model: " + currentModelNames[position]);
             if (!isLoading) {
-                prefsManager.saveApiEndpoint(MODEL_ENDPOINTS[selectedModelIndex]);
+                String provider = prefsManager.getProvider();
+                prefsManager.saveModelForProvider(provider, currentModelIds[selectedModelIndex]);
                 showSavedFeedback();
             }
         });
@@ -241,12 +330,35 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /**
-     * Saves the API key.
+     * Saves the Gemini API key.
      */
-    private void saveApiKey() {
+    private void saveGeminiApiKey() {
         String apiKey = apiKeyInput.getText() != null ? apiKeyInput.getText().toString().trim() : "";
         if (!apiKey.isEmpty()) {
             prefsManager.saveApiKey(apiKey);
+            showSavedFeedback();
+        }
+    }
+
+    /**
+     * Saves the Groq API key.
+     */
+    private void saveGroqApiKey() {
+        String apiKey = groqApiKeyInput.getText() != null ? groqApiKeyInput.getText().toString().trim() : "";
+        if (!apiKey.isEmpty()) {
+            prefsManager.saveGroqApiKey(apiKey);
+            showSavedFeedback();
+        }
+    }
+
+    /**
+     * Saves the OpenRouter API key.
+     */
+    private void saveOpenRouterApiKey() {
+        String apiKey = openRouterApiKeyInput.getText() != null ? openRouterApiKeyInput.getText().toString().trim()
+                : "";
+        if (!apiKey.isEmpty()) {
+            prefsManager.saveOpenRouterApiKey(apiKey);
             showSavedFeedback();
         }
     }
@@ -259,15 +371,103 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets up the model dropdown with available options.
+     * Sets up the AI provider dropdown.
      */
-    private void setupModelDropdown() {
+    private void setupProviderDropdown() {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_dropdown_item_1line,
-                MODEL_NAMES);
+                PROVIDER_NAMES);
+        providerDropdown.setAdapter(adapter);
+
+        // Handle provider selection
+        providerDropdown.setOnItemClickListener((parent, view, position, id) -> {
+            if (isLoading)
+                return;
+
+            String selectedProvider = PROVIDER_VALUES[position];
+            prefsManager.saveProvider(selectedProvider);
+            updateApiKeyContainerVisibility(selectedProvider);
+            updateModelDropdownForProvider(selectedProvider);
+            showSavedFeedback();
+            Log.d(TAG, "Selected provider: " + selectedProvider);
+        });
+    }
+
+    /**
+     * Updates the visibility of API key containers based on selected provider.
+     */
+    private void updateApiKeyContainerVisibility(String provider) {
+        geminiKeyContainer.setVisibility(View.GONE);
+        groqKeyContainer.setVisibility(View.GONE);
+        openRouterKeyContainer.setVisibility(View.GONE);
+
+        switch (provider) {
+            case PreferencesManager.PROVIDER_GROQ:
+                groqKeyContainer.setVisibility(View.VISIBLE);
+                break;
+            case PreferencesManager.PROVIDER_OPENROUTER:
+                openRouterKeyContainer.setVisibility(View.VISIBLE);
+                break;
+            case PreferencesManager.PROVIDER_GEMINI:
+            default:
+                geminiKeyContainer.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    /**
+     * Sets up the model dropdown with available options.
+     */
+    private void setupModelDropdown() {
+        // Initial setup with Gemini models (will be updated based on provider)
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                currentModelNames);
         modelDropdown.setAdapter(adapter);
         // Item click listener is now in setupAutoSaveListeners()
+    }
+
+    /**
+     * Updates the model dropdown based on the selected provider.
+     */
+    private void updateModelDropdownForProvider(String provider) {
+        switch (provider) {
+            case PreferencesManager.PROVIDER_GROQ:
+                currentModelNames = GROQ_MODEL_NAMES;
+                currentModelIds = GROQ_MODEL_IDS;
+                break;
+            case PreferencesManager.PROVIDER_OPENROUTER:
+                currentModelNames = OPENROUTER_MODEL_NAMES;
+                currentModelIds = OPENROUTER_MODEL_IDS;
+                break;
+            case PreferencesManager.PROVIDER_GEMINI:
+            default:
+                currentModelNames = GEMINI_MODEL_NAMES;
+                currentModelIds = GEMINI_MODEL_ENDPOINTS;
+                break;
+        }
+
+        // Update adapter with new model list
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                currentModelNames);
+        modelDropdown.setAdapter(adapter);
+
+        // Load saved model for this provider or default to first
+        String savedModel = prefsManager.getModelForProvider(provider);
+        selectedModelIndex = 0;
+        for (int i = 0; i < currentModelIds.length; i++) {
+            if (currentModelIds[i].equals(savedModel)) {
+                selectedModelIndex = i;
+                break;
+            }
+        }
+        modelDropdown.setText(currentModelNames[selectedModelIndex], false);
+        Log.d(TAG, "Updated model dropdown for provider: " + provider + ", selected: "
+                + currentModelNames[selectedModelIndex]);
     }
 
     /**
@@ -275,22 +475,37 @@ public class SettingsActivity extends AppCompatActivity {
      */
     private void loadSettings() {
         Log.d(TAG, "Loading settings from preferences");
-        // Load API key (if exists)
-        String apiKey = prefsManager.getApiKey();
-        if (apiKey != null) {
-            apiKeyInput.setText(apiKey);
-        }
 
-        // Load model - find matching endpoint
-        String savedEndpoint = prefsManager.getApiEndpoint();
-        selectedModelIndex = 3; // Default to Gemini 2.0 Flash
-        for (int i = 0; i < MODEL_ENDPOINTS.length; i++) {
-            if (MODEL_ENDPOINTS[i].equals(savedEndpoint)) {
-                selectedModelIndex = i;
+        // Load provider
+        String provider = prefsManager.getProvider();
+        int providerIndex = 0;
+        for (int i = 0; i < PROVIDER_VALUES.length; i++) {
+            if (PROVIDER_VALUES[i].equals(provider)) {
+                providerIndex = i;
                 break;
             }
         }
-        modelDropdown.setText(MODEL_NAMES[selectedModelIndex], false);
+        providerDropdown.setText(PROVIDER_NAMES[providerIndex], false);
+        updateApiKeyContainerVisibility(provider);
+
+        // Load API keys for all providers
+        String geminiKey = prefsManager.getApiKey();
+        if (geminiKey != null) {
+            apiKeyInput.setText(geminiKey);
+        }
+
+        String groqKey = prefsManager.getGroqApiKey();
+        if (groqKey != null) {
+            groqApiKeyInput.setText(groqKey);
+        }
+
+        String openRouterKey = prefsManager.getOpenRouterApiKey();
+        if (openRouterKey != null) {
+            openRouterApiKeyInput.setText(openRouterKey);
+        }
+
+        // Update model dropdown for current provider
+        updateModelDropdownForProvider(provider);
 
         // Load tone
         String tone = prefsManager.getTone();
@@ -322,7 +537,7 @@ public class SettingsActivity extends AppCompatActivity {
             themeRadioGroup.check(R.id.themeSystem);
         }
 
-        Log.d(TAG, "Settings loaded - Model: " + MODEL_NAMES[selectedModelIndex] + ", Tone: " + tone +
+        Log.d(TAG, "Settings loaded - Model: " + currentModelNames[selectedModelIndex] + ", Tone: " + tone +
                 ", Theme: " + theme + ", Hashtags enabled: " + hashtagsEnabled +
                 ", Source enabled: " + sourceEnabled);
 
@@ -335,8 +550,23 @@ public class SettingsActivity extends AppCompatActivity {
      */
     private void onTestConnectionClick() {
         Log.i(TAG, ">>> Test connection clicked <<<");
-        String apiKey = apiKeyInput.getText() != null ? apiKeyInput.getText().toString().trim() : "";
-        String endpoint = MODEL_ENDPOINTS[selectedModelIndex];
+        String provider = prefsManager.getProvider();
+        String apiKey;
+
+        // Get the correct API key for the current provider
+        switch (provider) {
+            case PreferencesManager.PROVIDER_GROQ:
+                apiKey = groqApiKeyInput.getText() != null ? groqApiKeyInput.getText().toString().trim() : "";
+                break;
+            case PreferencesManager.PROVIDER_OPENROUTER:
+                apiKey = openRouterApiKeyInput.getText() != null ? openRouterApiKeyInput.getText().toString().trim()
+                        : "";
+                break;
+            case PreferencesManager.PROVIDER_GEMINI:
+            default:
+                apiKey = this.apiKeyInput.getText() != null ? this.apiKeyInput.getText().toString().trim() : "";
+                break;
+        }
 
         if (apiKey.isEmpty()) {
             Toast.makeText(this, "Please enter an API key first", Toast.LENGTH_SHORT).show();
@@ -347,19 +577,59 @@ public class SettingsActivity extends AppCompatActivity {
         testConnectionButton.setEnabled(false);
         testConnectionButton.setText("Testing...");
 
+        final String finalApiKey = apiKey;
         executor.execute(() -> {
             try {
                 String tone = toneRadioGroup.getCheckedRadioButtonId() == R.id.toneFormal
                         ? PreferencesManager.TONE_FORMAL
                         : PreferencesManager.TONE_CASUAL;
 
-                GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
-                String result = gemini.curatePost("Test connection: Manchester United won 3-0.", true);
+                String result;
+                switch (provider) {
+                    case PreferencesManager.PROVIDER_GROQ:
+                        // Use OpenAICompatibleCurator for Groq
+                        com.najmi.oreamnos.curator.OpenAICompatibleCurator groqCurator = new com.najmi.oreamnos.curator.OpenAICompatibleCurator(
+                                finalApiKey,
+                                "https://api.groq.com/openai/v1/chat/completions",
+                                currentModelIds[selectedModelIndex],
+                                tone,
+                                false);
+                        result = groqCurator.curatePost("Test connection: Manchester United won 3-0.", true);
+                        break;
+                    case PreferencesManager.PROVIDER_OPENROUTER:
+                        // Use OpenAICompatibleCurator for OpenRouter
+                        com.najmi.oreamnos.curator.OpenAICompatibleCurator openRouterCurator = new com.najmi.oreamnos.curator.OpenAICompatibleCurator(
+                                finalApiKey,
+                                "https://openrouter.ai/api/v1/chat/completions",
+                                currentModelIds[selectedModelIndex],
+                                tone,
+                                true);
+                        result = openRouterCurator.curatePost("Test connection: Manchester United won 3-0.", true);
+                        break;
+                    case PreferencesManager.PROVIDER_GEMINI:
+                    default:
+                        // Use GeminiService for Gemini
+                        String endpoint = currentModelIds[selectedModelIndex];
+                        GeminiService gemini = new GeminiService(finalApiKey, endpoint, tone);
+                        result = gemini.curatePost("Test connection: Manchester United won 3-0.", true);
+                        break;
+                }
 
                 Log.i(TAG, "Test connection SUCCESSFUL - Response received");
                 mainHandler.post(() -> {
-                    // Save the working API key
-                    prefsManager.saveApiKey(apiKey);
+                    // Save the working API key for the current provider
+                    switch (provider) {
+                        case PreferencesManager.PROVIDER_GROQ:
+                            prefsManager.saveGroqApiKey(finalApiKey);
+                            break;
+                        case PreferencesManager.PROVIDER_OPENROUTER:
+                            prefsManager.saveOpenRouterApiKey(finalApiKey);
+                            break;
+                        case PreferencesManager.PROVIDER_GEMINI:
+                        default:
+                            prefsManager.saveApiKey(finalApiKey);
+                            break;
+                    }
 
                     testConnectionButton.setEnabled(true);
                     testConnectionButton.setText(R.string.test_connection);

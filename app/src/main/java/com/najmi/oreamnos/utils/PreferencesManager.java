@@ -19,6 +19,9 @@ public class PreferencesManager {
     private static final String KEY_HASHTAGS_ENABLED = "hashtags_enabled";
     private static final String KEY_SOURCE_ENABLED = "source_enabled";
     private static final String KEY_THEME = "app_theme";
+    private static final String KEY_PROVIDER = "ai_provider";
+    private static final String KEY_GROQ_API_KEY = "groq_api_key";
+    private static final String KEY_OPENROUTER_API_KEY = "openrouter_api_key";
     private static final String DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     private static final String DEFAULT_HASHTAGS = "#BolaSepak #Football";
 
@@ -28,6 +31,21 @@ public class PreferencesManager {
     public static final String THEME_SYSTEM = "system";
     public static final String THEME_LIGHT = "light";
     public static final String THEME_DARK = "dark";
+
+    // AI Provider constants
+    public static final String PROVIDER_GEMINI = "gemini";
+    public static final String PROVIDER_GROQ = "groq";
+    public static final String PROVIDER_OPENROUTER = "openrouter";
+
+    // Model keys per provider
+    private static final String KEY_GEMINI_MODEL = "gemini_model";
+    private static final String KEY_GROQ_MODEL = "groq_model";
+    private static final String KEY_OPENROUTER_MODEL = "openrouter_model";
+
+    // Default models per provider
+    private static final String DEFAULT_GEMINI_MODEL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
+    private static final String DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile";
+    private static final String DEFAULT_OPENROUTER_MODEL = "deepseek/deepseek-r1:free";
 
     private final SharedPreferences securePrefs;
     private final Context context;
@@ -270,6 +288,148 @@ public class PreferencesManager {
      */
     public boolean isSourceEnabled() {
         return securePrefs.getBoolean(KEY_SOURCE_ENABLED, true); // Enabled by default
+    }
+
+    // ==================== AI PROVIDER ====================
+
+    /**
+     * Saves the selected AI provider.
+     * 
+     * @param provider One of PROVIDER_GEMINI, PROVIDER_GROQ, or PROVIDER_OPENROUTER
+     */
+    public void saveProvider(String provider) {
+        securePrefs.edit()
+                .putString(KEY_PROVIDER, provider)
+                .apply();
+    }
+
+    /**
+     * Gets the selected AI provider.
+     * 
+     * @return The provider, defaults to PROVIDER_GEMINI
+     */
+    public String getProvider() {
+        return securePrefs.getString(KEY_PROVIDER, PROVIDER_GEMINI);
+    }
+
+    /**
+     * Saves the Groq API key securely.
+     */
+    public boolean saveGroqApiKey(String apiKey) {
+        try {
+            securePrefs.edit()
+                    .putString(KEY_GROQ_API_KEY, apiKey)
+                    .apply();
+            return true;
+        } catch (Exception e) {
+            android.util.Log.e("PreferencesManager", "Failed to save Groq API key", e);
+            return false;
+        }
+    }
+
+    /**
+     * Gets the Groq API key.
+     */
+    public String getGroqApiKey() {
+        try {
+            return securePrefs.getString(KEY_GROQ_API_KEY, null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Saves the OpenRouter API key securely.
+     */
+    public boolean saveOpenRouterApiKey(String apiKey) {
+        try {
+            securePrefs.edit()
+                    .putString(KEY_OPENROUTER_API_KEY, apiKey)
+                    .apply();
+            return true;
+        } catch (Exception e) {
+            android.util.Log.e("PreferencesManager", "Failed to save OpenRouter API key", e);
+            return false;
+        }
+    }
+
+    /**
+     * Gets the OpenRouter API key.
+     */
+    public String getOpenRouterApiKey() {
+        try {
+            return securePrefs.getString(KEY_OPENROUTER_API_KEY, null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Checks if the current provider has a valid API key.
+     */
+    public boolean hasApiKeyForCurrentProvider() {
+        String provider = getProvider();
+        switch (provider) {
+            case PROVIDER_GROQ:
+                String groqKey = getGroqApiKey();
+                return groqKey != null && !groqKey.trim().isEmpty();
+            case PROVIDER_OPENROUTER:
+                String orKey = getOpenRouterApiKey();
+                return orKey != null && !orKey.trim().isEmpty();
+            case PROVIDER_GEMINI:
+            default:
+                return hasApiKey();
+        }
+    }
+
+    /**
+     * Saves the selected model for a specific provider.
+     * 
+     * @param provider The provider (gemini, groq, openrouter)
+     * @param modelId  The model ID or endpoint
+     */
+    public void saveModelForProvider(String provider, String modelId) {
+        String key;
+        switch (provider) {
+            case PROVIDER_GROQ:
+                key = KEY_GROQ_MODEL;
+                break;
+            case PROVIDER_OPENROUTER:
+                key = KEY_OPENROUTER_MODEL;
+                break;
+            case PROVIDER_GEMINI:
+            default:
+                key = KEY_GEMINI_MODEL;
+                break;
+        }
+        securePrefs.edit().putString(key, modelId).apply();
+    }
+
+    /**
+     * Gets the selected model for a specific provider.
+     * 
+     * @param provider The provider (gemini, groq, openrouter)
+     * @return The model ID or endpoint, or default if not set
+     */
+    public String getModelForProvider(String provider) {
+        String key;
+        String defaultModel;
+        switch (provider) {
+            case PROVIDER_GROQ:
+                key = KEY_GROQ_MODEL;
+                defaultModel = DEFAULT_GROQ_MODEL;
+                break;
+            case PROVIDER_OPENROUTER:
+                key = KEY_OPENROUTER_MODEL;
+                defaultModel = DEFAULT_OPENROUTER_MODEL;
+                break;
+            case PROVIDER_GEMINI:
+            default:
+                key = KEY_GEMINI_MODEL;
+                defaultModel = DEFAULT_GEMINI_MODEL;
+                break;
+        }
+        return securePrefs.getString(key, defaultModel);
     }
 
     // ==================== GENERATION PILLS ====================

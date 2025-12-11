@@ -8,6 +8,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-36:\\mipmap-hdpi\\oreamnos_white.png"
     },
     {
+        "merged": "com.najmi.oreamnos.app-debug-34:/layout_activity_settings.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-36:/layout/activity_settings.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-34:\\color_chip_text_color_selector.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-36:\\color\\chip_text_color_selector.xml"
     },
@@ -64,12 +68,12 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-36:\\anim\\button_release.xml"
     },
     {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-34:\\drawable_ic_empty_state.xml.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-36:\\drawable\\ic_empty_state.xml"
-    },
-    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-34:\\drawable_ic_dropdown.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-36:\\drawable\\ic_dropdown.xml"
+    },
+    {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-34:\\drawable_ic_empty_state.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-36:\\drawable\\ic_empty_state.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-34:\\menu_menu_main.xml.flat",
@@ -130,10 +134,6 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-34:\\drawable_ic_stadium.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-36:\\drawable\\ic_stadium.xml"
-    },
-    {
-        "merged": "com.najmi.oreamnos.app-debug-34:/layout_activity_main.xml.flat",
-        "source": "com.najmi.oreamnos.app-main-36:/layout/activity_main.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-34:\\layout_bottom_sheet_pill_selector.xml.flat",
