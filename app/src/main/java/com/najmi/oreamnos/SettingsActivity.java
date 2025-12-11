@@ -84,31 +84,27 @@ public class SettingsActivity extends AppCompatActivity {
 
     // Available OpenRouter free models
     private static final String[] OPENROUTER_MODEL_NAMES = {
-            "DeepSeek R1 (Free)",
+            "DeepSeek V3 Base (Free)",
             "DeepSeek Chat V3 (Free)",
-            "Llama 3.3 70B (Free)",
-            "Llama 3.2 3B (Free)",
-            "Llama 3.2 1B (Free)",
-            "Llama 3.1 8B (Free)",
-            "Qwen 2.5 72B (Free)",
-            "Qwen 2.5 7B (Free)",
-            "Gemma 2 9B (Free)",
-            "Phi-3 Mini 128K (Free)",
-            "Mistral 7B (Free)"
+            "Llama 3.3 70B Instruct (Free)",
+            "Gemma 3 27B (Free)",
+            "Mistral Small 3.1 24B (Free)",
+            "Qwen 3 235B A22B (Free)",
+            "Gemini 2.0 Flash Exp (Free)",
+            "Phi-4 Multimodal (Free)",
+            "Llama 4 Maverick (Free)"
     };
 
     private static final String[] OPENROUTER_MODEL_IDS = {
-            "deepseek/deepseek-r1:free",
+            "deepseek/deepseek-v3-base:free",
             "deepseek/deepseek-chat-v3-0324:free",
             "meta-llama/llama-3.3-70b-instruct:free",
-            "meta-llama/llama-3.2-3b-instruct:free",
-            "meta-llama/llama-3.2-1b-instruct:free",
-            "meta-llama/llama-3.1-8b-instruct:free",
-            "qwen/qwen-2.5-72b-instruct:free",
-            "qwen/qwen-2.5-7b-instruct:free",
-            "google/gemma-2-9b-it:free",
-            "microsoft/phi-3-mini-128k-instruct:free",
-            "mistralai/mistral-7b-instruct:free"
+            "google/gemma-3-27b-it:free",
+            "mistralai/mistral-small-3.1-24b-instruct:free",
+            "qwen/qwen3-235b-a22b:free",
+            "google/gemini-2.0-flash-exp:free",
+            "microsoft/phi-4-multimodal-instruct:free",
+            "meta-llama/llama-4-maverick:free"
     };
 
     // Current model arrays (dynamically updated based on provider)

@@ -45,7 +45,7 @@ public class PreferencesManager {
     // Default models per provider
     private static final String DEFAULT_GEMINI_MODEL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
     private static final String DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile";
-    private static final String DEFAULT_OPENROUTER_MODEL = "deepseek/deepseek-r1:free";
+    private static final String DEFAULT_OPENROUTER_MODEL = "deepseek/deepseek-v3-base:free";
 
     private final SharedPreferences securePrefs;
     private final Context context;
