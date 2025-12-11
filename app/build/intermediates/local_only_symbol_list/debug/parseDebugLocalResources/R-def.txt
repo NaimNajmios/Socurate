@@ -106,6 +106,9 @@ id emptyPillsText
 id emptyStateMessage
 id emptyStateTitle
 id enableHashtagsSwitch
+id errorCard
+id errorMessage
+id errorTitle
 id expandArrow
 id failedRequestsValue
 id generateFab
@@ -154,7 +157,6 @@ id responseTokensBar
 id responseTokensValue
 id resultCard
 id saveButton
-id saveFab
 id shareButton
 id sharedText
 id shimmerLayout
@@ -176,6 +178,7 @@ id toneRadioGroup
 id toneToggleContainer
 id toolbar
 id totalTokensValue
+id tryAgainButton
 layout activity_main
 layout activity_settings
 layout activity_share_receiver
@@ -226,6 +229,9 @@ string empty_history_title
 string empty_state_message
 string empty_state_title
 string enable_hashtags
+string error_state_api
+string error_state_network
+string error_state_title
 string error_title
 string extracting_content
 string failed_requests
@@ -331,6 +337,7 @@ string tone_label
 string tone_quick_toggle
 string total_tokens
 string total_tokens_label
+string try_again_button
 string warning_title
 style ShapeAppearance.Oreamnos.BottomSheet
 style TextAppearance.Socurate.BodyLarge

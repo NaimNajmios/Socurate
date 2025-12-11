@@ -12,6 +12,9 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,7 +24,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.najmi.oreamnos.adapters.PillAdapter;
@@ -65,7 +67,9 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchMaterial enableHashtagsSwitch;
     private SwitchMaterial sourceEnabledSwitch;
     private MaterialButton testConnectionButton;
-    private ExtendedFloatingActionButton saveFab;
+
+    // Flag to prevent auto-save during initial load
+    private boolean isLoading = true;
 
     // Pills section
     private RecyclerView pillsRecyclerView;
@@ -116,7 +120,6 @@ public class SettingsActivity extends AppCompatActivity {
         enableHashtagsSwitch = findViewById(R.id.enableHashtagsSwitch);
         sourceEnabledSwitch = findViewById(R.id.sourceEnabledSwitch);
         testConnectionButton = findViewById(R.id.testConnectionButton);
-        saveFab = findViewById(R.id.saveFab);
 
         // Pills section views
         pillsRecyclerView = findViewById(R.id.pillsRecyclerView);
@@ -135,12 +138,16 @@ public class SettingsActivity extends AppCompatActivity {
         // Load current settings
         loadSettings();
 
+        // Setup auto-save listeners (after loading to prevent initial saves)
+        setupAutoSaveListeners();
+
         // Setup button listeners
-        saveFab.setOnClickListener(v -> onSaveClick());
         testConnectionButton.setOnClickListener(v -> onTestConnectionClick());
 
-        // Setup theme radio group listener
+        // Theme radio group listener - save immediately
         themeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (isLoading)
+                return;
             String theme;
             if (checkedId == R.id.themeLight) {
                 theme = PreferencesManager.THEME_LIGHT;
@@ -151,7 +158,104 @@ public class SettingsActivity extends AppCompatActivity {
             }
             prefsManager.saveTheme(theme);
             applyTheme(theme);
+            showSavedFeedback();
         });
+    }
+
+    /**
+     * Sets up auto-save listeners for all input fields.
+     */
+    private void setupAutoSaveListeners() {
+        // API Key - save on focus lost
+        apiKeyInput.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus && !isLoading) {
+                saveApiKey();
+            }
+        });
+
+        // Model dropdown - save on selection
+        modelDropdown.setOnItemClickListener((parent, view, position, id) -> {
+            selectedModelIndex = position;
+            Log.d(TAG, "Selected model: " + MODEL_NAMES[position]);
+            if (!isLoading) {
+                prefsManager.saveApiEndpoint(MODEL_ENDPOINTS[selectedModelIndex]);
+                showSavedFeedback();
+            }
+        });
+
+        // Tone radio group - save on change
+        toneRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (isLoading)
+                return;
+            String tone = checkedId == R.id.toneFormal
+                    ? PreferencesManager.TONE_FORMAL
+                    : PreferencesManager.TONE_CASUAL;
+            prefsManager.saveTone(tone);
+            showSavedFeedback();
+        });
+
+        // Hashtags - save on text change with debounce
+        hashtagsInput.addTextChangedListener(new TextWatcher() {
+            private final Handler handler = new Handler(Looper.getMainLooper());
+            private Runnable saveRunnable;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isLoading)
+                    return;
+                if (saveRunnable != null) {
+                    handler.removeCallbacks(saveRunnable);
+                }
+                saveRunnable = () -> {
+                    String hashtags = s.toString().trim();
+                    prefsManager.saveHashtags(hashtags);
+                    Log.d(TAG, "Auto-saved hashtags: " + hashtags);
+                };
+                handler.postDelayed(saveRunnable, 500); // 500ms debounce
+            }
+        });
+
+        // Hashtags enabled switch - save on change
+        enableHashtagsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isLoading)
+                return;
+            prefsManager.setHashtagsEnabled(isChecked);
+            showSavedFeedback();
+        });
+
+        // Source enabled switch - save on change
+        sourceEnabledSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isLoading)
+                return;
+            prefsManager.saveSourceEnabled(isChecked);
+            showSavedFeedback();
+        });
+    }
+
+    /**
+     * Saves the API key.
+     */
+    private void saveApiKey() {
+        String apiKey = apiKeyInput.getText() != null ? apiKeyInput.getText().toString().trim() : "";
+        if (!apiKey.isEmpty()) {
+            prefsManager.saveApiKey(apiKey);
+            showSavedFeedback();
+        }
+    }
+
+    /**
+     * Shows brief feedback when settings are auto-saved.
+     */
+    private void showSavedFeedback() {
+        Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -163,12 +267,7 @@ public class SettingsActivity extends AppCompatActivity {
                 android.R.layout.simple_dropdown_item_1line,
                 MODEL_NAMES);
         modelDropdown.setAdapter(adapter);
-
-        // Handle selection
-        modelDropdown.setOnItemClickListener((parent, view, position, id) -> {
-            selectedModelIndex = position;
-            Log.d(TAG, "Selected model: " + MODEL_NAMES[position]);
-        });
+        // Item click listener is now in setupAutoSaveListeners()
     }
 
     /**
@@ -226,49 +325,9 @@ public class SettingsActivity extends AppCompatActivity {
         Log.d(TAG, "Settings loaded - Model: " + MODEL_NAMES[selectedModelIndex] + ", Tone: " + tone +
                 ", Theme: " + theme + ", Hashtags enabled: " + hashtagsEnabled +
                 ", Source enabled: " + sourceEnabled);
-    }
 
-    /**
-     * Saves settings to preferences.
-     */
-    private void onSaveClick() {
-        Log.i(TAG, ">>> Save settings clicked <<<");
-        // Get values
-        String apiKey = apiKeyInput.getText() != null ? apiKeyInput.getText().toString().trim() : "";
-        String endpoint = MODEL_ENDPOINTS[selectedModelIndex];
-
-        // Validate
-        if (apiKey.isEmpty()) {
-            Toast.makeText(this, "API key cannot be empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Get tone
-        String tone = toneRadioGroup.getCheckedRadioButtonId() == R.id.toneFormal
-                ? PreferencesManager.TONE_FORMAL
-                : PreferencesManager.TONE_CASUAL;
-
-        // Get hashtags
-        String hashtags = hashtagsInput.getText() != null ? hashtagsInput.getText().toString().trim() : "";
-        boolean hashtagsEnabled = enableHashtagsSwitch.isChecked();
-
-        // Get source enabled
-        boolean sourceEnabled = sourceEnabledSwitch.isChecked();
-
-        // Save
-        prefsManager.saveApiKey(apiKey);
-        prefsManager.saveApiEndpoint(endpoint);
-        prefsManager.saveTone(tone);
-        prefsManager.saveHashtags(hashtags);
-        prefsManager.setHashtagsEnabled(hashtagsEnabled);
-        prefsManager.saveSourceEnabled(sourceEnabled);
-
-        Log.i(TAG, "Settings saved - Model: " + MODEL_NAMES[selectedModelIndex] + ", Tone: " + tone +
-                ", Hashtags: '" + hashtags + "', Enabled: " + hashtagsEnabled +
-                ", Source enabled: " + sourceEnabled);
-
-        Toast.makeText(this, R.string.settings_saved, Toast.LENGTH_SHORT).show();
-        finish();
+        // Mark loading complete so listeners can save
+        isLoading = false;
     }
 
     /**

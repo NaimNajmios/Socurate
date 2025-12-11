@@ -4,12 +4,20 @@ A sleek, modern Android application that transforms global football news into po
 
 ## ✨ What's New
 
+### 📊 Usage Statistics & Token Tracking
+- **Token Tracking**: Monitor total tokens used (prompt + response)
+- **Visual Breakdown**: Stacked bar chart showing token distribution
+- **Request Stats**: Track successful and failed API requests
+- **Reset Option**: Clear all usage statistics anytime
+
 ### 🎨 Modern UI/UX Redesign
 - **Premium Dark Theme**: Sleek dark interface with sophisticated Blue Grey accents
 - **Theme Toggle**: Switch between Light, Dark, or System (auto) themes
-- **Smooth Animations**: Fade-in/fade-out transitions and shimmer skeleton loading states
+- **Material Icons**: 10+ custom vector icons replacing legacy system icons
+- **Bottom Navigation**: Quick access to Generate, History, and Settings tabs
+- **Smooth Animations**: Fade-in/fade-out transitions, slide animations, and shimmer skeleton loading
+- **Empty State Illustrations**: Beautiful placeholder graphics when no content
 - **Material Design 3**: Cards, pill-shaped buttons, filter chips, and modern typography
-- **Glassy Effects**: Subtle translucency for a premium feel
 
 ### 🔘 Dynamic Output Toggles
 - **Title Toggle**: Show or hide the post title with a single tap
@@ -17,11 +25,6 @@ A sleek, modern Android application that transforms global football news into po
 - **Source Toggle**: Control source citation visibility dynamically
 - **Filter Chips**: Beautiful, accessible chip-based toggle controls
 - **Live Preview**: See changes instantly as you toggle options
-
-### 🔔 Progress Notifications
-- **Real-time Status**: Shows notification with progress bar during content generation
-- **Completion Alert**: Updates notification when post is ready
-- **Auto-dismiss**: Notifications clear automatically after a few seconds
 
 ### 📱 Enhanced Share Intent Experience
 - **Modern Bottom Sheet**: Sleek slide-up overlay instead of full-screen activity
@@ -227,6 +230,9 @@ app/src/main/
 │   ├── MainActivity.java                  # Main content generation activity
 │   ├── ShareReceiverActivity.java        # Share intent handler
 │   ├── SettingsActivity.java             # Settings and configuration
+│   ├── model/
+│   │   ├── GenerationPill.java           # Preset generation configuration
+│   │   └── UsageStats.java               # Token usage statistics
 │   ├── services/
 │   │   ├── GeminiService.java            # AI API integration with retry logic
 │   │   ├── ContentGenerationService.java # Background generation service
@@ -236,32 +242,47 @@ app/src/main/
 │       ├── HapticHelper.java             # Vibration feedback utility
 │       └── PreferencesManager.java       # Secure settings storage
 ├── res/
-│   ├── anim/                             # Animations (fade, slide)
+│   ├── anim/                             # Animations
 │   │   ├── fade_in.xml
 │   │   ├── fade_out.xml
-│   │   └── slide_up.xml
+│   │   ├── slide_up_fade_in.xml          # Card entrance animation
+│   │   ├── slide_down_fade_out.xml       # Card exit animation
+│   │   ├── button_press.xml              # Button press scale
+│   │   └── button_release.xml            # Button release scale
 │   ├── color/                            # Color state selectors
 │   │   ├── chip_background_selector.xml  # Chip background states
 │   │   └── chip_text_color_selector.xml  # Chip text color states
 │   ├── drawable/                         # Custom drawables
-│   │   ├── pill_button.xml              # Pill-shaped button background
-│   │   ├── pill_button_dark.xml         # Dark theme variant
-│   │   ├── skeleton_item.xml            # Skeleton loading item
-│   │   └── ic_stadium.xml               # Placeholder illustration
+│   │   ├── ic_paste.xml                  # Material paste icon
+│   │   ├── ic_clear.xml                  # Material clear icon
+│   │   ├── ic_refresh.xml                # Material refresh icon
+│   │   ├── ic_settings.xml               # Material settings icon
+│   │   ├── ic_copy.xml                   # Material copy icon
+│   │   ├── ic_share.xml                  # Material share icon
+│   │   ├── ic_generate.xml               # Material generate/code icon
+│   │   ├── ic_history.xml                # Material history icon
+│   │   ├── ic_empty_state.xml            # Empty state illustration
+│   │   ├── token_bar_prompt.xml          # Token visualization bar
+│   │   ├── token_bar_response.xml        # Token visualization bar
+│   │   └── shimmer_placeholder.xml       # Shimmer loading shape
 │   ├── layout/
-│   │   ├── activity_main.xml            # Main screen with filter chips
-│   │   ├── activity_share_receiver.xml  # Share receiver layout
-│   │   └── activity_settings.xml        # Settings screen layout
+│   │   ├── activity_main.xml             # Main screen with bottom nav
+│   │   ├── activity_share_receiver.xml   # Share receiver layout
+│   │   ├── activity_settings.xml         # Settings screen with usage stats
+│   │   ├── layout_empty_state.xml        # Empty state component
+│   │   └── layout_shimmer_loading.xml    # Shimmer loading component
+│   ├── menu/
+│   │   ├── menu_main.xml                 # Toolbar menu
+│   │   └── menu_bottom_nav.xml           # Bottom navigation menu
 │   ├── values/
-│   │   ├── strings.xml                  # App strings
-│   │   ├── colors.xml                   # Color palette
-│   │   └── themes.xml                   # Light theme
+│   │   ├── strings.xml                   # App strings
+│   │   ├── colors.xml                    # Color palette
+│   │   ├── themes.xml                    # Light theme
+│   │   └── type.xml                      # Typography styles
 │   ├── values-night/
-│   │   ├── colors.xml                   # Dark theme colors
-│   │   └── themes.xml                   # Dark theme
-│   ├── mipmap-*/                        # App icons (all densities)
-│   └── menu/
-│       └── menu_main.xml                # Toolbar menu
+│   │   ├── colors.xml                    # Dark theme colors
+│   │   └── themes.xml                    # Dark theme
+│   └── mipmap-*/                         # App icons (all densities)
 └── AndroidManifest.xml
 ```
 

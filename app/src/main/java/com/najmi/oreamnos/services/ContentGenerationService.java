@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.najmi.oreamnos.R;
+import com.najmi.oreamnos.curator.CuratorFactory;
+import com.najmi.oreamnos.curator.IContentCurator;
 import com.najmi.oreamnos.utils.NotificationHelper;
 import com.najmi.oreamnos.utils.PreferencesManager;
 
@@ -117,19 +119,15 @@ public class ContentGenerationService extends Service {
                     content = extractor.extractContent(inputText);
                 }
 
-                // Generate post with Gemini
-                String apiKey = prefsManager.getApiKey();
-                String endpoint = prefsManager.getApiEndpoint();
-                String tone = prefsManager.getTone();
-
-                GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
-                String result = gemini.curatePost(content, includeSource);
+                // Generate post using curator abstraction
+                IContentCurator curator = CuratorFactory.create(ContentGenerationService.this);
+                String result = curator.curatePost(content, includeSource);
 
                 // Record token usage
                 prefsManager.recordApiSuccess(
-                        gemini.getLastPromptTokens(),
-                        gemini.getLastCandidateTokens(),
-                        gemini.getLastTotalTokens());
+                        curator.getLastPromptTokens(),
+                        curator.getLastCandidateTokens(),
+                        curator.getLastTotalTokens());
 
                 Log.i(TAG, "Content generation successful");
                 broadcastSuccess(result, false);
@@ -172,18 +170,15 @@ public class ContentGenerationService extends Service {
             try {
                 Log.i(TAG, "Starting content refinement with options: " + refinements);
 
-                String apiKey = prefsManager.getApiKey();
-                String endpoint = prefsManager.getApiEndpoint();
-                String tone = prefsManager.getTone();
-
-                GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
-                String result = gemini.refinePost(originalPost, refinements, includeSource);
+                // Refine post using curator abstraction
+                IContentCurator curator = CuratorFactory.create(ContentGenerationService.this);
+                String result = curator.refinePost(originalPost, refinements, includeSource);
 
                 // Record token usage
                 prefsManager.recordApiSuccess(
-                        gemini.getLastPromptTokens(),
-                        gemini.getLastCandidateTokens(),
-                        gemini.getLastTotalTokens());
+                        curator.getLastPromptTokens(),
+                        curator.getLastCandidateTokens(),
+                        curator.getLastTotalTokens());
 
                 Log.i(TAG, "Content refinement successful");
                 broadcastSuccess(result, true);

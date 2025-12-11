@@ -3370,6 +3370,9 @@ id end
 id endToStart
 id enterAlways
 id enterAlwaysCollapsed
+id errorCard
+id errorMessage
+id errorTitle
 id exitUntilCollapsed
 id expandArrow
 id expand_activities_button
@@ -3609,7 +3612,6 @@ id right_to_left
 id rounded
 id row_index_key
 id saveButton
-id saveFab
 id save_non_transition_alpha
 id save_overlay_view
 id sawtooth
@@ -3739,6 +3741,7 @@ id transition_position
 id transition_scene_layoutid_cache
 id transition_transform
 id triangle
+id tryAgainButton
 id unchecked
 id uniform
 id unlabeled
@@ -4045,6 +4048,9 @@ string empty_state_title
 string enable_hashtags
 string error_a11y_label
 string error_icon_content_description
+string error_state_api
+string error_state_network
+string error_state_title
 string error_title
 string exposed_dropdown_menu_content_description
 string extracting_content
@@ -4268,6 +4274,7 @@ string tone_label
 string tone_quick_toggle
 string total_tokens
 string total_tokens_label
+string try_again_button
 string warning_title
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light

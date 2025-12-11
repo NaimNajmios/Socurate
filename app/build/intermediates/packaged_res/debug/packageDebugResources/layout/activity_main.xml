@@ -19,8 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="@string/app_name"
-            app:titleTextColor="?attr/colorOnBackground"
-            app:menu="@menu/menu_main" />
+            app:titleTextColor="?attr/colorOnBackground" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -359,6 +358,77 @@
                         </LinearLayout>
 
                     </com.facebook.shimmer.ShimmerFrameLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Error State Card (shown on error) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/errorCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="?attr/colorErrorContainer"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/colorError"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="32dp">
+
+                    <!-- Error Icon -->
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@android:drawable/ic_dialog_alert"
+                        android:contentDescription="@string/error_title"
+                        android:layout_marginBottom="16dp"
+                        app:tint="?attr/colorError" />
+
+                    <!-- Error Title -->
+                    <TextView
+                        android:id="@+id/errorTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/error_state_title"
+                        android:textColor="?attr/colorOnErrorContainer"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Error Message -->
+                    <TextView
+                        android:id="@+id/errorMessage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/error_state_network"
+                        android:textColor="?attr/colorOnErrorContainer"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:layout_marginBottom="24dp" />
+
+                    <!-- Try Again Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/tryAgainButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="@string/try_again_button"
+                        android:textColor="?attr/colorOnError"
+                        android:textStyle="bold"
+                        android:paddingStart="32dp"
+                        android:paddingEnd="32dp"
+                        android:backgroundTint="?attr/colorError"
+                        app:cornerRadius="24dp"
+                        app:icon="@android:drawable/ic_menu_rotate"
+                        app:iconTint="?attr/colorOnError"
+                        style="@style/Widget.Material3.Button" />
 
                 </LinearLayout>
 

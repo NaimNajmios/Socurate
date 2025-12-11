@@ -13,8 +13,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -24,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -39,6 +38,8 @@ import com.najmi.oreamnos.model.GenerationPill;
 import com.najmi.oreamnos.services.ContentGenerationService;
 import com.najmi.oreamnos.utils.NotificationHelper;
 import com.najmi.oreamnos.utils.PreferencesManager;
+import com.najmi.oreamnos.viewmodel.GenerationState;
+import com.najmi.oreamnos.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +88,15 @@ public class MainActivity extends AppCompatActivity {
     // Pill selector
     private Chip pillSelectorChip;
 
+    // Error state UI
+    private MaterialCardView errorCard;
+    private TextView errorMessage;
+    private MaterialButton tryAgainButton;
+    private boolean lastOperationWasRefinement = false;
+
     private PreferencesManager prefsManager;
     private NotificationHelper notificationHelper;
+    private MainViewModel viewModel;
 
     private String originalGeneratedPost = "";
     private String generatedSourceCitation = "";
@@ -108,9 +116,11 @@ public class MainActivity extends AppCompatActivity {
 
             if (success) {
                 String result = intent.getStringExtra(ContentGenerationService.EXTRA_RESULT);
+                // Update ViewModel state - it will survive rotation
                 handleGenerationSuccess(result, isRefinement);
             } else {
                 String error = intent.getStringExtra(ContentGenerationService.EXTRA_ERROR);
+                // Update ViewModel state
                 handleGenerationError(error, isRefinement);
             }
         }
@@ -124,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
         // Initialize preferences
         prefsManager = new PreferencesManager(this);
         notificationHelper = new NotificationHelper(this);
+
+        // Initialize ViewModel (survives configuration changes)
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         // Apply saved theme before setContentView
         applyTheme(prefsManager.getTheme());
@@ -173,6 +186,12 @@ public class MainActivity extends AppCompatActivity {
         // Pill selector
         pillSelectorChip = findViewById(R.id.pillSelectorChip);
         pillSelectorChip.setOnClickListener(v -> showPillSelectorBottomSheet());
+
+        // Error state UI
+        errorCard = findViewById(R.id.errorCard);
+        errorMessage = findViewById(R.id.errorMessage);
+        tryAgainButton = findViewById(R.id.tryAgainButton);
+        tryAgainButton.setOnClickListener(v -> onTryAgainClick());
 
         // Apply Pill button
         applyPillButton.setOnClickListener(v -> applyPillToRefinements());
@@ -246,6 +265,57 @@ public class MainActivity extends AppCompatActivity {
 
         // Handle incoming intent from ShareReceiverActivity
         handleIncomingIntent(getIntent());
+
+        // Restore state from ViewModel after rotation (if any)
+        restoreStateFromViewModel();
+    }
+
+    /**
+     * Restores UI state from ViewModel after configuration change (e.g., rotation).
+     * This is the key MVVM benefit - data survives screen rotation.
+     */
+    private void restoreStateFromViewModel() {
+        GenerationState currentState = viewModel.getCurrentState();
+
+        // Restore input text if available
+        String savedInputText = viewModel.getCurrentInputText();
+        if (savedInputText != null && !savedInputText.isEmpty()) {
+            inputText.setText(savedInputText);
+            originalInputText = viewModel.getOriginalInputText();
+        }
+
+        // Restore generated content if available
+        if (currentState != null && currentState.hasContent()) {
+            Log.i(TAG, "Restoring state from ViewModel after rotation");
+
+            // Restore content from ViewModel
+            generatedTitle = currentState.getGeneratedTitle();
+            generatedBody = currentState.getGeneratedBody();
+            generatedSourceCitation = currentState.getSourceCitation();
+            originalGeneratedPost = viewModel.getOriginalGeneratedPost();
+
+            // Rebuild UI
+            rebuildOutputText();
+            hidePlaceholder();
+            showOutputCard();
+            refinementCard.setVisibility(View.VISIBLE);
+            clearRefinementCheckboxes();
+
+            // Restore edit mode state
+            isEditMode = viewModel.isEditMode();
+            if (isEditMode) {
+                outputText.setFocusable(true);
+                outputText.setFocusableInTouchMode(true);
+                editButton.setText(R.string.save_edit);
+                editButton.setIconResource(android.R.drawable.ic_menu_save);
+
+                // Restore user-edited content if any
+                String userEdits = viewModel.getUserEditedContent();
+                if (userEdits != null && !userEdits.isEmpty()) {
+                    outputText.setText(userEdits);
+                }
+            }
+        }
     }
 
     /**
@@ -349,23 +419,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
+        // Save current state to ViewModel before pausing
+        saveStateToViewModel();
+
         // Unregister broadcast receiver
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceResultReceiver);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+    /**
+     * Saves current UI state to ViewModel for preservation across rotation.
+     */
+    private void saveStateToViewModel() {
+        // Save input text
+        String currentInput = inputText.getText() != null ? inputText.getText().toString() : "";
+        viewModel.setCurrentInputText(currentInput);
+        viewModel.setOriginalInputText(originalInputText);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
+        // Save edit mode state
+        viewModel.setEditMode(isEditMode);
+
+        // Save user-edited content if in edit mode
+        if (isEditMode && outputText.getText() != null) {
+            viewModel.setUserEditedContent(outputText.getText().toString());
         }
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -517,8 +594,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Hide placeholder and show skeleton loading
+        // Hide placeholder, error card and show skeleton loading
         hidePlaceholder();
+        hideErrorCard();
         showSkeletonLoading(true);
 
         // Store for potential regeneration
@@ -802,6 +880,10 @@ public class MainActivity extends AppCompatActivity {
         // Extract title and body
         extractTitleAndBody(contentWithoutSource);
 
+        // Save state to ViewModel (survives rotation)
+        viewModel.setSuccess(generatedTitle, generatedBody, generatedSourceCitation, isRefinement);
+        viewModel.setOriginalGeneratedPost(originalGeneratedPost);
+
         // Rebuild text based on checkbox states
         rebuildOutputText();
 
@@ -819,19 +901,68 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Handles error result from the service.
+     * Shows inline error state with retry button instead of toast.
      */
     private void handleGenerationError(String error, boolean isRefinement) {
         Log.e(TAG, "Handling " + (isRefinement ? "refinement" : "generation") + " error: " + error);
 
         showSkeletonLoading(false);
+        lastOperationWasRefinement = isRefinement;
+
+        // Show inline error card instead of toast
+        showErrorCard(error, isRefinement);
+    }
+
+    /**
+     * Shows the inline error card with message and retry button.
+     */
+    private void showErrorCard(String error, boolean isRefinement) {
+        // Hide other views
+        placeholderView.setVisibility(View.GONE);
 
         if (isRefinement) {
+            // For refinement errors, keep the output visible
             outputCard.setVisibility(View.VISIBLE);
             refinementCard.setVisibility(View.VISIBLE);
-            Toast.makeText(this, "Refinement error: " + error, Toast.LENGTH_LONG).show();
         } else {
-            showPlaceholder();
-            Toast.makeText(this, getString(R.string.processing_error, error), Toast.LENGTH_LONG).show();
+            outputCard.setVisibility(View.GONE);
+            refinementCard.setVisibility(View.GONE);
+        }
+
+        // Set error message based on error type
+        if (error != null && (error.toLowerCase().contains("network") ||
+                error.toLowerCase().contains("connection") ||
+                error.toLowerCase().contains("timeout"))) {
+            errorMessage.setText(R.string.error_state_network);
+        } else {
+            errorMessage.setText(error != null ? error : getString(R.string.error_state_api));
+        }
+
+        // Show error card with animation
+        errorCard.setVisibility(View.VISIBLE);
+        errorCard.setAlpha(0f);
+        errorCard.animate().alpha(1f).setDuration(300).start();
+    }
+
+    /**
+     * Hides the error card.
+     */
+    private void hideErrorCard() {
+        errorCard.setVisibility(View.GONE);
+    }
+
+    /**
+     * Handler for Try Again button click.
+     */
+    private void onTryAgainClick() {
+        hideErrorCard();
+
+        if (lastOperationWasRefinement) {
+            // Retry refinement
+            onRegenerateClick();
+        } else {
+            // Retry generation
+            onGenerateClick();
         }
     }
 
