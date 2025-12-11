@@ -127,8 +127,7 @@ public class SettingsActivity extends AppCompatActivity {
     private MaterialButton testConnectionButton;
 
     // Provider constants (must match PreferencesManager)
-    private static final String[] PROVIDER_NAMES = { "Gemini (Google)", "Groq (Llama 3.3)",
-            "OpenRouter (Free Models)" };
+    private static final String[] PROVIDER_NAMES = { "Gemini", "Groq", "OpenRouter" };
     private static final String[] PROVIDER_VALUES = { "gemini", "groq", "openrouter" };
 
     // Flag to prevent auto-save during initial load
