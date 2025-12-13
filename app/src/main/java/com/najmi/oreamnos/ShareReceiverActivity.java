@@ -51,15 +51,26 @@ public class ShareReceiverActivity extends AppCompatActivity {
 
     /**
      * Gets the shared content from the intent.
+     * Supports both ACTION_SEND (share sheet) and PROCESS_TEXT (text selection
+     * menu).
      */
     private String getSharedContent() {
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
 
+        // Handle share sheet intent (ACTION_SEND)
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type)) {
                 return intent.getStringExtra(Intent.EXTRA_TEXT);
+            }
+        }
+
+        // Handle text selection menu intent (PROCESS_TEXT)
+        if (Intent.ACTION_PROCESS_TEXT.equals(action)) {
+            CharSequence processText = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT);
+            if (processText != null) {
+                return processText.toString();
             }
         }
 
