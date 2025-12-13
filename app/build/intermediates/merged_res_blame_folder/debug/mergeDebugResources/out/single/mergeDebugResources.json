@@ -32,10 +32,6 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\token_bar_prompt.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-debug-35:/drawable_rounded_bg_surface.xml.flat",
-        "source": "com.najmi.oreamnos.app-main-37:/drawable/rounded_bg_surface.xml"
-    },
-    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_ic_clear.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\ic_clear.xml"
     },
@@ -200,6 +196,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\layout\\activity_share_receiver.xml"
     },
     {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_rounded_bg_surface.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\rounded_bg_surface.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\layout_item_log_entry.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\layout\\item_log_entry.xml"
     },
@@ -218,6 +218,10 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\mipmap-xhdpi_oreamnos_white.png.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\mipmap-xhdpi\\oreamnos_white.png"
+    },
+    {
+        "merged": "com.najmi.oreamnos.app-debug-35:/layout_activity_main.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-37:/layout/activity_main.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\layout_item_session_entry.xml.flat",

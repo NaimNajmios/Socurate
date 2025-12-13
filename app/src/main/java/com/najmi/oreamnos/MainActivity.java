@@ -697,6 +697,21 @@ public class MainActivity extends AppCompatActivity {
             String url = text.trim();
             if (!url.equals(detectedUrl)) {
                 detectedUrl = url;
+
+                // Optimistic UI: Show domain immediately
+                try {
+                    java.net.URL netUrl = new java.net.URL(url);
+                    String domain = netUrl.getHost();
+                    if (domain.startsWith("www.")) {
+                        domain = domain.substring(4);
+                    }
+                    previewTitle.setText("Loading...");
+                    previewDomain.setText(domain);
+                    urlPreviewCard.setVisibility(View.VISIBLE);
+                } catch (Exception e) {
+                    // If URL parsing fails, just wait for full fetch
+                }
+
                 fetchUrlMetadata(url);
             }
         } else {
