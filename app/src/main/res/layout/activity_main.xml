@@ -43,11 +43,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="16dp"
                 app:strokeColor="?attr/colorOutline"
-                app:strokeWidth="1dp">
+                app:strokeWidth="1dp"
+                app:rippleColor="?attr/colorPrimary">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -240,7 +244,7 @@
                                 <View
                                     android:layout_width="100dp"
                                     android:layout_height="20dp"
-                                    android:background="@drawable/skeleton_item" />
+                                    android:background="@drawable/skeleton_item_light" />
 
                                 <View
                                     android:layout_width="0dp"
@@ -250,7 +254,7 @@
                                 <View
                                     android:layout_width="80dp"
                                     android:layout_height="36dp"
-                                    android:background="@drawable/skeleton_item" />
+                                    android:background="@drawable/skeleton_item_light" />
 
                             </LinearLayout>
 
@@ -259,7 +263,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="16dp"
                                 android:layout_marginBottom="8dp"
-                                android:background="@drawable/skeleton_item" />
+                                android:background="@drawable/skeleton_item_dark" />
 
                             <View
                                 android:layout_width="match_parent"
@@ -291,7 +295,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="16dp"
                                 android:layout_marginBottom="8dp"
-                                android:background="@drawable/skeleton_item" />
+                                android:background="@drawable/skeleton_item_dark" />
 
                             <!-- Skeleton Line 5 (60% width) -->
                             <LinearLayout
@@ -422,11 +426,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="16dp"
                 app:strokeColor="?attr/colorOutline"
-                app:strokeWidth="1dp">
+                app:strokeWidth="1dp"
+                app:rippleColor="?attr/colorPrimary">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -632,11 +640,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="16dp"
                 app:strokeColor="?attr/colorOutline"
-                app:strokeWidth="1dp">
+                app:strokeWidth="1dp"
+                app:rippleColor="?attr/colorPrimary">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -794,7 +806,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="100dp"
         android:text="@string/generate_button"
         android:textColor="?attr/colorOnPrimary"
         android:textStyle="bold"

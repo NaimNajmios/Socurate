@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.OvershootInterpolator;
+import android.os.Handler;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -213,13 +215,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup button listeners
         generateFab.setOnClickListener(v -> {
-            // Add scale animation to FAB
-            ObjectAnimator scaleX = ObjectAnimator.ofFloat(v, "scaleX", 1f, 0.9f, 1f);
-            ObjectAnimator scaleY = ObjectAnimator.ofFloat(v, "scaleY", 1f, 0.9f, 1f);
-            scaleX.setDuration(150);
-            scaleY.setDuration(150);
-            scaleX.start();
-            scaleY.start();
+            // Apply spring animation to FAB
+            applyFabSpringAnimation(v);
             onGenerateClick();
         });
         editButton.setOnClickListener(v -> toggleEditMode());
@@ -841,12 +838,117 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows the output card with slide up animation.
+     * Shows the output card with slide up animation and glow effect.
      */
     private void showOutputCard() {
         outputCard.setVisibility(View.VISIBLE);
         Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
         outputCard.startAnimation(slideUp);
+
+        // Apply temporary glow effect for fresh content
+        showOutputCardGlow();
+    }
+
+    /**
+     * Applies a spring bounce animation to the FAB using OvershootInterpolator.
+     */
+    private void applyFabSpringAnimation(View fab) {
+        // Press animation
+        Animation pressAnim = AnimationUtils.loadAnimation(this, R.anim.fab_spring_press);
+        pressAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                // Release animation with bounce
+                Animation releaseAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_spring_release);
+                fab.startAnimation(releaseAnim);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+        fab.startAnimation(pressAnim);
+    }
+
+    /**
+     * Shows a subtle glow effect on the output card for fresh content.
+     * The glow fades out after 3 seconds.
+     */
+    private void showOutputCardGlow() {
+        // Apply glow background
+        outputCard.setStrokeColor(getResources().getColor(R.color.glow_accent, getTheme()));
+        outputCard.setStrokeWidth(3);
+
+        // Fade out glow after 3 seconds
+        new Handler().postDelayed(() -> {
+            // Animate back to normal stroke
+            ObjectAnimator strokeAnim = ObjectAnimator.ofArgb(
+                    outputCard,
+                    "strokeColor",
+                    getResources().getColor(R.color.glow_accent, getTheme()),
+                    getResources().getColor(android.R.color.transparent, getTheme()));
+            strokeAnim.setDuration(500);
+            strokeAnim.addListener(new android.animation.AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(android.animation.Animator animation) {
+                    // Reset to normal outline
+                    outputCard.setStrokeColor(getResources().getColor(R.color.md_theme_light_outline, getTheme()));
+                    outputCard.setStrokeWidth(1);
+                }
+            });
+            strokeAnim.start();
+        }, 3000);
+    }
+
+    /**
+     * Animates refinement chips with Material Motion stagger effect.
+     */
+    private void animateRefinementChipsWithStagger() {
+        ChipGroup builtInChips = findViewById(R.id.builtInRefinementChips);
+        if (builtInChips == null)
+            return;
+
+        int staggerDelay = 50; // 50ms delay between each chip
+
+        for (int i = 0; i < builtInChips.getChildCount(); i++) {
+            View chip = builtInChips.getChildAt(i);
+            chip.setAlpha(0f);
+            chip.setScaleX(0.8f);
+            chip.setScaleY(0.8f);
+
+            final int delay = i * staggerDelay;
+            new Handler().postDelayed(() -> {
+                Animation chipAnim = AnimationUtils.loadAnimation(this, R.anim.chip_stagger_item);
+                chip.startAnimation(chipAnim);
+                chip.setAlpha(1f);
+                chip.setScaleX(1f);
+                chip.setScaleY(1f);
+            }, delay);
+        }
+
+        // Also animate custom pill chips
+        if (customPillChips != null) {
+            int baseDelay = builtInChips.getChildCount() * staggerDelay;
+            for (int i = 0; i < customPillChips.getChildCount(); i++) {
+                View chip = customPillChips.getChildAt(i);
+                chip.setAlpha(0f);
+                chip.setScaleX(0.8f);
+                chip.setScaleY(0.8f);
+
+                final int delay = baseDelay + (i * staggerDelay);
+                new Handler().postDelayed(() -> {
+                    Animation chipAnim = AnimationUtils.loadAnimation(this, R.anim.chip_stagger_item);
+                    chip.startAnimation(chipAnim);
+                    chip.setAlpha(1f);
+                    chip.setScaleX(1f);
+                    chip.setScaleY(1f);
+                }, delay);
+            }
+        }
     }
 
     /**
@@ -1026,9 +1128,10 @@ public class MainActivity extends AppCompatActivity {
         editButton.setIconResource(android.R.drawable.ic_menu_edit);
         editedIndicator.setVisibility(View.GONE);
 
-        // Show refinement section
+        // Show refinement section with stagger animation
         refinementCard.setVisibility(View.VISIBLE);
         clearRefinementCheckboxes();
+        animateRefinementChipsWithStagger();
     }
 
     /**

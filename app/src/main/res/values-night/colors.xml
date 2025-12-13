@@ -57,4 +57,12 @@
     <color name="md_theme_light_inverseOnSurface">#121212</color>
     <color name="md_theme_light_inverseSurface">#ECEFF1</color>
     <color name="md_theme_light_inversePrimary">#455A64</color>
+    
+    <!-- Skeleton Shimmer Variants (Dark Theme) -->
+    <color name="skeleton_dark">#1A1E21</color>
+    <color name="skeleton_light">#2A3035</color>
+    
+    <!-- Glow Effect Colors (Dark Theme) -->
+    <color name="glow_accent">#5490A4AE</color>
+    <color name="glow_accent_transparent">#2690A4AE</color>
 </resources>

@@ -25,10 +25,13 @@ anim btn_radio_to_on_mtrl_ring_outer_animation
 anim btn_radio_to_on_mtrl_ring_outer_path_animation
 anim button_press
 anim button_release
+anim chip_stagger_item
 anim design_bottom_sheet_slide_in
 anim design_bottom_sheet_slide_out
 anim design_snackbar_in
 anim design_snackbar_out
+anim fab_spring_press
+anim fab_spring_release
 anim fade_in
 anim fade_out
 anim fragment_fast_out_extra_slow_in
@@ -1444,6 +1447,8 @@ color error_color_material_light
 color error_light
 color foreground_material_dark
 color foreground_material_light
+color glow_accent
+color glow_accent_transparent
 color highlighted_text_material_dark
 color highlighted_text_material_light
 color m3_appbar_overlay_color
@@ -2145,6 +2150,8 @@ color secondary_text_default_material_light
 color secondary_text_disabled_material_dark
 color secondary_text_disabled_material_light
 color secondary_variant_light
+color skeleton_dark
+color skeleton_light
 color surface_light
 color switch_thumb_disabled_material_dark
 color switch_thumb_disabled_material_light
@@ -3152,11 +3159,14 @@ drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
+drawable output_card_glow
 drawable pill_button_dark
 drawable pill_button_green
 drawable shimmer_placeholder
 drawable shimmer_placeholder_chip
 drawable skeleton_item
+drawable skeleton_item_dark
+drawable skeleton_item_light
 drawable skeleton_shimmer
 drawable test_level_drawable
 drawable token_bar_background

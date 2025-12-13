@@ -2,6 +2,9 @@ R_DEF: Internal format may change without notice
 local
 anim button_press
 anim button_release
+anim chip_stagger_item
+anim fab_spring_press
+anim fab_spring_release
 anim fade_in
 anim fade_out
 anim slide_down_fade_out
@@ -12,6 +15,8 @@ color chip_background_selector
 color chip_text_color_selector
 color divider_light
 color error_light
+color glow_accent
+color glow_accent_transparent
 color md_theme_light_background
 color md_theme_light_error
 color md_theme_light_errorContainer
@@ -44,6 +49,8 @@ color primary_light
 color primary_variant_light
 color secondary_light
 color secondary_variant_light
+color skeleton_dark
+color skeleton_light
 color surface_light
 color text_primary_light
 color text_secondary_light
@@ -70,11 +77,14 @@ drawable log_badge_debug
 drawable log_badge_error
 drawable log_badge_info
 drawable log_badge_warn
+drawable output_card_glow
 drawable pill_button_dark
 drawable pill_button_green
 drawable shimmer_placeholder
 drawable shimmer_placeholder_chip
 drawable skeleton_item
+drawable skeleton_item_dark
+drawable skeleton_item_light
 drawable skeleton_shimmer
 drawable token_bar_background
 drawable token_bar_prompt

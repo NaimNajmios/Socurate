@@ -24,10 +24,13 @@ int anim btn_radio_to_on_mtrl_ring_outer_animation 0x7f010016
 int anim btn_radio_to_on_mtrl_ring_outer_path_animation 0x7f010017
 int anim button_press 0x7f010018
 int anim button_release 0x7f010019
+int anim chip_stagger_item 0x7f010033
 int anim design_bottom_sheet_slide_in 0x7f01001a
 int anim design_bottom_sheet_slide_out 0x7f01001b
 int anim design_snackbar_in 0x7f01001c
 int anim design_snackbar_out 0x7f01001d
+int anim fab_spring_press 0x7f010034
+int anim fab_spring_release 0x7f010035
 int anim fade_in 0x7f01001e
 int anim fade_out 0x7f01001f
 int anim fragment_fast_out_extra_slow_in 0x7f010020
@@ -1443,6 +1446,8 @@ int color error_color_material_light 0x7f05005c
 int color error_light 0x7f05005d
 int color foreground_material_dark 0x7f05005e
 int color foreground_material_light 0x7f05005f
+int color glow_accent 0x7f050328
+int color glow_accent_transparent 0x7f050329
 int color highlighted_text_material_dark 0x7f050060
 int color highlighted_text_material_light 0x7f050061
 int color m3_appbar_overlay_color 0x7f050062
@@ -2144,6 +2149,8 @@ int color secondary_text_default_material_light 0x7f050319
 int color secondary_text_disabled_material_dark 0x7f05031a
 int color secondary_text_disabled_material_light 0x7f05031b
 int color secondary_variant_light 0x7f05031c
+int color skeleton_dark 0x7f05032a
+int color skeleton_light 0x7f05032b
 int color surface_light 0x7f05031d
 int color switch_thumb_disabled_material_dark 0x7f05031e
 int color switch_thumb_disabled_material_light 0x7f05031f
@@ -3151,11 +3158,14 @@ int drawable notification_template_icon_bg 0x7f0700ec
 int drawable notification_template_icon_low_bg 0x7f0700ed
 int drawable notification_tile_bg 0x7f0700ee
 int drawable notify_panel_notification_icon_bg 0x7f0700ef
+int drawable output_card_glow 0x7f0700fc
 int drawable pill_button_dark 0x7f0700f0
 int drawable pill_button_green 0x7f0700f1
 int drawable shimmer_placeholder 0x7f0700f2
 int drawable shimmer_placeholder_chip 0x7f0700f3
 int drawable skeleton_item 0x7f0700f4
+int drawable skeleton_item_dark 0x7f0700fd
+int drawable skeleton_item_light 0x7f0700fe
 int drawable skeleton_shimmer 0x7f0700f5
 int drawable test_level_drawable 0x7f0700f6
 int drawable token_bar_background 0x7f0700f7

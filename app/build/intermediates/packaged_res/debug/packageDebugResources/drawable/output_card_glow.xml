@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Subtle glow gradient for fresh content indication on output card -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="16dp" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/glow_accent" />
+    <gradient
+        android:type="radial"
+        android:gradientRadius="400dp"
+        android:centerX="0.5"
+        android:centerY="0.5"
+        android:startColor="@color/glow_accent_transparent"
+        android:endColor="@android:color/transparent" />
+</shape>

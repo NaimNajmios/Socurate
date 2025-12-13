@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Darker skeleton variant for visual depth - used for main content areas -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/skeleton_dark" />
+    <corners android:radius="8dp" />
+</shape>

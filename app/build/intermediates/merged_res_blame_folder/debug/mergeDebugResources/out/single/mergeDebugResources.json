@@ -28,12 +28,12 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\ic_clear.xml"
     },
     {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_ic_refresh.xml.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\ic_refresh.xml"
-    },
-    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_log_badge_info.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\log_badge_info.xml"
+    },
+    {
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_ic_refresh.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\ic_refresh.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\color_chip_text_color_selector.xml.flat",
@@ -50,10 +50,6 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_shimmer_placeholder_chip.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\shimmer_placeholder_chip.xml"
-    },
-    {
-        "merged": "com.najmi.oreamnos.app-debug-35:/layout_activity_settings.xml.flat",
-        "source": "com.najmi.oreamnos.app-main-37:/layout/activity_settings.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\anim_slide_up.xml.flat",
@@ -82,6 +78,10 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_ic_paste.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\ic_paste.xml"
+    },
+    {
+        "merged": "com.najmi.oreamnos.app-debug-35:/anim_chip_stagger_item.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-37:/anim/chip_stagger_item.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\anim_button_press.xml.flat",
@@ -128,6 +128,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\skeleton_item.xml"
     },
     {
+        "merged": "com.najmi.oreamnos.app-debug-35:/drawable_output_card_glow.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-37:/drawable/output_card_glow.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_ic_sparkle.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\ic_sparkle.xml"
     },
@@ -142,6 +146,10 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\mipmap-xxhdpi_oreamnos_white.png.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\mipmap-xxhdpi\\oreamnos_white.png"
+    },
+    {
+        "merged": "com.najmi.oreamnos.app-debug-35:/anim_fab_spring_release.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-37:/anim/fab_spring_release.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\layout_activity_main.xml.flat",
@@ -176,6 +184,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\layout\\item_log_entry.xml"
     },
     {
+        "merged": "com.najmi.oreamnos.app-debug-35:/anim_fab_spring_press.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-37:/anim/fab_spring_press.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_ic_usage.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\ic_usage.xml"
     },
@@ -192,6 +204,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\mipmap-xhdpi\\oreamnos_white.png"
     },
     {
+        "merged": "com.najmi.oreamnos.app-debug-35:/layout_activity_main.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-37:/layout/activity_main.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\layout_item_session_entry.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\layout\\item_session_entry.xml"
     },
@@ -204,6 +220,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\skeleton_shimmer.xml"
     },
     {
+        "merged": "com.najmi.oreamnos.app-debug-35:/drawable_skeleton_item_dark.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-37:/drawable/skeleton_item_dark.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_ic_add.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\ic_add.xml"
     },
@@ -214,6 +234,10 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\layout_layout_shimmer_loading.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\layout\\layout_shimmer_loading.xml"
+    },
+    {
+        "merged": "com.najmi.oreamnos.app-debug-35:/drawable_skeleton_item_light.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-37:/drawable/skeleton_item_light.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_ic_settings.xml.flat",
