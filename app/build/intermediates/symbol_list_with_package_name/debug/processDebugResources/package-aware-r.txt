@@ -3586,10 +3586,7 @@ id position
 id postLayout
 id pressed
 id previewCard
-id progressBar
-id progressCard
 id progressOverlay
-id progressStatusText
 id progressText
 id progress_circular
 id progress_horizontal

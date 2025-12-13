@@ -1,6 +1,5 @@
 package com.najmi.oreamnos;
 
-import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -27,11 +26,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.najmi.oreamnos.services.ContentGenerationService;
 import com.najmi.oreamnos.services.GeminiService;
@@ -45,8 +44,9 @@ import java.util.concurrent.Executors;
 
 /**
  * Bottom Sheet Dialog Fragment for handling shared content.
- * Features: collapsible input, progress bar, tone toggle, haptic feedback,
- * background processing.
+ * Features: collapsible input, shimmer skeleton loading, tone toggle, haptic
+ * feedback,
+ * background processing, error state handling.
  */
 public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
 
@@ -61,9 +61,13 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
     private View toneToggleContainer;
     private Chip chipFormal;
     private Chip chipCasual;
-    private MaterialCardView progressCard;
-    private LinearProgressIndicator progressBar;
-    private TextView progressStatusText;
+    private MaterialCardView skeletonCard;
+    private ShimmerFrameLayout shimmerLayout;
+    private TextView skeletonLoadingText;
+    private MaterialCardView errorCard;
+    private TextView errorTitle;
+    private TextView errorMessage;
+    private MaterialButton tryAgainButton;
     private MaterialCardView resultCard;
     private TextInputEditText outputText;
     private TextView outputWordCount;
@@ -184,10 +188,16 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
         chipFormal = view.findViewById(R.id.chipFormal);
         chipCasual = view.findViewById(R.id.chipCasual);
 
-        // Progress
-        progressCard = view.findViewById(R.id.progressCard);
-        progressBar = view.findViewById(R.id.progressBar);
-        progressStatusText = view.findViewById(R.id.progressStatusText);
+        // Skeleton loading (shimmer)
+        skeletonCard = view.findViewById(R.id.skeletonCard);
+        shimmerLayout = view.findViewById(R.id.shimmerLayout);
+        skeletonLoadingText = view.findViewById(R.id.skeletonLoadingText);
+
+        // Error state
+        errorCard = view.findViewById(R.id.errorCard);
+        errorTitle = view.findViewById(R.id.errorTitle);
+        errorMessage = view.findViewById(R.id.errorMessage);
+        tryAgainButton = view.findViewById(R.id.tryAgainButton);
 
         // Result
         resultCard = view.findViewById(R.id.resultCard);
@@ -224,6 +234,7 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
         shareButton.setOnClickListener(v -> onShareClick());
         backgroundButton.setOnClickListener(v -> onBackgroundClick());
         continueButton.setOnClickListener(v -> onContinueClick());
+        tryAgainButton.setOnClickListener(v -> onTryAgainClick());
 
         // Output chips
         includeTitleCheckbox.setOnCheckedChangeListener((v, checked) -> rebuildOutputText());
@@ -258,7 +269,7 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
         if (getArguments() != null) {
             originalSharedContent = getArguments().getString(ARG_SHARED_TEXT, "");
             sharedText.setText(originalSharedContent);
-            inputCharCount.setText(originalSharedContent.length() + " chars");
+            inputCharCount.setText(originalSharedContent.length() + " characters");
 
             // Auto-start processing if API key is set
             if (prefsManager.hasApiKey() && !originalSharedContent.isEmpty()) {
@@ -317,12 +328,8 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
         // Haptic feedback
         hapticHelper.onGenerationStart();
 
-        // Show progress
-        progressCard.setVisibility(View.VISIBLE);
-        progressBar.setProgress(0);
-        progressStatusText.setText(R.string.progress_extracting);
-        toneToggleContainer.setVisibility(View.GONE);
-        backgroundButton.setVisibility(View.VISIBLE);
+        // Show skeleton loading with shimmer
+        showLoadingState();
 
         // Get selected tone
         String tone = chipFormal.isChecked() ? PreferencesManager.TONE_FORMAL : PreferencesManager.TONE_CASUAL;
@@ -334,16 +341,13 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
 
                 // Check if content is a URL
                 if (WebContentExtractor.isUrl(originalSharedContent)) {
-                    mainHandler.post(() -> animateProgress(0, 40));
+                    mainHandler.post(() -> updateLoadingText(getString(R.string.progress_extracting)));
                     WebContentExtractor extractor = new WebContentExtractor();
                     textToProcess = extractor.extractContent(originalSharedContent);
                 }
 
-                // Update progress
-                mainHandler.post(() -> {
-                    animateProgress(40, 80);
-                    progressStatusText.setText(R.string.progress_generating);
-                });
+                // Update loading text
+                mainHandler.post(() -> updateLoadingText(getString(R.string.progress_generating)));
 
                 // Generate post
                 String apiKey = prefsManager.getApiKey();
@@ -352,7 +356,6 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
                 String result = gemini.curatePost(textToProcess, includeSource);
 
                 mainHandler.post(() -> {
-                    animateProgress(80, 100);
                     mainHandler.postDelayed(() -> handleGenerationSuccess(result), 300);
                 });
 
@@ -362,11 +365,37 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
         });
     }
 
-    private void animateProgress(int from, int to) {
-        ValueAnimator animator = ValueAnimator.ofInt(from, to);
-        animator.setDuration(500);
-        animator.addUpdateListener(animation -> progressBar.setProgress((int) animation.getAnimatedValue()));
-        animator.start();
+    private void showLoadingState() {
+        skeletonCard.setVisibility(View.VISIBLE);
+        shimmerLayout.startShimmer();
+        skeletonLoadingText.setText(R.string.generating_post);
+        toneToggleContainer.setVisibility(View.GONE);
+        errorCard.setVisibility(View.GONE);
+        resultCard.setVisibility(View.GONE);
+        backgroundButton.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLoadingState() {
+        shimmerLayout.stopShimmer();
+        skeletonCard.setVisibility(View.GONE);
+    }
+
+    private void updateLoadingText(String text) {
+        skeletonLoadingText.setText(text);
+    }
+
+    private void showErrorState(String error) {
+        hideLoadingState();
+        errorCard.setVisibility(View.VISIBLE);
+        resultCard.setVisibility(View.GONE);
+        toneToggleContainer.setVisibility(View.VISIBLE);
+        backgroundButton.setVisibility(View.GONE);
+
+        if (error != null && !error.isEmpty()) {
+            errorMessage.setText(error);
+        } else {
+            errorMessage.setText(R.string.error_state_network);
+        }
     }
 
     private void handleGenerationSuccess(String result) {
@@ -374,6 +403,9 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
 
         // Haptic feedback
         hapticHelper.onGenerationComplete();
+
+        // Hide loading state
+        hideLoadingState();
 
         // Extract source and title/body
         String contentWithoutSource = extractSourceCitation(result);
@@ -383,7 +415,7 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
         rebuildOutputText();
 
         // Update UI
-        progressCard.setVisibility(View.GONE);
+        errorCard.setVisibility(View.GONE);
         resultCard.setVisibility(View.VISIBLE);
         backgroundButton.setVisibility(View.GONE);
         continueButton.setVisibility(View.VISIBLE);
@@ -398,11 +430,14 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
         // Haptic feedback
         hapticHelper.onError();
 
-        progressCard.setVisibility(View.GONE);
-        toneToggleContainer.setVisibility(View.VISIBLE);
+        // Show error state
+        showErrorState(error);
+    }
 
-        String errorMsg = error != null ? error : "Unknown error";
-        Toast.makeText(getContext(), getString(R.string.processing_error, errorMsg), Toast.LENGTH_LONG).show();
+    private void onTryAgainClick() {
+        // Hide error card and retry generation
+        errorCard.setVisibility(View.GONE);
+        startGeneration();
     }
 
     private String extractSourceCitation(String fullResult) {

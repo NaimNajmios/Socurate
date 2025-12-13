@@ -146,10 +146,7 @@ id pillsEmptyText
 id pillsRecyclerView
 id placeholderView
 id previewCard
-id progressBar
-id progressCard
 id progressOverlay
-id progressStatusText
 id progressText
 id promptTokensBar
 id promptTokensValue

@@ -65,16 +65,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
-                app:cardCornerRadius="12dp"
-                app:strokeWidth="0dp">
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <!-- Header Row (always visible) -->
                     <LinearLayout
@@ -82,22 +83,27 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
 
                         <TextView
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:text="Input"
                             android:textColor="?attr/colorOnSurface"
-                            android:textSize="14sp"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
 
                         <TextView
                             android:id="@+id/inputCharCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0 chars"
+                            android:text="0 characters"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="12sp"
                             android:layout_marginEnd="8dp" />
@@ -117,7 +123,6 @@
                         android:id="@+id/sharedText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="14sp"
                         android:maxLines="8"
@@ -180,16 +185,16 @@
 
             </LinearLayout>
 
-            <!-- Progress Section -->
+            <!-- Skeleton Loading (shown while processing) - matches main interface -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/progressCard"
+                android:id="@+id/skeletonCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="20dp"
                 android:visibility="gone"
                 app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="16dp"
                 app:strokeColor="?attr/colorOutline"
                 app:strokeWidth="1dp">
 
@@ -197,29 +202,215 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
+                    <!-- Loading Text -->
                     <TextView
-                        android:id="@+id/progressStatusText"
+                        android:id="@+id/skeletonLoadingText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/progress_extracting"
+                        android:text="@string/generating_post"
                         android:textColor="?attr/colorPrimary"
                         android:textSize="13sp"
                         android:textStyle="bold"
-                        android:layout_marginBottom="12dp" />
+                        android:layout_marginBottom="16dp" />
 
-                    <com.google.android.material.progressindicator.LinearProgressIndicator
-                        android:id="@+id/progressBar"
+                    <!-- Shimmer Container -->
+                    <com.facebook.shimmer.ShimmerFrameLayout
+                        android:id="@+id/shimmerLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:indeterminate="false"
-                        android:progress="0"
-                        android:max="100"
-                        app:trackThickness="6dp"
-                        app:trackCornerRadius="3dp"
-                        app:indicatorColor="?attr/colorPrimary"
-                        app:trackColor="?attr/colorSurfaceVariant" />
+                        app:shimmer_auto_start="true"
+                        app:shimmer_duration="1200"
+                        app:shimmer_base_alpha="0.7"
+                        app:shimmer_highlight_alpha="1.0"
+                        app:shimmer_direction="left_to_right">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <!-- Skeleton Header -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="16dp">
+
+                                <View
+                                    android:layout_width="100dp"
+                                    android:layout_height="20dp"
+                                    android:background="@drawable/skeleton_item" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="1" />
+
+                                <View
+                                    android:layout_width="80dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/skeleton_item" />
+
+                            </LinearLayout>
+
+                            <!-- Skeleton Lines -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@drawable/skeleton_item" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@drawable/skeleton_item" />
+
+                            <!-- Skeleton Line 3 (80% width) -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="16dp"
+                                    android:layout_weight="0.8"
+                                    android:background="@drawable/skeleton_item" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="0.2" />
+
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@drawable/skeleton_item" />
+
+                            <!-- Skeleton Line 5 (60% width) -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="20dp"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="16dp"
+                                    android:layout_weight="0.6"
+                                    android:background="@drawable/skeleton_item" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="0.4" />
+
+                            </LinearLayout>
+
+                            <!-- Skeleton Buttons -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="48dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/skeleton_item" />
+
+                                <View
+                                    android:layout_width="12dp"
+                                    android:layout_height="1dp" />
+
+                                <View
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"
+                                    android:background="@drawable/skeleton_item" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </com.facebook.shimmer.ShimmerFrameLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Error State Card (shown on error) - matches main interface -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/errorCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="?attr/colorErrorContainer"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/colorError"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="32dp">
+
+                    <!-- Error Icon -->
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@android:drawable/ic_dialog_alert"
+                        android:contentDescription="@string/error_title"
+                        android:layout_marginBottom="16dp"
+                        app:tint="?attr/colorError" />
+
+                    <!-- Error Title -->
+                    <TextView
+                        android:id="@+id/errorTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/error_state_title"
+                        android:textColor="?attr/colorOnErrorContainer"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Error Message -->
+                    <TextView
+                        android:id="@+id/errorMessage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/error_state_network"
+                        android:textColor="?attr/colorOnErrorContainer"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:layout_marginBottom="24dp" />
+
+                    <!-- Try Again Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/tryAgainButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="@string/try_again_button"
+                        android:textColor="?attr/colorOnError"
+                        android:textStyle="bold"
+                        android:paddingStart="32dp"
+                        android:paddingEnd="32dp"
+                        android:backgroundTint="?attr/colorError"
+                        app:cornerRadius="24dp"
+                        app:icon="@android:drawable/ic_menu_rotate"
+                        app:iconTint="?attr/colorOnError"
+                        style="@style/Widget.Material3.Button" />
 
                 </LinearLayout>
 
@@ -299,23 +490,27 @@
 
                     </LinearLayout>
 
-                    <!-- Output Text -->
+                    <!-- Output Text with Scrollable Container -->
                     <ScrollView
+                        android:id="@+id/outputScrollView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:maxHeight="200dp"
+                        android:maxHeight="300dp"
                         android:nestedScrollingEnabled="true"
                         android:fillViewport="true"
-                        android:layout_marginBottom="12dp">
+                        android:scrollbars="vertical"
+                        android:fadeScrollbars="false"
+                        android:layout_marginBottom="16dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/outputText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:text="@string/output_placeholder"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="15sp"
                             android:lineSpacingExtra="4dp"
-                            android:minLines="3"
+                            android:minLines="4"
                             android:gravity="top|start"
                             android:inputType="textMultiLine|textCapSentences"
                             android:background="@null"
@@ -335,7 +530,7 @@
                         android:textSize="12sp"
                         android:layout_marginBottom="12dp" />
 
-                    <!-- Output Chips -->
+                    <!-- Pill Checkboxes (Chips) -->
                     <com.google.android.material.chip.ChipGroup
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -394,6 +589,7 @@
                         android:orientation="horizontal"
                         android:gravity="center">
 
+                        <!-- Copy Button -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/copyButton"
                             android:layout_width="0dp"
@@ -408,6 +604,7 @@
                             app:iconTint="?attr/colorOnPrimary"
                             style="@style/Widget.Material3.Button" />
 
+                        <!-- Share Button -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/shareButton"
                             android:layout_width="48dp"
