@@ -124,15 +124,26 @@ public class ContentGenerationService extends Service {
                     content = extractor.extractContent(inputText);
                 }
 
+                // Get provider name for logging
+                String provider = prefsManager.getProvider();
+                String providerDisplay = CuratorFactory.getProviderDisplayName(provider);
+
+                // Log the API request start
+                prefsManager.logInfo("API", "Request started via " + providerDisplay);
+
                 // Generate post using curator abstraction
                 IContentCurator curator = CuratorFactory.create(ContentGenerationService.this);
                 String result = curator.curatePost(content, includeSource);
 
                 // Record token usage
-                prefsManager.recordApiSuccess(
-                        curator.getLastPromptTokens(),
-                        curator.getLastCandidateTokens(),
-                        curator.getLastTotalTokens());
+                int promptTokens = curator.getLastPromptTokens();
+                int candidateTokens = curator.getLastCandidateTokens();
+                int totalTokens = curator.getLastTotalTokens();
+                prefsManager.recordApiSuccess(promptTokens, candidateTokens, totalTokens);
+
+                // Log success
+                prefsManager.logInfo("API",
+                        "Request successful via " + providerDisplay + " (" + totalTokens + " tokens)");
 
                 Log.i(TAG, "Content generation successful");
                 broadcastSuccess(result, false);
@@ -140,10 +151,22 @@ public class ContentGenerationService extends Service {
             } catch (RateLimitException rle) {
                 Log.w(TAG, "Rate limit hit: " + rle.getMessage());
                 prefsManager.recordApiFailure();
+
+                // Log rate limit error
+                String providerName = rle.getProviderName() != null ? rle.getProviderName() : "Unknown";
+                long delayMs = rle.getRetryDelayMs();
+                String delayInfo = delayMs > 0 ? " (retry in " + (delayMs / 1000) + "s)" : "";
+                prefsManager.logWarning("API", "Rate limit hit on " + providerName + delayInfo, rle.getMessage());
+
                 broadcastRateLimit(rle, false);
             } catch (Exception e) {
                 Log.e(TAG, "Content generation failed: " + e.getMessage(), e);
                 prefsManager.recordApiFailure();
+
+                // Log error
+                String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown error";
+                prefsManager.logError("API", "Request failed", errorMsg);
+
                 broadcastError(e.getMessage(), false);
             } finally {
                 // Show completion notification and stop service
@@ -179,15 +202,27 @@ public class ContentGenerationService extends Service {
             try {
                 Log.i(TAG, "Starting content refinement with options: " + refinements);
 
+                // Get provider name for logging
+                String provider = prefsManager.getProvider();
+                String providerDisplay = CuratorFactory.getProviderDisplayName(provider);
+
+                // Log the refinement request start
+                prefsManager.logInfo("API",
+                        "Refinement started via " + providerDisplay + " (" + refinements.toString() + ")");
+
                 // Refine post using curator abstraction
                 IContentCurator curator = CuratorFactory.create(ContentGenerationService.this);
                 String result = curator.refinePost(originalPost, refinements, includeSource);
 
                 // Record token usage
-                prefsManager.recordApiSuccess(
-                        curator.getLastPromptTokens(),
-                        curator.getLastCandidateTokens(),
-                        curator.getLastTotalTokens());
+                int promptTokens = curator.getLastPromptTokens();
+                int candidateTokens = curator.getLastCandidateTokens();
+                int totalTokens = curator.getLastTotalTokens();
+                prefsManager.recordApiSuccess(promptTokens, candidateTokens, totalTokens);
+
+                // Log success
+                prefsManager.logInfo("API",
+                        "Refinement successful via " + providerDisplay + " (" + totalTokens + " tokens)");
 
                 Log.i(TAG, "Content refinement successful");
                 broadcastSuccess(result, true);
@@ -195,10 +230,23 @@ public class ContentGenerationService extends Service {
             } catch (RateLimitException rle) {
                 Log.w(TAG, "Rate limit hit during refinement: " + rle.getMessage());
                 prefsManager.recordApiFailure();
+
+                // Log rate limit error
+                String providerName = rle.getProviderName() != null ? rle.getProviderName() : "Unknown";
+                long delayMs = rle.getRetryDelayMs();
+                String delayInfo = delayMs > 0 ? " (retry in " + (delayMs / 1000) + "s)" : "";
+                prefsManager.logWarning("API", "Rate limit during refinement on " + providerName + delayInfo,
+                        rle.getMessage());
+
                 broadcastRateLimit(rle, true);
             } catch (Exception e) {
                 Log.e(TAG, "Content refinement failed: " + e.getMessage(), e);
                 prefsManager.recordApiFailure();
+
+                // Log error
+                String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown error";
+                prefsManager.logError("API", "Refinement failed", errorMsg);
+
                 broadcastError(e.getMessage(), true);
             } finally {
                 // Show completion notification and stop service
