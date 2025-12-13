@@ -1,6 +1,6 @@
 package com.najmi.oreamnos;
 
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -151,6 +151,7 @@ public class UsageActivity extends AppCompatActivity {
         logCountBadge = findViewById(R.id.logCountBadge);
         logsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         logAdapter = new LogAdapter();
+        logAdapter.setOnLogClickListener(this::showLogDetailsDialog);
         logsRecyclerView.setAdapter(logAdapter);
 
         // Buttons
@@ -334,6 +335,76 @@ public class UsageActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(mode);
     }
 
+    private void showLogDetailsDialog(UsageStats.LogEntry log) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_log_details, null);
+
+        TextView levelBadge = dialogView.findViewById(R.id.dialogLevelBadge);
+        TextView tagText = dialogView.findViewById(R.id.dialogTagText);
+        TextView timeText = dialogView.findViewById(R.id.dialogTimeText);
+        TextView messageText = dialogView.findViewById(R.id.dialogMessageText);
+        TextView detailsText = dialogView.findViewById(R.id.dialogDetailsText);
+        MaterialButton copyButton = dialogView.findViewById(R.id.dialogCopyButton);
+
+        // Set data
+        levelBadge.setText(log.getLevel());
+
+        // Set badge background
+        int badgeRes;
+        switch (log.getLevel()) {
+            case UsageStats.LogEntry.LEVEL_ERROR:
+                badgeRes = R.drawable.log_badge_error;
+                break;
+            case UsageStats.LogEntry.LEVEL_WARNING:
+                badgeRes = R.drawable.log_badge_warn;
+                break;
+            case UsageStats.LogEntry.LEVEL_DEBUG:
+                badgeRes = R.drawable.log_badge_debug;
+                break;
+            case UsageStats.LogEntry.LEVEL_INFO:
+            default:
+                badgeRes = R.drawable.log_badge_info;
+                break;
+        }
+        levelBadge.setBackgroundResource(badgeRes);
+
+        tagText.setText(log.getTag() != null ? log.getTag() : "App");
+        timeText.setText(log.getFormattedDate());
+        messageText.setText(log.getMessage());
+
+        String details = log.getDetails();
+        if (details != null && !details.isEmpty()) {
+            detailsText.setText(details);
+        } else {
+            detailsText.setText("No additional details.");
+            detailsText.setTypeface(null, android.graphics.Typeface.ITALIC);
+        }
+
+        AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("Log Details")
+                .setView(dialogView)
+                .setPositiveButton("Close", null)
+                .create();
+
+        copyButton.setOnClickListener(v -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Level: ").append(log.getLevel()).append("\n");
+            sb.append("Time: ").append(log.getFormattedDate()).append("\n");
+            sb.append("Tag: ").append(log.getTag()).append("\n");
+            sb.append("Message: ").append(log.getMessage()).append("\n");
+            if (log.getDetails() != null) {
+                sb.append("Details:\n").append(log.getDetails());
+            }
+
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(
+                    android.content.Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Log Details", sb.toString());
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, "Log details copied", Toast.LENGTH_SHORT).show();
+        });
+
+        dialog.show();
+    }
+
     // ==================== SESSION ADAPTER ====================
 
     private static class SessionAdapter extends RecyclerView.Adapter<SessionAdapter.SessionViewHolder> {
@@ -426,10 +497,19 @@ public class UsageActivity extends AppCompatActivity {
     private static class LogAdapter extends RecyclerView.Adapter<LogAdapter.LogViewHolder> {
 
         private List<UsageStats.LogEntry> logs;
+        private OnLogClickListener listener;
+
+        public interface OnLogClickListener {
+            void onLogClick(UsageStats.LogEntry log);
+        }
 
         public void setLogs(List<UsageStats.LogEntry> logs) {
             this.logs = logs;
             notifyDataSetChanged();
+        }
+
+        public void setOnLogClickListener(OnLogClickListener listener) {
+            this.listener = listener;
         }
 
         @NonNull
@@ -446,6 +526,12 @@ public class UsageActivity extends AppCompatActivity {
                 return;
             UsageStats.LogEntry log = logs.get(position);
             holder.bind(log);
+
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onLogClick(log);
+                }
+            });
         }
 
         @Override

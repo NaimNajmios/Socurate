@@ -75,13 +75,14 @@ public class GeminiService {
      * @return The curated post
      * @throws Exception if API call fails after retries
      */
-    public String curatePost(String inputText, boolean includeSource) throws Exception {
+    public String curatePost(String inputText, boolean includeSource, boolean keepStructure) throws Exception {
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString().substring(0, 8);
 
         Log.i(TAG, "=== GEMINI API CALL START [" + requestId + "] ===");
         Log.i(TAG, "[" + requestId + "] Input text length: " + (inputText != null ? inputText.length() : 0));
         Log.i(TAG, "[" + requestId + "] Include source: " + includeSource);
+        Log.i(TAG, "[" + requestId + "] Keep structure: " + keepStructure);
 
         // Validate inputs
         if (apiKey == null || apiKey.trim().isEmpty()) {
@@ -95,7 +96,8 @@ public class GeminiService {
         }
 
         // Build the prompt based on tone
-        String prompt = buildPrompt(tone, inputText, includeSource);
+        String prompt = new com.najmi.oreamnos.prompts.PromptManager().buildInitialPrompt(tone, inputText,
+                includeSource, keepStructure);
 
         // Build request JSON
         JsonObject requestJson = new JsonObject();

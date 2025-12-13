@@ -24,8 +24,8 @@ public class GeminiCurator implements IContentCurator {
     }
 
     @Override
-    public String curatePost(String inputText, boolean includeSource) throws Exception {
-        return geminiService.curatePost(inputText, includeSource);
+    public String curatePost(String inputText, boolean includeSource, boolean keepStructure) throws Exception {
+        return geminiService.curatePost(inputText, includeSource, keepStructure);
     }
 
     @Override

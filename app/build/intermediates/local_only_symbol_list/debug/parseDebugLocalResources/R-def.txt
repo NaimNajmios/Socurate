@@ -110,6 +110,13 @@ id closeButton
 id continueButton
 id copyButton
 id customPillChips
+id dialogCopyButton
+id dialogDetailsLabel
+id dialogDetailsText
+id dialogLevelBadge
+id dialogMessageText
+id dialogTagText
+id dialogTimeText
 id dialogTitle
 id editButton
 id editedIndicator
@@ -141,6 +148,7 @@ id inputCard
 id inputCharCount
 id inputHeader
 id inputText
+id keepStructureSwitch
 id levelBadge
 id logCountBadge
 id logsRecyclerView
@@ -221,6 +229,7 @@ layout activity_settings
 layout activity_share_receiver
 layout activity_usage
 layout dialog_create_pill
+layout dialog_log_details
 layout fragment_share_bottom_sheet
 layout item_log_entry
 layout item_session_entry

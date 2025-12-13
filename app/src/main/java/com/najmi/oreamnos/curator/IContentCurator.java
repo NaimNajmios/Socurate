@@ -14,10 +14,11 @@ public interface IContentCurator {
      *
      * @param inputText     The text to curate
      * @param includeSource Whether to include source citation
+     * @param keepStructure Whether to preserve original formatting/structure
      * @return The curated post
      * @throws Exception if curation fails
      */
-    String curatePost(String inputText, boolean includeSource) throws Exception;
+    String curatePost(String inputText, boolean includeSource, boolean keepStructure) throws Exception;
 
     /**
      * Refines an existing post based on selected refinement options.

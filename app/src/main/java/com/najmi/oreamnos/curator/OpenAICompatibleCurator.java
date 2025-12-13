@@ -64,10 +64,10 @@ public class OpenAICompatibleCurator implements IContentCurator {
     }
 
     @Override
-    public String curatePost(String inputText, boolean includeSource) throws Exception {
+    public String curatePost(String inputText, boolean includeSource, boolean keepStructure) throws Exception {
         String systemPrompt = "You are a professional social media content writer for a Malaysian football club. " +
                 "Write in Malaysian Malay (Bahasa Malaysia) only. Do not include hashtags.";
-        String userPrompt = promptManager.buildInitialPrompt(tone, inputText, includeSource);
+        String userPrompt = promptManager.buildInitialPrompt(tone, inputText, includeSource, keepStructure);
 
         return callApi(systemPrompt, userPrompt);
     }

@@ -15,9 +15,10 @@ public class PromptManager {
      * @param tone          Post tone ("formal" or "casual")
      * @param inputText     The text to curate
      * @param includeSource Whether to include source citation
+     * @param keepStructure Whether to preserve original formatting/structure
      * @return The formatted prompt string
      */
-    public String buildInitialPrompt(String tone, String inputText, boolean includeSource) {
+    public String buildInitialPrompt(String tone, String inputText, boolean includeSource, boolean keepStructure) {
         int originalLength = inputText.length();
         int targetMinLength = (int) (originalLength * 0.4);
         int targetMaxLength = (int) (originalLength * 0.6);
@@ -47,9 +48,15 @@ public class PromptManager {
 
         prompt.append("STRICT REQUIREMENTS:\n")
                 .append("1. Write ONLY in Bahasa Malaysia (Malaysian Malay) - do not include any English text in your output\n")
-                .append("2. ").append(toneInstruction).append("\n")
-                .append("3. The output must be approximately 40-60% of the original content length (target: ")
-                .append(targetMinLength).append("-").append(targetMaxLength).append(" characters)\n");
+                .append("2. ").append(toneInstruction).append("\n");
+
+        if (keepStructure) {
+            prompt.append(
+                    "3. STRICTLY PRESERVE the original formatting, bullet points, lists, and structure. Do NOT summarize into paragraphs if the original used a list format. Translate the content line-by-line while keeping the visual layout exactly the same.\n");
+        } else {
+            prompt.append("3. The output must be approximately 40-60% of the original content length (target: ")
+                    .append(targetMinLength).append("-").append(targetMaxLength).append(" characters)\n");
+        }
 
         // Add quote handling instruction if quotes detected
         if (hasQuotes) {
@@ -71,16 +78,18 @@ public class PromptManager {
         }
 
         // Adapt structure based on content type
-        if (isTechnicalArticle) {
-            prompt.append(hasQuotes ? "8" : "7")
-                    .append(". STRUCTURE FOR TECHNICAL ANALYSIS: Start with a clear, engaging Headline. Then organize content focusing on:\n")
-                    .append("   - Key Stats: Highlight important statistics and numbers\n")
-                    .append("   - Formations: Describe tactical setups and player positions\n")
-                    .append("   - Tactical Shifts: Explain strategic changes and their impact\n")
-                    .append("   Separate sections with blank lines.\n");
-        } else {
-            prompt.append(hasQuotes ? "8" : "7")
-                    .append(". STRUCTURE: Start with a clear, engaging Headline. Separate paragraphs with a blank line.\n");
+        if (!keepStructure) {
+            if (isTechnicalArticle) {
+                prompt.append(hasQuotes ? "8" : "7")
+                        .append(". STRUCTURE FOR TECHNICAL ANALYSIS: Start with a clear, engaging Headline. Then organize content focusing on:\n")
+                        .append("   - Key Stats: Highlight important statistics and numbers\n")
+                        .append("   - Formations: Describe tactical setups and player positions\n")
+                        .append("   - Tactical Shifts: Explain strategic changes and their impact\n")
+                        .append("   Separate sections with blank lines.\n");
+            } else {
+                prompt.append(hasQuotes ? "8" : "7")
+                        .append(". STRUCTURE: Start with a clear, engaging Headline. Separate paragraphs with a blank line.\n");
+            }
         }
 
         int nextNum = (isTechnicalArticle || hasQuotes) ? 9 : 8;
@@ -95,7 +104,10 @@ public class PromptManager {
         prompt.append("ORIGINAL ENGLISH TEXT:\n---\n")
                 .append(inputText).append("\n---\n\n");
 
-        if (isTechnicalArticle) {
+        if (keepStructure) {
+            prompt.append(
+                    "Provide ONLY the Bahasa Malaysia social media post. STRICTLY PRESERVE the original formatting (lists, bullets, spacing). Do NOT include any hashtags.");
+        } else if (isTechnicalArticle) {
             prompt.append(
                     "Provide ONLY the Bahasa Malaysia social media post. Structure it with a headline followed by Key Stats, Formations, and Tactical Shifts sections. Separate sections with blank lines. Do NOT include any hashtags.");
         } else {

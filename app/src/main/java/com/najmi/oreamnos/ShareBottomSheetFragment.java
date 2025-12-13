@@ -353,7 +353,7 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
                 String apiKey = prefsManager.getApiKey();
                 String endpoint = prefsManager.getApiEndpoint();
                 GeminiService gemini = new GeminiService(apiKey, endpoint, tone);
-                String result = gemini.curatePost(textToProcess, includeSource);
+                String result = gemini.curatePost(textToProcess, includeSource, false);
 
                 mainHandler.post(() -> {
                     mainHandler.postDelayed(() -> handleGenerationSuccess(result), 300);

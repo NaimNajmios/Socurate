@@ -561,7 +561,7 @@ public class SettingsActivity extends AppCompatActivity {
                                 currentModelIds[selectedModelIndex],
                                 tone,
                                 false);
-                        result = groqCurator.curatePost("Test connection: Manchester United won 3-0.", true);
+                        result = groqCurator.curatePost("Test connection: Manchester United won 3-0.", true, false);
                         break;
                     case PreferencesManager.PROVIDER_OPENROUTER:
                         // Use OpenAICompatibleCurator for OpenRouter
@@ -571,14 +571,15 @@ public class SettingsActivity extends AppCompatActivity {
                                 currentModelIds[selectedModelIndex],
                                 tone,
                                 true);
-                        result = openRouterCurator.curatePost("Test connection: Manchester United won 3-0.", true);
+                        result = openRouterCurator.curatePost("Test connection: Manchester United won 3-0.", true,
+                                false);
                         break;
                     case PreferencesManager.PROVIDER_GEMINI:
                     default:
                         // Use GeminiService for Gemini
                         String endpoint = currentModelIds[selectedModelIndex];
                         GeminiService gemini = new GeminiService(finalApiKey, endpoint, tone);
-                        result = gemini.curatePost("Test connection: Manchester United won 3-0.", true);
+                        result = gemini.curatePost("Test connection: Manchester United won 3-0.", true, false);
                         break;
                 }
 

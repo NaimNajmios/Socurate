@@ -38,6 +38,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.najmi.oreamnos.curator.CuratorFactory;
 import com.najmi.oreamnos.model.GenerationPill;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private Chip includeTitleCheckbox;
     private Chip includeHashtagsCheckbox;
     private Chip includeSourceCheckbox;
+    private MaterialSwitch keepStructureSwitch;
     private ExtendedFloatingActionButton generateFab;
 
     // Refinement UI
@@ -190,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         includeTitleCheckbox = findViewById(R.id.includeTitleCheckbox);
         includeHashtagsCheckbox = findViewById(R.id.includeHashtagsCheckbox);
         includeSourceCheckbox = findViewById(R.id.includeSourceCheckbox);
+        keepStructureSwitch = findViewById(R.id.keepStructureSwitch);
         generateFab = findViewById(R.id.generateFab);
 
         // Refinement UI
@@ -630,10 +633,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Start the Foreground Service for generation
         boolean includeSource = prefsManager.isSourceEnabled();
+        boolean keepStructure = keepStructureSwitch.isChecked();
         Intent serviceIntent = new Intent(this, ContentGenerationService.class);
         serviceIntent.setAction(ContentGenerationService.ACTION_GENERATE);
         serviceIntent.putExtra(ContentGenerationService.EXTRA_INPUT_TEXT, input);
         serviceIntent.putExtra(ContentGenerationService.EXTRA_INCLUDE_SOURCE, includeSource);
+        serviceIntent.putExtra(ContentGenerationService.EXTRA_KEEP_STRUCTURE, keepStructure);
 
         Log.i(TAG, "Starting ContentGenerationService for generation");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -654,11 +659,15 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Gets the final text to copy/share (with hashtags if enabled).
+     * Strips markdown formatting for clean paste.
      */
     private String getFinalText() {
         // Use raw text for copy/share (not rendered markdown)
         String text = rawOutputText.isEmpty() ? (outputText.getText() != null ? outputText.getText().toString() : "")
                 : rawOutputText;
+
+        // Strip markdown formatting for clean copy/paste
+        text = stripMarkdownFormatting(text);
 
         // Add hashtags if enabled
         if (includeHashtagsCheckbox.isChecked() && prefsManager.areHashtagsEnabled()) {
@@ -669,6 +678,51 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return text;
+    }
+
+    /**
+     * Strips markdown formatting from text for clean clipboard copy.
+     * Removes bold, italic, headers, links, etc. while preserving the actual text
+     * content.
+     */
+    private String stripMarkdownFormatting(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+
+        // Remove bold: **text** or __text__
+        text = text.replaceAll("\\*\\*(.+?)\\*\\*", "$1");
+        text = text.replaceAll("__(.+?)__", "$1");
+
+        // Remove italic: *text* or _text_ (simple approach)
+        text = text.replaceAll("(?<!\\*)\\*(?!\\*)([^*]+)(?<!\\*)\\*(?!\\*)", "$1");
+        text = text.replaceAll("(?<!_)_(?!_)([^_]+)(?<!_)_(?!_)", "$1");
+
+        // Remove strikethrough: ~~text~~
+        text = text.replaceAll("~~(.+?)~~", "$1");
+
+        // Remove headers: # Header -> Header
+        text = text.replaceAll("(?m)^#{1,6}\\s*", "");
+
+        // Remove inline code: `code`
+        text = text.replaceAll("`([^`]+)`", "$1");
+
+        // Remove links: [text](url) -> text
+        text = text.replaceAll("\\[([^\\]]+)\\]\\([^)]+\\)", "$1");
+
+        // Remove images: ![alt](url) -> alt
+        text = text.replaceAll("!\\[([^\\]]*?)\\]\\([^)]+\\)", "$1");
+
+        // Remove blockquotes: > text -> text
+        text = text.replaceAll("(?m)^>\\s*", "");
+
+        // Remove horizontal rules
+        text = text.replaceAll("(?m)^[-*_]{3,}$", "");
+
+        // Clean up extra whitespace but preserve paragraph breaks
+        text = text.replaceAll("\n{3,}", "\n\n");
+
+        return text.trim();
     }
 
     /**

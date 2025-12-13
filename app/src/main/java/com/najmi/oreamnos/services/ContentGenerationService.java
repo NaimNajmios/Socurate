@@ -40,6 +40,7 @@ public class ContentGenerationService extends Service {
     public static final String EXTRA_ORIGINAL_POST = "extra_original_post";
     public static final String EXTRA_REFINEMENTS = "extra_refinements";
     public static final String EXTRA_INCLUDE_SOURCE = "extra_include_source";
+    public static final String EXTRA_KEEP_STRUCTURE = "extra_keep_structure";
 
     // Result extras
     public static final String EXTRA_SUCCESS = "extra_success";
@@ -105,6 +106,7 @@ public class ContentGenerationService extends Service {
     private void handleGenerate(Intent intent) {
         String inputText = intent.getStringExtra(EXTRA_INPUT_TEXT);
         boolean includeSource = intent.getBooleanExtra(EXTRA_INCLUDE_SOURCE, false);
+        boolean keepStructure = intent.getBooleanExtra(EXTRA_KEEP_STRUCTURE, false);
 
         if (inputText == null || inputText.isEmpty()) {
             broadcastError("Input text is required", false);
@@ -133,7 +135,7 @@ public class ContentGenerationService extends Service {
 
                 // Generate post using curator abstraction
                 IContentCurator curator = CuratorFactory.create(ContentGenerationService.this);
-                String result = curator.curatePost(content, includeSource);
+                String result = curator.curatePost(content, includeSource, keepStructure);
 
                 // Record token usage
                 int promptTokens = curator.getLastPromptTokens();
