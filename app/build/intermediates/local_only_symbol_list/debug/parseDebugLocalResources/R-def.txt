@@ -95,6 +95,8 @@ id addCustomPillChip
 id apiKeyInput
 id backgroundButton
 id bottomNavigation
+id btnShowMoreLogs
+id btnShowMoreSessions
 id builtInRefinementChips
 id cancelButton
 id checkConversational

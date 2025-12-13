@@ -3279,6 +3279,8 @@ id bounce
 id bounceBoth
 id bounceEnd
 id bounceStart
+id btnShowMoreLogs
+id btnShowMoreSessions
 id builtInRefinementChips
 id buttonPanel
 id cache_measures

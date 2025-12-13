@@ -77,6 +77,12 @@ public class UsageActivity extends AppCompatActivity {
     private LogAdapter logAdapter;
     private MaterialButton clearLogsButton;
 
+    // Expansion State
+    private boolean isSessionsExpanded = false;
+    private boolean isLogsExpanded = false;
+    private MaterialButton btnShowMoreSessions;
+    private MaterialButton btnShowMoreLogs;
+
     // Reset button
     private MaterialButton resetStatsButton;
 
@@ -157,6 +163,19 @@ public class UsageActivity extends AppCompatActivity {
         // Buttons
         resetStatsButton = findViewById(R.id.resetStatsButton);
         clearLogsButton = findViewById(R.id.clearLogsButton);
+        btnShowMoreSessions = findViewById(R.id.btnShowMoreSessions);
+        btnShowMoreLogs = findViewById(R.id.btnShowMoreLogs);
+
+        // Setup expansion listeners
+        btnShowMoreSessions.setOnClickListener(v -> {
+            isSessionsExpanded = !isSessionsExpanded;
+            refreshStats(); // Re-render list
+        });
+
+        btnShowMoreLogs.setOnClickListener(v -> {
+            isLogsExpanded = !isLogsExpanded;
+            refreshStats(); // Re-render list
+        });
     }
 
     private void setupResetButton() {
@@ -280,32 +299,64 @@ public class UsageActivity extends AppCompatActivity {
     }
 
     private void updateSessionsList(UsageStats stats) {
-        List<UsageStats.SessionEntry> sessions = stats.getRecentSessions();
+        List<UsageStats.SessionEntry> allSessions = stats.getRecentSessions();
 
-        if (sessions == null || sessions.isEmpty()) {
+        if (allSessions == null || allSessions.isEmpty()) {
             emptySessionsText.setVisibility(View.VISIBLE);
             sessionsRecyclerView.setVisibility(View.GONE);
+            btnShowMoreSessions.setVisibility(View.GONE);
         } else {
             emptySessionsText.setVisibility(View.GONE);
             sessionsRecyclerView.setVisibility(View.VISIBLE);
-            sessionAdapter.setSessions(sessions);
+
+            List<UsageStats.SessionEntry> displayList;
+            if (allSessions.size() > 10 && !isSessionsExpanded) {
+                displayList = allSessions.subList(0, 10);
+                btnShowMoreSessions.setVisibility(View.VISIBLE);
+                btnShowMoreSessions.setText("Show More (" + (allSessions.size() - 10) + ")");
+            } else {
+                displayList = allSessions;
+                if (allSessions.size() > 10) {
+                    btnShowMoreSessions.setVisibility(View.VISIBLE);
+                    btnShowMoreSessions.setText("Show Less");
+                } else {
+                    btnShowMoreSessions.setVisibility(View.GONE);
+                }
+            }
+            sessionAdapter.setSessions(displayList);
         }
     }
 
     private void updateLogsList(UsageStats stats) {
-        List<UsageStats.LogEntry> logs = stats.getLogs();
+        List<UsageStats.LogEntry> allLogs = stats.getLogs();
 
         // Update count badge
-        int count = logs != null ? logs.size() : 0;
+        int count = allLogs != null ? allLogs.size() : 0;
         logCountBadge.setText(String.format(Locale.US, "%d entries", count));
 
-        if (logs == null || logs.isEmpty()) {
+        if (allLogs == null || allLogs.isEmpty()) {
             emptyLogsText.setVisibility(View.VISIBLE);
             logsRecyclerView.setVisibility(View.GONE);
+            btnShowMoreLogs.setVisibility(View.GONE);
         } else {
             emptyLogsText.setVisibility(View.GONE);
             logsRecyclerView.setVisibility(View.VISIBLE);
-            logAdapter.setLogs(logs);
+
+            List<UsageStats.LogEntry> displayList;
+            if (allLogs.size() > 10 && !isLogsExpanded) {
+                displayList = allLogs.subList(0, 10);
+                btnShowMoreLogs.setVisibility(View.VISIBLE);
+                btnShowMoreLogs.setText("Show More (" + (allLogs.size() - 10) + ")");
+            } else {
+                displayList = allLogs;
+                if (allLogs.size() > 10) {
+                    btnShowMoreLogs.setVisibility(View.VISIBLE);
+                    btnShowMoreLogs.setText("Show Less");
+                } else {
+                    btnShowMoreLogs.setVisibility(View.GONE);
+                }
+            }
+            logAdapter.setLogs(displayList);
         }
     }
 

@@ -589,6 +589,16 @@
                         android:nestedScrollingEnabled="false"
                         android:visibility="gone" />
 
+                    <!-- Show More Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnShowMoreSessions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="Show More"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:visibility="gone" />
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
@@ -742,6 +752,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:nestedScrollingEnabled="false"
+                        android:visibility="gone" />
+
+                    <!-- Show More Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnShowMoreLogs"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="Show More"
+                        style="@style/Widget.Material3.Button.TextButton"
                         android:visibility="gone" />
 
                 </LinearLayout>

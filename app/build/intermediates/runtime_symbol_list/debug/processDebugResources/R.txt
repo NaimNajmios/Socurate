@@ -3278,6 +3278,8 @@ int id bounce 0x7f080064
 int id bounceBoth 0x7f080065
 int id bounceEnd 0x7f080066
 int id bounceStart 0x7f080067
+int id btnShowMoreLogs 0x7f080285
+int id btnShowMoreSessions 0x7f080286
 int id builtInRefinementChips 0x7f080068
 int id buttonPanel 0x7f080069
 int id cache_measures 0x7f08006a
