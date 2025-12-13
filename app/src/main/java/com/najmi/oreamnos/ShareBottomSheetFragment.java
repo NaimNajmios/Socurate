@@ -78,8 +78,10 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
     private MaterialButton backgroundButton;
     private MaterialButton continueButton;
     private Chip includeTitleCheckbox;
+    private Chip includeEmojisCheckbox;
     private Chip includeHashtagsCheckbox;
     private Chip includeSourceCheckbox;
+    private TextView readabilityScore;
 
     // State
     private String originalSharedContent = "";
@@ -208,8 +210,10 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
         copyButton = view.findViewById(R.id.copyButton);
         shareButton = view.findViewById(R.id.shareButton);
         includeTitleCheckbox = view.findViewById(R.id.includeTitleCheckbox);
+        includeEmojisCheckbox = view.findViewById(R.id.includeEmojisCheckbox);
         includeHashtagsCheckbox = view.findViewById(R.id.includeHashtagsCheckbox);
         includeSourceCheckbox = view.findViewById(R.id.includeSourceCheckbox);
+        readabilityScore = view.findViewById(R.id.readabilityScore);
 
         // Buttons
         backgroundButton = view.findViewById(R.id.backgroundButton);
@@ -238,6 +242,7 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
 
         // Output chips
         includeTitleCheckbox.setOnCheckedChangeListener((v, checked) -> rebuildOutputText());
+        includeEmojisCheckbox.setOnCheckedChangeListener((v, checked) -> rebuildOutputText());
         includeHashtagsCheckbox.setOnCheckedChangeListener((v, checked) -> rebuildOutputText());
         includeSourceCheckbox.setOnCheckedChangeListener((v, checked) -> rebuildOutputText());
 
@@ -261,6 +266,10 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
                 String text = s.toString().trim();
                 int wordCount = text.isEmpty() ? 0 : text.split("\\s+").length;
                 outputWordCount.setText(wordCount + " words");
+
+                // Update readability score
+                double score = com.najmi.oreamnos.utils.ReadabilityUtils.calculateFleschKincaidGradeLevel(text);
+                readabilityScore.setText(String.format("Grade: %.1f", score));
             }
         });
     }
@@ -488,11 +497,29 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
 
         // 1. Title (if enabled)
         if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
-            textBuilder.append(generatedTitle).append("\n\n");
+            String titleText = generatedTitle;
+            if (!includeEmojisCheckbox.isChecked()) {
+                titleText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(titleText);
+            }
+            textBuilder.append(titleText).append("\n\n");
         }
 
         // 2. Body
-        textBuilder.append(generatedBody);
+        String bodyText = generatedBody;
+        if (!includeEmojisCheckbox.isChecked()) {
+            // If emojis are disabled, strip them all
+            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
+        } else if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
+            // If emojis are enabled BUT title is shown (and has emoji),
+            // strip emoji from the body to avoid double emojis.
+            // The prompt puts emojis on BOTH Title and First Para, so we remove the Body
+            // one here.
+            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
+        }
+        // If emojis are enabled AND title is NOT shown, we keep the Body emoji (from
+        // the prompt).
+
+        textBuilder.append(bodyText);
 
         // 3. Source (before hashtags)
         if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {

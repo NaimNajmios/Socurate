@@ -1,15 +1,15 @@
 [
     {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\anim_slide_down_fade_out.xml.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\anim\\slide_down_fade_out.xml"
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_log_badge_warn.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\log_badge_warn.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_ic_dropdown.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\ic_dropdown.xml"
     },
     {
-        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_log_badge_warn.xml.flat",
-        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\log_badge_warn.xml"
+        "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\anim_slide_down_fade_out.xml.flat",
+        "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\anim\\slide_down_fade_out.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\layout_dialog_log_details.xml.flat",
@@ -32,6 +32,10 @@
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\token_bar_prompt.xml"
     },
     {
+        "merged": "com.najmi.oreamnos.app-debug-35:/layout_fragment_share_bottom_sheet.xml.flat",
+        "source": "com.najmi.oreamnos.app-main-37:/layout/fragment_share_bottom_sheet.xml"
+    },
+    {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\drawable_ic_clear.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\drawable\\ic_clear.xml"
     },
@@ -50,10 +54,6 @@
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\color_chip_text_color_selector.xml.flat",
         "source": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-main-37:\\color\\chip_text_color_selector.xml"
-    },
-    {
-        "merged": "com.najmi.oreamnos.app-debug-35:/layout_activity_usage.xml.flat",
-        "source": "com.najmi.oreamnos.app-main-37:/layout/activity_usage.xml"
     },
     {
         "merged": "C:\\Users\\NAIM\\.gradle\\daemon\\8.6\\com.najmi.oreamnos.app-debug-35:\\menu_menu_bottom_nav.xml.flat",

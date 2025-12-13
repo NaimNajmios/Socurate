@@ -625,7 +625,7 @@ public class MainActivity extends AppCompatActivity {
         if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
             String titleText = generatedTitle;
             if (!includeEmojisCheckbox.isChecked()) {
-                titleText = stripLeadingEmojis(titleText);
+                titleText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(titleText);
             }
             textBuilder.append(titleText).append("\n\n");
         }
@@ -634,13 +634,13 @@ public class MainActivity extends AppCompatActivity {
         String bodyText = generatedBody;
         if (!includeEmojisCheckbox.isChecked()) {
             // If emojis are disabled, strip them all
-            bodyText = stripLeadingEmojis(bodyText);
+            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
         } else if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
             // If emojis are enabled BUT title is shown (and has emoji),
             // strip emoji from the body to avoid double emojis.
             // The prompt puts emojis on BOTH Title and First Para, so we remove the Body
             // one here.
-            bodyText = stripLeadingEmojis(bodyText);
+            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
         }
         // If emojis are enabled AND title is NOT shown, we keep the Body emoji (from
         // the prompt).
@@ -1600,33 +1600,6 @@ public class MainActivity extends AppCompatActivity {
         if (url.length() <= 60)
             return url;
         return url.substring(0, 57) + "...";
-    }
-
-    /**
-     * Strips leading emojis from paragraphs.
-     */
-    private String stripLeadingEmojis(String text) {
-        if (text == null || text.isEmpty())
-            return "";
-
-        // Regex to match emojis at the start of lines/paragraphs
-        // Matches surrogate pairs (most emojis) and common symbol ranges
-        String emojiRegex = "^([\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|[\\u2600-\\u27BF])+\\s*";
-
-        StringBuilder sb = new StringBuilder();
-        String[] lines = text.split("\n");
-
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-            // Replace leading emoji and whitespace
-            line = line.replaceAll(emojiRegex, "");
-            sb.append(line);
-            if (i < lines.length - 1) {
-                sb.append("\n");
-            }
-        }
-
-        return sb.toString();
     }
 
     // ==================== CUSTOM REFINEMENT PILLS ====================
