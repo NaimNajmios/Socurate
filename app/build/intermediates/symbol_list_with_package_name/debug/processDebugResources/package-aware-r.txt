@@ -3076,6 +3076,10 @@ drawable ic_share
 drawable ic_sparkle
 drawable ic_stadium
 drawable ic_usage
+drawable log_badge_debug
+drawable log_badge_error
+drawable log_badge_info
+drawable log_badge_warn
 drawable m3_avd_hide_password
 drawable m3_avd_show_password
 drawable m3_bottom_sheet_drag_handle
@@ -3296,6 +3300,7 @@ id chipShortenDetailed
 id chronometer
 id circle_center
 id clearInputButton
+id clearLogsButton
 id clear_text
 id clip_horizontal
 id clip_vertical
@@ -3364,6 +3369,7 @@ id edit_query
 id editedIndicator
 id elastic
 id embed
+id emptyLogsText
 id emptyPillsText
 id emptySessionsText
 id emptyStateMessage
@@ -3452,11 +3458,14 @@ id left
 id leftToRight
 id left_to_right
 id legacy
+id levelBadge
 id line1
 id line3
 id linear
 id listMode
 id list_item
+id logCountBadge
+id logsRecyclerView
 id m3_side_sheet
 id markwon_drawables_scheduler
 id markwon_drawables_scheduler_last_text_hashcode
@@ -3486,6 +3495,7 @@ id material_timepicker_view
 id material_value_index
 id matrix
 id message
+id messageText
 id middle
 id mini
 id modelDropdown
@@ -3707,6 +3717,7 @@ id successRateValue
 id successfulRequestsValue
 id supportScrollUp
 id tabMode
+id tagText
 id tag_accessibility_actions
 id tag_accessibility_clickable_spans
 id tag_accessibility_heading
@@ -3742,6 +3753,7 @@ id themeLight
 id themeRadioGroup
 id themeSystem
 id time
+id timeText
 id timestampText
 id title
 id titleDividerNoCustom
@@ -3934,6 +3946,7 @@ layout design_text_input_end_icon
 layout design_text_input_start_icon
 layout dialog_create_pill
 layout fragment_share_bottom_sheet
+layout item_log_entry
 layout item_pill_settings
 layout item_session_entry
 layout layout_empty_state
@@ -4062,6 +4075,7 @@ string character_counter_pattern
 string chip_casual
 string chip_formal
 string clear_input
+string clear_logs
 string clear_text_end_icon_content_description
 string connection_test_failed
 string connection_test_success
@@ -4114,6 +4128,7 @@ string input_hint
 string input_required
 string invalid_url
 string item_view_role_description
+string logs_cleared
 string m3_exceed_max_badge_text_suffix
 string m3_ref_typeface_brand_medium
 string m3_ref_typeface_brand_regular
@@ -4224,6 +4239,7 @@ string nav_settings
 string nav_usage
 string network_error
 string no_active_pill
+string no_logs
 string no_recent_activity
 string notification_action_copy
 string notification_action_open

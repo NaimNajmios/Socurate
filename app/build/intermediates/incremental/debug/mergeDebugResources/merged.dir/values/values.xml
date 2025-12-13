@@ -2033,6 +2033,7 @@
     <string name="chip_casual">Casual</string>
     <string name="chip_formal">Formal</string>
     <string name="clear_input">Clear input</string>
+    <string name="clear_logs">Clear Logs</string>
     <string name="clear_text_end_icon_content_description">Clear text</string>
     <string name="connection_test_failed">Connection failed: %1$s</string>
     <string name="connection_test_success">Connection successful!</string>
@@ -2087,6 +2088,7 @@
     <string name="input_required">Please enter some text or URL</string>
     <string name="invalid_url">Could not extract content from URL</string>
     <string name="item_view_role_description">Tab</string>
+    <string name="logs_cleared">Logs cleared</string>
     <string name="m3_exceed_max_badge_text_suffix" translatable="false"><ns2:g example="Some te" id="part of a long text">%1$s</ns2:g><ns2:g example="…" id="suffix">%2$s</ns2:g></string>
     <string name="m3_ref_typeface_brand_medium" translatable="false">sans-serif-medium</string>
     <string name="m3_ref_typeface_brand_regular" translatable="false">sans-serif</string>
@@ -2203,6 +2205,7 @@
     <string name="nav_usage">Usage</string>
     <string name="network_error">Network error. Please check your connection.</string>
     <string name="no_active_pill">No pill selected</string>
+    <string name="no_logs">No logs recorded</string>
     <string name="no_recent_activity">No recent activity yet</string>
     <string name="notification_action_copy">Copy</string>
     <string name="notification_action_open">Open</string>

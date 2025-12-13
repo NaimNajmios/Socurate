@@ -243,6 +243,84 @@ public class UsageStats {
         }
     }
 
+    /**
+     * A log entry for tracking app/API events and errors.
+     */
+    public static class LogEntry {
+        public static final String LEVEL_INFO = "INFO";
+        public static final String LEVEL_WARNING = "WARN";
+        public static final String LEVEL_ERROR = "ERROR";
+        public static final String LEVEL_DEBUG = "DEBUG";
+
+        private long timestamp;
+        private String level;
+        private String tag;
+        private String message;
+        private String details;
+
+        public LogEntry() {
+        }
+
+        public LogEntry(String level, String tag, String message, String details) {
+            this.timestamp = System.currentTimeMillis();
+            this.level = level;
+            this.tag = tag;
+            this.message = message;
+            this.details = details;
+        }
+
+        public static LogEntry info(String tag, String message) {
+            return new LogEntry(LEVEL_INFO, tag, message, null);
+        }
+
+        public static LogEntry warning(String tag, String message, String details) {
+            return new LogEntry(LEVEL_WARNING, tag, message, details);
+        }
+
+        public static LogEntry error(String tag, String message, String details) {
+            return new LogEntry(LEVEL_ERROR, tag, message, details);
+        }
+
+        public static LogEntry debug(String tag, String message) {
+            return new LogEntry(LEVEL_DEBUG, tag, message, null);
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public String getLevel() {
+            return level;
+        }
+
+        public String getTag() {
+            return tag;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getDetails() {
+            return details;
+        }
+
+        public String getFormattedTime() {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+            return sdf.format(new Date(timestamp));
+        }
+
+        public String getFormattedDate() {
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, HH:mm:ss", Locale.getDefault());
+            return sdf.format(new Date(timestamp));
+        }
+    }
+
+    // ==================== LOG ENTRIES ====================
+
+    private List<LogEntry> logs;
+    private static final int MAX_LOGS = 100;
+
     // ==================== CONSTRUCTOR ====================
 
     public UsageStats() {
@@ -273,6 +351,7 @@ public class UsageStats {
         this.providerStats = new HashMap<>();
         this.modelStats = new HashMap<>();
         this.recentSessions = new ArrayList<>();
+        this.logs = new ArrayList<>();
     }
 
     // ==================== TIME HELPERS ====================
@@ -467,6 +546,75 @@ public class UsageStats {
         this.providerStats = new HashMap<>();
         this.modelStats = new HashMap<>();
         this.recentSessions = new ArrayList<>();
+        // Note: logs are NOT reset when resetting stats - use clearLogs() separately
+    }
+
+    // ==================== LOG METHODS ====================
+
+    /**
+     * Adds a log entry.
+     */
+    public void addLog(LogEntry entry) {
+        if (logs == null) {
+            logs = new ArrayList<>();
+        }
+        logs.add(0, entry); // Add at beginning (newest first)
+        // Keep only last MAX_LOGS
+        while (logs.size() > MAX_LOGS) {
+            logs.remove(logs.size() - 1);
+        }
+    }
+
+    /**
+     * Convenience method to add an info log.
+     */
+    public void logInfo(String tag, String message) {
+        addLog(LogEntry.info(tag, message));
+    }
+
+    /**
+     * Convenience method to add a warning log.
+     */
+    public void logWarning(String tag, String message, String details) {
+        addLog(LogEntry.warning(tag, message, details));
+    }
+
+    /**
+     * Convenience method to add an error log.
+     */
+    public void logError(String tag, String message, String details) {
+        addLog(LogEntry.error(tag, message, details));
+    }
+
+    /**
+     * Gets all log entries.
+     */
+    public List<LogEntry> getLogs() {
+        return logs != null ? logs : new ArrayList<>();
+    }
+
+    /**
+     * Clears all log entries.
+     */
+    public void clearLogs() {
+        if (logs != null) {
+            logs.clear();
+        }
+    }
+
+    /**
+     * Gets the number of error logs.
+     */
+    public int getErrorCount() {
+        if (logs == null)
+            return 0;
+        int count = 0;
+        for (LogEntry log : logs) {
+            if (LogEntry.LEVEL_ERROR.equals(log.getLevel())) {
+                count++;
+            }
+        }
+        return count;
     }
 
     // ==================== GETTERS ====================

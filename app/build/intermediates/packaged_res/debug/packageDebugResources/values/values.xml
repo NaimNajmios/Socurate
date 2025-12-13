@@ -59,6 +59,7 @@
     <string name="chip_casual">Casual</string>
     <string name="chip_formal">Formal</string>
     <string name="clear_input">Clear input</string>
+    <string name="clear_logs">Clear Logs</string>
     <string name="connection_test_failed">Connection failed: %1$s</string>
     <string name="connection_test_success">Connection successful!</string>
     <string name="content_copied_notification">Content copied!</string>
@@ -102,6 +103,7 @@
     <string name="input_hint">Paste article text or URL here…</string>
     <string name="input_required">Please enter some text or URL</string>
     <string name="invalid_url">Could not extract content from URL</string>
+    <string name="logs_cleared">Logs cleared</string>
     <string name="model_2_0_flash">Gemini 2.0 Flash</string>
     <string name="model_2_5_flash">Gemini 2.5 Flash</string>
     <string name="model_2_5_flash_lite">Gemini 2.5 Flash Lite</string>
@@ -112,6 +114,7 @@
     <string name="nav_usage">Usage</string>
     <string name="network_error">Network error. Please check your connection.</string>
     <string name="no_active_pill">No pill selected</string>
+    <string name="no_logs">No logs recorded</string>
     <string name="no_recent_activity">No recent activity yet</string>
     <string name="notification_action_copy">Copy</string>
     <string name="notification_action_open">Open</string>

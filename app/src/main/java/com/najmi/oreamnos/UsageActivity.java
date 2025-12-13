@@ -70,6 +70,13 @@ public class UsageActivity extends AppCompatActivity {
     private TextView emptySessionsText;
     private SessionAdapter sessionAdapter;
 
+    // Logs
+    private RecyclerView logsRecyclerView;
+    private TextView emptyLogsText;
+    private TextView logCountBadge;
+    private LogAdapter logAdapter;
+    private MaterialButton clearLogsButton;
+
     // Reset button
     private MaterialButton resetStatsButton;
 
@@ -89,6 +96,7 @@ public class UsageActivity extends AppCompatActivity {
 
         initViews();
         setupResetButton();
+        setupClearLogsButton();
         refreshStats();
     }
 
@@ -137,8 +145,17 @@ public class UsageActivity extends AppCompatActivity {
         sessionAdapter = new SessionAdapter();
         sessionsRecyclerView.setAdapter(sessionAdapter);
 
-        // Reset button
+        // Logs
+        logsRecyclerView = findViewById(R.id.logsRecyclerView);
+        emptyLogsText = findViewById(R.id.emptyLogsText);
+        logCountBadge = findViewById(R.id.logCountBadge);
+        logsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        logAdapter = new LogAdapter();
+        logsRecyclerView.setAdapter(logAdapter);
+
+        // Buttons
         resetStatsButton = findViewById(R.id.resetStatsButton);
+        clearLogsButton = findViewById(R.id.clearLogsButton);
     }
 
     private void setupResetButton() {
@@ -150,6 +167,21 @@ public class UsageActivity extends AppCompatActivity {
                         prefsManager.resetUsageStats();
                         refreshStats();
                         Toast.makeText(this, R.string.stats_reset, Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
+    }
+
+    private void setupClearLogsButton() {
+        clearLogsButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.clear_logs)
+                    .setMessage("Are you sure you want to clear all logs?")
+                    .setPositiveButton("Clear", (dialog, which) -> {
+                        prefsManager.clearLogs();
+                        refreshStats();
+                        Toast.makeText(this, R.string.logs_cleared, Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton("Cancel", null)
                     .show();
@@ -184,6 +216,9 @@ public class UsageActivity extends AppCompatActivity {
 
         // Sessions
         updateSessionsList(stats);
+
+        // Logs
+        updateLogsList(stats);
     }
 
     private void updateTokenBreakdown(UsageStats stats) {
@@ -253,6 +288,23 @@ public class UsageActivity extends AppCompatActivity {
             emptySessionsText.setVisibility(View.GONE);
             sessionsRecyclerView.setVisibility(View.VISIBLE);
             sessionAdapter.setSessions(sessions);
+        }
+    }
+
+    private void updateLogsList(UsageStats stats) {
+        List<UsageStats.LogEntry> logs = stats.getLogs();
+
+        // Update count badge
+        int count = logs != null ? logs.size() : 0;
+        logCountBadge.setText(String.format(Locale.US, "%d entries", count));
+
+        if (logs == null || logs.isEmpty()) {
+            emptyLogsText.setVisibility(View.VISIBLE);
+            logsRecyclerView.setVisibility(View.GONE);
+        } else {
+            emptyLogsText.setVisibility(View.GONE);
+            logsRecyclerView.setVisibility(View.VISIBLE);
+            logAdapter.setLogs(logs);
         }
     }
 
@@ -365,6 +417,94 @@ public class UsageActivity extends AppCompatActivity {
                 if (s == null || s.isEmpty())
                     return s;
                 return s.substring(0, 1).toUpperCase() + s.substring(1);
+            }
+        }
+    }
+
+    // ==================== LOG ADAPTER ====================
+
+    private static class LogAdapter extends RecyclerView.Adapter<LogAdapter.LogViewHolder> {
+
+        private List<UsageStats.LogEntry> logs;
+
+        public void setLogs(List<UsageStats.LogEntry> logs) {
+            this.logs = logs;
+            notifyDataSetChanged();
+        }
+
+        @NonNull
+        @Override
+        public LogViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_log_entry, parent, false);
+            return new LogViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull LogViewHolder holder, int position) {
+            if (logs == null || position >= logs.size())
+                return;
+            UsageStats.LogEntry log = logs.get(position);
+            holder.bind(log);
+        }
+
+        @Override
+        public int getItemCount() {
+            return logs != null ? logs.size() : 0;
+        }
+
+        static class LogViewHolder extends RecyclerView.ViewHolder {
+            private final TextView levelBadge;
+            private final TextView tagText;
+            private final TextView timeText;
+            private final TextView messageText;
+
+            LogViewHolder(@NonNull View itemView) {
+                super(itemView);
+                levelBadge = itemView.findViewById(R.id.levelBadge);
+                tagText = itemView.findViewById(R.id.tagText);
+                timeText = itemView.findViewById(R.id.timeText);
+                messageText = itemView.findViewById(R.id.messageText);
+            }
+
+            void bind(UsageStats.LogEntry log) {
+                // Level badge
+                String level = log.getLevel();
+                levelBadge.setText(level);
+
+                // Set badge background based on level
+                int badgeRes;
+                switch (level) {
+                    case UsageStats.LogEntry.LEVEL_ERROR:
+                        badgeRes = R.drawable.log_badge_error;
+                        break;
+                    case UsageStats.LogEntry.LEVEL_WARNING:
+                        badgeRes = R.drawable.log_badge_warn;
+                        break;
+                    case UsageStats.LogEntry.LEVEL_DEBUG:
+                        badgeRes = R.drawable.log_badge_debug;
+                        break;
+                    case UsageStats.LogEntry.LEVEL_INFO:
+                    default:
+                        badgeRes = R.drawable.log_badge_info;
+                        break;
+                }
+                levelBadge.setBackgroundResource(badgeRes);
+
+                // Tag
+                tagText.setText(log.getTag() != null ? log.getTag() : "App");
+
+                // Time
+                timeText.setText(log.getFormattedTime());
+
+                // Message
+                String msg = log.getMessage();
+                String details = log.getDetails();
+                if (details != null && !details.isEmpty()) {
+                    messageText.setText(msg + ": " + details);
+                } else {
+                    messageText.setText(msg);
+                }
             }
         }
     }

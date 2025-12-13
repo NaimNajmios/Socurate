@@ -202,6 +202,9 @@
     <string name="this_month">This Month</string>
     <string name="all_time">All Time</string>
     <string name="no_recent_activity">No recent activity yet</string>
+    <string name="no_logs">No logs recorded</string>
+    <string name="clear_logs">Clear Logs</string>
+    <string name="logs_cleared">Logs cleared</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_generate">Generate</string>

@@ -610,4 +610,42 @@ public class PreferencesManager {
     public void resetUsageStats() {
         saveUsageStats(new com.najmi.oreamnos.model.UsageStats());
     }
+
+    // ==================== LOG METHODS ====================
+
+    /**
+     * Logs an info message.
+     */
+    public void logInfo(String tag, String message) {
+        com.najmi.oreamnos.model.UsageStats stats = getUsageStats();
+        stats.logInfo(tag, message);
+        saveUsageStats(stats);
+    }
+
+    /**
+     * Logs a warning message.
+     */
+    public void logWarning(String tag, String message, String details) {
+        com.najmi.oreamnos.model.UsageStats stats = getUsageStats();
+        stats.logWarning(tag, message, details);
+        saveUsageStats(stats);
+    }
+
+    /**
+     * Logs an error message.
+     */
+    public void logError(String tag, String message, String details) {
+        com.najmi.oreamnos.model.UsageStats stats = getUsageStats();
+        stats.logError(tag, message, details);
+        saveUsageStats(stats);
+    }
+
+    /**
+     * Clears all logs.
+     */
+    public void clearLogs() {
+        com.najmi.oreamnos.model.UsageStats stats = getUsageStats();
+        stats.clearLogs();
+        saveUsageStats(stats);
+    }
 }

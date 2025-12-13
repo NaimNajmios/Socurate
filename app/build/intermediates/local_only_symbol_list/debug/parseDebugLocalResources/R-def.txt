@@ -65,6 +65,10 @@ drawable ic_share
 drawable ic_sparkle
 drawable ic_stadium
 drawable ic_usage
+drawable log_badge_debug
+drawable log_badge_error
+drawable log_badge_info
+drawable log_badge_warn
 drawable pill_button_dark
 drawable pill_button_green
 drawable shimmer_placeholder
@@ -95,6 +99,7 @@ id chipRecheckWording
 id chipRephrase
 id chipShortenDetailed
 id clearInputButton
+id clearLogsButton
 id closeButton
 id continueButton
 id copyButton
@@ -104,6 +109,7 @@ id dialogTitle
 id editButton
 id editPillButton
 id editedIndicator
+id emptyLogsText
 id emptyPillsText
 id emptySessionsText
 id emptyStateMessage
@@ -132,6 +138,10 @@ id inputCard
 id inputCharCount
 id inputHeader
 id inputText
+id levelBadge
+id logCountBadge
+id logsRecyclerView
+id messageText
 id modelDropdown
 id modelDropdownLayout
 id monthRequests
@@ -188,11 +198,13 @@ id sourceEnabledSwitch
 id statusIndicator
 id successRateValue
 id successfulRequestsValue
+id tagText
 id testConnectionButton
 id themeDark
 id themeLight
 id themeRadioGroup
 id themeSystem
+id timeText
 id timestampText
 id todayRequests
 id todayTokens
@@ -216,6 +228,7 @@ layout activity_usage
 layout bottom_sheet_pill_selector
 layout dialog_create_pill
 layout fragment_share_bottom_sheet
+layout item_log_entry
 layout item_pill_settings
 layout item_session_entry
 layout layout_empty_state
@@ -244,6 +257,7 @@ string cancel_edit
 string chip_casual
 string chip_formal
 string clear_input
+string clear_logs
 string connection_test_failed
 string connection_test_success
 string content_copied_notification
@@ -287,6 +301,7 @@ string input_cleared
 string input_hint
 string input_required
 string invalid_url
+string logs_cleared
 string model_2_0_flash
 string model_2_5_flash
 string model_2_5_flash_lite
@@ -297,6 +312,7 @@ string nav_settings
 string nav_usage
 string network_error
 string no_active_pill
+string no_logs
 string no_recent_activity
 string notification_action_copy
 string notification_action_open
