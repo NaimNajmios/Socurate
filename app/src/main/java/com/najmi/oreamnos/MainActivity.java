@@ -87,10 +87,10 @@ public class MainActivity extends AppCompatActivity {
     private Chip checkConversational;
     private Chip checkShortenDetailed;
     private MaterialButton regenerateButton;
-    private MaterialButton applyPillButton;
 
-    // Pill selector
-    private Chip pillSelectorChip;
+    // Custom refinement pills
+    private ChipGroup customPillChips;
+    private Chip addCustomPillChip;
 
     // Error state UI
     private MaterialCardView errorCard;
@@ -199,20 +199,17 @@ public class MainActivity extends AppCompatActivity {
         checkConversational = findViewById(R.id.checkConversational);
         checkShortenDetailed = findViewById(R.id.checkShortenDetailed);
         regenerateButton = findViewById(R.id.regenerateButton);
-        applyPillButton = findViewById(R.id.applyPillButton);
 
-        // Pill selector
-        pillSelectorChip = findViewById(R.id.pillSelectorChip);
-        pillSelectorChip.setOnClickListener(v -> showPillSelectorBottomSheet());
+        // Custom refinement pills
+        customPillChips = findViewById(R.id.customPillChips);
+        addCustomPillChip = findViewById(R.id.addCustomPillChip);
+        addCustomPillChip.setOnClickListener(v -> showCreateCustomPillDialog(null));
 
         // Error state UI
         errorCard = findViewById(R.id.errorCard);
         errorMessage = findViewById(R.id.errorMessage);
         tryAgainButton = findViewById(R.id.tryAgainButton);
         tryAgainButton.setOnClickListener(v -> onTryAgainClick());
-
-        // Apply Pill button
-        applyPillButton.setOnClickListener(v -> applyPillToRefinements());
 
         // Setup button listeners
         generateFab.setOnClickListener(v -> {
@@ -430,8 +427,8 @@ public class MainActivity extends AppCompatActivity {
         includeHashtagsCheckbox.setVisibility(
                 !prefsManager.getHashtags().isEmpty() ? View.VISIBLE : View.GONE);
 
-        // Update pill selector chip display
-        updatePillChipDisplay();
+        // Load custom refinement pills
+        loadCustomPillChips();
 
         // Check clipboard for football URLs
         checkClipboardForFootballUrl();
@@ -1133,128 +1130,6 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(mode);
     }
 
-    // ==================== PILL SELECTOR ====================
-
-    /**
-     * Updates the pill selector chip to display the active pill.
-     */
-    private void updatePillChipDisplay() {
-        GenerationPill activePill = prefsManager.getActivePill();
-        if (activePill != null) {
-            pillSelectorChip.setText(activePill.getName());
-            // Use a tinted background to indicate active pill
-            pillSelectorChip.setChipBackgroundColorResource(android.R.color.holo_green_dark);
-            pillSelectorChip.setTextColor(getResources().getColor(android.R.color.white, getTheme()));
-            // Show Apply Pill button in refinement section
-            applyPillButton.setVisibility(View.VISIBLE);
-            applyPillButton.setText(getString(R.string.apply_pill) + ": " + activePill.getName());
-        } else {
-            pillSelectorChip.setText(R.string.no_active_pill);
-            pillSelectorChip.setChipBackgroundColorResource(android.R.color.transparent);
-            pillSelectorChip.setTextColor(getResources().getColor(android.R.color.darker_gray, getTheme()));
-            // Hide Apply Pill button when no active pill
-            applyPillButton.setVisibility(View.GONE);
-        }
-    }
-
-    /**
-     * Applies the active pill's refinements to the refinement chips.
-     */
-    private void applyPillToRefinements() {
-        GenerationPill activePill = prefsManager.getActivePill();
-        if (activePill == null) {
-            Toast.makeText(this, R.string.no_active_pill, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Clear current selections
-        clearRefinementCheckboxes();
-
-        // Apply pill refinements
-        List<String> refinements = activePill.getRefinements();
-        for (String refinement : refinements) {
-            switch (refinement) {
-                case "rephrase":
-                    checkRephrase.setChecked(true);
-                    break;
-                case "recheck_flow":
-                    checkRecheckFlow.setChecked(true);
-                    break;
-                case "recheck_wording":
-                    checkRecheckWording.setChecked(true);
-                    break;
-                case "shorten_detailed":
-                    checkShortenDetailed.setChecked(true);
-                    break;
-            }
-        }
-
-        // Apply tone-based refinements
-        String tone = activePill.getTone();
-        if ("formal".equals(tone)) {
-            checkFormal.setChecked(true);
-        } else if ("casual".equals(tone)) {
-            checkConversational.setChecked(true);
-        }
-
-        Toast.makeText(this, R.string.pill_applied, Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-     * Shows the bottom sheet for pill selection.
-     */
-    private void showPillSelectorBottomSheet() {
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
-        View sheetView = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_pill_selector, null);
-        dialog.setContentView(sheetView);
-
-        ChipGroup pillChipGroup = sheetView.findViewById(R.id.pillChipGroup);
-        TextView emptyText = sheetView.findViewById(R.id.emptyPillsText);
-
-        List<GenerationPill> pills = prefsManager.getPills();
-        String activePillId = prefsManager.getActivePillId();
-
-        if (pills.isEmpty()) {
-            emptyText.setVisibility(View.VISIBLE);
-            pillChipGroup.setVisibility(View.GONE);
-        } else {
-            emptyText.setVisibility(View.GONE);
-            pillChipGroup.setVisibility(View.VISIBLE);
-
-            // Add "None" chip
-            Chip noneChip = new Chip(this);
-            noneChip.setText(R.string.no_active_pill);
-            noneChip.setCheckable(true);
-            noneChip.setChecked(activePillId == null);
-            noneChip.setOnClickListener(v -> {
-                prefsManager.saveActivePillId(null);
-                Toast.makeText(this, R.string.pill_cleared, Toast.LENGTH_SHORT).show();
-                updatePillChipDisplay();
-                dialog.dismiss();
-            });
-            pillChipGroup.addView(noneChip);
-
-            // Add pill chips
-            for (GenerationPill pill : pills) {
-                Chip chip = new Chip(this);
-                chip.setText(pill.getName());
-                chip.setCheckable(true);
-                chip.setChecked(pill.getId().equals(activePillId));
-
-                chip.setOnClickListener(v -> {
-                    prefsManager.saveActivePillId(pill.getId());
-                    Toast.makeText(this, R.string.pill_set_active, Toast.LENGTH_SHORT).show();
-                    updatePillChipDisplay();
-                    dialog.dismiss();
-                });
-
-                pillChipGroup.addView(chip);
-            }
-        }
-
-        dialog.show();
-    }
-
     /**
      * Sets up the bottom navigation with click listeners.
      */
@@ -1409,5 +1284,160 @@ public class MainActivity extends AppCompatActivity {
         if (url.length() <= 60)
             return url;
         return url.substring(0, 57) + "...";
+    }
+
+    // ==================== CUSTOM REFINEMENT PILLS ====================
+
+    /**
+     * Shows dialog to create or edit a custom refinement pill.
+     */
+    private void showCreateCustomPillDialog(com.najmi.oreamnos.model.GenerationPill existingPill) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_create_pill, null);
+
+        TextView titleView = dialogView.findViewById(R.id.dialogTitle);
+        com.google.android.material.textfield.TextInputEditText nameInput = dialogView.findViewById(R.id.pillNameInput);
+        com.google.android.material.textfield.TextInputEditText commandInput = dialogView
+                .findViewById(R.id.pillCommandInput);
+        com.google.android.material.button.MaterialButton cancelButton = dialogView.findViewById(R.id.cancelButton);
+        com.google.android.material.button.MaterialButton saveButton = dialogView.findViewById(R.id.saveButton);
+
+        // Set title based on create or edit mode
+        boolean isEdit = existingPill != null;
+        titleView.setText(isEdit ? R.string.edit_custom_pill : R.string.create_custom_pill);
+
+        // Pre-fill if editing
+        if (isEdit) {
+            nameInput.setText(existingPill.getName());
+            commandInput.setText(existingPill.getCommand());
+        }
+
+        android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+
+        saveButton.setOnClickListener(v -> {
+            String name = nameInput.getText() != null ? nameInput.getText().toString().trim() : "";
+            String command = commandInput.getText() != null ? commandInput.getText().toString().trim() : "";
+
+            if (name.isEmpty() || command.isEmpty()) {
+                Toast.makeText(this, "Please enter both name and command", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            com.najmi.oreamnos.model.GenerationPill pill;
+            if (isEdit) {
+                pill = existingPill;
+                pill.setName(name);
+                pill.setCommand(command);
+            } else {
+                pill = new com.najmi.oreamnos.model.GenerationPill(name, command);
+            }
+
+            prefsManager.savePill(pill);
+            Toast.makeText(this, R.string.pill_saved, Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+            loadCustomPillChips();
+        });
+
+        dialog.show();
+    }
+
+    /**
+     * Loads custom pill chips from preferences and adds them to the ChipGroup.
+     */
+    private void loadCustomPillChips() {
+        // Remove all chips except the add button
+        int childCount = customPillChips.getChildCount();
+        for (int i = childCount - 1; i >= 0; i--) {
+            View child = customPillChips.getChildAt(i);
+            if (child.getId() != R.id.addCustomPillChip) {
+                customPillChips.removeView(child);
+            }
+        }
+
+        // Load pills and add chips
+        java.util.List<com.najmi.oreamnos.model.GenerationPill> pills = prefsManager.getPills();
+        for (com.najmi.oreamnos.model.GenerationPill pill : pills) {
+            Chip chip = new Chip(this);
+            chip.setText(pill.getName());
+            chip.setTag(pill);
+            chip.setCheckable(true);
+            chip.setChipBackgroundColorResource(R.color.chip_background_selector);
+            chip.setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, getTheme()));
+            chip.setChipStrokeWidth(1 * getResources().getDisplayMetrics().density); // 1dp
+            chip.setCheckedIconVisible(true);
+
+            // Long press to edit/delete
+            chip.setOnLongClickListener(v -> {
+                showPillOptionsMenu(pill, chip);
+                return true;
+            });
+
+            // Insert before add button
+            int addButtonIndex = customPillChips.indexOfChild(addCustomPillChip);
+            customPillChips.addView(chip, addButtonIndex);
+        }
+    }
+
+    /**
+     * Shows options menu (edit/delete) for a custom pill.
+     */
+    private void showPillOptionsMenu(com.najmi.oreamnos.model.GenerationPill pill, View anchor) {
+        android.widget.PopupMenu popup = new android.widget.PopupMenu(this, anchor);
+        popup.getMenu().add(0, 1, 0, R.string.edit_custom_pill);
+        popup.getMenu().add(0, 2, 0, R.string.pill_deleted);
+
+        popup.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == 1) {
+                showCreateCustomPillDialog(pill);
+                return true;
+            } else if (item.getItemId() == 2) {
+                confirmDeletePill(pill);
+                return true;
+            }
+            return false;
+        });
+
+        popup.show();
+    }
+
+    /**
+     * Shows confirmation dialog to delete a custom pill.
+     */
+    private void confirmDeletePill(com.najmi.oreamnos.model.GenerationPill pill) {
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.pill_deleted)
+                .setMessage(R.string.delete_pill_confirm)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    prefsManager.deletePill(pill.getId());
+                    Toast.makeText(this, R.string.pill_deleted, Toast.LENGTH_SHORT).show();
+                    loadCustomPillChips();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * Gets commands from all selected custom pill chips.
+     */
+    private java.util.List<String> getSelectedCustomPillCommands() {
+        java.util.List<String> commands = new java.util.ArrayList<>();
+        int childCount = customPillChips.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View child = customPillChips.getChildAt(i);
+            if (child instanceof Chip && child.getId() != R.id.addCustomPillChip) {
+                Chip chip = (Chip) child;
+                if (chip.isChecked()) {
+                    com.najmi.oreamnos.model.GenerationPill pill = (com.najmi.oreamnos.model.GenerationPill) chip
+                            .getTag();
+                    if (pill != null && pill.getCommand() != null && !pill.getCommand().isEmpty()) {
+                        commands.add(pill.getCommand());
+                    }
+                }
+            }
+        }
+        return commands;
     }
 }

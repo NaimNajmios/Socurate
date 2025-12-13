@@ -26,8 +26,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
-import com.najmi.oreamnos.adapters.PillAdapter;
-import com.najmi.oreamnos.model.GenerationPill;
+
 import com.najmi.oreamnos.model.UsageStats;
 import com.najmi.oreamnos.services.GeminiService;
 import com.najmi.oreamnos.utils.PreferencesManager;
@@ -133,12 +132,6 @@ public class SettingsActivity extends AppCompatActivity {
     // Flag to prevent auto-save during initial load
     private boolean isLoading = true;
 
-    // Pills section
-    private RecyclerView pillsRecyclerView;
-    private TextView pillsEmptyText;
-    private MaterialButton addPillButton;
-    private PillAdapter pillAdapter;
-
     private PreferencesManager prefsManager;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -179,17 +172,9 @@ public class SettingsActivity extends AppCompatActivity {
         sourceEnabledSwitch = findViewById(R.id.sourceEnabledSwitch);
         testConnectionButton = findViewById(R.id.testConnectionButton);
 
-        // Pills section views
-        pillsRecyclerView = findViewById(R.id.pillsRecyclerView);
-        pillsEmptyText = findViewById(R.id.pillsEmptyText);
-        addPillButton = findViewById(R.id.addPillButton);
-
         // Setup dropdowns
         setupProviderDropdown();
         setupModelDropdown();
-
-        // Setup pills section
-        setupPillsSection();
 
         // Load current settings
         loadSettings();
@@ -654,187 +639,11 @@ public class SettingsActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(mode);
     }
 
-    // ==================== PILLS MANAGEMENT ====================
-
-    /**
-     * Sets up the pills section with RecyclerView and adapter.
-     */
-    private void setupPillsSection() {
-        pillAdapter = new PillAdapter(new PillAdapter.OnPillActionListener() {
-            @Override
-            public void onPillClick(GenerationPill pill) {
-                showPillDialog(pill);
-            }
-
-            @Override
-            public void onPillEdit(GenerationPill pill) {
-                showPillDialog(pill);
-            }
-
-            @Override
-            public void onPillDelete(GenerationPill pill) {
-                confirmDeletePill(pill);
-            }
-
-            @Override
-            public void onPillSetActive(GenerationPill pill) {
-                String currentActive = prefsManager.getActivePillId();
-                if (pill.getId().equals(currentActive)) {
-                    // Toggle off if already active
-                    prefsManager.saveActivePillId(null);
-                    Toast.makeText(SettingsActivity.this, R.string.pill_cleared, Toast.LENGTH_SHORT).show();
-                } else {
-                    prefsManager.saveActivePillId(pill.getId());
-                    Toast.makeText(SettingsActivity.this, R.string.pill_set_active, Toast.LENGTH_SHORT).show();
-                }
-                refreshPills();
-            }
-        });
-
-        pillsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        pillsRecyclerView.setAdapter(pillAdapter);
-
-        // Add pill button
-        addPillButton.setOnClickListener(v -> showPillDialog(null));
-
-        // Initial load
-        refreshPills();
-    }
-
-    /**
-     * Refreshes the pills list from preferences.
-     */
-    private void refreshPills() {
-        List<GenerationPill> pills = prefsManager.getPills();
-        pillAdapter.setPills(pills);
-        pillAdapter.setActivePillId(prefsManager.getActivePillId());
-
-        // Show/hide empty state
-        if (pills.isEmpty()) {
-            pillsEmptyText.setVisibility(View.VISIBLE);
-            pillsRecyclerView.setVisibility(View.GONE);
-        } else {
-            pillsEmptyText.setVisibility(View.GONE);
-            pillsRecyclerView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    /**
-     * Shows the create/edit pill dialog.
-     */
-    private void showPillDialog(GenerationPill existingPill) {
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_create_pill, null);
-        dialog.setContentView(dialogView);
-
-        // Get views
-        TextView titleText = dialogView.findViewById(R.id.dialogTitle);
-        TextInputEditText nameInput = dialogView.findViewById(R.id.pillNameInput);
-        RadioGroup toneRadioGroup = dialogView.findViewById(R.id.toneRadioGroup);
-        Chip chipRephrase = dialogView.findViewById(R.id.chipRephrase);
-        Chip chipRecheckFlow = dialogView.findViewById(R.id.chipRecheckFlow);
-        Chip chipRecheckWording = dialogView.findViewById(R.id.chipRecheckWording);
-        Chip chipShortenDetailed = dialogView.findViewById(R.id.chipShortenDetailed);
-        TextInputEditText customInstructionInput = dialogView.findViewById(R.id.customInstructionInput);
-        MaterialButton cancelButton = dialogView.findViewById(R.id.cancelButton);
-        MaterialButton saveButton = dialogView.findViewById(R.id.saveButton);
-
-        // Setup for edit mode
-        final GenerationPill pill;
-        if (existingPill != null) {
-            pill = existingPill;
-            titleText.setText(R.string.edit_pill);
-            nameInput.setText(pill.getName());
-
-            // Set tone
-            if ("casual".equals(pill.getTone())) {
-                toneRadioGroup.check(R.id.toneCasual);
-            } else {
-                toneRadioGroup.check(R.id.toneFormal);
-            }
-
-            // Set refinements
-            List<String> refinements = pill.getRefinements();
-            chipRephrase.setChecked(refinements.contains("rephrase"));
-            chipRecheckFlow.setChecked(refinements.contains("recheck_flow"));
-            chipRecheckWording.setChecked(refinements.contains("recheck_wording"));
-            chipShortenDetailed.setChecked(refinements.contains("shorten_detailed"));
-
-            // Set custom instruction
-            customInstructionInput.setText(pill.getCustomInstruction());
-        } else {
-            pill = new GenerationPill();
-            titleText.setText(R.string.create_pill);
-        }
-
-        // Cancel button
-        cancelButton.setOnClickListener(v -> dialog.dismiss());
-
-        // Save button
-        saveButton.setOnClickListener(v -> {
-            String name = nameInput.getText() != null ? nameInput.getText().toString().trim() : "";
-
-            if (name.isEmpty()) {
-                nameInput.setError("Name is required");
-                return;
-            }
-
-            // Get tone
-            String tone = toneRadioGroup.getCheckedRadioButtonId() == R.id.toneCasual ? "casual" : "formal";
-
-            // Get refinements
-            List<String> refinements = new ArrayList<>();
-            if (chipRephrase.isChecked())
-                refinements.add("rephrase");
-            if (chipRecheckFlow.isChecked())
-                refinements.add("recheck_flow");
-            if (chipRecheckWording.isChecked())
-                refinements.add("recheck_wording");
-            if (chipShortenDetailed.isChecked())
-                refinements.add("shorten_detailed");
-
-            // Get custom instruction
-            String customInstruction = customInstructionInput.getText() != null
-                    ? customInstructionInput.getText().toString().trim()
-                    : "";
-
-            // Update pill
-            pill.setName(name);
-            pill.setTone(tone);
-            pill.setRefinements(refinements);
-            pill.setCustomInstruction(customInstruction);
-
-            // Save
-            prefsManager.savePill(pill);
-            Toast.makeText(this, R.string.pill_saved, Toast.LENGTH_SHORT).show();
-
-            dialog.dismiss();
-            refreshPills();
-        });
-
-        dialog.show();
-    }
-
-    /**
-     * Shows confirmation dialog for deleting a pill.
-     */
-    private void confirmDeletePill(GenerationPill pill) {
-        new AlertDialog.Builder(this)
-                .setTitle("Delete Pill")
-                .setMessage("Delete \"" + pill.getName() + "\"?")
-                .setPositiveButton("Delete", (d, which) -> {
-                    prefsManager.deletePill(pill.getId());
-                    Toast.makeText(this, R.string.pill_deleted, Toast.LENGTH_SHORT).show();
-                    refreshPills();
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
-    }
-
     @Override
     protected void onDestroy() {
         Log.i(TAG, "=== SettingsActivity onDestroy ===");
         super.onDestroy();
         executor.shutdown();
     }
+
 }

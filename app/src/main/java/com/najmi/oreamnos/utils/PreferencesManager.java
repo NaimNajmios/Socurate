@@ -432,13 +432,12 @@ public class PreferencesManager {
         return securePrefs.getString(key, defaultModel);
     }
 
-    // ==================== GENERATION PILLS ====================
+    // ==================== CUSTOM REFINEMENT PILLS ====================
 
     private static final String KEY_PILLS = "generation_pills";
-    private static final String KEY_ACTIVE_PILL_ID = "active_pill_id";
 
     /**
-     * Saves all generation pills.
+     * Saves all custom refinement pills.
      * 
      * @param pills List of pills to save
      */
@@ -450,7 +449,7 @@ public class PreferencesManager {
     }
 
     /**
-     * Retrieves all saved generation pills.
+     * Retrieves all saved custom refinement pills.
      * 
      * @return List of pills, empty list if none saved
      */
@@ -494,53 +493,6 @@ public class PreferencesManager {
         java.util.List<com.najmi.oreamnos.model.GenerationPill> pills = getPills();
         pills.removeIf(p -> p.getId().equals(pillId));
         savePills(pills);
-
-        // Clear active pill if it was deleted
-        String activePillId = getActivePillId();
-        if (pillId.equals(activePillId)) {
-            saveActivePillId(null);
-        }
-    }
-
-    /**
-     * Saves the currently active pill ID.
-     * 
-     * @param pillId ID of active pill, or null to clear
-     */
-    public void saveActivePillId(String pillId) {
-        securePrefs.edit()
-                .putString(KEY_ACTIVE_PILL_ID, pillId)
-                .apply();
-    }
-
-    /**
-     * Gets the currently active pill ID.
-     * 
-     * @return Active pill ID, or null if none
-     */
-    public String getActivePillId() {
-        return securePrefs.getString(KEY_ACTIVE_PILL_ID, null);
-    }
-
-    /**
-     * Gets the currently active pill.
-     * 
-     * @return Active pill, or null if none
-     */
-    public com.najmi.oreamnos.model.GenerationPill getActivePill() {
-        String activePillId = getActivePillId();
-        if (activePillId == null) {
-            return null;
-        }
-
-        java.util.List<com.najmi.oreamnos.model.GenerationPill> pills = getPills();
-        for (com.najmi.oreamnos.model.GenerationPill pill : pills) {
-            if (pill.getId().equals(activePillId)) {
-                return pill;
-            }
-        }
-
-        return null;
     }
 
     /**

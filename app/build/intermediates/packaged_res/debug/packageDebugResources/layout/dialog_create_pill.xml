@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:text="@string/create_pill"
+        android:text="@string/create_custom_pill"
         android:textColor="?attr/colorOnSurface"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -36,125 +36,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
+            android:maxLength="20"
             android:textColor="?attr/colorOnSurface" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Tone Selection -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/tone_label"
-        android:textColor="?attr/colorOnSurface"
-        android:textSize="14sp" />
-
-    <RadioGroup
-        android:id="@+id/toneRadioGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:orientation="horizontal">
-
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/toneFormal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:checked="true"
-            android:text="@string/tone_formal"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="14sp"
-            app:buttonTint="?attr/colorPrimary" />
-
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/toneCasual"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/tone_casual"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="14sp"
-            app:buttonTint="?attr/colorPrimary" />
-
-    </RadioGroup>
-
-    <!-- Refinements -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/pill_refinements"
-        android:textColor="?attr/colorOnSurface"
-        android:textSize="14sp" />
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/refinementsChipGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:chipSpacingVertical="4dp"
-        app:singleLine="false">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipRephrase"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/refine_rephrase"
-            android:textColor="@color/chip_text_color_selector"
-            app:checkedIconTint="?attr/colorOnPrimary"
-            app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/chip_background_selector"
-            app:chipStrokeColor="?attr/colorOutline"
-            app:chipStrokeWidth="1dp" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipRecheckFlow"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/refine_recheck_flow"
-            android:textColor="@color/chip_text_color_selector"
-            app:checkedIconTint="?attr/colorOnPrimary"
-            app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/chip_background_selector"
-            app:chipStrokeColor="?attr/colorOutline"
-            app:chipStrokeWidth="1dp" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipRecheckWording"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/refine_recheck_wording"
-            android:textColor="@color/chip_text_color_selector"
-            app:checkedIconTint="?attr/colorOnPrimary"
-            app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/chip_background_selector"
-            app:chipStrokeColor="?attr/colorOutline"
-            app:chipStrokeWidth="1dp" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipShortenDetailed"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/refine_shorten_detailed"
-            android:textColor="@color/chip_text_color_selector"
-            app:checkedIconTint="?attr/colorOnPrimary"
-            app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/chip_background_selector"
-            app:chipStrokeColor="?attr/colorOutline"
-            app:chipStrokeWidth="1dp" />
-
-    </com.google.android.material.chip.ChipGroup>
-
-    <!-- Custom Instruction -->
+    <!-- Command (AI instruction) -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:hint="@string/pill_custom_instruction_hint"
+        android:hint="@string/pill_command_hint"
         app:boxBackgroundMode="outline"
         app:boxCornerRadiusBottomEnd="12dp"
         app:boxCornerRadiusBottomStart="12dp"
@@ -164,7 +56,7 @@
         app:hintTextColor="?attr/colorOnSurfaceVariant">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/customInstructionInput"
+            android:id="@+id/pillCommandInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="top|start"
@@ -196,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="?attr/colorPrimary"
-            android:text="@string/save_settings"
+            android:text="@android:string/ok"
             android:textColor="?attr/colorOnPrimary"
             app:cornerRadius="20dp" />
 

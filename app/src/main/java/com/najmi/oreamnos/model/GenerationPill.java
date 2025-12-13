@@ -9,30 +9,25 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Represents a Generation Pill - a preset combination of generation options.
- * Pills allow users to quickly apply saved settings like tone, refinements,
- * and custom instructions when generating posts.
+ * Represents a Custom Refinement Pill - a user-defined refinement command.
+ * Pills appear as selectable chips alongside built-in refinements (Rephrase,
+ * etc.).
  */
 public class GenerationPill {
 
     private String id;
-    private String name;
-    private String tone; // "formal" or "casual"
-    private List<String> refinements;
-    private String customInstruction;
+    private String name; // Display label (e.g., "Punchy")
+    private String command; // AI instruction (e.g., "Make it punchy and engaging")
 
     // Required for Gson deserialization
     public GenerationPill() {
         this.id = UUID.randomUUID().toString();
-        this.refinements = new ArrayList<>();
     }
 
-    public GenerationPill(String name, String tone) {
+    public GenerationPill(String name, String command) {
         this.id = UUID.randomUUID().toString();
         this.name = name;
-        this.tone = tone;
-        this.refinements = new ArrayList<>();
-        this.customInstruction = "";
+        this.command = command;
     }
 
     // Getters
@@ -44,16 +39,8 @@ public class GenerationPill {
         return name;
     }
 
-    public String getTone() {
-        return tone;
-    }
-
-    public List<String> getRefinements() {
-        return refinements != null ? refinements : new ArrayList<>();
-    }
-
-    public String getCustomInstruction() {
-        return customInstruction;
+    public String getCommand() {
+        return command;
     }
 
     // Setters
@@ -65,48 +52,8 @@ public class GenerationPill {
         this.name = name;
     }
 
-    public void setTone(String tone) {
-        this.tone = tone;
-    }
-
-    public void setRefinements(List<String> refinements) {
-        this.refinements = refinements != null ? refinements : new ArrayList<>();
-    }
-
-    public void setCustomInstruction(String customInstruction) {
-        this.customInstruction = customInstruction;
-    }
-
-    /**
-     * Returns a display-friendly summary of the pill's options.
-     */
-    public String getOptionsSummary() {
-        StringBuilder summary = new StringBuilder();
-
-        // Add tone
-        if (tone != null && !tone.isEmpty()) {
-            summary.append(tone.substring(0, 1).toUpperCase())
-                    .append(tone.substring(1));
-        }
-
-        // Add refinement count
-        int refCount = getRefinements().size();
-        if (refCount > 0) {
-            if (summary.length() > 0)
-                summary.append(" • ");
-            summary.append(refCount).append(" refinement");
-            if (refCount > 1)
-                summary.append("s");
-        }
-
-        // Indicate custom instruction
-        if (customInstruction != null && !customInstruction.trim().isEmpty()) {
-            if (summary.length() > 0)
-                summary.append(" • ");
-            summary.append("Custom");
-        }
-
-        return summary.length() > 0 ? summary.toString() : "Default settings";
+    public void setCommand(String command) {
+        this.command = command;
     }
 
     /**

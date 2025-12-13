@@ -71,25 +71,6 @@
                             android:textSize="16sp"
                             android:textStyle="bold" />
 
-                        <!-- Active Pill Indicator -->
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/pillSelectorChip"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:layout_marginStart="12dp"
-                            android:text="@string/no_active_pill"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="11sp"
-                            app:chipBackgroundColor="?attr/colorSurfaceVariant"
-                            app:chipCornerRadius="16dp"
-                            app:chipIcon="@drawable/ic_settings"
-                            app:chipIconSize="14dp"
-                            app:chipIconTint="?attr/colorOnSurfaceVariant"
-                            app:chipMinHeight="28dp"
-                            app:chipMinTouchTargetSize="0dp"
-                            app:chipStrokeWidth="0dp"
-                            app:ensureMinTouchTargetSize="false" />
-
                         <View
                             android:layout_width="0dp"
                             android:layout_height="0dp"
@@ -663,42 +644,22 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Refine Draft Header with Apply Pill Button -->
-                    <LinearLayout
+                    <!-- Refine Draft Header -->
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
+                        android:layout_marginBottom="12dp"
+                        android:text="@string/refine_section"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/refine_section"
-                            android:textColor="?attr/colorPrimary"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/applyPillButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:text="@string/apply_pill"
-                            android:textSize="11sp"
-                            android:visibility="gone"
-                            style="@style/Widget.Material3.Button.TonalButton"
-                            app:cornerRadius="16dp"
-                            app:icon="@android:drawable/ic_menu_preferences"
-                            app:iconSize="14dp" />
-
-                    </LinearLayout>
-
-                    <!-- Refinement Chips -->
+                    <!-- Built-in Refinement Chips -->
                     <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/builtInRefinementChips"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginBottom="8dp"
                         app:singleLine="false"
                         app:chipSpacingVertical="8dp">
 
@@ -779,6 +740,31 @@
                             app:chipStrokeWidth="1dp"
                             app:checkedIconVisible="true"
                             app:checkedIconTint="?attr/colorOnPrimary" />
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <!-- Custom Refinement Pills (dynamically added) -->
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/customPillChips"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:singleLine="false"
+                        app:chipSpacingVertical="8dp">
+
+                        <!-- + Add Custom Pill chip -->
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/addCustomPillChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/add_custom_pill"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            style="@style/Widget.Material3.Chip.Assist"
+                            app:chipBackgroundColor="?attr/colorSurfaceVariant"
+                            app:chipIcon="@android:drawable/ic_input_add"
+                            app:chipIconTint="?attr/colorOnSurfaceVariant"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp" />
 
                     </com.google.android.material.chip.ChipGroup>
 
