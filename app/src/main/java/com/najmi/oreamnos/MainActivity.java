@@ -18,7 +18,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.OvershootInterpolator;
 import android.os.Handler;
+import android.os.Looper;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -101,6 +103,16 @@ public class MainActivity extends AppCompatActivity {
     private TextView errorMessage;
     private MaterialButton tryAgainButton;
     private boolean lastOperationWasRefinement = false;
+
+    // URL Preview
+    private MaterialCardView urlPreviewCard;
+    private ImageView previewFavicon;
+    private TextView previewTitle;
+    private TextView previewDomain;
+    private ImageButton closePreviewButton;
+    private String detectedUrl = "";
+    private Handler urlCheckHandler = new Handler(Looper.getMainLooper());
+    private Runnable urlCheckRunnable;
 
     private PreferencesManager prefsManager;
     private NotificationHelper notificationHelper;
@@ -195,6 +207,13 @@ public class MainActivity extends AppCompatActivity {
         keepStructureSwitch = findViewById(R.id.keepStructureSwitch);
         generateFab = findViewById(R.id.generateFab);
 
+        // URL Preview
+        urlPreviewCard = findViewById(R.id.urlPreviewCard);
+        previewFavicon = findViewById(R.id.previewFavicon);
+        previewTitle = findViewById(R.id.previewTitle);
+        previewDomain = findViewById(R.id.previewDomain);
+        closePreviewButton = findViewById(R.id.closePreviewButton);
+
         // Refinement UI
         refinementCard = findViewById(R.id.refinementCard);
         checkRephrase = findViewById(R.id.checkRephrase);
@@ -230,6 +249,12 @@ public class MainActivity extends AppCompatActivity {
         pasteButton.setOnClickListener(v -> onPasteClick());
         regenerateButton.setOnClickListener(v -> onRegenerateClick());
 
+        // Close preview button
+        closePreviewButton.setOnClickListener(v -> {
+            urlPreviewCard.setVisibility(View.GONE);
+            detectedUrl = "";
+        });
+
         // Watch for text changes to update character count
         inputText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -238,6 +263,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Debounce URL check
+                if (urlCheckRunnable != null) {
+                    urlCheckHandler.removeCallbacks(urlCheckRunnable);
+                }
+                urlCheckRunnable = () -> checkAndPreviewUrl(s.toString());
+                urlCheckHandler.postDelayed(urlCheckRunnable, 500);
             }
 
             @Override
@@ -649,8 +680,89 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets the output text with optional hashtags.
+     * Checks if the input text contains a URL and shows a preview if found.
      */
+    private void checkAndPreviewUrl(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            runOnUiThread(() -> {
+                if (urlPreviewCard != null)
+                    urlPreviewCard.setVisibility(View.GONE);
+            });
+            return;
+        }
+
+        // Simple check if text IS a URL (not just contains one)
+        // We only want to trigger this if the user pasted a link directly
+        if (com.najmi.oreamnos.services.WebContentExtractor.isUrl(text)) {
+            String url = text.trim();
+            if (!url.equals(detectedUrl)) {
+                detectedUrl = url;
+                fetchUrlMetadata(url);
+            }
+        } else {
+            runOnUiThread(() -> {
+                if (urlPreviewCard != null)
+                    urlPreviewCard.setVisibility(View.GONE);
+            });
+            detectedUrl = "";
+        }
+    }
+
+    /**
+     * Fetches metadata for the URL and updates the preview card.
+     */
+    private void fetchUrlMetadata(String url) {
+        // Show loading state in preview card? Or just wait?
+        // For now, let's just fetch silently and show when ready
+
+        java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            try {
+                com.najmi.oreamnos.services.WebContentExtractor extractor = new com.najmi.oreamnos.services.WebContentExtractor();
+                com.najmi.oreamnos.services.WebContentExtractor.UrlMetadata metadata = extractor.extractMetadata(url);
+
+                new Handler(Looper.getMainLooper()).post(() -> showUrlPreview(metadata));
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to fetch metadata: " + e.getMessage());
+                // Don't show error, just don't show preview
+            } finally {
+                executor.shutdown();
+            }
+        });
+    }
+
+    /**
+     * Updates the UI with the URL metadata.
+     */
+    private void showUrlPreview(com.najmi.oreamnos.services.WebContentExtractor.UrlMetadata metadata) {
+        if (isFinishing() || isDestroyed())
+            return;
+
+        previewTitle.setText(metadata.title != null ? metadata.title : "No Title");
+        previewDomain.setText(metadata.domain);
+
+        // Load favicon (placeholder for now, would need an image loading library like
+        // Glide/Picasso)
+        // Since we don't have Glide, we'll try to load it manually or just show the
+        // domain icon
+        // For this implementation, we'll stick to the default icon but if we had Glide:
+        // Glide.with(this).load(metadata.faviconUrl).into(previewFavicon);
+
+        urlPreviewCard.setVisibility(View.VISIBLE);
+
+        // Show Snackbar to prompt generation
+        com.google.android.material.snackbar.Snackbar
+                .make(generateFab, "Link detected. Generate post?",
+                        com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+                .setAction("Generate", v -> {
+                    // Apply spring animation to FAB
+                    applyFabSpringAnimation(generateFab);
+                    onGenerateClick();
+                })
+                .setAnchorView(generateFab)
+                .show();
+    }
+
     private void setOutputText(String text) {
         outputText.setText(text);
         outputText.setFocusable(false);

@@ -200,6 +200,99 @@ public class WebContentExtractor {
     }
 
     /**
+     * Extracts metadata (title, favicon, domain) from a URL.
+     */
+    public UrlMetadata extractMetadata(String url) throws Exception {
+        if (url == null || url.trim().isEmpty()) {
+            throw new Exception("URL cannot be empty");
+        }
+
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "https://" + url;
+        }
+
+        String html = fetchHtml(url);
+        Document doc = Jsoup.parse(html);
+
+        String title = null;
+        String faviconUrl = null;
+
+        // Extract Title
+        Element ogTitle = doc.selectFirst("meta[property=og:title]");
+        if (ogTitle != null) {
+            title = ogTitle.attr("content");
+        }
+        if (title == null || title.isEmpty()) {
+            title = doc.title();
+        }
+
+        // Extract Favicon
+        // Try apple-touch-icon first (usually higher res)
+        Element appleIcon = doc.selectFirst("link[rel=apple-touch-icon]");
+        if (appleIcon != null) {
+            faviconUrl = appleIcon.attr("href");
+        }
+
+        // Try standard icon
+        if (faviconUrl == null) {
+            Element icon = doc.selectFirst("link[rel~=icon]"); // matches "icon", "shortcut icon"
+            if (icon != null) {
+                faviconUrl = icon.attr("href");
+            }
+        }
+
+        // Try og:image as fallback
+        if (faviconUrl == null) {
+            Element ogImage = doc.selectFirst("meta[property=og:image]");
+            if (ogImage != null) {
+                faviconUrl = ogImage.attr("content");
+            }
+        }
+
+        // Resolve relative URLs for favicon
+        if (faviconUrl != null && !faviconUrl.startsWith("http")) {
+            try {
+                java.net.URL baseUrl = new java.net.URL(url);
+                java.net.URL absoluteUrl = new java.net.URL(baseUrl, faviconUrl);
+                faviconUrl = absoluteUrl.toString();
+            } catch (Exception e) {
+                Log.e(TAG, "Error resolving favicon URL: " + e.getMessage());
+            }
+        }
+
+        // Extract Domain
+        String domain = "";
+        try {
+            java.net.URL netUrl = new java.net.URL(url);
+            domain = netUrl.getHost();
+            if (domain.startsWith("www.")) {
+                domain = domain.substring(4);
+            }
+        } catch (Exception e) {
+            domain = url;
+        }
+
+        return new UrlMetadata(title, faviconUrl, domain, url);
+    }
+
+    /**
+     * Data class for URL metadata.
+     */
+    public static class UrlMetadata {
+        public final String title;
+        public final String faviconUrl;
+        public final String domain;
+        public final String originalUrl;
+
+        public UrlMetadata(String title, String faviconUrl, String domain, String originalUrl) {
+            this.title = title;
+            this.faviconUrl = faviconUrl;
+            this.domain = domain;
+            this.originalUrl = originalUrl;
+        }
+    }
+
+    /**
      * Checks if a string looks like a URL.
      */
     public static boolean isUrl(String text) {

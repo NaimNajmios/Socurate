@@ -146,6 +146,79 @@
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
 
+                    <!-- URL Preview Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/urlPreviewCard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="4dp"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                        app:cardCornerRadius="12dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="12dp"
+                            android:gravity="center_vertical">
+
+                            <!-- Favicon -->
+                            <ImageView
+                                android:id="@+id/previewFavicon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@android:drawable/ic_menu_compass"
+                                android:scaleType="centerCrop"
+                                android:background="@drawable/rounded_bg_surface"
+                                android:padding="4dp"
+                                app:tint="?attr/colorPrimary" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/previewTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Page Title"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:maxLines="1"
+                                    android:ellipsize="end" />
+
+                                <TextView
+                                    android:id="@+id/previewDomain"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="example.com"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="12sp"
+                                    android:alpha="0.7"
+                                    android:maxLines="1"
+                                    android:ellipsize="end" />
+                            </LinearLayout>
+
+                            <ImageButton
+                                android:id="@+id/closePreviewButton"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                                android:scaleType="centerInside"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/keepStructureSwitch"
                         android:layout_width="match_parent"

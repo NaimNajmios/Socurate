@@ -3162,6 +3162,7 @@ drawable notify_panel_notification_icon_bg
 drawable output_card_glow
 drawable pill_button_dark
 drawable pill_button_green
+drawable rounded_bg_surface
 drawable shimmer_placeholder
 drawable shimmer_placeholder_chip
 drawable skeleton_item
@@ -3312,6 +3313,7 @@ id clip_horizontal
 id clip_vertical
 id clockwise
 id closeButton
+id closePreviewButton
 id closest
 id collapseActionView
 id compress
@@ -3615,6 +3617,9 @@ id position
 id postLayout
 id pressed
 id previewCard
+id previewDomain
+id previewFavicon
+id previewTitle
 id progressOverlay
 id progressText
 id progress_circular
@@ -3791,6 +3796,7 @@ id unchecked
 id uniform
 id unlabeled
 id up
+id urlPreviewCard
 id useLogo
 id vertical_only
 id view_offset_helper

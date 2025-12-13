@@ -80,6 +80,7 @@ drawable log_badge_warn
 drawable output_card_glow
 drawable pill_button_dark
 drawable pill_button_green
+drawable rounded_bg_surface
 drawable shimmer_placeholder
 drawable shimmer_placeholder_chip
 drawable skeleton_item
@@ -107,6 +108,7 @@ id chipFormal
 id clearInputButton
 id clearLogsButton
 id closeButton
+id closePreviewButton
 id continueButton
 id copyButton
 id customPillChips
@@ -175,6 +177,9 @@ id pillCommandInput
 id pillNameInput
 id placeholderView
 id previewCard
+id previewDomain
+id previewFavicon
+id previewTitle
 id progressOverlay
 id progressText
 id promptTokensBar
@@ -222,6 +227,7 @@ id toneToggleContainer
 id toolbar
 id totalTokensValue
 id tryAgainButton
+id urlPreviewCard
 id weekRequests
 id weekTokens
 layout activity_main
