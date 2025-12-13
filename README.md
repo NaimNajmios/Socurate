@@ -73,7 +73,14 @@ A sleek, modern Android application that transforms global football news into po
   - **Make Formal**: Adjust tone for official communication
   - **Make Conversational**: Shift tone for fan engagement
   - **Shorten But Detailed**: Make more concise while keeping all important details
+- **Custom Refinement Pills**: Create your own reusable refinement commands
 - **One-Click Regeneration**: Apply selected refinements instantly
+
+### 💊 Custom Refinement Pills (NEW)
+- **Create Custom Commands**: Define your own refinement instructions (e.g., "Make it punchy")
+- **Selectable Chips**: Custom pills appear alongside built-in refinements
+- **Easy Management**: Tap "+" to create, long-press to edit/delete
+- **Reusable**: Save frequently-used instructions for quick access
 
 ## 🎯 Core Features
 
@@ -185,9 +192,13 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
    - **Make Formal**: Elevate tone for professional contexts
    - **Make Conversational**: Relax tone for fan communities
    - **Shorten But Detailed**: Make concise while keeping key information
-3. Tap "Regenerate" to apply improvements
-4. Refinement checkboxes auto-clear after each regeneration
-5. Repeat as needed for perfect results
+3. **Custom Pills** (optional):
+   - Tap "+" to create a custom refinement (e.g., "Make it punchy")
+   - Select your saved custom pills alongside built-in options
+   - Long-press any custom pill to edit or delete
+4. Tap "Regenerate" to apply improvements
+5. Refinement checkboxes auto-clear after each regeneration
+6. Repeat as needed for perfect results
 
 ### Quick Edit Mode
 

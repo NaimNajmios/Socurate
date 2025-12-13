@@ -173,7 +173,7 @@
     <string name="pill_name_hint">Name (e.g., Punchy)</string>
     <string name="pill_command_hint">Command (e.g., Make it punchy and engaging)</string>
     <string name="pill_saved">Custom refinement saved</string>
-    <string name="pill_deleted">Custom refinement deleted</string>
+    <string name="pill_deleted">Delete Custom Refinement</string>
     <string name="delete_pill_confirm">Delete this custom refinement?</string>
 
     <!-- Usage Stats -->
