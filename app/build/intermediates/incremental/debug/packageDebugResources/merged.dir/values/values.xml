@@ -60,6 +60,10 @@
     <string name="chip_formal">Formal</string>
     <string name="clear_input">Clear input</string>
     <string name="clear_logs">Clear Logs</string>
+    <string name="clipboard_dismiss">Dismiss</string>
+    <string name="clipboard_generate">Generate</string>
+    <string name="clipboard_url_detected">Football URL Detected</string>
+    <string name="clipboard_url_message">Generate a post from the copied URL?</string>
     <string name="connection_test_failed">Connection failed: %1$s</string>
     <string name="connection_test_success">Connection successful!</string>
     <string name="content_copied_notification">Content copied!</string>
@@ -199,6 +203,9 @@
     <string name="theme_system">Follow System</string>
     <string name="this_month">This Month</string>
     <string name="this_week">This Week</string>
+    <string name="tile_generating">Generating…</string>
+    <string name="tile_label">Socurate</string>
+    <string name="tile_no_clipboard">No URL in clipboard</string>
     <string name="today">Today</string>
     <string name="token_breakdown">Token Breakdown</string>
     <string name="tone_casual">Casual (Fan Banter)</string>

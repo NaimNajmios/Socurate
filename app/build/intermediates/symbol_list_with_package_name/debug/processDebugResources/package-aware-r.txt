@@ -3075,6 +3075,7 @@ drawable ic_settings
 drawable ic_share
 drawable ic_sparkle
 drawable ic_stadium
+drawable ic_tile
 drawable ic_usage
 drawable log_badge_debug
 drawable log_badge_error
@@ -4077,6 +4078,10 @@ string chip_formal
 string clear_input
 string clear_logs
 string clear_text_end_icon_content_description
+string clipboard_dismiss
+string clipboard_generate
+string clipboard_url_detected
+string clipboard_url_message
 string connection_test_failed
 string connection_test_success
 string content_copied_notification
@@ -4336,6 +4341,9 @@ string theme_section
 string theme_system
 string this_month
 string this_week
+string tile_generating
+string tile_label
+string tile_no_clipboard
 string today
 string token_breakdown
 string tone_casual

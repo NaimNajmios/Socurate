@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
     // Markwon for markdown rendering
     private Markwon markwon;
     private String rawOutputText = ""; // Store raw markdown text for editing
+    private String lastClipboardUrl = ""; // Track last clipboard URL to avoid repeat prompts
 
     /**
      * BroadcastReceiver for handling results from ContentGenerationService.
@@ -431,6 +432,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Update pill selector chip display
         updatePillChipDisplay();
+
+        // Check clipboard for football URLs
+        checkClipboardForFootballUrl();
     }
 
     @Override
@@ -1290,5 +1294,120 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.i(TAG, "=== MainActivity onDestroy ===");
         super.onDestroy();
+    }
+
+    // ==================== CLIPBOARD URL DETECTION ====================
+
+    /**
+     * Checks clipboard for football-related URLs and shows a dialog to generate.
+     */
+    private void checkClipboardForFootballUrl() {
+        // Don't show if input already has content
+        String currentInput = inputText.getText() != null ? inputText.getText().toString().trim() : "";
+        if (!currentInput.isEmpty()) {
+            return;
+        }
+
+        // Get clipboard content
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard == null || !clipboard.hasPrimaryClip()) {
+            return;
+        }
+
+        ClipData clip = clipboard.getPrimaryClip();
+        if (clip == null || clip.getItemCount() == 0) {
+            return;
+        }
+
+        CharSequence clipText = clip.getItemAt(0).getText();
+        if (clipText == null) {
+            return;
+        }
+
+        String url = clipText.toString().trim();
+
+        // Check if it's a URL
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            return;
+        }
+
+        // Don't show again for the same URL
+        if (url.equals(lastClipboardUrl)) {
+            return;
+        }
+
+        // Check if it's a football-related URL
+        if (!isFootballUrl(url)) {
+            return;
+        }
+
+        // Update last clipboard URL
+        lastClipboardUrl = url;
+
+        // Show dialog
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.clipboard_url_detected)
+                .setMessage(getString(R.string.clipboard_url_message) + "\n\n" + truncateUrl(url))
+                .setPositiveButton(R.string.clipboard_generate, (dialog, which) -> {
+                    inputText.setText(url);
+                    onGenerateClick();
+                })
+                .setNegativeButton(R.string.clipboard_dismiss, null)
+                .show();
+    }
+
+    /**
+     * Checks if a URL is likely a football-related site.
+     */
+    private boolean isFootballUrl(String url) {
+        if (url == null)
+            return false;
+        String lower = url.toLowerCase();
+
+        // Football news sites
+        String[] footballDomains = {
+                "skysports.com", "bbc.com/sport", "bbc.co.uk/sport",
+                "theathletic.com", "goal.com", "espn.com/soccer", "espnfc.com",
+                "90min.com", "football365.com", "fourfourtwo.com",
+                "transfermarkt.com", "whoscored.com", "sofascore.com",
+                "theguardian.com/football", "mirror.co.uk/sport/football",
+                "telegraph.co.uk/football", "dailymail.co.uk/sport/football",
+                "independent.co.uk/sport/football", "sportingnews.com/soccer",
+                "footballtransfers.com", "fabrizio romano", "football.london",
+                "manutd.com", "liverpoolfc.com", "mancity.com", "arsenal.com",
+                "chelseafc.com", "tottenhamhotspur.com", "fcbarcelona.com",
+                "realmadrid.com", "juventus.com", "psg.fr", "bayernmunich.com"
+        };
+
+        for (String domain : footballDomains) {
+            if (lower.contains(domain)) {
+                return true;
+            }
+        }
+
+        // Also check for common football keywords in URL path
+        String[] footballKeywords = {
+                "/football/", "/soccer/", "/premier-league/", "/la-liga/",
+                "/bundesliga/", "/serie-a/", "/champions-league/", "/transfers/"
+        };
+
+        for (String keyword : footballKeywords) {
+            if (lower.contains(keyword)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Truncates URL for display in dialog.
+     */
+    private String truncateUrl(String url) {
+        if (url == null)
+            return "";
+        if (url.length() <= 60)
+            return url;
+        return url.substring(0, 57) + "...";
     }
 }

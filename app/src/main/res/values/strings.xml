@@ -206,6 +206,17 @@
     <string name="clear_logs">Clear Logs</string>
     <string name="logs_cleared">Logs cleared</string>
 
+    <!-- Clipboard Prompt -->
+    <string name="clipboard_url_detected">Football URL Detected</string>
+    <string name="clipboard_url_message">Generate a post from the copied URL?</string>
+    <string name="clipboard_generate">Generate</string>
+    <string name="clipboard_dismiss">Dismiss</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_label">Socurate</string>
+    <string name="tile_generating">Generating…</string>
+    <string name="tile_no_clipboard">No URL in clipboard</string>
+
     <!-- Bottom Navigation -->
     <string name="nav_generate">Generate</string>
     <string name="nav_usage">Usage</string>
