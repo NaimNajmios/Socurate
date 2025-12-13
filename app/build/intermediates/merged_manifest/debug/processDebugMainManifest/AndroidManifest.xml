@@ -29,6 +29,7 @@
         android:icon="@mipmap/oreamnos_white"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:testOnly="true"
         android:theme="@style/Theme.Oreamnos"
         android:usesCleartextTraffic="false" >
 
@@ -65,6 +66,14 @@
             android:name="com.najmi.oreamnos.SettingsActivity"
             android:exported="false"
             android:label="@string/settings"
+            android:parentActivityName="com.najmi.oreamnos.MainActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
+        <!-- Usage Activity -->
+        <activity
+            android:name="com.najmi.oreamnos.UsageActivity"
+            android:exported="false"
+            android:label="@string/nav_usage"
             android:parentActivityName="com.najmi.oreamnos.MainActivity"
             android:theme="@style/Theme.Oreamnos" />
 

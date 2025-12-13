@@ -1266,10 +1266,11 @@ public class MainActivity extends AppCompatActivity {
             if (itemId == R.id.nav_generate) {
                 // Already on Generate screen - do nothing
                 return true;
-            } else if (itemId == R.id.nav_history) {
-                // History feature - show toast for now
-                Toast.makeText(this, "History feature coming soon!", Toast.LENGTH_SHORT).show();
-                // Keep Generate selected since we're not navigating
+            } else if (itemId == R.id.nav_usage) {
+                // Open Usage activity
+                Intent intent = new Intent(this, UsageActivity.class);
+                startActivity(intent);
+                // Keep Generate selected since Usage is a separate activity
                 bottomNav.setSelectedItemId(R.id.nav_generate);
                 return false;
             } else if (itemId == R.id.nav_settings) {

@@ -139,16 +139,6 @@ public class SettingsActivity extends AppCompatActivity {
     private MaterialButton addPillButton;
     private PillAdapter pillAdapter;
 
-    // Usage stats section
-    private TextView totalTokensValue;
-    private TextView promptTokensValue;
-    private TextView responseTokensValue;
-    private View promptTokensBar;
-    private View responseTokensBar;
-    private TextView successfulRequestsValue;
-    private TextView failedRequestsValue;
-    private MaterialButton resetStatsButton;
-
     private PreferencesManager prefsManager;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -200,9 +190,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Setup pills section
         setupPillsSection();
-
-        // Setup usage stats section
-        setupUsageStatsSection();
 
         // Load current settings
         loadSettings();
@@ -712,88 +699,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Initial load
         refreshPills();
-    }
-
-    // ==================== USAGE STATS MANAGEMENT ====================
-
-    /**
-     * Sets up the usage stats section.
-     */
-    private void setupUsageStatsSection() {
-        totalTokensValue = findViewById(R.id.totalTokensValue);
-        promptTokensValue = findViewById(R.id.promptTokensValue);
-        responseTokensValue = findViewById(R.id.responseTokensValue);
-        promptTokensBar = findViewById(R.id.promptTokensBar);
-        responseTokensBar = findViewById(R.id.responseTokensBar);
-        successfulRequestsValue = findViewById(R.id.successfulRequestsValue);
-        failedRequestsValue = findViewById(R.id.failedRequestsValue);
-        resetStatsButton = findViewById(R.id.resetStatsButton);
-
-        // Load current stats
-        refreshUsageStats();
-
-        // Reset button click listener
-        resetStatsButton.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle("Reset Statistics")
-                    .setMessage("Are you sure you want to reset all usage statistics?")
-                    .setPositiveButton("Reset", (dialog, which) -> {
-                        prefsManager.resetUsageStats();
-                        refreshUsageStats();
-                        Toast.makeText(this, R.string.stats_reset, Toast.LENGTH_SHORT).show();
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
-        });
-    }
-
-    /**
-     * Refreshes the usage stats display.
-     */
-    private void refreshUsageStats() {
-        UsageStats stats = prefsManager.getUsageStats();
-
-        // Update total tokens (large display)
-        totalTokensValue.setText(String.format("%,d", stats.getTotalTokens()));
-
-        // Update legend text
-        promptTokensValue.setText(String.format("Prompt: %,d", stats.getTotalPromptTokens()));
-        responseTokensValue.setText(String.format("Response: %,d", stats.getTotalCandidateTokens()));
-
-        // Update bar weights for visualization
-        long promptTokens = stats.getTotalPromptTokens();
-        long responseTokens = stats.getTotalCandidateTokens();
-        long totalTokens = promptTokens + responseTokens;
-
-        if (totalTokens > 0) {
-            float promptWeight = (float) promptTokens / totalTokens;
-            float responseWeight = (float) responseTokens / totalTokens;
-
-            android.widget.LinearLayout.LayoutParams promptParams = (android.widget.LinearLayout.LayoutParams) promptTokensBar
-                    .getLayoutParams();
-            promptParams.weight = promptWeight;
-            promptTokensBar.setLayoutParams(promptParams);
-
-            android.widget.LinearLayout.LayoutParams responseParams = (android.widget.LinearLayout.LayoutParams) responseTokensBar
-                    .getLayoutParams();
-            responseParams.weight = responseWeight;
-            responseTokensBar.setLayoutParams(responseParams);
-        } else {
-            // Equal weights when no data
-            android.widget.LinearLayout.LayoutParams promptParams = (android.widget.LinearLayout.LayoutParams) promptTokensBar
-                    .getLayoutParams();
-            promptParams.weight = 0.5f;
-            promptTokensBar.setLayoutParams(promptParams);
-
-            android.widget.LinearLayout.LayoutParams responseParams = (android.widget.LinearLayout.LayoutParams) responseTokensBar
-                    .getLayoutParams();
-            responseParams.weight = 0.5f;
-            responseTokensBar.setLayoutParams(responseParams);
-        }
-
-        // Update request counters
-        successfulRequestsValue.setText(String.valueOf(stats.getSuccessfulRequests()));
-        failedRequestsValue.setText(String.valueOf(stats.getFailedRequests()));
     }
 
     /**

@@ -572,21 +572,36 @@ public class PreferencesManager {
     }
 
     /**
-     * Records a successful API call with token usage.
+     * Records a successful API call with token usage and provider/model info.
      */
-    public void recordApiSuccess(int promptTokens, int candidateTokens, int totalTokens) {
+    public void recordApiSuccess(int promptTokens, int candidateTokens, int totalTokens,
+            String provider, String modelId, String modelName) {
         com.najmi.oreamnos.model.UsageStats stats = getUsageStats();
-        stats.recordSuccess(promptTokens, candidateTokens, totalTokens);
+        stats.recordSuccess(promptTokens, candidateTokens, totalTokens, provider, modelId, modelName);
         saveUsageStats(stats);
     }
 
     /**
-     * Records a failed API call.
+     * Records a successful API call with token usage (legacy, no provider info).
+     */
+    public void recordApiSuccess(int promptTokens, int candidateTokens, int totalTokens) {
+        recordApiSuccess(promptTokens, candidateTokens, totalTokens, getProvider(), null, null);
+    }
+
+    /**
+     * Records a failed API call with provider/model info.
+     */
+    public void recordApiFailure(String provider, String modelId, String modelName, String error) {
+        com.najmi.oreamnos.model.UsageStats stats = getUsageStats();
+        stats.recordFailure(provider, modelId, modelName, error);
+        saveUsageStats(stats);
+    }
+
+    /**
+     * Records a failed API call (legacy, no provider info).
      */
     public void recordApiFailure() {
-        com.najmi.oreamnos.model.UsageStats stats = getUsageStats();
-        stats.recordFailure();
-        saveUsageStats(stats);
+        recordApiFailure(getProvider(), null, null, null);
     }
 
     /**

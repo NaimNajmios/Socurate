@@ -49,6 +49,14 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.Oreamnos" />
 
+        <!-- Usage Activity -->
+        <activity
+            android:name=".UsageActivity"
+            android:exported="false"
+            android:label="@string/nav_usage"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
         <!-- Content Generation Foreground Service -->
         <service
             android:name=".services.ContentGenerationService"

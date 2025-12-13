@@ -7,9 +7,9 @@
         android:title="@string/nav_generate" />
 
     <item
-        android:id="@+id/nav_history"
-        android:icon="@drawable/ic_history"
-        android:title="@string/nav_history" />
+        android:id="@+id/nav_usage"
+        android:icon="@drawable/ic_usage"
+        android:title="@string/nav_usage" />
 
     <item
         android:id="@+id/nav_settings"

@@ -196,10 +196,16 @@
     <string name="failed_requests">Failed</string>
     <string name="reset_stats">Reset Statistics</string>
     <string name="stats_reset">Usage statistics reset</string>
+    <string name="success_rate">success rate</string>
+    <string name="today">Today</string>
+    <string name="this_week">This Week</string>
+    <string name="this_month">This Month</string>
+    <string name="all_time">All Time</string>
+    <string name="no_recent_activity">No recent activity yet</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_generate">Generate</string>
-    <string name="nav_history">History</string>
+    <string name="nav_usage">Usage</string>
     <string name="nav_settings">Settings</string>
     
     <!-- Empty States -->
@@ -214,4 +220,5 @@
     <string name="wait_button">Wait</string>
     <string name="go_to_settings">Go to Settings</string>
 </resources>
+
 

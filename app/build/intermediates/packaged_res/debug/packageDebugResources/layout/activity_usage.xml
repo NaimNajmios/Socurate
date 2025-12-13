@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    tools:context=".UsageActivity">
+
+    <!-- App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/colorBackground"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="@string/nav_usage"
+            app:titleTextColor="?attr/colorOnSurface"
+            app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
+            app:navigationIconTint="?attr/colorOnSurface" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Overview Card - Total Tokens & Success Rate -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <!-- Total Tokens Large Display -->
+                    <TextView
+                        android:id="@+id/totalTokensValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/colorOnPrimaryContainer"
+                        android:textSize="48sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total_tokens_label"
+                        android:textColor="?attr/colorOnPrimaryContainer"
+                        android:textSize="14sp"
+                        android:alpha="0.8"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Success Rate -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/successRateValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="100%"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/success_rate"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:textSize="12sp"
+                            android:alpha="0.8"
+                            android:layout_marginStart="8dp" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:id="@+id/requestsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 requests"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:textSize="12sp"
+                            android:alpha="0.8" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Time Period Section Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="USAGE BY TIME"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Time Period Cards Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <!-- Today -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="?attr/colorSurface"
+                    app:cardElevation="0dp"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="?attr/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/todayTokens"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/today"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/todayRequests"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 req"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="10sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- This Week -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="?attr/colorSurface"
+                    app:cardElevation="0dp"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="?attr/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/weekTokens"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/this_week"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/weekRequests"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 req"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="10sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- This Month -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="?attr/colorSurface"
+                    app:cardElevation="0dp"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="?attr/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/monthTokens"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/this_month"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/monthRequests"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 req"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="10sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- Token Breakdown Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TOKEN BREAKDOWN"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Stacked Bar -->
+                    <LinearLayout
+                        android:id="@+id/tokenBarContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="24dp"
+                        android:orientation="horizontal"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:layout_marginBottom="12dp">
+
+                        <View
+                            android:id="@+id/promptTokensBar"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/token_bar_prompt" />
+
+                        <View
+                            android:id="@+id/responseTokensBar"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/token_bar_response" />
+
+                    </LinearLayout>
+
+                    <!-- Legend -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:background="#4285F4" />
+
+                        <TextView
+                            android:id="@+id/promptTokensValue"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Prompt: 0"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp"
+                            android:layout_marginStart="8dp" />
+
+                        <View
+                            android:layout_width="12dp"
+                            android:layout_height="12dp"
+                            android:background="#34A853" />
+
+                        <TextView
+                            android:id="@+id/responseTokensValue"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Response: 0"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp"
+                            android:layout_marginStart="8dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- By Provider Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BY PROVIDER"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:id="@+id/providerStatsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Gemini Provider -->
+                    <LinearLayout
+                        android:id="@+id/geminiRow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
+
+                        <View
+                            android:layout_width="8dp"
+                            android:layout_height="32dp"
+                            android:background="#4285F4" />
+
+                        <TextView
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:text="Gemini"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp"
+                            android:layout_marginStart="12dp" />
+
+                        <ProgressBar
+                            android:id="@+id/geminiProgressBar"
+                            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="8dp"
+                            android:layout_weight="1"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#4285F4"
+                            android:progressBackgroundTint="?attr/colorSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/geminiTokens"
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp"
+                            android:gravity="end"
+                            android:layout_marginStart="8dp" />
+
+                    </LinearLayout>
+
+                    <!-- Groq Provider -->
+                    <LinearLayout
+                        android:id="@+id/groqRow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
+
+                        <View
+                            android:layout_width="8dp"
+                            android:layout_height="32dp"
+                            android:background="#FF6B35" />
+
+                        <TextView
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:text="Groq"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp"
+                            android:layout_marginStart="12dp" />
+
+                        <ProgressBar
+                            android:id="@+id/groqProgressBar"
+                            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="8dp"
+                            android:layout_weight="1"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#FF6B35"
+                            android:progressBackgroundTint="?attr/colorSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/groqTokens"
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp"
+                            android:gravity="end"
+                            android:layout_marginStart="8dp" />
+
+                    </LinearLayout>
+
+                    <!-- OpenRouter Provider -->
+                    <LinearLayout
+                        android:id="@+id/openRouterRow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp">
+
+                        <View
+                            android:layout_width="8dp"
+                            android:layout_height="32dp"
+                            android:background="#9B59B6" />
+
+                        <TextView
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:text="OpenRouter"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp"
+                            android:layout_marginStart="12dp" />
+
+                        <ProgressBar
+                            android:id="@+id/openRouterProgressBar"
+                            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="8dp"
+                            android:layout_weight="1"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#9B59B6"
+                            android:progressBackgroundTint="?attr/colorSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/openRouterTokens"
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp"
+                            android:gravity="end"
+                            android:layout_marginStart="8dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Recent Activity Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RECENT ACTIVITY"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Empty State -->
+                    <TextView
+                        android:id="@+id/emptySessionsText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/no_recent_activity"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="13sp"
+                        android:gravity="center"
+                        android:padding="32dp"
+                        android:visibility="visible" />
+
+                    <!-- Sessions List -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/sessionsRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Request Stats Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+
+                <!-- Successful Requests -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="?attr/colorSurface"
+                    app:cardElevation="0dp"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="?attr/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/successfulRequestsValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="#34A853"
+                            android:textSize="28sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/successful_requests"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp"
+                            android:gravity="center" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Failed Requests -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="?attr/colorSurface"
+                    app:cardElevation="0dp"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="?attr/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/failedRequestsValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="#EA4335"
+                            android:textSize="28sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/failed_requests"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp"
+                            android:gravity="center" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- Reset Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/resetStatsButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="@string/reset_stats"
+                android:textSize="13sp"
+                style="@style/Widget.Material3.Button.TonalButton"
+                app:cornerRadius="24dp" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
