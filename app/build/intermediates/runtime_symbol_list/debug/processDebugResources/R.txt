@@ -3447,6 +3447,7 @@ int id ignore 0x7f08010d
 int id ignoreRequest 0x7f08010e
 int id image 0x7f08010f
 int id immediateStop 0x7f080110
+int id includeEmojisCheckbox 0x7f080283
 int id includeHashtagsCheckbox 0x7f080111
 int id includeSourceCheckbox 0x7f080112
 int id includeTitleCheckbox 0x7f080113

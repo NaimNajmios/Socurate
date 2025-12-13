@@ -666,6 +666,20 @@
                             app:checkedIconVisible="true"
                             app:checkedIconTint="?attr/colorOnPrimary" />
 
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/includeEmojisCheckbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Include Emojis"
+                            android:textColor="@color/chip_text_color_selector"
+                            android:checked="true"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            app:chipBackgroundColor="@color/chip_background_selector"
+                            app:chipStrokeColor="?attr/colorOutline"
+                            app:chipStrokeWidth="1dp"
+                            app:checkedIconVisible="true"
+                            app:checkedIconTint="?attr/colorOnPrimary" />
+
                     </com.google.android.material.chip.ChipGroup>
 
                     <!-- Action Buttons -->

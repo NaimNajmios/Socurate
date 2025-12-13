@@ -98,7 +98,9 @@ public class PromptManager {
 
         prompt.append(nextNum).append(". Preserve key facts, names, dates, and statistics from the original\n");
         prompt.append(nextNum + 1).append(". Make the content engaging but maintain journalistic objectivity\n");
-        prompt.append(nextNum + 2)
+        prompt.append(nextNum + 2).append(
+                ". Start the Title and the FIRST paragraph of the body with a context-relevant emoji. Do NOT use emojis elsewhere.\n");
+        prompt.append(nextNum + 3)
                 .append(". The tone should be that of an official club announcement or news update\n\n");
 
         prompt.append("ORIGINAL ENGLISH TEXT:\n---\n")

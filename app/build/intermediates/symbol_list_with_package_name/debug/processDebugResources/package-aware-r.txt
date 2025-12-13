@@ -3448,6 +3448,7 @@ id ignore
 id ignoreRequest
 id image
 id immediateStop
+id includeEmojisCheckbox
 id includeHashtagsCheckbox
 id includeSourceCheckbox
 id includeTitleCheckbox

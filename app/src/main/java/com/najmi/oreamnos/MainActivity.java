@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     private Chip includeTitleCheckbox;
     private Chip includeHashtagsCheckbox;
     private Chip includeSourceCheckbox;
+    private Chip includeEmojisCheckbox;
     private MaterialSwitch keepStructureSwitch;
     private ExtendedFloatingActionButton generateFab;
 
@@ -204,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
         includeTitleCheckbox = findViewById(R.id.includeTitleCheckbox);
         includeHashtagsCheckbox = findViewById(R.id.includeHashtagsCheckbox);
         includeSourceCheckbox = findViewById(R.id.includeSourceCheckbox);
+        includeEmojisCheckbox = findViewById(R.id.includeEmojisCheckbox);
         keepStructureSwitch = findViewById(R.id.keepStructureSwitch);
         generateFab = findViewById(R.id.generateFab);
 
@@ -454,6 +456,11 @@ public class MainActivity extends AppCompatActivity {
             toggleTitle(isChecked);
         });
 
+        // Add listener for emojis toggling
+        includeEmojisCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            rebuildOutputText();
+        });
+
         // Update hashtags checkbox visibility
         includeHashtagsCheckbox.setVisibility(
                 !prefsManager.getHashtags().isEmpty() ? View.VISIBLE : View.GONE);
@@ -609,11 +616,29 @@ public class MainActivity extends AppCompatActivity {
 
         // Add title if checked and available
         if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
-            textBuilder.append(generatedTitle).append("\n\n");
+            String titleText = generatedTitle;
+            if (!includeEmojisCheckbox.isChecked()) {
+                titleText = stripLeadingEmojis(titleText);
+            }
+            textBuilder.append(titleText).append("\n\n");
         }
 
         // Add body
-        textBuilder.append(generatedBody);
+        String bodyText = generatedBody;
+        if (!includeEmojisCheckbox.isChecked()) {
+            // If emojis are disabled, strip them all
+            bodyText = stripLeadingEmojis(bodyText);
+        } else if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
+            // If emojis are enabled BUT title is shown (and has emoji),
+            // strip emoji from the body to avoid double emojis.
+            // The prompt puts emojis on BOTH Title and First Para, so we remove the Body
+            // one here.
+            bodyText = stripLeadingEmojis(bodyText);
+        }
+        // If emojis are enabled AND title is NOT shown, we keep the Body emoji (from
+        // the prompt).
+
+        textBuilder.append(bodyText);
 
         // Add source if checked and available
         if (includeSourceCheckbox.isChecked() && !generatedSourceCitation.isEmpty()) {
@@ -1568,6 +1593,33 @@ public class MainActivity extends AppCompatActivity {
         if (url.length() <= 60)
             return url;
         return url.substring(0, 57) + "...";
+    }
+
+    /**
+     * Strips leading emojis from paragraphs.
+     */
+    private String stripLeadingEmojis(String text) {
+        if (text == null || text.isEmpty())
+            return "";
+
+        // Regex to match emojis at the start of lines/paragraphs
+        // This regex matches common emoji ranges and whitespace
+        String emojiRegex = "^[\\uD83C\\uDF00-\\uD83D\\uDDFF\\uD83E\\uDD00-\\uD83E\\uDDFF\\uD83D\\uDE00-\\uD83D\\uDE4F\\uD83D\\uDE80-\\uD83D\\uDEFF\\u2600-\\u26FF\\u2700-\\u27BF]+\\s*";
+
+        StringBuilder sb = new StringBuilder();
+        String[] lines = text.split("\n");
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            // Replace leading emoji and whitespace
+            line = line.replaceAll(emojiRegex, "");
+            sb.append(line);
+            if (i < lines.length - 1) {
+                sb.append("\n");
+            }
+        }
+
+        return sb.toString();
     }
 
     // ==================== CUSTOM REFINEMENT PILLS ====================

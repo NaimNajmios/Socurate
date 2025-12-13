@@ -143,6 +143,7 @@ id groqProgressBar
 id groqRow
 id groqTokens
 id hashtagsInput
+id includeEmojisCheckbox
 id includeHashtagsCheckbox
 id includeSourceCheckbox
 id includeTitleCheckbox
