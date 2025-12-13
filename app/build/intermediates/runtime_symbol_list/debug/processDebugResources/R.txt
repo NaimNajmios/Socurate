@@ -3633,6 +3633,7 @@ int id providerStatsContainer 0x7f0801c6
 int id radial 0x7f0801c7
 int id radio 0x7f0801c8
 int id ratio 0x7f0801c9
+int id readabilityScore 0x7f080284
 int id rectangles 0x7f0801ca
 int id refinementCard 0x7f0801cb
 int id regenerateButton 0x7f0801cc

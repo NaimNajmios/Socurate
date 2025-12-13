@@ -189,6 +189,7 @@ id providerDropdown
 id providerDropdownLayout
 id providerModelText
 id providerStatsContainer
+id readabilityScore
 id refinementCard
 id regenerateButton
 id requestsCount

@@ -606,15 +606,32 @@
                     </ScrollView>
 
                     <!-- Word Count -->
-                    <TextView
-                        android:id="@+id/outputWordCount"
+                    <!-- Word Count and Readability Score -->
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
-                        android:text="0 words"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="12sp"
-                        android:layout_marginBottom="12dp" />
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:id="@+id/readabilityScore"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Grade: 0.0"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="16dp" />
+
+                        <TextView
+                            android:id="@+id/outputWordCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 words"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
 
                     <!-- Pill Checkboxes (Chips) -->
                     <com.google.android.material.chip.ChipGroup

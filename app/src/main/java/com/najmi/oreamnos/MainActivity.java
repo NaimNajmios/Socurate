@@ -47,6 +47,7 @@ import com.najmi.oreamnos.model.GenerationPill;
 import com.najmi.oreamnos.services.ContentGenerationService;
 import com.najmi.oreamnos.utils.NotificationHelper;
 import com.najmi.oreamnos.utils.PreferencesManager;
+import com.najmi.oreamnos.utils.ReadabilityUtils;
 import com.najmi.oreamnos.viewmodel.GenerationState;
 import com.najmi.oreamnos.viewmodel.MainViewModel;
 
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView progressText;
     private TextView inputCharCount;
     private TextView outputWordCount;
+    private TextView readabilityScore;
     private MaterialCardView outputCard;
     private MaterialCardView skeletonCard;
     private View progressOverlay;
@@ -196,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
         progressText = findViewById(R.id.progressText);
         inputCharCount = findViewById(R.id.inputCharCount);
         outputWordCount = findViewById(R.id.outputWordCount);
+        readabilityScore = findViewById(R.id.readabilityScore);
         clearInputButton = findViewById(R.id.clearInputButton);
         resetAllButton = findViewById(R.id.resetAllButton);
         pasteButton = findViewById(R.id.pasteButton);
@@ -302,6 +305,10 @@ public class MainActivity extends AppCompatActivity {
                 String text = s.toString().trim();
                 int wordCount = text.isEmpty() ? 0 : text.split("\\s+").length;
                 outputWordCount.setText(wordCount + " words");
+
+                // Update readability score
+                double score = ReadabilityUtils.calculateFleschKincaidGradeLevel(text);
+                readabilityScore.setText(String.format("Grade: %.1f", score));
             }
         });
 

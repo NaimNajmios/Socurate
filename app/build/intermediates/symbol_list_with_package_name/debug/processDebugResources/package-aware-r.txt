@@ -3634,6 +3634,7 @@ id providerStatsContainer
 id radial
 id radio
 id ratio
+id readabilityScore
 id rectangles
 id refinementCard
 id regenerateButton
