@@ -1610,8 +1610,8 @@ public class MainActivity extends AppCompatActivity {
             return "";
 
         // Regex to match emojis at the start of lines/paragraphs
-        // This regex matches common emoji ranges and whitespace
-        String emojiRegex = "^[\\uD83C\\uDF00-\\uD83D\\uDDFF\\uD83E\\uDD00-\\uD83E\\uDDFF\\uD83D\\uDE00-\\uD83D\\uDE4F\\uD83D\\uDE80-\\uD83D\\uDEFF\\u2600-\\u26FF\\u2700-\\u27BF]+\\s*";
+        // Matches surrogate pairs (most emojis) and common symbol ranges
+        String emojiRegex = "^([\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|[\\u2600-\\u27BF])+\\s*";
 
         StringBuilder sb = new StringBuilder();
         String[] lines = text.split("\n");

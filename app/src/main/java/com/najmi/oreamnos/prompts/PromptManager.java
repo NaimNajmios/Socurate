@@ -99,7 +99,7 @@ public class PromptManager {
         prompt.append(nextNum).append(". Preserve key facts, names, dates, and statistics from the original\n");
         prompt.append(nextNum + 1).append(". Make the content engaging but maintain journalistic objectivity\n");
         prompt.append(nextNum + 2).append(
-                ". Start the Title and the FIRST paragraph of the body with a HIGHLY context-specific and diverse emoji (e.g., use 🏥 for medical, 🌬️ or 📰 for rumors, 💰 for transfers, 🚨 for breaking news). Avoid generic emojis like ⚽ unless strictly relevant. Do NOT use emojis elsewhere.\n");
+                ". Start the Title with a HIGHLY context-specific and diverse emoji (e.g., 🏥, 🌬️, 💰, 🚨). ALSO start the FIRST paragraph of the body with a context-specific emoji. Do NOT use emojis elsewhere.\n");
         prompt.append(nextNum + 3)
                 .append(". The tone should be that of an official club announcement or news update\n\n");
 
@@ -173,7 +173,9 @@ public class PromptManager {
         prompt.append("\n---\n\n");
         prompt.append("Provide ONLY the refined Bahasa Malaysia post. ");
         prompt.append("Maintain the same length and structure. ");
-        prompt.append("Do NOT include any hashtags or explanations.");
+        prompt.append("Do NOT include any hashtags or explanations. ");
+        prompt.append(
+                "CRITICAL: You MUST include a context-relevant emoji at the start of the Title AND at the start of the First Paragraph of the body. Even if it seems redundant, you MUST do this.\n");
 
         if (includeSource) {
             prompt.append(
