@@ -108,6 +108,7 @@
     <string name="all_reset">Everything has been reset</string>
     <string name="paste_input">Paste</string>
     <string name="text_pasted">Text pasted</string>
+    <string name="close_preview">Close preview</string>
     
     <!-- Placeholder -->
     <string name="placeholder_title">Ready to curate. Paste a link to start.</string>
