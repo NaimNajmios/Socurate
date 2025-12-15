@@ -120,6 +120,7 @@
     <string name="try_again_button">Try Again</string>
     
     <!-- Accessibility -->
+    <string name="close_preview">Close preview</string>
     <string name="content_description_settings_icon">Settings</string>
     <string name="content_description_copy_icon">Copy to clipboard</string>
     <string name="content_description_share_icon">Share</string>
