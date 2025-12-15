@@ -8,6 +8,12 @@ import java.util.regex.Pattern;
  */
 public class ReadabilityUtils {
 
+    // Pre-compiled patterns for performance
+    private static final Pattern SENTENCE_SPLIT_PATTERN = Pattern.compile("[.!?]+");
+    private static final Pattern WORD_SPLIT_PATTERN = Pattern.compile("\\s+");
+    private static final Pattern NON_ALPHA_PATTERN = Pattern.compile("[^a-z]");
+    private static final Pattern VOWEL_PATTERN = Pattern.compile("[aeiouy]+");
+
     /**
      * Calculates the Flesch-Kincaid Grade Level for the given text.
      * Formula: 0.39 * (total words / total sentences) + 11.8 * (total syllables /
@@ -45,7 +51,7 @@ public class ReadabilityUtils {
             return 0;
         }
         // Split by sentence terminators
-        String[] sentences = text.split("[.!?]+");
+        String[] sentences = SENTENCE_SPLIT_PATTERN.split(text);
         int count = 0;
         for (String s : sentences) {
             if (!s.trim().isEmpty()) {
@@ -62,7 +68,7 @@ public class ReadabilityUtils {
         if (text == null || text.trim().isEmpty()) {
             return 0;
         }
-        String[] words = text.trim().split("\\s+");
+        String[] words = WORD_SPLIT_PATTERN.split(text.trim());
         return words.length;
     }
 
@@ -73,7 +79,7 @@ public class ReadabilityUtils {
         if (text == null || text.trim().isEmpty()) {
             return 0;
         }
-        String[] words = text.trim().split("\\s+");
+        String[] words = WORD_SPLIT_PATTERN.split(text.trim());
         int count = 0;
         for (String word : words) {
             count += countSyllables(word);
@@ -90,7 +96,9 @@ public class ReadabilityUtils {
             return 0;
         }
 
-        word = word.toLowerCase().replaceAll("[^a-z]", "");
+        // Clean the word: keep only lowercase letters
+        word = NON_ALPHA_PATTERN.matcher(word.toLowerCase()).replaceAll("");
+
         if (word.isEmpty()) {
             return 0;
         }
@@ -105,8 +113,7 @@ public class ReadabilityUtils {
         }
 
         // Count vowel groups
-        Pattern pattern = Pattern.compile("[aeiouy]+");
-        Matcher matcher = pattern.matcher(word);
+        Matcher matcher = VOWEL_PATTERN.matcher(word);
         int count = 0;
         while (matcher.find()) {
             count++;
