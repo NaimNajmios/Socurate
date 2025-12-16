@@ -133,6 +133,24 @@ public class MainActivity extends AppCompatActivity {
     private String rawOutputText = ""; // Store raw markdown text for editing
     private String lastClipboardUrl = ""; // Track last clipboard URL to avoid repeat prompts
 
+    // Pre-compiled Regex Patterns for Performance
+    private static final java.util.regex.Pattern SOURCE_CITATION_PATTERN = java.util.regex.Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$");
+    private static final java.util.regex.Pattern TRAILING_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\\n+$");
+
+    // Markdown stripping patterns
+    private static final java.util.regex.Pattern BOLD_PATTERN_1 = java.util.regex.Pattern.compile("\\*\\*(.+?)\\*\\*");
+    private static final java.util.regex.Pattern BOLD_PATTERN_2 = java.util.regex.Pattern.compile("__(.+?)__");
+    private static final java.util.regex.Pattern ITALIC_PATTERN_1 = java.util.regex.Pattern.compile("(?<!\\*)\\*(?!\\*)([^*]+)(?<!\\*)\\*(?!\\*)");
+    private static final java.util.regex.Pattern ITALIC_PATTERN_2 = java.util.regex.Pattern.compile("(?<!_)_(?!_)([^_]+)(?<!_)_(?!_)");
+    private static final java.util.regex.Pattern STRIKETHROUGH_PATTERN = java.util.regex.Pattern.compile("~~(.+?)~~");
+    private static final java.util.regex.Pattern HEADER_PATTERN = java.util.regex.Pattern.compile("(?m)^#{1,6}\\s*");
+    private static final java.util.regex.Pattern INLINE_CODE_PATTERN = java.util.regex.Pattern.compile("`([^`]+)`");
+    private static final java.util.regex.Pattern LINK_PATTERN = java.util.regex.Pattern.compile("\\[([^\\]]+)\\]\\([^)]+\\)");
+    private static final java.util.regex.Pattern IMAGE_PATTERN = java.util.regex.Pattern.compile("!\\[([^\\]]*?)\\]\\([^)]+\\)");
+    private static final java.util.regex.Pattern BLOCKQUOTE_PATTERN = java.util.regex.Pattern.compile("(?m)^>\\s*");
+    private static final java.util.regex.Pattern HR_PATTERN = java.util.regex.Pattern.compile("(?m)^[-*_]{3,}$");
+    private static final java.util.regex.Pattern EXCESSIVE_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\n{3,}");
+
     /**
      * BroadcastReceiver for handling results from ContentGenerationService.
      */
@@ -568,16 +586,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Regex to find the source citation line
         // Matches: "Sumber:", "*Sumber:*", "Source:", "Sumber :", etc.
-        String regex = "(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$";
-
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
-        java.util.regex.Matcher matcher = pattern.matcher(fullResult);
+        java.util.regex.Matcher matcher = SOURCE_CITATION_PATTERN.matcher(fullResult);
 
         if (matcher.find()) {
             generatedSourceCitation = matcher.group().trim();
-            String contentWithoutSource = fullResult.replaceAll(regex, "").trim();
+            String contentWithoutSource = matcher.replaceAll("").trim();
             // Clean up trailing newlines
-            return contentWithoutSource.replaceAll("\\n+$", "").trim();
+            return TRAILING_NEWLINES_PATTERN.matcher(contentWithoutSource).replaceAll("").trim();
         } else {
             generatedSourceCitation = "";
             return fullResult;
@@ -850,36 +865,36 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Remove bold: **text** or __text__
-        text = text.replaceAll("\\*\\*(.+?)\\*\\*", "$1");
-        text = text.replaceAll("__(.+?)__", "$1");
+        text = BOLD_PATTERN_1.matcher(text).replaceAll("$1");
+        text = BOLD_PATTERN_2.matcher(text).replaceAll("$1");
 
         // Remove italic: *text* or _text_ (simple approach)
-        text = text.replaceAll("(?<!\\*)\\*(?!\\*)([^*]+)(?<!\\*)\\*(?!\\*)", "$1");
-        text = text.replaceAll("(?<!_)_(?!_)([^_]+)(?<!_)_(?!_)", "$1");
+        text = ITALIC_PATTERN_1.matcher(text).replaceAll("$1");
+        text = ITALIC_PATTERN_2.matcher(text).replaceAll("$1");
 
         // Remove strikethrough: ~~text~~
-        text = text.replaceAll("~~(.+?)~~", "$1");
+        text = STRIKETHROUGH_PATTERN.matcher(text).replaceAll("$1");
 
         // Remove headers: # Header -> Header
-        text = text.replaceAll("(?m)^#{1,6}\\s*", "");
+        text = HEADER_PATTERN.matcher(text).replaceAll("");
 
         // Remove inline code: `code`
-        text = text.replaceAll("`([^`]+)`", "$1");
+        text = INLINE_CODE_PATTERN.matcher(text).replaceAll("$1");
 
         // Remove links: [text](url) -> text
-        text = text.replaceAll("\\[([^\\]]+)\\]\\([^)]+\\)", "$1");
+        text = LINK_PATTERN.matcher(text).replaceAll("$1");
 
         // Remove images: ![alt](url) -> alt
-        text = text.replaceAll("!\\[([^\\]]*?)\\]\\([^)]+\\)", "$1");
+        text = IMAGE_PATTERN.matcher(text).replaceAll("$1");
 
         // Remove blockquotes: > text -> text
-        text = text.replaceAll("(?m)^>\\s*", "");
+        text = BLOCKQUOTE_PATTERN.matcher(text).replaceAll("");
 
         // Remove horizontal rules
-        text = text.replaceAll("(?m)^[-*_]{3,}$", "");
+        text = HR_PATTERN.matcher(text).replaceAll("");
 
         // Clean up extra whitespace but preserve paragraph breaks
-        text = text.replaceAll("\n{3,}", "\n\n");
+        text = EXCESSIVE_NEWLINES_PATTERN.matcher(text).replaceAll("\n\n");
 
         return text.trim();
     }
