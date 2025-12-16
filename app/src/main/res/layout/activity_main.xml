@@ -80,28 +80,6 @@
                             android:layout_height="0dp"
                             android:layout_weight="1" />
 
-                        <!-- Paste Button -->
-                        <ImageButton
-                            android:id="@+id/pasteButton"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_paste"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/paste_input"
-                            android:padding="12dp"
-                            android:layout_marginEnd="4dp" />
-
-                        <!-- Clear Input Button -->
-                        <ImageButton
-                            android:id="@+id/clearInputButton"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_clear"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/clear_input"
-                            android:padding="12dp"
-                            android:layout_marginEnd="4dp" />
-
                         <!-- Reset All Button -->
                         <ImageButton
                             android:id="@+id/resetAllButton"
@@ -115,11 +93,17 @@
                     </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/input_hint"
                         app:boxBackgroundMode="none"
-                        app:hintTextColor="?attr/colorOnSurfaceVariant">
+                    app:hintTextColor="?attr/colorOnSurfaceVariant"
+                    app:endIconMode="custom"
+                    app:endIconDrawable="@drawable/ic_paste"
+                    app:endIconContentDescription="@string/paste_input"
+                    app:counterEnabled="true"
+                    app:counterTextColor="?attr/colorOnSurfaceVariant">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/inputText"
@@ -134,17 +118,6 @@
                             android:background="@null" />
 
                     </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- Character Count -->
-                    <TextView
-                        android:id="@+id/inputCharCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:text="0 characters"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="12sp"
-                        android:layout_marginTop="4dp" />
 
                     <!-- URL Preview Card -->
                     <com.google.android.material.card.MaterialCardView
