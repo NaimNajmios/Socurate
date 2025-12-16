@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 /**
  * Extracts main content from web URLs.
@@ -19,17 +20,26 @@ import java.util.concurrent.TimeUnit;
 public class WebContentExtractor {
 
     private static final String TAG = "WebContentExtractor";
-    private final OkHttpClient client;
+
+    // Share OkHttpClient instance to reuse connection pool and threads
+    private static final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .followRedirects(true)
+            .build();
+
+    // Pre-compiled regex patterns for better performance
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
+    private static final Pattern NEWLINES_PATTERN = Pattern.compile("(?:\\n\\s*){3,}");
+    private static final Pattern CLICK_HERE_PATTERN = Pattern.compile("(?i)\\bclick here\\b.*?\\bmore\\b");
+    private static final Pattern SHARE_THIS_PATTERN = Pattern.compile("(?i)\\bshare this\\b.*?\\bfacebook\\b");
+    private static final Pattern SUBSCRIBE_PATTERN = Pattern.compile("(?i)\\bsubscribe.*?newsletter\\b");
 
     /**
      * Creates a new WebContentExtractor instance.
      */
     public WebContentExtractor() {
-        this.client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .followRedirects(true)
-                .build();
+        // Client is now static and shared
     }
 
     /**
@@ -186,15 +196,15 @@ public class WebContentExtractor {
         }
 
         // Remove excessive whitespace
-        content = content.replaceAll("\\s+", " ");
+        content = WHITESPACE_PATTERN.matcher(content).replaceAll(" ");
 
         // Remove excessive newlines
-        content = content.replaceAll("(?:\\n\\s*){3,}", "\n\n");
+        content = NEWLINES_PATTERN.matcher(content).replaceAll("\n\n");
 
         // Remove common boilerplate phrases
-        content = content.replaceAll("(?i)\\bclick here\\b.*?\\bmore\\b", "");
-        content = content.replaceAll("(?i)\\bshare this\\b.*?\\bfacebook\\b", "");
-        content = content.replaceAll("(?i)\\bsubscribe.*?newsletter\\b", "");
+        content = CLICK_HERE_PATTERN.matcher(content).replaceAll("");
+        content = SHARE_THIS_PATTERN.matcher(content).replaceAll("");
+        content = SUBSCRIBE_PATTERN.matcher(content).replaceAll("");
 
         return content.trim();
     }
