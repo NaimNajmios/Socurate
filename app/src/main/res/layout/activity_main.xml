@@ -209,6 +209,7 @@
                                 android:background="?attr/selectableItemBackgroundBorderless"
                                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                                 android:scaleType="centerInside"
+                                android:contentDescription="@string/close_preview"
                                 app:tint="?attr/colorOnSurfaceVariant" />
 
                         </LinearLayout>
