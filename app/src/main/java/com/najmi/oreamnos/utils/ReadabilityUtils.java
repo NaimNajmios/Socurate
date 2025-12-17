@@ -28,8 +28,11 @@ public class ReadabilityUtils {
         }
 
         int totalSentences = countSentences(text);
-        int totalWords = countWords(text);
-        int totalSyllables = countSyllablesInText(text);
+
+        // Optimization: Split text into words once and reuse the array
+        String[] words = WORD_SPLIT_PATTERN.split(text.trim());
+        int totalWords = words.length;
+        int totalSyllables = countSyllablesInWords(words);
 
         if (totalWords == 0 || totalSentences == 0) {
             return 0.0;
@@ -80,6 +83,14 @@ public class ReadabilityUtils {
             return 0;
         }
         String[] words = WORD_SPLIT_PATTERN.split(text.trim());
+        return countSyllablesInWords(words);
+    }
+
+    /**
+     * Counts total syllables in an array of words.
+     * Helper method to avoid re-splitting text.
+     */
+    private static int countSyllablesInWords(String[] words) {
         int count = 0;
         for (String word : words) {
             count += countSyllables(word);
