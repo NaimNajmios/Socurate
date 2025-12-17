@@ -64,19 +64,17 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private TextInputEditText inputText;
+    private com.google.android.material.textfield.TextInputLayout inputLayout;
     private TextInputEditText outputText;
     private TextView editedIndicator;
     private TextView progressText;
-    private TextView inputCharCount;
     private TextView outputWordCount;
     private TextView readabilityScore;
     private MaterialCardView outputCard;
     private MaterialCardView skeletonCard;
     private View progressOverlay;
     private View placeholderView;
-    private ImageButton clearInputButton;
     private ImageButton resetAllButton;
-    private ImageButton pasteButton;
     private MaterialButton editButton;
     private MaterialButton copyButton;
     private MaterialButton shareButton;
@@ -207,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize views
         inputText = findViewById(R.id.inputText);
+        inputLayout = findViewById(R.id.inputLayout);
         outputText = findViewById(R.id.outputText);
         editedIndicator = findViewById(R.id.editedIndicator);
         outputCard = findViewById(R.id.outputCard);
@@ -214,12 +213,9 @@ public class MainActivity extends AppCompatActivity {
         placeholderView = findViewById(R.id.placeholderView);
         progressOverlay = findViewById(R.id.progressOverlay);
         progressText = findViewById(R.id.progressText);
-        inputCharCount = findViewById(R.id.inputCharCount);
         outputWordCount = findViewById(R.id.outputWordCount);
         readabilityScore = findViewById(R.id.readabilityScore);
-        clearInputButton = findViewById(R.id.clearInputButton);
         resetAllButton = findViewById(R.id.resetAllButton);
-        pasteButton = findViewById(R.id.pasteButton);
         editButton = findViewById(R.id.editButton);
         copyButton = findViewById(R.id.copyButton);
         shareButton = findViewById(R.id.shareButton);
@@ -267,10 +263,11 @@ public class MainActivity extends AppCompatActivity {
         editButton.setOnClickListener(v -> toggleEditMode());
         copyButton.setOnClickListener(v -> onCopyClick());
         shareButton.setOnClickListener(v -> onShareClick());
-        clearInputButton.setOnClickListener(v -> onClearInputClick());
         resetAllButton.setOnClickListener(v -> onResetAllClick());
-        pasteButton.setOnClickListener(v -> onPasteClick());
         regenerateButton.setOnClickListener(v -> onRegenerateClick());
+
+        // Initialize input state
+        updateInputEndIcon(inputText.getText() != null && inputText.getText().length() > 0);
 
         // Close preview button
         closePreviewButton.setOnClickListener(v -> {
@@ -296,8 +293,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                int charCount = s.length();
-                inputCharCount.setText(charCount + " characters");
+                updateInputEndIcon(s.length() > 0);
             }
         });
 
@@ -941,10 +937,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Updates the input layout end icon based on text content.
+     * Empty -> Paste
+     * Not Empty -> Clear
+     */
+    private void updateInputEndIcon(boolean hasText) {
+        if (hasText) {
+            inputLayout.setEndIconDrawable(R.drawable.ic_clear);
+            inputLayout.setEndIconContentDescription(R.string.clear_input);
+            inputLayout.setEndIconOnClickListener(v -> onClearInputClick());
+        } else {
+            inputLayout.setEndIconDrawable(R.drawable.ic_paste);
+            inputLayout.setEndIconContentDescription(R.string.paste_input);
+            inputLayout.setEndIconOnClickListener(v -> onPasteClick());
+        }
+    }
+
+    /**
      * Clears the input text field.
      */
     private void onClearInputClick() {
         if (inputText.getText() != null && !inputText.getText().toString().isEmpty()) {
+            performHapticFeedback();
             inputText.setText("");
             Toast.makeText(this, R.string.input_cleared, Toast.LENGTH_SHORT).show();
         }
@@ -989,6 +1003,7 @@ public class MainActivity extends AppCompatActivity {
      * Pastes text from clipboard into the input field.
      */
     private void onPasteClick() {
+        performHapticFeedback();
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         if (clipboard != null && clipboard.hasPrimaryClip()) {
             ClipData clip = clipboard.getPrimaryClip();
@@ -1004,6 +1019,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         Toast.makeText(this, "Clipboard is empty", Toast.LENGTH_SHORT).show();
+    }
+
+    private void performHapticFeedback() {
+        if (inputLayout != null) {
+            inputLayout.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK);
+        }
     }
 
     /**
