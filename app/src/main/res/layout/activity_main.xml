@@ -533,7 +533,7 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/editButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="36dp"
+                            android:layout_height="48dp"
                             android:text="@string/edit_button"
                             android:textColor="?attr/colorOnPrimary"
                             android:textSize="12sp"
@@ -543,7 +543,7 @@
                             android:backgroundTint="?attr/colorPrimary"
                             android:insetTop="0dp"
                             android:insetBottom="0dp"
-                            app:cornerRadius="18dp"
+                            app:cornerRadius="24dp"
                             app:icon="@android:drawable/ic_menu_edit"
                             app:iconSize="16dp"
                             app:iconTint="?attr/colorOnPrimary"
