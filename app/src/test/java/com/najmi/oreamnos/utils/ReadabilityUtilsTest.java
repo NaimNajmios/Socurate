@@ -15,6 +15,18 @@ public class ReadabilityUtilsTest {
         assertEquals(2, ReadabilityUtils.countSyllables("coding"));
         assertEquals(0, ReadabilityUtils.countSyllables(""));
         assertEquals(0, ReadabilityUtils.countSyllables(null));
+
+        // Additional tests for robustness
+        assertEquals(1, ReadabilityUtils.countSyllables("queue"));
+        assertEquals(1, ReadabilityUtils.countSyllables("tree"));
+        assertEquals(2, ReadabilityUtils.countSyllables("little"));
+        assertEquals(3, ReadabilityUtils.countSyllables("performance"));
+        assertEquals(5, ReadabilityUtils.countSyllables("optimization"));
+        assertEquals(2, ReadabilityUtils.countSyllables("regex"));
+
+        // Edge cases
+        assertEquals(0, ReadabilityUtils.countSyllables("123")); // Non-alpha
+        assertEquals(1, ReadabilityUtils.countSyllables("word123")); // Mixed
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.najmi.oreamnos.utils;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -11,8 +10,9 @@ public class ReadabilityUtils {
     // Pre-compiled patterns for performance
     private static final Pattern SENTENCE_SPLIT_PATTERN = Pattern.compile("[.!?]+");
     private static final Pattern WORD_SPLIT_PATTERN = Pattern.compile("\\s+");
-    private static final Pattern NON_ALPHA_PATTERN = Pattern.compile("[^a-z]");
-    private static final Pattern VOWEL_PATTERN = Pattern.compile("[aeiouy]+");
+    // NON_ALPHA_PATTERN and VOWEL_PATTERN removed as they are no longer used in the optimized countSyllables method
+    // private static final Pattern NON_ALPHA_PATTERN = Pattern.compile("[^a-z]");
+    // private static final Pattern VOWEL_PATTERN = Pattern.compile("[aeiouy]+");
 
     /**
      * Calculates the Flesch-Kincaid Grade Level for the given text.
@@ -101,36 +101,87 @@ public class ReadabilityUtils {
     /**
      * Counts syllables in a single word.
      * Uses a heuristic based on vowel groups.
+     * <p>
+     * ⚡ Bolt Optimization:
+     * This method was optimized to avoid regex allocation (Pattern/Matcher) and String manipulation
+     * (toLowerCase, replaceAll, substring) which creates excessive garbage.
+     * It now uses a single-pass character iteration with O(1) memory usage.
      */
     public static int countSyllables(String word) {
         if (word == null || word.isEmpty()) {
             return 0;
         }
 
-        // Clean the word: keep only lowercase letters
-        word = NON_ALPHA_PATTERN.matcher(word.toLowerCase()).replaceAll("");
+        int len = word.length();
+        int cleanLen = 0;
+        int lastAlphaIndex = -1;
+        char lastAlphaChar = 0;
 
-        if (word.isEmpty()) {
+        // Pass 1: Scan for alpha characters and determine "clean" length
+        for (int i = 0; i < len; i++) {
+            char c = word.charAt(i);
+            // Check if alpha (a-z or A-Z)
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+                cleanLen++;
+                lastAlphaIndex = i;
+                lastAlphaChar = c;
+            }
+        }
+
+        if (cleanLen == 0) {
             return 0;
         }
 
-        if (word.length() <= 3) {
+        if (cleanLen <= 3) {
             return 1;
         }
 
-        // Remove silent 'e' at the end
-        if (word.endsWith("e")) {
-            word = word.substring(0, word.length() - 1);
+        // Determine effective end index for vowel counting
+        // If the last alpha char is 'e' or 'E', we ignore it (silent 'e')
+        int effectiveEndIndex = len;
+
+        // Check if last alpha char is 'e' or 'E'
+        if (lastAlphaChar == 'e' || lastAlphaChar == 'E') {
+            // We want to stop processing before this character
+            // Since we iterate up to i < effectiveEndIndex, we set it to lastAlphaIndex
+            effectiveEndIndex = lastAlphaIndex;
         }
 
-        // Count vowel groups
-        Matcher matcher = VOWEL_PATTERN.matcher(word);
         int count = 0;
-        while (matcher.find()) {
-            count++;
+        boolean prevWasVowel = false;
+
+        // Pass 2: Count vowel groups
+        for (int i = 0; i < effectiveEndIndex; i++) {
+            char c = word.charAt(i);
+
+            // Skip non-alpha
+            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) {
+                continue;
+            }
+
+            // Check if vowel
+            // Vowels: a, e, i, o, u, y (case insensitive)
+            boolean isVowel = isVowel(c);
+
+            if (isVowel) {
+                if (!prevWasVowel) {
+                    count++;
+                }
+                prevWasVowel = true;
+            } else {
+                prevWasVowel = false;
+            }
         }
 
         // Adjust for specific cases if needed, but this is a standard approximation
         return Math.max(1, count);
+    }
+
+    /**
+     * Helper to check if a char is a vowel.
+     */
+    private static boolean isVowel(char c) {
+        return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y' ||
+               c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y';
     }
 }
