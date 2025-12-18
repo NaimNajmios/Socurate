@@ -238,7 +238,18 @@
                     android:text="@string/placeholder_subtitle"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Paste Action in Empty State -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/emptyStatePasteButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/paste_input"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_paste"
+                    style="@style/Widget.Material3.Button.Tonal" />
 
             </LinearLayout>
 
