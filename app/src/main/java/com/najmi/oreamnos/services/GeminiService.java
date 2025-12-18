@@ -53,7 +53,14 @@ public class GeminiService {
     private static final long MAX_DELAY_MS = 60000L; // Increased to 60 seconds for rate limits
     private static final long RATE_LIMIT_FALLBACK_DELAY_MS = 30000L; // 30 seconds if can't parse
 
-    private final OkHttpClient client;
+    // Shared OkHttpClient instance to enable connection pooling
+    // Bolt Optimization: Singleton pattern prevents creating new thread pools/connection pools for every request
+    private static final OkHttpClient sharedClient = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .build();
+
     private final Gson gson;
     private final String apiKey;
     private final String endpoint;
@@ -76,13 +83,6 @@ public class GeminiService {
         this.endpoint = endpoint;
         this.tone = tone != null ? tone : "formal";
         this.gson = new Gson();
-
-        // Configure OkHttp client with timeouts
-        this.client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .build();
     }
 
     /**
@@ -152,7 +152,7 @@ public class GeminiService {
                         .build();
 
                 long connectionStart = System.currentTimeMillis();
-                Response response = client.newCall(request).execute();
+                Response response = sharedClient.newCall(request).execute();
                 long connectionEnd = System.currentTimeMillis();
 
                 int code = response.code();
@@ -345,7 +345,7 @@ public class GeminiService {
                     .addHeader("Content-Type", "application/json")
                     .build();
 
-            Response response = client.newCall(request).execute();
+            Response response = sharedClient.newCall(request).execute();
             int code = response.code();
 
             if (code >= 400) {
