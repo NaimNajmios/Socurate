@@ -1,8 +1,3 @@
-## 2024-05-24 - [Smart Input Field]
-**Insight:** Consolidated "Paste" and "Clear" actions into the `TextInputLayout` End Icon.
-**Pattern:**
-- If input is empty -> Show Paste Icon.
-- If input has text -> Show Clear Icon.
-- This saves vertical space and keeps context-aware actions close to the input.
-- Added Haptic Feedback to these actions for a tactile feel.
-- Replaced custom character counter TextView with `TextInputLayout`'s native `app:counterEnabled="true"`.
+# Palette's UI Journal
+## 2025-05-01 - Card-ifying List Items
+**Insight:** The application uses flat `LinearLayout`s for list items (`item_session_entry.xml`, `item_log_entry.xml`). While functional, they lack visual separation and touch feedback. Converting these to `MaterialCardView` containers creates a cleaner, more "card-based" UI that aligns with Material Design 3 and provides better affordance for interaction (ripples, elevation).
