@@ -1,72 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:paddingHorizontal="20dp"
-    android:paddingVertical="10dp">
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="?attr/colorOutlineVariant"
+    android:clickable="true"
+    android:focusable="true">
 
-    <!-- Level Indicator -->
-    <TextView
-        android:id="@+id/levelBadge"
-        android:layout_width="42dp"
-        android:layout_height="20dp"
-        android:text="INFO"
-        android:textColor="@android:color/white"
-        android:textSize="9sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:background="@drawable/log_badge_info" />
-
-    <!-- Main content -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginStart="10dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingVertical="12dp">
 
-        <!-- Tag and Timestamp -->
+        <!-- Level Indicator -->
+        <TextView
+            android:id="@+id/levelBadge"
+            android:layout_width="42dp"
+            android:layout_height="20dp"
+            android:text="INFO"
+            android:textColor="@android:color/white"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:background="@drawable/log_badge_info" />
+
+        <!-- Main content -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
 
-            <TextView
-                android:id="@+id/tagText"
-                android:layout_width="0dp"
+            <!-- Tag and Timestamp -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="API"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
+                <TextView
+                    android:id="@+id/tagText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="API"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/timeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10:30:00"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
+            <!-- Message -->
             <TextView
-                android:id="@+id/timeText"
-                android:layout_width="wrap_content"
+                android:id="@+id/messageText"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="10:30:00"
+                android:text="Request completed successfully"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="10sp" />
+                android:textSize="11sp"
+                android:maxLines="2"
+                android:ellipsize="end" />
 
         </LinearLayout>
 
-        <!-- Message -->
-        <TextView
-            android:id="@+id/messageText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Request completed successfully"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="11sp"
-            android:maxLines="2"
-            android:ellipsize="end" />
-
     </LinearLayout>
 
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>
