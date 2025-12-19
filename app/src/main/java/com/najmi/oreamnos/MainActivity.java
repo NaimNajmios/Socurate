@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialCardView skeletonCard;
     private View progressOverlay;
     private View placeholderView;
+    private MaterialButton emptyStatePasteButton;
     private ImageButton resetAllButton;
     private MaterialButton editButton;
     private MaterialButton copyButton;
@@ -211,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
         outputCard = findViewById(R.id.outputCard);
         skeletonCard = findViewById(R.id.skeletonCard);
         placeholderView = findViewById(R.id.placeholderView);
+        emptyStatePasteButton = findViewById(R.id.emptyStatePasteButton);
         progressOverlay = findViewById(R.id.progressOverlay);
         progressText = findViewById(R.id.progressText);
         outputWordCount = findViewById(R.id.outputWordCount);
@@ -491,6 +493,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Check clipboard for football URLs
         checkClipboardForFootballUrl();
+
+        // Check clipboard for content to show/hide "Paste" button in empty state
+        checkClipboardForEmptyState();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            checkClipboardForEmptyState();
+        }
     }
 
     @Override
@@ -1581,6 +1594,36 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton(R.string.clipboard_dismiss, null)
                 .show();
+    }
+
+    /**
+     * Checks clipboard content to show/hide the "Paste" button in empty state.
+     */
+    private void checkClipboardForEmptyState() {
+        if (emptyStatePasteButton == null) return;
+
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        boolean hasClipboardContent = false;
+
+        if (clipboard != null && clipboard.hasPrimaryClip()) {
+            ClipData clip = clipboard.getPrimaryClip();
+            if (clip != null && clip.getItemCount() > 0) {
+                CharSequence text = clip.getItemAt(0).getText();
+                if (text != null && text.length() > 0) {
+                    hasClipboardContent = true;
+                }
+            }
+        }
+
+        if (hasClipboardContent) {
+            emptyStatePasteButton.setVisibility(View.VISIBLE);
+            emptyStatePasteButton.setOnClickListener(v -> {
+                onPasteClick();
+                // Optionally start generation immediately or just focus
+            });
+        } else {
+            emptyStatePasteButton.setVisibility(View.GONE);
+        }
     }
 
     /**
