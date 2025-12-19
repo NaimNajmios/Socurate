@@ -493,14 +493,14 @@ public class UsageActivity extends AppCompatActivity {
             private final View statusIndicator;
             private final TextView providerModelText;
             private final TextView timestampText;
-            private final TextView tokensText;
+            private final TextView tokensChip;
 
             SessionViewHolder(@NonNull View itemView) {
                 super(itemView);
                 statusIndicator = itemView.findViewById(R.id.statusIndicator);
                 providerModelText = itemView.findViewById(R.id.providerModelText);
                 timestampText = itemView.findViewById(R.id.timestampText);
-                tokensText = itemView.findViewById(R.id.tokensText);
+                tokensChip = itemView.findViewById(R.id.tokensChip);
             }
 
             void bind(UsageStats.SessionEntry session) {
@@ -526,12 +526,10 @@ public class UsageActivity extends AppCompatActivity {
 
                 // Tokens
                 if (session.isSuccess()) {
-                    tokensText.setText(String.format(Locale.US, "%,d tokens", session.getTotalTokens()));
-                    tokensText.setTextColor(itemView.getContext().getResources()
-                            .getColor(android.R.color.holo_green_dark, itemView.getContext().getTheme()));
+                    tokensChip.setText(String.format(Locale.US, "%,d", session.getTotalTokens()));
+                    // Reset chip style for success (green/neutral) if needed, but standard chip is fine
                 } else {
-                    tokensText.setText("Failed");
-                    tokensText.setTextColor(0xFFEA4335);
+                    tokensChip.setText("Failed");
                 }
             }
 

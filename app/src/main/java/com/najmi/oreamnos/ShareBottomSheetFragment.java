@@ -83,6 +83,12 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
     private TextView readabilityScore;
 
     // State
+    private static final java.util.regex.Pattern WHITESPACE_PATTERN = java.util.regex.Pattern.compile("\\s+");
+    private static final java.util.regex.Pattern SOURCE_CITATION_PATTERN = java.util.regex.Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$");
+    private static final java.util.regex.Pattern TRAILING_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\\n+$");
+    private static final java.util.regex.Pattern SPLIT_BY_DOUBLE_NEWLINE_PATTERN = java.util.regex.Pattern.compile("\\n\\n");
+    private static final java.util.regex.Pattern SPLIT_BY_NEWLINE_PATTERN = java.util.regex.Pattern.compile("\\n");
+
     private String originalSharedContent = "";
     private String lastGeneratedPost = "";
     private String generatedSourceCitation = "";
@@ -261,7 +267,7 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
                     editedIndicator.setVisibility(View.GONE);
                 }
                 String text = s.toString().trim();
-                int wordCount = text.isEmpty() ? 0 : text.split("\\s+").length;
+                int wordCount = text.isEmpty() ? 0 : WHITESPACE_PATTERN.split(text).length;
                 outputWordCount.setText(wordCount + " words");
 
                 // Update readability score
@@ -452,14 +458,12 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
             return "";
         }
 
-        String regex = "(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$";
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
-        java.util.regex.Matcher matcher = pattern.matcher(fullResult);
+        java.util.regex.Matcher matcher = SOURCE_CITATION_PATTERN.matcher(fullResult);
 
         if (matcher.find()) {
             generatedSourceCitation = matcher.group().trim();
-            String contentWithoutSource = fullResult.replaceAll(regex, "").trim();
-            return contentWithoutSource.replaceAll("\\n+$", "").trim();
+            String contentWithoutSource = matcher.replaceAll("").trim();
+            return TRAILING_NEWLINES_PATTERN.matcher(contentWithoutSource).replaceAll("").trim();
         } else {
             generatedSourceCitation = "";
             return fullResult;
@@ -473,12 +477,12 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
             return;
         }
 
-        String[] parts = content.split("\\n\\n", 2);
+        String[] parts = SPLIT_BY_DOUBLE_NEWLINE_PATTERN.split(content, 2);
         if (parts.length >= 2 && parts[0].length() < 150) {
             generatedTitle = parts[0].trim();
             generatedBody = parts[1].trim();
         } else {
-            parts = content.split("\\n", 2);
+            parts = SPLIT_BY_NEWLINE_PATTERN.split(content, 2);
             if (parts.length >= 2 && parts[0].length() < 150) {
                 generatedTitle = parts[0].trim();
                 generatedBody = parts[1].trim();

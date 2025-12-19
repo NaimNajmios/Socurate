@@ -64,19 +64,18 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private TextInputEditText inputText;
+    private com.google.android.material.textfield.TextInputLayout inputLayout;
     private TextInputEditText outputText;
     private TextView editedIndicator;
     private TextView progressText;
-    private TextView inputCharCount;
     private TextView outputWordCount;
     private TextView readabilityScore;
     private MaterialCardView outputCard;
     private MaterialCardView skeletonCard;
     private View progressOverlay;
     private View placeholderView;
-    private ImageButton clearInputButton;
+    private MaterialButton emptyStatePasteButton;
     private ImageButton resetAllButton;
-    private ImageButton pasteButton;
     private MaterialButton editButton;
     private MaterialButton copyButton;
     private MaterialButton shareButton;
@@ -131,6 +130,24 @@ public class MainActivity extends AppCompatActivity {
     private Markwon markwon;
     private String rawOutputText = ""; // Store raw markdown text for editing
     private String lastClipboardUrl = ""; // Track last clipboard URL to avoid repeat prompts
+
+    // Pre-compiled Regex Patterns for Performance
+    private static final java.util.regex.Pattern SOURCE_CITATION_PATTERN = java.util.regex.Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$");
+    private static final java.util.regex.Pattern TRAILING_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\\n+$");
+
+    // Markdown stripping patterns
+    private static final java.util.regex.Pattern BOLD_PATTERN_1 = java.util.regex.Pattern.compile("\\*\\*(.+?)\\*\\*");
+    private static final java.util.regex.Pattern BOLD_PATTERN_2 = java.util.regex.Pattern.compile("__(.+?)__");
+    private static final java.util.regex.Pattern ITALIC_PATTERN_1 = java.util.regex.Pattern.compile("(?<!\\*)\\*(?!\\*)([^*]+)(?<!\\*)\\*(?!\\*)");
+    private static final java.util.regex.Pattern ITALIC_PATTERN_2 = java.util.regex.Pattern.compile("(?<!_)_(?!_)([^_]+)(?<!_)_(?!_)");
+    private static final java.util.regex.Pattern STRIKETHROUGH_PATTERN = java.util.regex.Pattern.compile("~~(.+?)~~");
+    private static final java.util.regex.Pattern HEADER_PATTERN = java.util.regex.Pattern.compile("(?m)^#{1,6}\\s*");
+    private static final java.util.regex.Pattern INLINE_CODE_PATTERN = java.util.regex.Pattern.compile("`([^`]+)`");
+    private static final java.util.regex.Pattern LINK_PATTERN = java.util.regex.Pattern.compile("\\[([^\\]]+)\\]\\([^)]+\\)");
+    private static final java.util.regex.Pattern IMAGE_PATTERN = java.util.regex.Pattern.compile("!\\[([^\\]]*?)\\]\\([^)]+\\)");
+    private static final java.util.regex.Pattern BLOCKQUOTE_PATTERN = java.util.regex.Pattern.compile("(?m)^>\\s*");
+    private static final java.util.regex.Pattern HR_PATTERN = java.util.regex.Pattern.compile("(?m)^[-*_]{3,}$");
+    private static final java.util.regex.Pattern EXCESSIVE_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\n{3,}");
 
     /**
      * BroadcastReceiver for handling results from ContentGenerationService.
@@ -188,19 +205,18 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize views
         inputText = findViewById(R.id.inputText);
+        inputLayout = findViewById(R.id.inputLayout);
         outputText = findViewById(R.id.outputText);
         editedIndicator = findViewById(R.id.editedIndicator);
         outputCard = findViewById(R.id.outputCard);
         skeletonCard = findViewById(R.id.skeletonCard);
         placeholderView = findViewById(R.id.placeholderView);
+        emptyStatePasteButton = findViewById(R.id.emptyStatePasteButton);
         progressOverlay = findViewById(R.id.progressOverlay);
         progressText = findViewById(R.id.progressText);
-        inputCharCount = findViewById(R.id.inputCharCount);
         outputWordCount = findViewById(R.id.outputWordCount);
         readabilityScore = findViewById(R.id.readabilityScore);
-        clearInputButton = findViewById(R.id.clearInputButton);
         resetAllButton = findViewById(R.id.resetAllButton);
-        pasteButton = findViewById(R.id.pasteButton);
         editButton = findViewById(R.id.editButton);
         copyButton = findViewById(R.id.copyButton);
         shareButton = findViewById(R.id.shareButton);
@@ -247,10 +263,11 @@ public class MainActivity extends AppCompatActivity {
         editButton.setOnClickListener(v -> toggleEditMode());
         copyButton.setOnClickListener(v -> onCopyClick());
         shareButton.setOnClickListener(v -> onShareClick());
-        clearInputButton.setOnClickListener(v -> onClearInputClick());
         resetAllButton.setOnClickListener(v -> onResetAllClick());
-        pasteButton.setOnClickListener(v -> onPasteClick());
         regenerateButton.setOnClickListener(v -> onRegenerateClick());
+
+        // Initialize input state
+        updateInputEndIcon(inputText.getText() != null && inputText.getText().length() > 0);
 
         // Close preview button
         closePreviewButton.setOnClickListener(v -> {
@@ -276,8 +293,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                int charCount = s.length();
-                inputCharCount.setText(charCount + " characters");
+                updateInputEndIcon(s.length() > 0);
             }
         });
 
@@ -470,6 +486,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Check clipboard for football URLs
         checkClipboardForFootballUrl();
+
+        // Check clipboard for content to show/hide "Paste" button in empty state
+        checkClipboardForEmptyState();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            checkClipboardForEmptyState();
+        }
     }
 
     @Override
@@ -561,16 +588,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Regex to find the source citation line
         // Matches: "Sumber:", "*Sumber:*", "Source:", "Sumber :", etc.
-        String regex = "(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$";
-
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
-        java.util.regex.Matcher matcher = pattern.matcher(fullResult);
+        java.util.regex.Matcher matcher = SOURCE_CITATION_PATTERN.matcher(fullResult);
 
         if (matcher.find()) {
             generatedSourceCitation = matcher.group().trim();
-            String contentWithoutSource = fullResult.replaceAll(regex, "").trim();
+            String contentWithoutSource = matcher.replaceAll("").trim();
             // Clean up trailing newlines
-            return contentWithoutSource.replaceAll("\\n+$", "").trim();
+            return TRAILING_NEWLINES_PATTERN.matcher(contentWithoutSource).replaceAll("").trim();
         } else {
             generatedSourceCitation = "";
             return fullResult;
@@ -827,36 +851,36 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Remove bold: **text** or __text__
-        text = text.replaceAll("\\*\\*(.+?)\\*\\*", "$1");
-        text = text.replaceAll("__(.+?)__", "$1");
+        text = BOLD_PATTERN_1.matcher(text).replaceAll("$1");
+        text = BOLD_PATTERN_2.matcher(text).replaceAll("$1");
 
         // Remove italic: *text* or _text_ (simple approach)
-        text = text.replaceAll("(?<!\\*)\\*(?!\\*)([^*]+)(?<!\\*)\\*(?!\\*)", "$1");
-        text = text.replaceAll("(?<!_)_(?!_)([^_]+)(?<!_)_(?!_)", "$1");
+        text = ITALIC_PATTERN_1.matcher(text).replaceAll("$1");
+        text = ITALIC_PATTERN_2.matcher(text).replaceAll("$1");
 
         // Remove strikethrough: ~~text~~
-        text = text.replaceAll("~~(.+?)~~", "$1");
+        text = STRIKETHROUGH_PATTERN.matcher(text).replaceAll("$1");
 
         // Remove headers: # Header -> Header
-        text = text.replaceAll("(?m)^#{1,6}\\s*", "");
+        text = HEADER_PATTERN.matcher(text).replaceAll("");
 
         // Remove inline code: `code`
-        text = text.replaceAll("`([^`]+)`", "$1");
+        text = INLINE_CODE_PATTERN.matcher(text).replaceAll("$1");
 
         // Remove links: [text](url) -> text
-        text = text.replaceAll("\\[([^\\]]+)\\]\\([^)]+\\)", "$1");
+        text = LINK_PATTERN.matcher(text).replaceAll("$1");
 
         // Remove images: ![alt](url) -> alt
-        text = text.replaceAll("!\\[([^\\]]*?)\\]\\([^)]+\\)", "$1");
+        text = IMAGE_PATTERN.matcher(text).replaceAll("$1");
 
         // Remove blockquotes: > text -> text
-        text = text.replaceAll("(?m)^>\\s*", "");
+        text = BLOCKQUOTE_PATTERN.matcher(text).replaceAll("");
 
         // Remove horizontal rules
-        text = text.replaceAll("(?m)^[-*_]{3,}$", "");
+        text = HR_PATTERN.matcher(text).replaceAll("");
 
         // Clean up extra whitespace but preserve paragraph breaks
-        text = text.replaceAll("\n{3,}", "\n\n");
+        text = EXCESSIVE_NEWLINES_PATTERN.matcher(text).replaceAll("\n\n");
 
         return text.trim();
     }
@@ -903,10 +927,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Updates the input layout end icon based on text content.
+     * Empty -> Paste
+     * Not Empty -> Clear
+     */
+    private void updateInputEndIcon(boolean hasText) {
+        if (hasText) {
+            inputLayout.setEndIconDrawable(R.drawable.ic_clear);
+            inputLayout.setEndIconContentDescription(R.string.clear_input);
+            inputLayout.setEndIconOnClickListener(v -> onClearInputClick());
+        } else {
+            inputLayout.setEndIconDrawable(R.drawable.ic_paste);
+            inputLayout.setEndIconContentDescription(R.string.paste_input);
+            inputLayout.setEndIconOnClickListener(v -> onPasteClick());
+        }
+    }
+
+    /**
      * Clears the input text field.
      */
     private void onClearInputClick() {
         if (inputText.getText() != null && !inputText.getText().toString().isEmpty()) {
+            performHapticFeedback();
             inputText.setText("");
             Toast.makeText(this, R.string.input_cleared, Toast.LENGTH_SHORT).show();
         }
@@ -951,6 +993,7 @@ public class MainActivity extends AppCompatActivity {
      * Pastes text from clipboard into the input field.
      */
     private void onPasteClick() {
+        performHapticFeedback();
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         if (clipboard != null && clipboard.hasPrimaryClip()) {
             ClipData clip = clipboard.getPrimaryClip();
@@ -966,6 +1009,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         Toast.makeText(this, "Clipboard is empty", Toast.LENGTH_SHORT).show();
+    }
+
+    private void performHapticFeedback() {
+        if (inputLayout != null) {
+            inputLayout.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK);
+        }
     }
 
     /**
@@ -1528,6 +1577,36 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton(R.string.clipboard_dismiss, null)
                 .show();
+    }
+
+    /**
+     * Checks clipboard content to show/hide the "Paste" button in empty state.
+     */
+    private void checkClipboardForEmptyState() {
+        if (emptyStatePasteButton == null) return;
+
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        boolean hasClipboardContent = false;
+
+        if (clipboard != null && clipboard.hasPrimaryClip()) {
+            ClipData clip = clipboard.getPrimaryClip();
+            if (clip != null && clip.getItemCount() > 0) {
+                CharSequence text = clip.getItemAt(0).getText();
+                if (text != null && text.length() > 0) {
+                    hasClipboardContent = true;
+                }
+            }
+        }
+
+        if (hasClipboardContent) {
+            emptyStatePasteButton.setVisibility(View.VISIBLE);
+            emptyStatePasteButton.setOnClickListener(v -> {
+                onPasteClick();
+                // Optionally start generation immediately or just focus
+            });
+        } else {
+            emptyStatePasteButton.setVisibility(View.GONE);
+        }
     }
 
     /**

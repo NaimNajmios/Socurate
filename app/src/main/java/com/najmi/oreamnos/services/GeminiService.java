@@ -28,13 +28,39 @@ public class GeminiService {
     private static final String TAG = "GeminiService";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
+    // Pre-compiled Regex Patterns for Performance
+    private static final java.util.regex.Pattern HORIZONTAL_RULE_PATTERN = java.util.regex.Pattern.compile("(?m)^-{3,}\\s*$");
+    private static final java.util.regex.Pattern ASTERISK_TEXT_PATTERN = java.util.regex.Pattern.compile("\\*.*?\\*");
+    private static final java.util.regex.Pattern MULTIPLE_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\\n\\s*\\n\\s*\\n+");
+    private static final java.util.regex.Pattern HORIZONTAL_WHITESPACE_PATTERN = java.util.regex.Pattern.compile("[ \\t]+");
+    // Regex explanation:
+    // (?i) : Case insensitive
+    // (?m) : Multiline mode (^ and $ match start/end of line)
+    // ^ : Start of line
+    // [\s\p{Z}]* : Optional whitespace (including non-breaking spaces)
+    // [*_]* : Optional markdown (bold/italic) start
+    // (?:Sumber|Source) : Match "Sumber" or "Source"
+    // [*_]* : Optional markdown end
+    // [\s\p{Z}]* : Optional whitespace
+    // [:：] : Colon (regular or full-width)
+    // .*$ : Rest of the line
+    private static final java.util.regex.Pattern SOURCE_CITATION_PATTERN = java.util.regex.Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$");
+    private static final java.util.regex.Pattern TRAILING_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\\n+$");
+
     // Retry configuration
     private static final int MAX_RETRIES = 4;
     private static final long BASE_DELAY_MS = 500L;
     private static final long MAX_DELAY_MS = 60000L; // Increased to 60 seconds for rate limits
     private static final long RATE_LIMIT_FALLBACK_DELAY_MS = 30000L; // 30 seconds if can't parse
 
-    private final OkHttpClient client;
+    // Shared OkHttpClient instance to enable connection pooling
+    // Bolt Optimization: Singleton pattern prevents creating new thread pools/connection pools for every request
+    private static final OkHttpClient sharedClient = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .build();
+
     private final Gson gson;
     private final String apiKey;
     private final String endpoint;
@@ -57,13 +83,6 @@ public class GeminiService {
         this.endpoint = endpoint;
         this.tone = tone != null ? tone : "formal";
         this.gson = new Gson();
-
-        // Configure OkHttp client with timeouts
-        this.client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .build();
     }
 
     /**
@@ -133,7 +152,7 @@ public class GeminiService {
                         .build();
 
                 long connectionStart = System.currentTimeMillis();
-                Response response = client.newCall(request).execute();
+                Response response = sharedClient.newCall(request).execute();
                 long connectionEnd = System.currentTimeMillis();
 
                 int code = response.code();
@@ -326,7 +345,7 @@ public class GeminiService {
                     .addHeader("Content-Type", "application/json")
                     .build();
 
-            Response response = client.newCall(request).execute();
+            Response response = sharedClient.newCall(request).execute();
             int code = response.code();
 
             if (code >= 400) {
@@ -387,27 +406,14 @@ public class GeminiService {
         if (text == null || text.isEmpty())
             return text;
 
-        // Regex explanation:
-        // (?i) : Case insensitive
-        // (?m) : Multiline mode (^ and $ match start/end of line)
-        // ^ : Start of line
-        // [\s\p{Z}]* : Optional whitespace (including non-breaking spaces)
-        // [*_]* : Optional markdown (bold/italic) start
-        // (?:Sumber|Source) : Match "Sumber" or "Source"
-        // [*_]* : Optional markdown end
-        // [\s\p{Z}]* : Optional whitespace
-        // [:：] : Colon (regular or full-width)
-        // .*$ : Rest of the line
-        String regex = "(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$";
-
-        String cleaned = text.replaceAll(regex, "");
+        String cleaned = SOURCE_CITATION_PATTERN.matcher(text).replaceAll("");
 
         if (!text.equals(cleaned)) {
             Log.d(TAG, "Removed source citation via regex");
         }
 
         // Clean up any trailing newlines left behind
-        return cleaned.replaceAll("\\n+$", "").trim();
+        return TRAILING_NEWLINES_PATTERN.matcher(cleaned).replaceAll("").trim();
     }
 
     /**
@@ -698,7 +704,7 @@ public class GeminiService {
 
         // Remove horizontal rule markers (---, ----, ----------, etc.)
         // These sometimes appear at the beginning/end of AI-generated content
-        cleaned = cleaned.replaceAll("(?m)^-{3,}\\s*$", "");
+        cleaned = HORIZONTAL_RULE_PATTERN.matcher(cleaned).replaceAll("");
 
         // Remove unwanted explanatory phrases
         String[] unwantedPhrases = {
@@ -725,15 +731,14 @@ public class GeminiService {
         }
 
         // Remove text between asterisks (explanatory notes)
-        cleaned = cleaned.replaceAll("\\*.*?\\*", "");
+        cleaned = ASTERISK_TEXT_PATTERN.matcher(cleaned).replaceAll("");
 
         // Clean up spacing
-        // Clean up spacing
         // Normalize multiple newlines to max 2
-        cleaned = cleaned.replaceAll("\\n\\s*\\n\\s*\\n+", "\n\n");
+        cleaned = MULTIPLE_NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n");
         // Normalize horizontal whitespace (spaces, tabs) to single space, PRESERVING
         // newlines
-        cleaned = cleaned.replaceAll("[ \\t]+", " ");
+        cleaned = HORIZONTAL_WHITESPACE_PATTERN.matcher(cleaned).replaceAll(" ");
         cleaned = cleaned.trim();
 
         // If too short after cleaning, return original
