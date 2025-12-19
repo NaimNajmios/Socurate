@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
     private Chip includeTitleCheckbox;
     private Chip includeHashtagsCheckbox;
     private Chip includeSourceCheckbox;
-    private Chip includeEmojisCheckbox;
     private MaterialSwitch keepStructureSwitch;
     private ExtendedFloatingActionButton generateFab;
 
@@ -208,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
         includeTitleCheckbox = findViewById(R.id.includeTitleCheckbox);
         includeHashtagsCheckbox = findViewById(R.id.includeHashtagsCheckbox);
         includeSourceCheckbox = findViewById(R.id.includeSourceCheckbox);
-        includeEmojisCheckbox = findViewById(R.id.includeEmojisCheckbox);
         keepStructureSwitch = findViewById(R.id.keepStructureSwitch);
         generateFab = findViewById(R.id.generateFab);
 
@@ -463,11 +461,6 @@ public class MainActivity extends AppCompatActivity {
             toggleTitle(isChecked);
         });
 
-        // Add listener for emojis toggling
-        includeEmojisCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            rebuildOutputText();
-        });
-
         // Update hashtags checkbox visibility
         includeHashtagsCheckbox.setVisibility(
                 !prefsManager.getHashtags().isEmpty() ? View.VISIBLE : View.GONE);
@@ -621,38 +614,14 @@ public class MainActivity extends AppCompatActivity {
     private void rebuildOutputText() {
         StringBuilder textBuilder = new StringBuilder();
 
-        // Add title if checked and available
+        // Add title if checked and available (strip emojis)
         if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
-            String titleText = generatedTitle;
-            if (!includeEmojisCheckbox.isChecked()) {
-                titleText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(titleText);
-            }
+            String titleText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(generatedTitle);
             textBuilder.append(titleText).append("\n\n");
         }
 
-        // Add body
-        String bodyText = generatedBody;
-        if (!includeEmojisCheckbox.isChecked()) {
-            // If emojis are disabled, strip them all
-            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
-        } else if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
-            // If emojis are enabled AND title is shown,
-            // strip emoji from first paragraph of body (title has it), but also strip from
-            // all other paragraphs
-            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
-        } else if (!includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
-            // If emojis are enabled but title is NOT shown,
-            // prepend the title's emoji to the body, and strip emojis from 2nd paragraph
-            // onwards.
-            String titleEmoji = com.najmi.oreamnos.utils.StringUtils.extractLeadingEmojis(generatedTitle);
-            // Strip emojis from all paragraphs first
-            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
-            if (!titleEmoji.isEmpty()) {
-                // Prepend title's emoji to the first paragraph
-                bodyText = titleEmoji + bodyText;
-            }
-        }
-
+        // Add body (strip emojis)
+        String bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(generatedBody);
         textBuilder.append(bodyText);
 
         // Add source if checked and available

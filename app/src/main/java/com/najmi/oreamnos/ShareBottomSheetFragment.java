@@ -78,7 +78,6 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
     private MaterialButton backgroundButton;
     private MaterialButton continueButton;
     private Chip includeTitleCheckbox;
-    private Chip includeEmojisCheckbox;
     private Chip includeHashtagsCheckbox;
     private Chip includeSourceCheckbox;
     private TextView readabilityScore;
@@ -210,7 +209,6 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
         copyButton = view.findViewById(R.id.copyButton);
         shareButton = view.findViewById(R.id.shareButton);
         includeTitleCheckbox = view.findViewById(R.id.includeTitleCheckbox);
-        includeEmojisCheckbox = view.findViewById(R.id.includeEmojisCheckbox);
         includeHashtagsCheckbox = view.findViewById(R.id.includeHashtagsCheckbox);
         includeSourceCheckbox = view.findViewById(R.id.includeSourceCheckbox);
         readabilityScore = view.findViewById(R.id.readabilityScore);
@@ -242,7 +240,6 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
 
         // Output chips
         includeTitleCheckbox.setOnCheckedChangeListener((v, checked) -> rebuildOutputText());
-        includeEmojisCheckbox.setOnCheckedChangeListener((v, checked) -> rebuildOutputText());
         includeHashtagsCheckbox.setOnCheckedChangeListener((v, checked) -> rebuildOutputText());
         includeSourceCheckbox.setOnCheckedChangeListener((v, checked) -> rebuildOutputText());
 
@@ -495,38 +492,14 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
     private void rebuildOutputText() {
         StringBuilder textBuilder = new StringBuilder();
 
-        // 1. Title (if enabled)
+        // 1. Title (if enabled, strip emojis)
         if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
-            String titleText = generatedTitle;
-            if (!includeEmojisCheckbox.isChecked()) {
-                titleText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(titleText);
-            }
+            String titleText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(generatedTitle);
             textBuilder.append(titleText).append("\n\n");
         }
 
-        // 2. Body
-        String bodyText = generatedBody;
-        if (!includeEmojisCheckbox.isChecked()) {
-            // If emojis are disabled, strip them all
-            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
-        } else if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
-            // If emojis are enabled AND title is shown,
-            // strip emoji from first paragraph of body (title has it), but also strip from
-            // all other paragraphs
-            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
-        } else if (!includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
-            // If emojis are enabled but title is NOT shown,
-            // prepend the title's emoji to the body, and strip emojis from 2nd paragraph
-            // onwards.
-            String titleEmoji = com.najmi.oreamnos.utils.StringUtils.extractLeadingEmojis(generatedTitle);
-            // Strip emojis from all paragraphs first
-            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
-            if (!titleEmoji.isEmpty()) {
-                // Prepend title's emoji to the first paragraph
-                bodyText = titleEmoji + bodyText;
-            }
-        }
-
+        // 2. Body (strip emojis)
+        String bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(generatedBody);
         textBuilder.append(bodyText);
 
         // 3. Source (before hashtags)
