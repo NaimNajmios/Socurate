@@ -67,6 +67,7 @@
     <string name="clipboard_generate">Generate</string>
     <string name="clipboard_url_detected">Football URL Detected</string>
     <string name="clipboard_url_message">Generate a post from the copied URL?</string>
+    <string name="close_preview">Close preview</string>
     <string name="connection_test_failed">Connection failed: %1$s</string>
     <string name="connection_test_success">Connection successful!</string>
     <string name="content_copied_notification">Content copied!</string>

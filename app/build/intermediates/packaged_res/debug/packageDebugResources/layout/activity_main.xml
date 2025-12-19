@@ -80,46 +80,30 @@
                             android:layout_height="0dp"
                             android:layout_weight="1" />
 
-                        <!-- Paste Button -->
-                        <ImageButton
-                            android:id="@+id/pasteButton"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:src="@drawable/ic_paste"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/paste_input"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <!-- Clear Input Button -->
-                        <ImageButton
-                            android:id="@+id/clearInputButton"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:src="@drawable/ic_clear"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/clear_input"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
                         <!-- Reset All Button -->
                         <ImageButton
                             android:id="@+id/resetAllButton"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:src="@drawable/ic_refresh"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/reset_all"
-                            android:padding="4dp" />
+                            android:padding="12dp" />
 
                     </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/inputLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/input_hint"
                         app:boxBackgroundMode="none"
-                        app:hintTextColor="?attr/colorOnSurfaceVariant">
+                    app:hintTextColor="?attr/colorOnSurfaceVariant"
+                    app:endIconMode="custom"
+                    app:endIconDrawable="@drawable/ic_paste"
+                    app:endIconContentDescription="@string/paste_input"
+                    app:counterEnabled="true"
+                    app:counterTextColor="?attr/colorOnSurfaceVariant">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/inputText"
@@ -134,17 +118,6 @@
                             android:background="@null" />
 
                     </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- Character Count -->
-                    <TextView
-                        android:id="@+id/inputCharCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:text="0 characters"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="12sp"
-                        android:layout_marginTop="4dp" />
 
                     <!-- URL Preview Card -->
                     <com.google.android.material.card.MaterialCardView
@@ -204,11 +177,13 @@
 
                             <ImageButton
                                 android:id="@+id/closePreviewButton"
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:padding="12dp"
                                 android:background="?attr/selectableItemBackgroundBorderless"
                                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                                 android:scaleType="centerInside"
+                                android:contentDescription="@string/close_preview"
                                 app:tint="?attr/colorOnSurfaceVariant" />
 
                         </LinearLayout>
@@ -263,7 +238,18 @@
                     android:text="@string/placeholder_subtitle"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Paste Action in Empty State -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/emptyStatePasteButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/paste_input"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_paste"
+                    style="@style/Widget.Material3.Button.TonalButton" />
 
             </LinearLayout>
 
@@ -558,7 +544,7 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/editButton"
                             android:layout_width="wrap_content"
-                            android:layout_height="36dp"
+                            android:layout_height="48dp"
                             android:text="@string/edit_button"
                             android:textColor="?attr/colorOnPrimary"
                             android:textSize="12sp"
@@ -568,7 +554,7 @@
                             android:backgroundTint="?attr/colorPrimary"
                             android:insetTop="0dp"
                             android:insetBottom="0dp"
-                            app:cornerRadius="18dp"
+                            app:cornerRadius="24dp"
                             app:icon="@android:drawable/ic_menu_edit"
                             app:iconSize="16dp"
                             app:iconTint="?attr/colorOnPrimary"

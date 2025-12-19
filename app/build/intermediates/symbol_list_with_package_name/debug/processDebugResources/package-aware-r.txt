@@ -3308,7 +3308,6 @@ id chipCasual
 id chipFormal
 id chronometer
 id circle_center
-id clearInputButton
 id clearLogsButton
 id clear_text
 id clip_horizontal
@@ -3387,6 +3386,7 @@ id embed
 id emptyLogsText
 id emptySessionsText
 id emptyStateMessage
+id emptyStatePasteButton
 id emptyStateTitle
 id enableHashtagsSwitch
 id end
@@ -3459,6 +3459,7 @@ id info
 id inputCard
 id inputCharCount
 id inputHeader
+id inputLayout
 id inputText
 id invisible
 id inward
@@ -3606,7 +3607,6 @@ id parentPanel
 id parentRelative
 id parent_matrix
 id password_toggle
-id pasteButton
 id path
 id pathRelative
 id peekHeight
@@ -3774,7 +3774,7 @@ id todayRequests
 id todayTokens
 id toggle
 id tokenBarContainer
-id tokensText
+id tokensChip
 id toneCasual
 id toneChipGroup
 id toneFormal
@@ -4091,6 +4091,7 @@ string clipboard_dismiss
 string clipboard_generate
 string clipboard_url_detected
 string clipboard_url_message
+string close_preview
 string connection_test_failed
 string connection_test_success
 string content_copied_notification

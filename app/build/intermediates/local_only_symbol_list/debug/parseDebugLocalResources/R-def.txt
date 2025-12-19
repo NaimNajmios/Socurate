@@ -107,7 +107,6 @@ id checkRephrase
 id checkShortenDetailed
 id chipCasual
 id chipFormal
-id clearInputButton
 id clearLogsButton
 id closeButton
 id closePreviewButton
@@ -127,6 +126,7 @@ id editedIndicator
 id emptyLogsText
 id emptySessionsText
 id emptyStateMessage
+id emptyStatePasteButton
 id emptyStateTitle
 id enableHashtagsSwitch
 id errorCard
@@ -151,6 +151,7 @@ id includeTitleCheckbox
 id inputCard
 id inputCharCount
 id inputHeader
+id inputLayout
 id inputText
 id keepStructureSwitch
 id levelBadge
@@ -174,7 +175,6 @@ id outputCard
 id outputScrollView
 id outputText
 id outputWordCount
-id pasteButton
 id pillCommandInput
 id pillNameInput
 id placeholderView
@@ -221,7 +221,7 @@ id timestampText
 id todayRequests
 id todayTokens
 id tokenBarContainer
-id tokensText
+id tokensChip
 id toneCasual
 id toneChipGroup
 id toneFormal
@@ -272,6 +272,7 @@ string clipboard_dismiss
 string clipboard_generate
 string clipboard_url_detected
 string clipboard_url_message
+string close_preview
 string connection_test_failed
 string connection_test_success
 string content_copied_notification
