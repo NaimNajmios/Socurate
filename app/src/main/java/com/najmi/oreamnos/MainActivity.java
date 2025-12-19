@@ -1263,11 +1263,17 @@ public class MainActivity extends AppCompatActivity {
         if (checkShortenDetailed.isChecked())
             refinements.add("shorten_detailed");
 
-        // Ensure at least one option is selected
-        if (refinements.isEmpty()) {
+        // Get selected custom pill commands
+        java.util.List<String> customCommands = getSelectedCustomPillCommands();
+
+        // Ensure at least one option is selected (built-in OR custom)
+        if (refinements.isEmpty() && customCommands.isEmpty()) {
             Toast.makeText(this, "Please select at least one refinement option", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // Add custom commands to the refinements list
+        refinements.addAll(customCommands);
 
         Log.i(TAG, "Regenerating with refinements: " + refinements);
 
