@@ -636,14 +636,22 @@ public class MainActivity extends AppCompatActivity {
             // If emojis are disabled, strip them all
             bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
         } else if (includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
-            // If emojis are enabled BUT title is shown (and has emoji),
-            // strip emoji from the body to avoid double emojis.
-            // The prompt puts emojis on BOTH Title and First Para, so we remove the Body
-            // one here.
+            // If emojis are enabled AND title is shown,
+            // strip emoji from first paragraph of body (title has it), but also strip from
+            // all other paragraphs
             bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
+        } else if (!includeTitleCheckbox.isChecked() && !generatedTitle.isEmpty()) {
+            // If emojis are enabled but title is NOT shown,
+            // prepend the title's emoji to the body, and strip emojis from 2nd paragraph
+            // onwards.
+            String titleEmoji = com.najmi.oreamnos.utils.StringUtils.extractLeadingEmojis(generatedTitle);
+            // Strip emojis from all paragraphs first
+            bodyText = com.najmi.oreamnos.utils.StringUtils.stripLeadingEmojis(bodyText);
+            if (!titleEmoji.isEmpty()) {
+                // Prepend title's emoji to the first paragraph
+                bodyText = titleEmoji + bodyText;
+            }
         }
-        // If emojis are enabled AND title is NOT shown, we keep the Body emoji (from
-        // the prompt).
 
         textBuilder.append(bodyText);
 
