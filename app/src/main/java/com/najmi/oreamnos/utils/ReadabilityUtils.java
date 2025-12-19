@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 public class ReadabilityUtils {
 
     // Pre-compiled patterns for performance
-    private static final Pattern SENTENCE_SPLIT_PATTERN = Pattern.compile("[.!?]+");
     private static final Pattern WORD_SPLIT_PATTERN = Pattern.compile("\\s+");
     // Removed regex patterns used in countSyllables as they are replaced by loop implementation
 
@@ -46,20 +45,39 @@ public class ReadabilityUtils {
 
     /**
      * Counts the number of sentences in the text.
-     * Approximated by splitting by punctuation (. ! ?).
+     * Approximated by counting sentence terminators (. ! ?) and handling segments.
+     * Optimized to avoid String.split() and array allocation.
      */
     public static int countSentences(String text) {
         if (text == null || text.trim().isEmpty()) {
             return 0;
         }
-        // Split by sentence terminators
-        String[] sentences = SENTENCE_SPLIT_PATTERN.split(text);
+
         int count = 0;
-        for (String s : sentences) {
-            if (!s.trim().isEmpty()) {
-                count++;
+        boolean hasContent = false;
+        int len = text.length();
+
+        for (int i = 0; i < len; i++) {
+            char c = text.charAt(i);
+            boolean isTerminator = (c == '.' || c == '!' || c == '?');
+
+            if (isTerminator) {
+                if (hasContent) {
+                    count++;
+                    hasContent = false;
+                }
+            } else {
+                if (!Character.isWhitespace(c)) {
+                    hasContent = true;
+                }
             }
         }
+
+        // If there is trailing content without a terminator, count it as a sentence
+        if (hasContent) {
+            count++;
+        }
+
         return Math.max(1, count); // At least 1 sentence if text is not empty
     }
 
