@@ -37,6 +37,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+    private MaterialCardView inputCard;
     private TextInputEditText inputText;
     private com.google.android.material.textfield.TextInputLayout inputLayout;
     private TextInputEditText outputText;
@@ -204,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
         setupBottomNavigation();
 
         // Initialize views
+        inputCard = findViewById(R.id.inputCard);
         inputText = findViewById(R.id.inputText);
         inputLayout = findViewById(R.id.inputLayout);
         outputText = findViewById(R.id.outputText);
@@ -296,6 +299,9 @@ public class MainActivity extends AppCompatActivity {
                 updateInputEndIcon(s.length() > 0);
             }
         });
+
+        // Focus animation for input card
+        inputText.setOnFocusChangeListener((v, hasFocus) -> animateInputFocus(hasFocus));
 
         // Watch for text changes to show edited indicator and update word count
         outputText.addTextChangedListener(new TextWatcher() {
@@ -1817,5 +1823,55 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return commands;
+    }
+
+    /**
+     * Animates the input card's elevation and stroke when focused.
+     */
+    private void animateInputFocus(boolean hasFocus) {
+        if (inputCard == null) return;
+
+        int elevationStart = hasFocus ? 0 : 12; // 0dp to 4dp (approx 12px)
+        int elevationEnd = hasFocus ? 12 : 0;
+
+        int strokeWidthStart = hasFocus ? 1 : 2; // 1dp to 2dp
+        int strokeWidthEnd = hasFocus ? 2 : 1; // 1dp to 2dp (pixels depend on density, kept simple here as integers)
+
+        // Resolve colors
+        int colorOutline = MaterialColors.getColor(inputCard, com.google.android.material.R.attr.colorOutline);
+        int colorPrimary = MaterialColors.getColor(inputCard, com.google.android.material.R.attr.colorPrimary);
+
+        int colorStart = hasFocus ? colorOutline : colorPrimary;
+        int colorEnd = hasFocus ? colorPrimary : colorOutline;
+
+        // Convert dp to px for elevation
+        float density = getResources().getDisplayMetrics().density;
+        float elevationStartPx = (hasFocus ? 0 : 4) * density;
+        float elevationEndPx = (hasFocus ? 4 : 0) * density;
+
+        // Convert dp to px for stroke width
+        int strokeWidthStartPx = (int) ((hasFocus ? 1 : 2) * density);
+        int strokeWidthEndPx = (int) ((hasFocus ? 2 : 1) * density);
+
+        // Animate Elevation
+        ObjectAnimator elevationAnim = ObjectAnimator.ofFloat(inputCard, "cardElevation", elevationStartPx, elevationEndPx);
+        elevationAnim.setDuration(200);
+        elevationAnim.start();
+
+        // Animate Stroke Color
+        ObjectAnimator colorAnim = ObjectAnimator.ofArgb(inputCard, "strokeColor", colorStart, colorEnd);
+        colorAnim.setDuration(200);
+        colorAnim.start();
+
+        // Animate Stroke Width (ObjectAnimator doesn't support int directly for custom properties easily without wrapper,
+        // but MaterialCardView has setStrokeWidth. We can just set it immediately or use ValueAnimator if needed.
+        // For simplicity and "snappiness", setting it immediately or using a ValueAnimator is better.
+        // Let's use ValueAnimator for smooth transition)
+        android.animation.ValueAnimator strokeWidthAnim = android.animation.ValueAnimator.ofInt(strokeWidthStartPx, strokeWidthEndPx);
+        strokeWidthAnim.setDuration(200);
+        strokeWidthAnim.addUpdateListener(animation -> {
+            inputCard.setStrokeWidth((int) animation.getAnimatedValue());
+        });
+        strokeWidthAnim.start();
     }
 }
