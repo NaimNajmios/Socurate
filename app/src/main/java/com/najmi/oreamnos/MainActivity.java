@@ -67,12 +67,11 @@ public class MainActivity extends AppCompatActivity {
     private com.google.android.material.textfield.TextInputLayout inputLayout;
     private TextInputEditText outputText;
     private TextView editedIndicator;
-    private TextView progressText;
     private TextView outputWordCount;
     private TextView readabilityScore;
+    private MaterialCardView inputCard;
     private MaterialCardView outputCard;
     private MaterialCardView skeletonCard;
-    private View progressOverlay;
     private View placeholderView;
     private MaterialButton emptyStatePasteButton;
     private ImageButton resetAllButton;
@@ -204,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
         setupBottomNavigation();
 
         // Initialize views
+        inputCard = findViewById(R.id.inputCard);
         inputText = findViewById(R.id.inputText);
         inputLayout = findViewById(R.id.inputLayout);
         outputText = findViewById(R.id.outputText);
@@ -212,8 +212,6 @@ public class MainActivity extends AppCompatActivity {
         skeletonCard = findViewById(R.id.skeletonCard);
         placeholderView = findViewById(R.id.placeholderView);
         emptyStatePasteButton = findViewById(R.id.emptyStatePasteButton);
-        progressOverlay = findViewById(R.id.progressOverlay);
-        progressText = findViewById(R.id.progressText);
         outputWordCount = findViewById(R.id.outputWordCount);
         readabilityScore = findViewById(R.id.readabilityScore);
         resetAllButton = findViewById(R.id.resetAllButton);
@@ -295,6 +293,11 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 updateInputEndIcon(s.length() > 0);
             }
+        });
+
+        // Add focus listener for active input state animation
+        inputText.setOnFocusChangeListener((v, hasFocus) -> {
+            animateInputCardFocus(hasFocus);
         });
 
         // Watch for text changes to show edited indicator and update word count
@@ -920,10 +923,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows or hides the progress overlay.
+     * Animates the input card when focus changes.
      */
-    private void showProgress(boolean show) {
-        progressOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
+    private void animateInputCardFocus(boolean hasFocus) {
+        if (inputCard == null) return;
+
+        float targetElevation = hasFocus ? 6 * getResources().getDisplayMetrics().density : 0f;
+        int targetStrokeColor = hasFocus ? getColorFromAttr(com.google.android.material.R.attr.colorPrimary)
+                : getColorFromAttr(com.google.android.material.R.attr.colorOutline);
+        int startStrokeColor = hasFocus ? getColorFromAttr(com.google.android.material.R.attr.colorOutline)
+                : getColorFromAttr(com.google.android.material.R.attr.colorPrimary);
+
+        // Animate elevation
+        ObjectAnimator elevationAnim = ObjectAnimator.ofFloat(inputCard, "cardElevation", targetElevation);
+        elevationAnim.setDuration(200);
+        elevationAnim.start();
+
+        // Animate stroke color
+        ObjectAnimator strokeAnim = ObjectAnimator.ofArgb(inputCard, "strokeColor", startStrokeColor, targetStrokeColor);
+        strokeAnim.setDuration(200);
+        strokeAnim.start();
+    }
+
+    /**
+     * Helper to get color from attribute.
+     */
+    private int getColorFromAttr(int attr) {
+        android.util.TypedValue typedValue = new android.util.TypedValue();
+        getTheme().resolveAttribute(attr, typedValue, true);
+        return typedValue.data;
     }
 
     /**
