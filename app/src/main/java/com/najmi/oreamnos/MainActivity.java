@@ -133,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
     // Pre-compiled Regex Patterns for Performance
     private static final java.util.regex.Pattern SOURCE_CITATION_PATTERN = java.util.regex.Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$");
     private static final java.util.regex.Pattern TRAILING_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\\n+$");
+    private static final java.util.regex.Pattern WHITESPACE_PATTERN = java.util.regex.Pattern.compile("\\s+");
+    private static final java.util.regex.Pattern SPLIT_BY_DOUBLE_NEWLINE_PATTERN = java.util.regex.Pattern.compile("\\n\\n");
+    private static final java.util.regex.Pattern SPLIT_BY_NEWLINE_PATTERN = java.util.regex.Pattern.compile("\\n");
 
     // Markdown stripping patterns
     private static final java.util.regex.Pattern BOLD_PATTERN_1 = java.util.regex.Pattern.compile("\\*\\*(.+?)\\*\\*");
@@ -320,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Update word count
                 String text = s.toString().trim();
-                int wordCount = text.isEmpty() ? 0 : text.split("\\s+").length;
+                int wordCount = text.isEmpty() ? 0 : WHITESPACE_PATTERN.split(text).length;
                 outputWordCount.setText(wordCount + " words");
 
                 // Update readability score
@@ -616,14 +619,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Split by first double newline or single newline
-        String[] parts = content.split("\\n\\n", 2);
+        String[] parts = SPLIT_BY_DOUBLE_NEWLINE_PATTERN.split(content, 2);
         if (parts.length >= 2 && parts[0].length() < 150) {
             // First part is title (if reasonably short)
             generatedTitle = parts[0].trim();
             generatedBody = parts[1].trim();
         } else {
             // Try single newline
-            parts = content.split("\\n", 2);
+            parts = SPLIT_BY_NEWLINE_PATTERN.split(content, 2);
             if (parts.length >= 2 && parts[0].length() < 150) {
                 generatedTitle = parts[0].trim();
                 generatedBody = parts[1].trim();
