@@ -38,6 +38,7 @@ import com.najmi.oreamnos.services.WebContentExtractor;
 import com.najmi.oreamnos.utils.HapticHelper;
 import com.najmi.oreamnos.utils.NotificationHelper;
 import com.najmi.oreamnos.utils.PreferencesManager;
+import com.najmi.oreamnos.utils.ReadabilityUtils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -267,11 +268,11 @@ public class ShareBottomSheetFragment extends BottomSheetDialogFragment {
                     editedIndicator.setVisibility(View.GONE);
                 }
                 String text = s.toString().trim();
-                int wordCount = text.isEmpty() ? 0 : WHITESPACE_PATTERN.split(text).length;
+                int wordCount = ReadabilityUtils.countWords(text);
                 outputWordCount.setText(wordCount + " words");
 
                 // Update readability score
-                double score = com.najmi.oreamnos.utils.ReadabilityUtils.calculateFleschKincaidGradeLevel(text);
+                double score = ReadabilityUtils.calculateFleschKincaidGradeLevel(text);
                 readabilityScore.setText(String.format("Grade: %.1f", score));
             }
         });

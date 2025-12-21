@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Update word count
                 String text = s.toString().trim();
-                int wordCount = text.isEmpty() ? 0 : text.split("\\s+").length;
+                int wordCount = ReadabilityUtils.countWords(text);
                 outputWordCount.setText(wordCount + " words");
 
                 // Update readability score

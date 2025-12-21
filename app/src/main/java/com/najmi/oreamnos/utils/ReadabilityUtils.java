@@ -83,13 +83,31 @@ public class ReadabilityUtils {
 
     /**
      * Counts the number of words in the text.
+     * Optimized to avoid String.split() and array allocation.
+     * Uses a character iteration loop (O(N), zero allocation).
      */
     public static int countWords(String text) {
-        if (text == null || text.trim().isEmpty()) {
+        if (text == null || text.isEmpty()) {
             return 0;
         }
-        String[] words = WORD_SPLIT_PATTERN.split(text.trim());
-        return words.length;
+
+        int count = 0;
+        boolean inWord = false;
+        int len = text.length();
+
+        for (int i = 0; i < len; i++) {
+            char c = text.charAt(i);
+            // Check for whitespace (same behavior as \\s+)
+            if (Character.isWhitespace(c)) {
+                inWord = false;
+            } else {
+                if (!inWord) {
+                    count++;
+                    inWord = true;
+                }
+            }
+        }
+        return count;
     }
 
     /**
