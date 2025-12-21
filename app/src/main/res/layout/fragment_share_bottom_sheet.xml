@@ -116,6 +116,7 @@
                             android:layout_height="24dp"
                             android:src="@android:drawable/arrow_up_float"
                             android:rotation="180"
+                            android:contentDescription="@string/tap_to_collapse"
                             android:tint="?attr/colorOnSurfaceVariant" />
 
                     </LinearLayout>
