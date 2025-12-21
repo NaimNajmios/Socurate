@@ -206,53 +206,16 @@
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Placeholder Illustration (shown when no output) -->
-            <LinearLayout
+            <FrameLayout
                 android:id="@+id/placeholderView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="40dp"
-                android:layout_marginBottom="20dp"
-                android:visibility="visible">
+                android:visibility="visible"
+                android:layout_marginBottom="20dp">
 
-                <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:src="@drawable/ic_stadium"
-                    android:contentDescription="@string/placeholder_title"
-                    android:layout_marginBottom="20dp" />
+                <include layout="@layout/layout_empty_state" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/placeholder_title"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/placeholder_subtitle"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    android:layout_marginBottom="24dp" />
-
-                <!-- Paste Action in Empty State -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/emptyStatePasteButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/paste_input"
-                    android:visibility="gone"
-                    app:icon="@drawable/ic_paste"
-                    style="@style/Widget.Material3.Button.TonalButton" />
-
-            </LinearLayout>
+            </FrameLayout>
 
             <!-- Skeleton Loading (shown while processing) -->
             <com.google.android.material.card.MaterialCardView
