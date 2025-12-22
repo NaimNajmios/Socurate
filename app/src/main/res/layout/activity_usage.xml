@@ -39,84 +39,213 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Overview Card - Total Tokens & Success Rate -->
+            <!-- Segmented Control Tabs -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant"
                 app:cardElevation="0dp"
-                app:cardCornerRadius="16dp">
+                app:cardCornerRadius="12dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="24dp">
+                    android:orientation="horizontal"
+                    android:padding="4dp">
 
-                    <!-- Total Tokens Large Display -->
-                    <TextView
-                        android:id="@+id/totalTokensValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textColor="?attr/colorOnPrimaryContainer"
-                        android:textSize="48sp"
-                        android:textStyle="bold" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/tab24h"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:text="24H"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        app:backgroundTint="@android:color/transparent"
+                        app:cornerRadius="10dp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/total_tokens_label"
-                        android:textColor="?attr/colorOnPrimaryContainer"
-                        android:textSize="14sp"
-                        android:alpha="0.8"
-                        android:layout_marginBottom="16dp" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/tab7d"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:text="7D"
+                        android:textSize="13sp"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:backgroundTint="?attr/colorPrimary"
+                        app:cornerRadius="10dp" />
 
-                    <!-- Success Rate -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:id="@+id/successRateValue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="100%"
-                            android:textColor="?attr/colorOnPrimaryContainer"
-                            android:textSize="24sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/success_rate"
-                            android:textColor="?attr/colorOnPrimaryContainer"
-                            android:textSize="12sp"
-                            android:alpha="0.8"
-                            android:layout_marginStart="8dp" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="1dp"
-                            android:layout_weight="1" />
-
-                        <TextView
-                            android:id="@+id/requestsCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 requests"
-                            android:textColor="?attr/colorOnPrimaryContainer"
-                            android:textSize="12sp"
-                            android:alpha="0.8" />
-
-                    </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/tab30d"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:text="30D"
+                        android:textSize="13sp"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        app:backgroundTint="@android:color/transparent"
+                        app:cornerRadius="10dp" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- KPI Cards Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="20dp">
+
+                <!-- Total Tokens Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardBackgroundColor="?attr/colorSurface"
+                    app:cardElevation="0dp"
+                    app:cardCornerRadius="16dp"
+                    app:strokeColor="?attr/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_sparkle"
+                                app:tint="?attr/colorPrimary"
+                                android:contentDescription="Total Tokens" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/total_tokens_label"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="12sp"
+                                android:layout_marginStart="6dp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/totalTokensValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="28sp"
+                            android:textStyle="bold" />
+
+                        <!-- Trend indicator -->
+                        <TextView
+                            android:id="@+id/tokensTrendValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="↗ +12% vs last week"
+                            android:textColor="@color/success"
+                            android:textSize="11sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Est. Cost Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="?attr/colorSurface"
+                    app:cardElevation="0dp"
+                    app:cardCornerRadius="16dp"
+                    app:strokeColor="?attr/colorOutline"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_usage"
+                                app:tint="?attr/colorPrimary"
+                                android:contentDescription="Estimated Cost" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Est. Cost"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="12sp"
+                                android:layout_marginStart="6dp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/estCostValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="$0.00"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="28sp"
+                            android:textStyle="bold" />
+
+                        <!-- Reset days indicator -->
+                        <TextView
+                            android:id="@+id/resetDaysValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Reset in 30 days"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- Hidden Legacy Fields for backward compatibility -->
+            <TextView
+                android:id="@+id/successRateValue"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                android:text="100%" />
+
+            <TextView
+                android:id="@+id/requestsCount"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                android:text="0 requests" />
 
             <!-- Time Period Section Header -->
             <TextView
@@ -281,21 +410,11 @@
 
             </LinearLayout>
 
-            <!-- Token Breakdown Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TOKEN BREAKDOWN"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="12dp" />
-
+            <!-- Token Distribution Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="20dp"
                 app:cardBackgroundColor="?attr/colorSurface"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="16dp"
@@ -308,68 +427,219 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Stacked Bar -->
+                    <!-- Header with Legend -->
                     <LinearLayout
-                        android:id="@+id/tokenBarContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="24dp"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:clipChildren="false"
-                        android:clipToPadding="false"
-                        android:layout_marginBottom="12dp">
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="20dp">
 
-                        <View
-                            android:id="@+id/promptTokensBar"
+                        <TextView
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:background="@drawable/token_bar_prompt" />
+                            android:text="Token Distribution"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
 
+                        <!-- Response Legend -->
                         <View
-                            android:id="@+id/responseTokensBar"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@drawable/token_bar_response" />
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:background="@drawable/rounded_bg_surface"
+                            android:backgroundTint="#3B82F6" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Response"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp"
+                            android:layout_marginStart="4dp"
+                            android:layout_marginEnd="12dp" />
+
+                        <!-- Prompt Legend -->
+                        <View
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:background="@drawable/rounded_bg_surface"
+                            android:backgroundTint="#64748B" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Prompt"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp"
+                            android:layout_marginStart="4dp" />
 
                     </LinearLayout>
 
-                    <!-- Legend -->
+                    <!-- Bar Chart Area -->
+                    <LinearLayout
+                        android:id="@+id/barChartContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:orientation="horizontal"
+                        android:gravity="bottom"
+                        android:layout_marginBottom="12dp">
+
+                        <!-- MON -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="bottom|center_horizontal">
+                            <View android:id="@+id/barMonResponse"
+                                android:layout_width="16dp"
+                                android:layout_height="40dp"
+                                android:background="@drawable/bar_top_rounded"
+                                android:backgroundTint="#3B82F6" />
+                            <View android:id="@+id/barMonPrompt"
+                                android:layout_width="16dp"
+                                android:layout_height="30dp"
+                                android:background="#64748B" />
+                        </LinearLayout>
+
+                        <!-- TUE -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="bottom|center_horizontal">
+                            <View android:id="@+id/barTueResponse"
+                                android:layout_width="16dp"
+                                android:layout_height="50dp"
+                                android:background="@drawable/bar_top_rounded"
+                                android:backgroundTint="#3B82F6" />
+                            <View android:id="@+id/barTuePrompt"
+                                android:layout_width="16dp"
+                                android:layout_height="35dp"
+                                android:background="#64748B" />
+                        </LinearLayout>
+
+                        <!-- WED (Active - highlighted) -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="bottom|center_horizontal">
+                            <View android:id="@+id/barWedResponse"
+                                android:layout_width="16dp"
+                                android:layout_height="65dp"
+                                android:background="@drawable/bar_top_rounded"
+                                android:backgroundTint="#3B82F6" />
+                            <View android:id="@+id/barWedPrompt"
+                                android:layout_width="16dp"
+                                android:layout_height="40dp"
+                                android:background="#64748B" />
+                        </LinearLayout>
+
+                        <!-- THU -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="bottom|center_horizontal">
+                            <View android:id="@+id/barThuResponse"
+                                android:layout_width="16dp"
+                                android:layout_height="35dp"
+                                android:background="@drawable/bar_top_rounded"
+                                android:backgroundTint="#3B82F6" />
+                            <View android:id="@+id/barThuPrompt"
+                                android:layout_width="16dp"
+                                android:layout_height="25dp"
+                                android:background="#64748B" />
+                        </LinearLayout>
+
+                        <!-- FRI -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="bottom|center_horizontal">
+                            <View android:id="@+id/barFriResponse"
+                                android:layout_width="16dp"
+                                android:layout_height="55dp"
+                                android:background="@drawable/bar_top_rounded"
+                                android:backgroundTint="#3B82F6" />
+                            <View android:id="@+id/barFriPrompt"
+                                android:layout_width="16dp"
+                                android:layout_height="35dp"
+                                android:background="#64748B" />
+                        </LinearLayout>
+
+                        <!-- SAT -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="bottom|center_horizontal">
+                            <View android:id="@+id/barSatResponse"
+                                android:layout_width="16dp"
+                                android:layout_height="25dp"
+                                android:background="@drawable/bar_top_rounded"
+                                android:backgroundTint="#3B82F6" />
+                            <View android:id="@+id/barSatPrompt"
+                                android:layout_width="16dp"
+                                android:layout_height="20dp"
+                                android:background="#64748B" />
+                        </LinearLayout>
+
+                        <!-- SUN -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="bottom|center_horizontal">
+                            <View android:id="@+id/barSunResponse"
+                                android:layout_width="16dp"
+                                android:layout_height="20dp"
+                                android:background="@drawable/bar_top_rounded"
+                                android:backgroundTint="#3B82F6" />
+                            <View android:id="@+id/barSunPrompt"
+                                android:layout_width="16dp"
+                                android:layout_height="15dp"
+                                android:background="#64748B" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- X-Axis Labels -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="MON" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="TUE" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="WED" android:textColor="?attr/colorOnSurface" android:textSize="10sp" android:textStyle="bold" android:gravity="center" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="THU" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="FRI" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="SAT" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                            android:text="SUN" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                    </LinearLayout>
 
-                        <View
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:background="#4285F4" />
-
-                        <TextView
-                            android:id="@+id/promptTokensValue"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Prompt: 0"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="12sp"
-                            android:layout_marginStart="8dp" />
-
-                        <View
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:background="#34A853" />
-
-                        <TextView
-                            android:id="@+id/responseTokensValue"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Response: 0"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="12sp"
-                            android:layout_marginStart="8dp" />
-
+                    <!-- Hidden legacy fields for backward compatibility -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone">
+                        <View android:id="@+id/tokenBarContainer" android:layout_width="0dp" android:layout_height="0dp" />
+                        <View android:id="@+id/promptTokensBar" android:layout_width="0dp" android:layout_height="0dp" />
+                        <View android:id="@+id/responseTokensBar" android:layout_width="0dp" android:layout_height="0dp" />
+                        <TextView android:id="@+id/promptTokensValue" android:layout_width="0dp" android:layout_height="0dp" android:text="0" />
+                        <TextView android:id="@+id/responseTokensValue" android:layout_width="0dp" android:layout_height="0dp" android:text="0" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -536,6 +806,228 @@
                             android:textSize="12sp"
                             android:gravity="end"
                             android:layout_marginStart="8dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- API Health Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Header with Status Badge -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="API Health"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <!-- Operational Badge -->
+                        <TextView
+                            android:id="@+id/apiHealthBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="● Operational"
+                            android:textColor="@color/success"
+                            android:textSize="12sp"
+                            android:background="@drawable/rounded_bg_surface"
+                            android:backgroundTint="#1A4ADE80"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp" />
+
+                    </LinearLayout>
+
+                    <!-- Health Progress Bar -->
+                    <ProgressBar
+                        android:id="@+id/apiHealthProgressBar"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="12dp"
+                        android:max="100"
+                        android:progress="99"
+                        android:progressTint="#3B82F6"
+                        android:progressBackgroundTint="?attr/colorError"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Success/Failed Legend -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:background="#3B82F6" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Successful"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp"
+                            android:layout_marginStart="4dp" />
+                        <TextView
+                            android:id="@+id/successfulCountValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4,281"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:layout_marginStart="4dp" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <View
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:background="?attr/colorError" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Failed"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp"
+                            android:layout_marginStart="4dp" />
+                        <TextView
+                            android:id="@+id/failedCountValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="34"
+                            android:textColor="?attr/colorError"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:layout_marginStart="4dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Additional Stats Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:divider="@drawable/divider_horizontal"
+                    android:showDividers="middle">
+
+                    <!-- Avg. Response Time -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Avg. Response Time"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/avgResponseTimeValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1.2s"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp"
+                            android:fontFamily="monospace" />
+
+                    </LinearLayout>
+
+                    <!-- Last Request -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Last Request"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/lastRequestValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="14:02 PM"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp"
+                            android:fontFamily="monospace" />
+
+                    </LinearLayout>
+
+                    <!-- Active Model -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Active Model"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/activeModelValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="● Gemini 1.5 Pro"
+                            android:textColor="@color/success"
+                            android:textSize="14sp" />
 
                     </LinearLayout>
 

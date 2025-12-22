@@ -1,68 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Light Mode Colors -->
+    <!-- Deep Dark Mode Premium Color Palette -->
+    <!-- Based on Socurate Design Language -->
     
-    <!-- Background & Surface -->
-    <color name="background_light">#FFFFFF</color>
-    <color name="surface_light">#F5F7F8</color>
+    <!-- Background & Surface - Deep Navy -->
+    <color name="background_light">#0B1120</color>
+    <color name="surface_light">#1E293B</color>
     
-    <!-- Primary & Secondary -->
-    <color name="primary_light">#455A64</color>
-    <color name="primary_variant_light">#37474F</color>
-    <color name="secondary_light">#8D7B6F</color>
-    <color name="secondary_variant_light">#6D5D51</color>
+    <!-- Primary - Electric Blue -->
+    <color name="primary_light">#3B82F6</color>
+    <color name="primary_variant_light">#60A5FA</color>
+    <color name="secondary_light">#60A5FA</color>
+    <color name="secondary_variant_light">#93C5FD</color>
     
-    <!-- Text Colors -->
-    <color name="text_primary_light">#1C2326</color>
-    <color name="text_secondary_light">#546E7A</color>
+    <!-- Text Colors - High Emphasis White, Medium Emphasis Slate -->
+    <color name="text_primary_light">#FFFFFF</color>
+    <color name="text_secondary_light">#94A3B8</color>
     
     <!-- Additional UI Colors -->
-    <color name="outline_light">#CFD8DC</color>
-    <color name="divider_light">#ECEFF1</color>
+    <color name="outline_light">#334155</color>
+    <color name="divider_light">#1E293B</color>
     
-    <!-- Error Colors -->
-    <color name="error_light">#B00020</color>
-    <color name="on_error_light">#FFFFFF</color>
+    <!-- Error Colors - Muted Red -->
+    <color name="error_light">#F87171</color>
+    <color name="on_error_light">#0B1120</color>
     
-    <!-- Material Design 3 Light Theme Mappings -->
-    <color name="md_theme_light_primary">#455A64</color>
+    <!-- Success Colors - Muted Green -->
+    <color name="success">#4ADE80</color>
+    <color name="on_success">#0B1120</color>
+    
+    <!-- Material Design 3 Theme Mappings -->
+    <color name="md_theme_light_primary">#3B82F6</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
-    <color name="md_theme_light_primaryContainer">#CFD8DC</color>
-    <color name="md_theme_light_onPrimaryContainer">#1C2326</color>
+    <color name="md_theme_light_primaryContainer">#1E3A5F</color>
+    <color name="md_theme_light_onPrimaryContainer">#DBEAFE</color>
     
-    <color name="md_theme_light_secondary">#8D7B6F</color>
-    <color name="md_theme_light_onSecondary">#FFFFFF</color>
-    <color name="md_theme_light_secondaryContainer">#F5F7F8</color>
-    <color name="md_theme_light_onSecondaryContainer">#1C2326</color>
+    <color name="md_theme_light_secondary">#60A5FA</color>
+    <color name="md_theme_light_onSecondary">#0B1120</color>
+    <color name="md_theme_light_secondaryContainer">#1E293B</color>
+    <color name="md_theme_light_onSecondaryContainer">#FFFFFF</color>
     
-    <color name="md_theme_light_tertiary">#546E7A</color>
-    <color name="md_theme_light_onTertiary">#FFFFFF</color>
-    <color name="md_theme_light_tertiaryContainer">#CFD8DC</color>
-    <color name="md_theme_light_onTertiaryContainer">#1C2326</color>
+    <color name="md_theme_light_tertiary">#94A3B8</color>
+    <color name="md_theme_light_onTertiary">#0B1120</color>
+    <color name="md_theme_light_tertiaryContainer">#334155</color>
+    <color name="md_theme_light_onTertiaryContainer">#F1F5F9</color>
     
-    <color name="md_theme_light_error">#B00020</color>
-    <color name="md_theme_light_errorContainer">#FDECEA</color>
-    <color name="md_theme_light_onError">#FFFFFF</color>
-    <color name="md_theme_light_onErrorContainer">#B00020</color>
+    <color name="md_theme_light_error">#F87171</color>
+    <color name="md_theme_light_errorContainer">#7F1D1D</color>
+    <color name="md_theme_light_onError">#0B1120</color>
+    <color name="md_theme_light_onErrorContainer">#FEE2E2</color>
     
-    <color name="md_theme_light_background">#FFFFFF</color>
-    <color name="md_theme_light_onBackground">#1C2326</color>
+    <color name="md_theme_light_background">#0B1120</color>
+    <color name="md_theme_light_onBackground">#FFFFFF</color>
     
-    <color name="md_theme_light_surface">#F5F7F8</color>
-    <color name="md_theme_light_onSurface">#1C2326</color>
-    <color name="md_theme_light_surfaceVariant">#ECEFF1</color>
-    <color name="md_theme_light_onSurfaceVariant">#546E7A</color>
+    <color name="md_theme_light_surface">#1E293B</color>
+    <color name="md_theme_light_onSurface">#FFFFFF</color>
+    <color name="md_theme_light_surfaceVariant">#0F172A</color>
+    <color name="md_theme_light_onSurfaceVariant">#94A3B8</color>
     
-    <color name="md_theme_light_outline">#CFD8DC</color>
-    <color name="md_theme_light_inverseOnSurface">#F5F7F8</color>
-    <color name="md_theme_light_inverseSurface">#1C2326</color>
-    <color name="md_theme_light_inversePrimary">#90A4AE</color>
+    <color name="md_theme_light_outline">#334155</color>
+    <color name="md_theme_light_inverseOnSurface">#0B1120</color>
+    <color name="md_theme_light_inverseSurface">#F1F5F9</color>
+    <color name="md_theme_light_inversePrimary">#1D4ED8</color>
     
-    <!-- Skeleton Shimmer Variants (Light Theme) -->
-    <color name="skeleton_dark">#D0D7DC</color>
-    <color name="skeleton_light">#E8ECEF</color>
+    <!-- Skeleton Shimmer Variants -->
+    <color name="skeleton_dark">#0F172A</color>
+    <color name="skeleton_light">#1E293B</color>
     
-    <!-- Glow Effect Colors (Light Theme) -->
-    <color name="glow_accent">#5490A4AE</color>
-    <color name="glow_accent_transparent">#1A90A4AE</color>
+    <!-- Glow Effect Colors -->
+    <color name="glow_accent">#543B82F6</color>
+    <color name="glow_accent_transparent">#263B82F6</color>
 </resources>
