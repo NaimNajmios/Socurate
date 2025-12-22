@@ -17,7 +17,9 @@ public class StringUtils {
             "\ufe0f" + // Variation selector
             "]+";
 
-    private static final Pattern LEADING_EMOJI_PATTERN = Pattern.compile("^(" + EMOJI_PATTERN + ")+\\s*");
+    // Bolt Optimization: Use Multiline flag to match start of lines without splitting the string
+    // Use [ \t]* instead of \s* to avoid matching newlines
+    private static final Pattern LEADING_EMOJI_PATTERN = Pattern.compile("^(" + EMOJI_PATTERN + ")+[ \\t]*", Pattern.MULTILINE);
 
     /**
      * Strips ALL emojis from the text (anywhere in the text, not just leading).
@@ -35,24 +37,15 @@ public class StringUtils {
      * Strips leading emojis and whitespace from the beginning of each
      * line/paragraph.
      * Uses a robust regex to handle most emoji types including compound emojis.
+     * <p>
+     * Optimized by Bolt: Uses Multiline regex to avoid string splitting and array allocation.
      */
     public static String stripLeadingEmojis(String text) {
         if (text == null || text.isEmpty())
             return "";
 
-        StringBuilder sb = new StringBuilder();
-        String[] lines = text.split("\n");
-
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-            // Replace leading emoji and whitespace using the pattern matcher
-            line = LEADING_EMOJI_PATTERN.matcher(line).replaceFirst("");
-            sb.append(line);
-            if (i < lines.length - 1) {
-                sb.append("\n");
-            }
-        }
-
-        return sb.toString();
+        // Bolt Optimization: Replace all matches in one pass using Multiline pattern
+        // This avoids split(), array allocation, and StringBuilder operations
+        return LEADING_EMOJI_PATTERN.matcher(text).replaceAll("");
     }
 }
