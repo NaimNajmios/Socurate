@@ -56,6 +56,13 @@ color success
 color surface_light
 color text_primary_light
 color text_secondary_light
+dimen card_corner_radius
+dimen chip_stroke_width
+dimen spacing_lg
+dimen spacing_md
+dimen spacing_sm
+dimen spacing_xl
+dimen spacing_xs
 drawable bar_top_rounded
 drawable bottom_sheet_handle
 drawable circle_indicator

@@ -1,6 +1,7 @@
 package com.najmi.oreamnos;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -222,6 +223,21 @@ public class SettingsActivity extends AppCompatActivity {
             applyTheme(theme);
             showSavedFeedback();
         });
+
+        // Navigation row click handlers
+        View hashtagManagerRow = findViewById(R.id.hashtagManagerRow);
+        if (hashtagManagerRow != null) {
+            hashtagManagerRow.setOnClickListener(v -> {
+                startActivity(new Intent(this, HashtagManagerActivity.class));
+            });
+        }
+
+        View usageStatsRow = findViewById(R.id.usageStatsRow);
+        if (usageStatsRow != null) {
+            usageStatsRow.setOnClickListener(v -> {
+                startActivity(new Intent(this, UsageActivity.class));
+            });
+        }
     }
 
     /**

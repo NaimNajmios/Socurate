@@ -87,6 +87,14 @@
             android:parentActivityName="com.najmi.oreamnos.MainActivity"
             android:theme="@style/Theme.Oreamnos" />
 
+        <!-- Hashtag Manager Activity -->
+        <activity
+            android:name="com.najmi.oreamnos.HashtagManagerActivity"
+            android:exported="false"
+            android:label="Hashtag Manager"
+            android:parentActivityName="com.najmi.oreamnos.SettingsActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
         <!-- Log List Activity -->
         <activity
             android:name="com.najmi.oreamnos.LogListActivity"

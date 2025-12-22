@@ -64,6 +64,14 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.Oreamnos" />
 
+        <!-- Hashtag Manager Activity -->
+        <activity
+            android:name=".HashtagManagerActivity"
+            android:exported="false"
+            android:label="Hashtag Manager"
+            android:parentActivityName=".SettingsActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
         <!-- Log List Activity -->
         <activity
             android:name=".LogListActivity"
