@@ -213,6 +213,43 @@
 
                     </LinearLayout>
 
+                    <!-- Cerebras API Key (hidden by default) -->
+                    <LinearLayout
+                        android:id="@+id/cerebrasKeyContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/cerebras_api_key_label"
+                            app:boxBackgroundMode="none"
+                            app:endIconMode="password_toggle"
+                            app:endIconTint="?attr/colorPrimary"
+                            app:hintTextColor="?attr/colorOnSurfaceVariant"
+                            android:layout_marginBottom="8dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/cerebrasApiKeyInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="?attr/colorOnSurface"
+                                android:inputType="textPassword"
+                                android:background="@null" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/provider_help_cerebras"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
                     <!-- Divider -->
                     <View
                         android:layout_width="match_parent"

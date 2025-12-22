@@ -153,6 +153,10 @@
     <string name="openrouter_api_key_hint">Enter your OpenRouter API key</string>
     <string name="provider_help_groq">Get your key at console.groq.com</string>
     <string name="provider_help_openrouter">Get your key at openrouter.ai</string>
+    <string name="cerebras_api_key_label">Cerebras API Key</string>
+    <string name="cerebras_api_key_hint">Enter your Cerebras API key</string>
+    <string name="provider_help_cerebras">Get your key at cloud.cerebras.ai</string>
+    <string name="provider_cerebras">Cerebras (Fast Inference)</string>
     
     <!-- Bottom Sheet Share -->
     <string name="progress_extracting">Extracting content…</string>

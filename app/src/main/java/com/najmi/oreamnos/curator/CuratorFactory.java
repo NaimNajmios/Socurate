@@ -12,6 +12,7 @@ import com.najmi.oreamnos.utils.PreferencesManager;
  * - Gemini (Google) - default
  * - Groq (Llama 3.3 70B)
  * - OpenRouter (access to free models)
+ * - Cerebras (ultra-fast inference)
  */
 public class CuratorFactory {
 
@@ -19,14 +20,17 @@ public class CuratorFactory {
     public static final String PROVIDER_GEMINI = "gemini";
     public static final String PROVIDER_GROQ = "groq";
     public static final String PROVIDER_OPENROUTER = "openrouter";
+    public static final String PROVIDER_CEREBRAS = "cerebras";
 
     // API endpoints
     private static final String GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
     private static final String OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+    private static final String CEREBRAS_API_URL = "https://api.cerebras.ai/v1/chat/completions";
 
     // Default model IDs
     private static final String GROQ_MODEL_ID = "llama-3.3-70b-versatile";
     private static final String OPENROUTER_MODEL_ID = "google/gemini-2.0-flash-exp:free";
+    private static final String CEREBRAS_MODEL_ID = "llama-3.3-70b";
 
     /**
      * Creates an IContentCurator based on user preferences.
@@ -61,6 +65,16 @@ public class CuratorFactory {
                         true // isOpenRouter = true (requires special headers)
                 );
 
+            case PROVIDER_CEREBRAS:
+                String cerebrasKey = prefs.getCerebrasApiKey();
+                return new OpenAICompatibleCurator(
+                        cerebrasKey,
+                        CEREBRAS_API_URL,
+                        CEREBRAS_MODEL_ID,
+                        tone,
+                        false // isOpenRouter = false
+                );
+
             case PROVIDER_GEMINI:
             default:
                 String geminiKey = prefs.getApiKey();
@@ -91,6 +105,8 @@ public class CuratorFactory {
                 return "Groq (Llama 3.3)";
             case PROVIDER_OPENROUTER:
                 return "OpenRouter (Free Models)";
+            case PROVIDER_CEREBRAS:
+                return "Cerebras (Fast Inference)";
             case PROVIDER_GEMINI:
             default:
                 return "Gemini (Google)";

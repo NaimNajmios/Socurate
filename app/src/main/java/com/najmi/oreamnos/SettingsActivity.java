@@ -106,6 +106,23 @@ public class SettingsActivity extends AppCompatActivity {
             "meta-llama/llama-4-maverick:free"
     };
 
+    // Available Cerebras models (free tier)
+    private static final String[] CEREBRAS_MODEL_NAMES = {
+            "Llama 3.3 70B",
+            "Llama 3.1 8B",
+            "Qwen 3 32B",
+            "GPT-OSS 120B",
+            "Z.ai GLM 4.6"
+    };
+
+    private static final String[] CEREBRAS_MODEL_IDS = {
+            "llama-3.3-70b",
+            "llama3.1-8b",
+            "qwen-3-32b",
+            "gpt-oss-120b",
+            "zai-glm-4.6"
+    };
+
     // Current model arrays (dynamically updated based on provider)
     private String[] currentModelNames = GEMINI_MODEL_NAMES;
     private String[] currentModelIds = GEMINI_MODEL_ENDPOINTS;
@@ -118,6 +135,8 @@ public class SettingsActivity extends AppCompatActivity {
     private View geminiKeyContainer;
     private View groqKeyContainer;
     private View openRouterKeyContainer;
+    private View cerebrasKeyContainer;
+    private TextInputEditText cerebrasApiKeyInput;
     private TextInputEditText hashtagsInput;
     private RadioGroup toneRadioGroup;
     private RadioGroup themeRadioGroup;
@@ -126,8 +145,8 @@ public class SettingsActivity extends AppCompatActivity {
     private MaterialButton testConnectionButton;
 
     // Provider constants (must match PreferencesManager)
-    private static final String[] PROVIDER_NAMES = { "Gemini", "Groq", "OpenRouter" };
-    private static final String[] PROVIDER_VALUES = { "gemini", "groq", "openrouter" };
+    private static final String[] PROVIDER_NAMES = { "Gemini", "Groq", "OpenRouter", "Cerebras" };
+    private static final String[] PROVIDER_VALUES = { "gemini", "groq", "openrouter", "cerebras" };
 
     // Flag to prevent auto-save during initial load
     private boolean isLoading = true;
@@ -165,6 +184,8 @@ public class SettingsActivity extends AppCompatActivity {
         geminiKeyContainer = findViewById(R.id.geminiKeyContainer);
         groqKeyContainer = findViewById(R.id.groqKeyContainer);
         openRouterKeyContainer = findViewById(R.id.openRouterKeyContainer);
+        cerebrasKeyContainer = findViewById(R.id.cerebrasKeyContainer);
+        cerebrasApiKeyInput = findViewById(R.id.cerebrasApiKeyInput);
         hashtagsInput = findViewById(R.id.hashtagsInput);
         toneRadioGroup = findViewById(R.id.toneRadioGroup);
         themeRadioGroup = findViewById(R.id.themeRadioGroup);
@@ -225,6 +246,13 @@ public class SettingsActivity extends AppCompatActivity {
         openRouterApiKeyInput.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus && !isLoading) {
                 saveOpenRouterApiKey();
+            }
+        });
+
+        // Cerebras API Key - save on focus lost
+        cerebrasApiKeyInput.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus && !isLoading) {
+                saveCerebrasApiKey();
             }
         });
 
@@ -331,6 +359,18 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /**
+     * Saves the Cerebras API key.
+     */
+    private void saveCerebrasApiKey() {
+        String apiKey = cerebrasApiKeyInput.getText() != null ? cerebrasApiKeyInput.getText().toString().trim()
+                : "";
+        if (!apiKey.isEmpty()) {
+            prefsManager.saveCerebrasApiKey(apiKey);
+            showSavedFeedback();
+        }
+    }
+
+    /**
      * Shows brief feedback when settings are auto-saved.
      */
     private void showSavedFeedback() {
@@ -368,6 +408,7 @@ public class SettingsActivity extends AppCompatActivity {
         geminiKeyContainer.setVisibility(View.GONE);
         groqKeyContainer.setVisibility(View.GONE);
         openRouterKeyContainer.setVisibility(View.GONE);
+        cerebrasKeyContainer.setVisibility(View.GONE);
 
         switch (provider) {
             case PreferencesManager.PROVIDER_GROQ:
@@ -375,6 +416,9 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
             case PreferencesManager.PROVIDER_OPENROUTER:
                 openRouterKeyContainer.setVisibility(View.VISIBLE);
+                break;
+            case PreferencesManager.PROVIDER_CEREBRAS:
+                cerebrasKeyContainer.setVisibility(View.VISIBLE);
                 break;
             case PreferencesManager.PROVIDER_GEMINI:
             default:
@@ -408,6 +452,10 @@ public class SettingsActivity extends AppCompatActivity {
             case PreferencesManager.PROVIDER_OPENROUTER:
                 currentModelNames = OPENROUTER_MODEL_NAMES;
                 currentModelIds = OPENROUTER_MODEL_IDS;
+                break;
+            case PreferencesManager.PROVIDER_CEREBRAS:
+                currentModelNames = CEREBRAS_MODEL_NAMES;
+                currentModelIds = CEREBRAS_MODEL_IDS;
                 break;
             case PreferencesManager.PROVIDER_GEMINI:
             default:
@@ -471,6 +519,11 @@ public class SettingsActivity extends AppCompatActivity {
             openRouterApiKeyInput.setText(openRouterKey);
         }
 
+        String cerebrasKey = prefsManager.getCerebrasApiKey();
+        if (cerebrasKey != null) {
+            cerebrasApiKeyInput.setText(cerebrasKey);
+        }
+
         // Update model dropdown for current provider
         updateModelDropdownForProvider(provider);
 
@@ -529,6 +582,10 @@ public class SettingsActivity extends AppCompatActivity {
                 apiKey = openRouterApiKeyInput.getText() != null ? openRouterApiKeyInput.getText().toString().trim()
                         : "";
                 break;
+            case PreferencesManager.PROVIDER_CEREBRAS:
+                apiKey = cerebrasApiKeyInput.getText() != null ? cerebrasApiKeyInput.getText().toString().trim()
+                        : "";
+                break;
             case PreferencesManager.PROVIDER_GEMINI:
             default:
                 apiKey = this.apiKeyInput.getText() != null ? this.apiKeyInput.getText().toString().trim() : "";
@@ -574,6 +631,17 @@ public class SettingsActivity extends AppCompatActivity {
                         result = openRouterCurator.curatePost("Test connection: Manchester United won 3-0.", true,
                                 false);
                         break;
+                    case PreferencesManager.PROVIDER_CEREBRAS:
+                        // Use OpenAICompatibleCurator for Cerebras
+                        com.najmi.oreamnos.curator.OpenAICompatibleCurator cerebrasCurator = new com.najmi.oreamnos.curator.OpenAICompatibleCurator(
+                                finalApiKey,
+                                "https://api.cerebras.ai/v1/chat/completions",
+                                currentModelIds[selectedModelIndex],
+                                tone,
+                                false);
+                        result = cerebrasCurator.curatePost("Test connection: Manchester United won 3-0.", true,
+                                false);
+                        break;
                     case PreferencesManager.PROVIDER_GEMINI:
                     default:
                         // Use GeminiService for Gemini
@@ -592,6 +660,9 @@ public class SettingsActivity extends AppCompatActivity {
                             break;
                         case PreferencesManager.PROVIDER_OPENROUTER:
                             prefsManager.saveOpenRouterApiKey(finalApiKey);
+                            break;
+                        case PreferencesManager.PROVIDER_CEREBRAS:
+                            prefsManager.saveCerebrasApiKey(finalApiKey);
                             break;
                         case PreferencesManager.PROVIDER_GEMINI:
                         default:

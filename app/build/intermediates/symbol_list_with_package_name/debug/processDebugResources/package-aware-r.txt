@@ -3293,6 +3293,8 @@ id centerCrop
 id centerInside
 id center_horizontal
 id center_vertical
+id cerebrasApiKeyInput
+id cerebrasKeyContainer
 id chain
 id chain2
 id chains
@@ -4079,6 +4081,8 @@ string bottomsheet_action_expand_halfway
 string bottomsheet_drag_handle_clicked
 string bottomsheet_drag_handle_content_description
 string cancel_edit
+string cerebras_api_key_hint
+string cerebras_api_key_label
 string character_counter_content_description
 string character_counter_overflowed_content_description
 string character_counter_pattern
@@ -4289,8 +4293,10 @@ string processing_error
 string progress_extracting
 string progress_generating
 string prompt_tokens
+string provider_cerebras
 string provider_gemini
 string provider_groq
+string provider_help_cerebras
 string provider_help_groq
 string provider_help_openrouter
 string provider_label

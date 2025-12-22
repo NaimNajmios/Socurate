@@ -22,6 +22,7 @@ public class PreferencesManager {
     private static final String KEY_PROVIDER = "ai_provider";
     private static final String KEY_GROQ_API_KEY = "groq_api_key";
     private static final String KEY_OPENROUTER_API_KEY = "openrouter_api_key";
+    private static final String KEY_CEREBRAS_API_KEY = "cerebras_api_key";
     private static final String DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     private static final String DEFAULT_HASHTAGS = "#BolaSepak #Football";
 
@@ -36,16 +37,19 @@ public class PreferencesManager {
     public static final String PROVIDER_GEMINI = "gemini";
     public static final String PROVIDER_GROQ = "groq";
     public static final String PROVIDER_OPENROUTER = "openrouter";
+    public static final String PROVIDER_CEREBRAS = "cerebras";
 
     // Model keys per provider
     private static final String KEY_GEMINI_MODEL = "gemini_model";
     private static final String KEY_GROQ_MODEL = "groq_model";
     private static final String KEY_OPENROUTER_MODEL = "openrouter_model";
+    private static final String KEY_CEREBRAS_MODEL = "cerebras_model";
 
     // Default models per provider
     private static final String DEFAULT_GEMINI_MODEL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
     private static final String DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile";
     private static final String DEFAULT_OPENROUTER_MODEL = "deepseek/deepseek-v3-base:free";
+    private static final String DEFAULT_CEREBRAS_MODEL = "llama-3.3-70b";
 
     private final SharedPreferences securePrefs;
     private final Context context;
@@ -365,6 +369,32 @@ public class PreferencesManager {
     }
 
     /**
+     * Saves the Cerebras API key securely.
+     */
+    public boolean saveCerebrasApiKey(String apiKey) {
+        try {
+            securePrefs.edit()
+                    .putString(KEY_CEREBRAS_API_KEY, apiKey)
+                    .apply();
+            return true;
+        } catch (Exception e) {
+            android.util.Log.e("PreferencesManager", "Failed to save Cerebras API key", e);
+            return false;
+        }
+    }
+
+    /**
+     * Gets the Cerebras API key.
+     */
+    public String getCerebrasApiKey() {
+        try {
+            return securePrefs.getString(KEY_CEREBRAS_API_KEY, null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * Checks if the current provider has a valid API key.
      */
     public boolean hasApiKeyForCurrentProvider() {
@@ -376,6 +406,9 @@ public class PreferencesManager {
             case PROVIDER_OPENROUTER:
                 String orKey = getOpenRouterApiKey();
                 return orKey != null && !orKey.trim().isEmpty();
+            case PROVIDER_CEREBRAS:
+                String cerebrasKey = getCerebrasApiKey();
+                return cerebrasKey != null && !cerebrasKey.trim().isEmpty();
             case PROVIDER_GEMINI:
             default:
                 return hasApiKey();
@@ -396,6 +429,9 @@ public class PreferencesManager {
                 break;
             case PROVIDER_OPENROUTER:
                 key = KEY_OPENROUTER_MODEL;
+                break;
+            case PROVIDER_CEREBRAS:
+                key = KEY_CEREBRAS_MODEL;
                 break;
             case PROVIDER_GEMINI:
             default:
@@ -422,6 +458,10 @@ public class PreferencesManager {
             case PROVIDER_OPENROUTER:
                 key = KEY_OPENROUTER_MODEL;
                 defaultModel = DEFAULT_OPENROUTER_MODEL;
+                break;
+            case PROVIDER_CEREBRAS:
+                key = KEY_CEREBRAS_MODEL;
+                defaultModel = DEFAULT_CEREBRAS_MODEL;
                 break;
             case PROVIDER_GEMINI:
             default:

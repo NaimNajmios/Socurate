@@ -18,12 +18,13 @@ import java.util.List;
 import com.najmi.oreamnos.exceptions.RateLimitException;
 
 /**
- * OpenAI-compatible API curator that works with both Groq and OpenRouter.
+ * OpenAI-compatible API curator that works with Groq, OpenRouter, and Cerebras.
  * These providers use the same OpenAI chat completions format.
  * 
  * Supported providers:
  * - Groq: Fast inference with Llama 3.3
  * - OpenRouter: Access to multiple free models
+ * - Cerebras: Ultra-fast inference with various models
  */
 public class OpenAICompatibleCurator implements IContentCurator {
 
