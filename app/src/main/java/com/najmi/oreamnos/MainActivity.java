@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
     private MaterialCardView skeletonCard;
     private View placeholderView;
     private MaterialButton emptyStatePasteButton;
+    private MaterialCardView emptyStateCard;
+    private ImageView emptyStateIcon;
     private ImageButton resetAllButton;
     private MaterialButton editButton;
     private MaterialButton copyButton;
@@ -214,6 +216,9 @@ public class MainActivity extends AppCompatActivity {
         outputCard = findViewById(R.id.outputCard);
         skeletonCard = findViewById(R.id.skeletonCard);
         placeholderView = findViewById(R.id.placeholderView);
+        // Bind included layout views
+        emptyStateCard = findViewById(R.id.emptyStateCard);
+        emptyStateIcon = findViewById(R.id.emptyStateIcon);
         emptyStatePasteButton = findViewById(R.id.emptyStatePasteButton);
         outputWordCount = findViewById(R.id.outputWordCount);
         readabilityScore = findViewById(R.id.readabilityScore);
@@ -1080,6 +1085,21 @@ public class MainActivity extends AppCompatActivity {
             placeholderView.setVisibility(View.VISIBLE);
             Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
             placeholderView.startAnimation(fadeIn);
+
+            // Animate empty state icon (subtle pulse)
+            if (emptyStateIcon != null) {
+                ObjectAnimator scaleX = ObjectAnimator.ofFloat(emptyStateIcon, "scaleX", 0.9f, 1.0f);
+                ObjectAnimator scaleY = ObjectAnimator.ofFloat(emptyStateIcon, "scaleY", 0.9f, 1.0f);
+                scaleX.setDuration(1000);
+                scaleY.setDuration(1000);
+                scaleX.setRepeatMode(ObjectAnimator.REVERSE);
+                scaleY.setRepeatMode(ObjectAnimator.REVERSE);
+                // Just animate once for entry (one full pulse: 0.9 -> 1.0 -> 0.9)
+                scaleX.setRepeatCount(1);
+                scaleY.setRepeatCount(1);
+                scaleX.start();
+                scaleY.start();
+            }
         }
     }
 
