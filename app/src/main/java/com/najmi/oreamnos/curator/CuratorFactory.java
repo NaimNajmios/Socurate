@@ -29,7 +29,7 @@ public class CuratorFactory {
 
     // Default model IDs
     private static final String GROQ_MODEL_ID = "llama-3.3-70b-versatile";
-    private static final String OPENROUTER_MODEL_ID = "google/gemini-2.0-flash-exp:free";
+    private static final String OPENROUTER_MODEL_ID = "meta-llama/llama-3.3-70b-instruct:free";
     private static final String CEREBRAS_MODEL_ID = "llama-3.3-70b";
 
     /**

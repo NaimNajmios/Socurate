@@ -83,27 +83,27 @@ public class SettingsActivity extends AppCompatActivity {
 
     // Available OpenRouter free models
     private static final String[] OPENROUTER_MODEL_NAMES = {
-            "DeepSeek V3 Base (Free)",
-            "DeepSeek Chat V3 (Free)",
-            "Llama 3.3 70B Instruct (Free)",
-            "Gemma 3 27B (Free)",
-            "Mistral Small 3.1 24B (Free)",
-            "Qwen 3 235B A22B (Free)",
-            "Gemini 2.0 Flash Exp (Free)",
-            "Phi-4 Multimodal (Free)",
-            "Llama 4 Maverick (Free)"
+            "Llama 3.3 70B Instruct",
+            "Llama 3.1 8B Instruct",
+            "Llama 3.1 405B Instruct",
+            "Llama 3.2 3B Instruct",
+            "Google Gemma 2 9B",
+            "Mistral 7B Instruct",
+            "Qwen 2.5 7B Instruct",
+            "NVIDIA Nemotron 70B",
+            "HuggingFace Zephyr 7B"
     };
 
     private static final String[] OPENROUTER_MODEL_IDS = {
-            "deepseek/deepseek-v3-base:free",
-            "deepseek/deepseek-chat-v3-0324:free",
             "meta-llama/llama-3.3-70b-instruct:free",
-            "google/gemma-3-27b-it:free",
-            "mistralai/mistral-small-3.1-24b-instruct:free",
-            "qwen/qwen3-235b-a22b:free",
-            "google/gemini-2.0-flash-exp:free",
-            "microsoft/phi-4-multimodal-instruct:free",
-            "meta-llama/llama-4-maverick:free"
+            "meta-llama/llama-3.1-8b-instruct:free",
+            "meta-llama/llama-3.1-405b-instruct:free",
+            "meta-llama/llama-3.2-3b-instruct:free",
+            "google/gemma-2-9b-it:free",
+            "mistralai/mistral-7b-instruct:free",
+            "qwen/qwen-2.5-7b-instruct:free",
+            "nvidia/llama-3.1-nemotron-70b-instruct:free",
+            "huggingfaceh4/zephyr-7b-beta:free"
     };
 
     // Available Cerebras models (free tier)
