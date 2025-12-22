@@ -67,14 +67,15 @@ public class MainActivity extends AppCompatActivity {
     private com.google.android.material.textfield.TextInputLayout inputLayout;
     private TextInputEditText outputText;
     private TextView editedIndicator;
-    private TextView progressText;
     private TextView outputWordCount;
     private TextView readabilityScore;
+    private MaterialCardView inputCard;
     private MaterialCardView outputCard;
     private MaterialCardView skeletonCard;
-    private View progressOverlay;
     private View placeholderView;
     private MaterialButton emptyStatePasteButton;
+    private MaterialCardView emptyStateCard;
+    private ImageView emptyStateIcon;
     private ImageButton resetAllButton;
     private MaterialButton editButton;
     private MaterialButton copyButton;
@@ -134,6 +135,9 @@ public class MainActivity extends AppCompatActivity {
     // Pre-compiled Regex Patterns for Performance
     private static final java.util.regex.Pattern SOURCE_CITATION_PATTERN = java.util.regex.Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$");
     private static final java.util.regex.Pattern TRAILING_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\\n+$");
+    private static final java.util.regex.Pattern WHITESPACE_PATTERN = java.util.regex.Pattern.compile("\\s+");
+    private static final java.util.regex.Pattern SPLIT_BY_DOUBLE_NEWLINE_PATTERN = java.util.regex.Pattern.compile("\\n\\n");
+    private static final java.util.regex.Pattern SPLIT_BY_NEWLINE_PATTERN = java.util.regex.Pattern.compile("\\n");
 
     // Markdown stripping patterns
     private static final java.util.regex.Pattern BOLD_PATTERN_1 = java.util.regex.Pattern.compile("\\*\\*(.+?)\\*\\*");
@@ -204,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         setupBottomNavigation();
 
         // Initialize views
+        inputCard = findViewById(R.id.inputCard);
         inputText = findViewById(R.id.inputText);
         inputLayout = findViewById(R.id.inputLayout);
         outputText = findViewById(R.id.outputText);
@@ -211,9 +216,10 @@ public class MainActivity extends AppCompatActivity {
         outputCard = findViewById(R.id.outputCard);
         skeletonCard = findViewById(R.id.skeletonCard);
         placeholderView = findViewById(R.id.placeholderView);
+        // Bind included layout views
+        emptyStateCard = findViewById(R.id.emptyStateCard);
+        emptyStateIcon = findViewById(R.id.emptyStateIcon);
         emptyStatePasteButton = findViewById(R.id.emptyStatePasteButton);
-        progressOverlay = findViewById(R.id.progressOverlay);
-        progressText = findViewById(R.id.progressText);
         outputWordCount = findViewById(R.id.outputWordCount);
         readabilityScore = findViewById(R.id.readabilityScore);
         resetAllButton = findViewById(R.id.resetAllButton);
@@ -297,6 +303,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Add focus listener for active input state animation
+        inputText.setOnFocusChangeListener((v, hasFocus) -> {
+            animateInputCardFocus(hasFocus);
+        });
+
         // Watch for text changes to show edited indicator and update word count
         outputText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -317,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Update word count
                 String text = s.toString().trim();
-                int wordCount = text.isEmpty() ? 0 : text.split("\\s+").length;
+                int wordCount = text.isEmpty() ? 0 : WHITESPACE_PATTERN.split(text).length;
                 outputWordCount.setText(wordCount + " words");
 
                 // Update readability score
@@ -613,14 +624,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Split by first double newline or single newline
-        String[] parts = content.split("\\n\\n", 2);
+        String[] parts = SPLIT_BY_DOUBLE_NEWLINE_PATTERN.split(content, 2);
         if (parts.length >= 2 && parts[0].length() < 150) {
             // First part is title (if reasonably short)
             generatedTitle = parts[0].trim();
             generatedBody = parts[1].trim();
         } else {
             // Try single newline
-            parts = content.split("\\n", 2);
+            parts = SPLIT_BY_NEWLINE_PATTERN.split(content, 2);
             if (parts.length >= 2 && parts[0].length() < 150) {
                 generatedTitle = parts[0].trim();
                 generatedBody = parts[1].trim();
@@ -920,10 +931,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows or hides the progress overlay.
+     * Animates the input card when focus changes.
      */
-    private void showProgress(boolean show) {
-        progressOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
+    private void animateInputCardFocus(boolean hasFocus) {
+        if (inputCard == null) return;
+
+        float targetElevation = hasFocus ? 6 * getResources().getDisplayMetrics().density : 0f;
+        int targetStrokeColor = hasFocus ? getColorFromAttr(com.google.android.material.R.attr.colorPrimary)
+                : getColorFromAttr(com.google.android.material.R.attr.colorOutline);
+        int startStrokeColor = hasFocus ? getColorFromAttr(com.google.android.material.R.attr.colorOutline)
+                : getColorFromAttr(com.google.android.material.R.attr.colorPrimary);
+
+        // Animate elevation
+        ObjectAnimator elevationAnim = ObjectAnimator.ofFloat(inputCard, "cardElevation", targetElevation);
+        elevationAnim.setDuration(200);
+        elevationAnim.start();
+
+        // Animate stroke color
+        ObjectAnimator strokeAnim = ObjectAnimator.ofArgb(inputCard, "strokeColor", startStrokeColor, targetStrokeColor);
+        strokeAnim.setDuration(200);
+        strokeAnim.start();
+    }
+
+    /**
+     * Helper to get color from attribute.
+     */
+    private int getColorFromAttr(int attr) {
+        android.util.TypedValue typedValue = new android.util.TypedValue();
+        getTheme().resolveAttribute(attr, typedValue, true);
+        return typedValue.data;
     }
 
     /**
@@ -1049,6 +1085,21 @@ public class MainActivity extends AppCompatActivity {
             placeholderView.setVisibility(View.VISIBLE);
             Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
             placeholderView.startAnimation(fadeIn);
+
+            // Animate empty state icon (subtle pulse)
+            if (emptyStateIcon != null) {
+                ObjectAnimator scaleX = ObjectAnimator.ofFloat(emptyStateIcon, "scaleX", 0.9f, 1.0f);
+                ObjectAnimator scaleY = ObjectAnimator.ofFloat(emptyStateIcon, "scaleY", 0.9f, 1.0f);
+                scaleX.setDuration(1000);
+                scaleY.setDuration(1000);
+                scaleX.setRepeatMode(ObjectAnimator.REVERSE);
+                scaleY.setRepeatMode(ObjectAnimator.REVERSE);
+                // Just animate once for entry (one full pulse: 0.9 -> 1.0 -> 0.9)
+                scaleX.setRepeatCount(1);
+                scaleY.setRepeatCount(1);
+                scaleX.start();
+                scaleY.start();
+            }
         }
     }
 
@@ -1599,7 +1650,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (hasClipboardContent) {
-            emptyStatePasteButton.setVisibility(View.VISIBLE);
+            if (emptyStatePasteButton.getVisibility() != View.VISIBLE) {
+                emptyStatePasteButton.setVisibility(View.VISIBLE);
+                emptyStatePasteButton.setScaleX(0f);
+                emptyStatePasteButton.setScaleY(0f);
+                emptyStatePasteButton.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(300)
+                        .setInterpolator(new OvershootInterpolator())
+                        .start();
+            }
             emptyStatePasteButton.setOnClickListener(v -> {
                 onPasteClick();
                 // Optionally start generation immediately or just focus
