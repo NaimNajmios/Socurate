@@ -47,6 +47,35 @@ public class GeminiService {
     private static final java.util.regex.Pattern SOURCE_CITATION_PATTERN = java.util.regex.Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$");
     private static final java.util.regex.Pattern TRAILING_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\\n+$");
 
+    // Bolt Optimization: Move constant array allocation to static final
+    private static final String[] TACTICAL_KEYWORDS = {
+            "formation", "tactical", "pressing", "possession", "xg", "expected goals",
+            "pass completion", "progressive passes", "defensive line", "build-up",
+            "counter-attack", "high press", "low block", "transition", "shape",
+            "midfielder", "forward", "defender", "fullback", "winger",
+            "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2", "3-4-3"
+    };
+
+    // Bolt Optimization: Move unwanted phrases to static final
+    private static final String[] UNWANTED_PHRASES = {
+            "Okay, ini percubaan untuk mengubah teks tersebut",
+            "terjemahkan ke Bahasa Melayu (Malaysia)",
+            "suntikkan sedikit gaya yang kurang formal",
+            "istilah bola sepak Inggeris yang biasa",
+            "Saya cuba gunakan perkataan yang lebih santai",
+            "Saya juga masukkan istilah bola sepak",
+            "Struktur diubah dengan menggabungkan",
+            "Em dash (—) dibuang seperti yang diminta",
+            "Tukar perkataan dari bahasa inggeris",
+            "Semoga ini membantu",
+            "Saya cuba",
+            "Saya juga",
+            "Struktur diubah",
+            "Em dash",
+            "Tukar perkataan",
+            "Semoga ini"
+    };
+
     // Retry configuration
     private static final int MAX_RETRIES = 4;
     private static final long BASE_DELAY_MS = 500L;
@@ -598,16 +627,9 @@ public class GeminiService {
         String lowerText = text.toLowerCase();
 
         // Count tactical keywords
-        String[] tacticalKeywords = {
-                "formation", "tactical", "pressing", "possession", "xg", "expected goals",
-                "pass completion", "progressive passes", "defensive line", "build-up",
-                "counter-attack", "high press", "low block", "transition", "shape",
-                "midfielder", "forward", "defender", "fullback", "winger",
-                "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2", "3-4-3"
-        };
-
+        // Bolt Optimization: Use static final array instead of allocating new one each call
         int keywordCount = 0;
-        for (String keyword : tacticalKeywords) {
+        for (String keyword : TACTICAL_KEYWORDS) {
             if (lowerText.contains(keyword)) {
                 keywordCount++;
             }
@@ -707,26 +729,8 @@ public class GeminiService {
         cleaned = HORIZONTAL_RULE_PATTERN.matcher(cleaned).replaceAll("");
 
         // Remove unwanted explanatory phrases
-        String[] unwantedPhrases = {
-                "Okay, ini percubaan untuk mengubah teks tersebut",
-                "terjemahkan ke Bahasa Melayu (Malaysia)",
-                "suntikkan sedikit gaya yang kurang formal",
-                "istilah bola sepak Inggeris yang biasa",
-                "Saya cuba gunakan perkataan yang lebih santai",
-                "Saya juga masukkan istilah bola sepak",
-                "Struktur diubah dengan menggabungkan",
-                "Em dash (—) dibuang seperti yang diminta",
-                "Tukar perkataan dari bahasa inggeris",
-                "Semoga ini membantu",
-                "Saya cuba",
-                "Saya juga",
-                "Struktur diubah",
-                "Em dash",
-                "Tukar perkataan",
-                "Semoga ini"
-        };
-
-        for (String phrase : unwantedPhrases) {
+        // Bolt Optimization: Use static final array to avoid allocation
+        for (String phrase : UNWANTED_PHRASES) {
             cleaned = cleaned.replace(phrase, "");
         }
 
