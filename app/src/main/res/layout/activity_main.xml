@@ -89,6 +89,7 @@
                             android:src="@drawable/ic_refresh"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="@string/reset_all"
+                            android:tooltipText="@string/reset_all"
                             android:padding="12dp" />
 
                     </LinearLayout>
@@ -148,6 +149,7 @@
                                 android:scaleType="centerCrop"
                                 android:background="@drawable/rounded_bg_surface"
                                 android:padding="4dp"
+                                android:contentDescription="@string/website_icon"
                                 app:tint="?attr/colorPrimary" />
 
                             <LinearLayout
@@ -185,6 +187,7 @@
                                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                                 android:scaleType="centerInside"
                                 android:contentDescription="@string/close_preview"
+                                android:tooltipText="@string/close_preview"
                                 app:tint="?attr/colorOnSurfaceVariant" />
 
                         </LinearLayout>

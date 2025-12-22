@@ -124,7 +124,8 @@
     <string name="content_description_settings_icon">Settings</string>
     <string name="content_description_copy_icon">Copy to clipboard</string>
     <string name="content_description_share_icon">Share</string>
-    
+    <string name="website_icon">Website Icon</string>
+
     <!-- Notifications -->
     <string name="notification_channel_name">Content Generation</string>
     <string name="notification_channel_desc">Shows progress when generating posts</string>

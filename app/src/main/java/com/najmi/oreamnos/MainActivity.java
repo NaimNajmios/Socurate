@@ -1650,7 +1650,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (hasClipboardContent) {
-            emptyStatePasteButton.setVisibility(View.VISIBLE);
+            if (emptyStatePasteButton.getVisibility() != View.VISIBLE) {
+                emptyStatePasteButton.setVisibility(View.VISIBLE);
+                emptyStatePasteButton.setScaleX(0f);
+                emptyStatePasteButton.setScaleY(0f);
+                emptyStatePasteButton.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(300)
+                        .setInterpolator(new OvershootInterpolator())
+                        .start();
+            }
             emptyStatePasteButton.setOnClickListener(v -> {
                 onPasteClick();
                 // Optionally start generation immediately or just focus
