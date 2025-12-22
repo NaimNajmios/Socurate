@@ -3387,6 +3387,8 @@ id elastic
 id embed
 id emptyLogsText
 id emptySessionsText
+id emptyStateCard
+id emptyStateIcon
 id emptyStateMessage
 id emptyStatePasteButton
 id emptyStateTitle
@@ -4363,6 +4365,7 @@ string total_tokens_label
 string try_again_button
 string wait_button
 string warning_title
+string website_icon
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light
 style Animation_AppCompat_Dialog

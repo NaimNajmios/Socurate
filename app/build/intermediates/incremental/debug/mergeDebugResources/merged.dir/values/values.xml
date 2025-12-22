@@ -2322,6 +2322,7 @@
     <string name="try_again_button">Try Again</string>
     <string name="wait_button">Wait</string>
     <string name="warning_title">Warning</string>
+    <string name="website_icon">Website Icon</string>
     <style name="AlertDialog.AppCompat" parent="Base.AlertDialog.AppCompat"/>
     <style name="AlertDialog.AppCompat.Light" parent="Base.AlertDialog.AppCompat.Light"/>
     <style name="Animation.AppCompat.Dialog" parent="Base.Animation.AppCompat.Dialog"/>

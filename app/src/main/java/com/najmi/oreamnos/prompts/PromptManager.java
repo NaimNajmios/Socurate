@@ -165,6 +165,12 @@ public class PromptManager {
                     prompt.append(
                             "- Shorten But Detailed: Make the post more concise while retaining all important details, facts, and key information. Remove redundant or filler words but keep the substance.\n");
                     break;
+                default:
+                    // Handle custom refinement commands (user-defined pills)
+                    if (refinement != null && !refinement.trim().isEmpty()) {
+                        prompt.append("- Custom Instruction: ").append(refinement).append("\n");
+                    }
+                    break;
             }
         }
 

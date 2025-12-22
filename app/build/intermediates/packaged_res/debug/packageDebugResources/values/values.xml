@@ -217,6 +217,7 @@
     <string name="try_again_button">Try Again</string>
     <string name="wait_button">Wait</string>
     <string name="warning_title">Warning</string>
+    <string name="website_icon">Website Icon</string>
     <style name="ShapeAppearance.Oreamnos.BottomSheet" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopLeft">20dp</item>

@@ -29,10 +29,13 @@ public class GeminiService {
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     // Pre-compiled Regex Patterns for Performance
-    private static final java.util.regex.Pattern HORIZONTAL_RULE_PATTERN = java.util.regex.Pattern.compile("(?m)^-{3,}\\s*$");
+    private static final java.util.regex.Pattern HORIZONTAL_RULE_PATTERN = java.util.regex.Pattern
+            .compile("(?m)^-{3,}\\s*$");
     private static final java.util.regex.Pattern ASTERISK_TEXT_PATTERN = java.util.regex.Pattern.compile("\\*.*?\\*");
-    private static final java.util.regex.Pattern MULTIPLE_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\\n\\s*\\n\\s*\\n+");
-    private static final java.util.regex.Pattern HORIZONTAL_WHITESPACE_PATTERN = java.util.regex.Pattern.compile("[ \\t]+");
+    private static final java.util.regex.Pattern MULTIPLE_NEWLINES_PATTERN = java.util.regex.Pattern
+            .compile("\\n\\s*\\n\\s*\\n+");
+    private static final java.util.regex.Pattern HORIZONTAL_WHITESPACE_PATTERN = java.util.regex.Pattern
+            .compile("[ \\t]+");
     // Regex explanation:
     // (?i) : Case insensitive
     // (?m) : Multiline mode (^ and $ match start/end of line)
@@ -44,7 +47,8 @@ public class GeminiService {
     // [\s\p{Z}]* : Optional whitespace
     // [:：] : Colon (regular or full-width)
     // .*$ : Rest of the line
-    private static final java.util.regex.Pattern SOURCE_CITATION_PATTERN = java.util.regex.Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$");
+    private static final java.util.regex.Pattern SOURCE_CITATION_PATTERN = java.util.regex.Pattern
+            .compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$");
     private static final java.util.regex.Pattern TRAILING_NEWLINES_PATTERN = java.util.regex.Pattern.compile("\\n+$");
 
     // Bolt Optimization: Move constant array allocation to static final
@@ -83,7 +87,8 @@ public class GeminiService {
     private static final long RATE_LIMIT_FALLBACK_DELAY_MS = 30000L; // 30 seconds if can't parse
 
     // Shared OkHttpClient instance to enable connection pooling
-    // Bolt Optimization: Singleton pattern prevents creating new thread pools/connection pools for every request
+    // Bolt Optimization: Singleton pattern prevents creating new thread
+    // pools/connection pools for every request
     private static final OkHttpClient sharedClient = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
@@ -477,6 +482,12 @@ public class GeminiService {
                     prompt.append(
                             "- Shorten But Detailed: Make the post more concise while retaining all important details, facts, and key information. Remove redundant or filler words but keep the substance.\n");
                     break;
+                default:
+                    // Handle custom refinement commands (user-defined pills)
+                    if (refinement != null && !refinement.trim().isEmpty()) {
+                        prompt.append("- Custom Instruction: ").append(refinement).append("\n");
+                    }
+                    break;
             }
         }
 
@@ -627,7 +638,8 @@ public class GeminiService {
         String lowerText = text.toLowerCase();
 
         // Count tactical keywords
-        // Bolt Optimization: Use static final array instead of allocating new one each call
+        // Bolt Optimization: Use static final array instead of allocating new one each
+        // call
         int keywordCount = 0;
         for (String keyword : TACTICAL_KEYWORDS) {
             if (lowerText.contains(keyword)) {
