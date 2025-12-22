@@ -304,16 +304,68 @@ public class WebContentExtractor {
 
     /**
      * Checks if a string looks like a URL.
+     * <p>
+     * ⚡ Bolt Optimization:
+     * This method avoids O(N) allocations (trim(), toLowerCase()) on the main thread
+     * by inspecting characters directly.
      */
     public static boolean isUrl(String text) {
-        if (text == null || text.trim().isEmpty()) {
+        if (text == null) {
             return false;
         }
 
-        String lower = text.trim().toLowerCase();
-        return lower.startsWith("http://") ||
-                lower.startsWith("https://") ||
-                lower.startsWith("www.") ||
-                (lower.contains(".") && !lower.contains(" ") && lower.length() > 5);
+        int len = text.length();
+        int start = 0;
+        // Skip leading whitespace (equivalent to trim start)
+        while (start < len && text.charAt(start) <= ' ') {
+            start++;
+        }
+
+        int end = len;
+        // Skip trailing whitespace (equivalent to trim end)
+        while (end > start && text.charAt(end - 1) <= ' ') {
+            end--;
+        }
+
+        if (start >= end) {
+            return false; // Empty or whitespace only
+        }
+
+        // Effective length of trimmed content
+        int effectiveLen = end - start;
+
+        // Check for common URL prefixes (case insensitive)
+        // http:// (7 chars)
+        if (effectiveLen >= 7 && text.regionMatches(true, start, "http://", 0, 7)) {
+            return true;
+        }
+        // https:// (8 chars)
+        if (effectiveLen >= 8 && text.regionMatches(true, start, "https://", 0, 8)) {
+            return true;
+        }
+        // www. (4 chars)
+        if (effectiveLen >= 4 && text.regionMatches(true, start, "www.", 0, 4)) {
+            return true;
+        }
+
+        // Fallback: contains dot, no space, length > 5
+        // Original logic: lower.contains(".") && !lower.contains(" ") && lower.length() > 5
+        if (effectiveLen <= 5) {
+            return false;
+        }
+
+        boolean hasDot = false;
+        for (int i = start; i < end; i++) {
+            char c = text.charAt(i);
+            if (c == ' ') {
+                // Any space inside the trimmed content disqualifies it
+                return false;
+            }
+            if (c == '.') {
+                hasDot = true;
+            }
+        }
+
+        return hasDot;
     }
 }
