@@ -1,6 +1,7 @@
 package com.najmi.oreamnos;
 
 import androidx.appcompat.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,11 +78,9 @@ public class UsageActivity extends AppCompatActivity {
     private LogAdapter logAdapter;
     private MaterialButton clearLogsButton;
 
-    // Expansion State
-    private boolean isSessionsExpanded = false;
-    private boolean isLogsExpanded = false;
-    private MaterialButton btnShowMoreSessions;
-    private MaterialButton btnShowMoreLogs;
+    // View All Buttons
+    private MaterialButton btnViewAllSessions;
+    private MaterialButton btnViewAllLogs;
 
     // Reset button
     private MaterialButton resetStatsButton;
@@ -163,18 +162,16 @@ public class UsageActivity extends AppCompatActivity {
         // Buttons
         resetStatsButton = findViewById(R.id.resetStatsButton);
         clearLogsButton = findViewById(R.id.clearLogsButton);
-        btnShowMoreSessions = findViewById(R.id.btnShowMoreSessions);
-        btnShowMoreLogs = findViewById(R.id.btnShowMoreLogs);
+        btnViewAllSessions = findViewById(R.id.btnShowMoreSessions);
+        btnViewAllLogs = findViewById(R.id.btnShowMoreLogs);
 
-        // Setup expansion listeners
-        btnShowMoreSessions.setOnClickListener(v -> {
-            isSessionsExpanded = !isSessionsExpanded;
-            refreshStats(); // Re-render list
+        // Setup "View All" buttons to open dedicated activities
+        btnViewAllSessions.setOnClickListener(v -> {
+            startActivity(new Intent(this, SessionListActivity.class));
         });
 
-        btnShowMoreLogs.setOnClickListener(v -> {
-            isLogsExpanded = !isLogsExpanded;
-            refreshStats(); // Re-render list
+        btnViewAllLogs.setOnClickListener(v -> {
+            startActivity(new Intent(this, LogListActivity.class));
         });
     }
 
@@ -304,24 +301,20 @@ public class UsageActivity extends AppCompatActivity {
         if (allSessions == null || allSessions.isEmpty()) {
             emptySessionsText.setVisibility(View.VISIBLE);
             sessionsRecyclerView.setVisibility(View.GONE);
-            btnShowMoreSessions.setVisibility(View.GONE);
+            btnViewAllSessions.setVisibility(View.GONE);
         } else {
             emptySessionsText.setVisibility(View.GONE);
             sessionsRecyclerView.setVisibility(View.VISIBLE);
 
+            // Show max 5 items in preview
             List<UsageStats.SessionEntry> displayList;
-            if (allSessions.size() > 10 && !isSessionsExpanded) {
-                displayList = allSessions.subList(0, 10);
-                btnShowMoreSessions.setVisibility(View.VISIBLE);
-                btnShowMoreSessions.setText("Show More (" + (allSessions.size() - 10) + ")");
+            if (allSessions.size() > 5) {
+                displayList = allSessions.subList(0, 5);
+                btnViewAllSessions.setVisibility(View.VISIBLE);
+                btnViewAllSessions.setText(getString(R.string.view_all) + " (" + allSessions.size() + ")");
             } else {
                 displayList = allSessions;
-                if (allSessions.size() > 10) {
-                    btnShowMoreSessions.setVisibility(View.VISIBLE);
-                    btnShowMoreSessions.setText("Show Less");
-                } else {
-                    btnShowMoreSessions.setVisibility(View.GONE);
-                }
+                btnViewAllSessions.setVisibility(View.GONE);
             }
             sessionAdapter.setSessions(displayList);
         }
@@ -337,24 +330,20 @@ public class UsageActivity extends AppCompatActivity {
         if (allLogs == null || allLogs.isEmpty()) {
             emptyLogsText.setVisibility(View.VISIBLE);
             logsRecyclerView.setVisibility(View.GONE);
-            btnShowMoreLogs.setVisibility(View.GONE);
+            btnViewAllLogs.setVisibility(View.GONE);
         } else {
             emptyLogsText.setVisibility(View.GONE);
             logsRecyclerView.setVisibility(View.VISIBLE);
 
+            // Show max 5 items in preview
             List<UsageStats.LogEntry> displayList;
-            if (allLogs.size() > 10 && !isLogsExpanded) {
-                displayList = allLogs.subList(0, 10);
-                btnShowMoreLogs.setVisibility(View.VISIBLE);
-                btnShowMoreLogs.setText("Show More (" + (allLogs.size() - 10) + ")");
+            if (allLogs.size() > 5) {
+                displayList = allLogs.subList(0, 5);
+                btnViewAllLogs.setVisibility(View.VISIBLE);
+                btnViewAllLogs.setText(getString(R.string.view_all) + " (" + allLogs.size() + ")");
             } else {
                 displayList = allLogs;
-                if (allLogs.size() > 10) {
-                    btnShowMoreLogs.setVisibility(View.VISIBLE);
-                    btnShowMoreLogs.setText("Show Less");
-                } else {
-                    btnShowMoreLogs.setVisibility(View.GONE);
-                }
+                btnViewAllLogs.setVisibility(View.GONE);
             }
             logAdapter.setLogs(displayList);
         }
@@ -527,7 +516,8 @@ public class UsageActivity extends AppCompatActivity {
                 // Tokens
                 if (session.isSuccess()) {
                     tokensChip.setText(String.format(Locale.US, "%,d", session.getTotalTokens()));
-                    // Reset chip style for success (green/neutral) if needed, but standard chip is fine
+                    // Reset chip style for success (green/neutral) if needed, but standard chip is
+                    // fine
                 } else {
                     tokensChip.setText("Failed");
                 }

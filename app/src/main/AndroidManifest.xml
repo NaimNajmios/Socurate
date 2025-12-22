@@ -64,6 +64,22 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.Oreamnos" />
 
+        <!-- Log List Activity -->
+        <activity
+            android:name=".LogListActivity"
+            android:exported="false"
+            android:label="@string/all_logs_title"
+            android:parentActivityName=".UsageActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
+        <!-- Session List Activity -->
+        <activity
+            android:name=".SessionListActivity"
+            android:exported="false"
+            android:label="@string/all_sessions_title"
+            android:parentActivityName=".UsageActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
         <!-- Content Generation Foreground Service -->
         <service
             android:name=".services.ContentGenerationService"

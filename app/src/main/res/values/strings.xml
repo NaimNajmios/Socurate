@@ -200,6 +200,9 @@
     <string name="all_time">All Time</string>
     <string name="no_recent_activity">No recent activity yet</string>
     <string name="no_logs">No logs recorded</string>
+    <string name="all_logs_title">All Logs</string>
+    <string name="all_sessions_title">Recent Sessions</string>
+    <string name="view_all">View All</string>
     <string name="clear_logs">Clear Logs</string>
     <string name="logs_cleared">Logs cleared</string>
 

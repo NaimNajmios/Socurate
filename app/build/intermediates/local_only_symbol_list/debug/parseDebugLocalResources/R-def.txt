@@ -58,6 +58,7 @@ drawable bottom_sheet_handle
 drawable circle_indicator
 drawable dark_card_bg
 drawable ic_add
+drawable ic_back
 drawable ic_clear
 drawable ic_copy
 drawable ic_document
@@ -160,6 +161,7 @@ id inputText
 id keepStructureSwitch
 id levelBadge
 id logCountBadge
+id logCountText
 id logsRecyclerView
 id messageText
 id modelDropdown
@@ -204,6 +206,7 @@ id responseTokensBar
 id responseTokensValue
 id resultCard
 id saveButton
+id sessionCountText
 id sessionsRecyclerView
 id shareButton
 id sharedText
@@ -237,7 +240,9 @@ id tryAgainButton
 id urlPreviewCard
 id weekRequests
 id weekTokens
+layout activity_log_list
 layout activity_main
+layout activity_session_list
 layout activity_settings
 layout activity_share_receiver
 layout activity_usage
@@ -253,7 +258,9 @@ menu menu_main
 mipmap oreamnos_white
 string add_custom_pill
 string advanced_settings
+string all_logs_title
 string all_reset
+string all_sessions_title
 string all_time
 string api_endpoint_default
 string api_endpoint_label
@@ -424,6 +431,7 @@ string tone_quick_toggle
 string total_tokens
 string total_tokens_label
 string try_again_button
+string view_all
 string wait_button
 string warning_title
 string website_icon

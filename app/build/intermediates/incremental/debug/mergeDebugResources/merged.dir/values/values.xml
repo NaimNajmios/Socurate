@@ -2007,7 +2007,9 @@
     <string name="abc_toolbar_collapse_description">Collapse</string>
     <string name="add_custom_pill">+ Add Custom</string>
     <string name="advanced_settings">ADVANCED SETTINGS</string>
+    <string name="all_logs_title">All Logs</string>
     <string name="all_reset">Everything has been reset</string>
+    <string name="all_sessions_title">Recent Sessions</string>
     <string name="all_time">All Time</string>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
     <string name="api_endpoint_default">https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent</string>
@@ -2320,6 +2322,7 @@
     <string name="total_tokens">Total Tokens Used</string>
     <string name="total_tokens_label">tokens used</string>
     <string name="try_again_button">Try Again</string>
+    <string name="view_all">View All</string>
     <string name="wait_button">Wait</string>
     <string name="warning_title">Warning</string>
     <string name="website_icon">Website Icon</string>

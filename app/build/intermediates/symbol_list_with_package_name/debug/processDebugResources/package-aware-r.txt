@@ -3058,6 +3058,7 @@ drawable design_password_eye
 drawable design_snackbar_background
 drawable ic_add
 drawable ic_arrow_back_black_24
+drawable ic_back
 drawable ic_clear
 drawable ic_clear_black_24
 drawable ic_clock_black_24dp
@@ -3485,6 +3486,7 @@ id linear
 id listMode
 id list_item
 id logCountBadge
+id logCountText
 id logsRecyclerView
 id m3_side_sheet
 id markwon_drawables_scheduler
@@ -3684,6 +3686,7 @@ id search_voice_btn
 id select_dialog_listview
 id selected
 id selection_type
+id sessionCountText
 id sessionsRecyclerView
 id shareButton
 id sharedText
@@ -3939,7 +3942,9 @@ layout abc_search_dropdown_item_icons_2line
 layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
+layout activity_log_list
 layout activity_main
+layout activity_session_list
 layout activity_settings
 layout activity_share_receiver
 layout activity_usage
@@ -4060,7 +4065,9 @@ string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
 string add_custom_pill
 string advanced_settings
+string all_logs_title
 string all_reset
+string all_sessions_title
 string all_time
 string androidx_startup
 string api_endpoint_default
@@ -4363,6 +4370,7 @@ string tone_quick_toggle
 string total_tokens
 string total_tokens_label
 string try_again_button
+string view_all
 string wait_button
 string warning_title
 string website_icon

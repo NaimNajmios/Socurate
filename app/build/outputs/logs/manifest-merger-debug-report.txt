@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:2:1-87:12
-INJECTED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:2:1-87:12
-INJECTED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:2:1-87:12
-INJECTED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:2:1-87:12
+ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:2:1-103:12
+INJECTED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:2:1-103:12
+INJECTED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:2:1-103:12
+INJECTED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:2:1-103:12
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\NAIM\.gradle\caches\transforms-4\cd613772c624989e6c4dc63fd6d2d609\transformed\material-1.11.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\NAIM\.gradle\caches\transforms-4\2fdc36888cf5758cef574003bb4919f5\transformed\constraintlayout-2.1.4\AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\NAIM\.gradle\caches\transforms-4\8956cb79e03d9a762c3888244085c813\transformed\appcompat-resources-1.6.1\AndroidManifest.xml:17:1-22:12
@@ -78,8 +78,8 @@ ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\Androi
 	android:name
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:9:22-63
 application
-ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:11:5-85:19
-INJECTED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:11:5-85:19
+ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:11:5-101:19
+INJECTED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:11:5-101:19
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\NAIM\.gradle\caches\transforms-4\cd613772c624989e6c4dc63fd6d2d609\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\NAIM\.gradle\caches\transforms-4\cd613772c624989e6c4dc63fd6d2d609\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\NAIM\.gradle\caches\transforms-4\2fdc36888cf5758cef574003bb4919f5\transformed\constraintlayout-2.1.4\AndroidManifest.xml:9:5-20
@@ -186,32 +186,56 @@ ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\Androi
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:65:13-50
 	android:name
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:61:13-42
-service#com.najmi.oreamnos.services.ContentGenerationService
-ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:68:9-71:56
+activity#com.najmi.oreamnos.LogListActivity
+ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:68:9-73:53
+	android:parentActivityName
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:72:13-56
+	android:label
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:71:13-51
 	android:exported
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:70:13-37
-	android:foregroundServiceType
-		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:71:13-53
+	android:theme
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:73:13-50
 	android:name
-		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:69:13-62
-service#com.najmi.oreamnos.services.GenerateTileService
-ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:74:9-83:19
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:69:13-44
+activity#com.najmi.oreamnos.SessionListActivity
+ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:76:9-81:53
+	android:parentActivityName
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:80:13-56
 	android:label
-		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:78:13-47
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:79:13-55
 	android:exported
-		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:76:13-36
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:78:13-37
+	android:theme
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:81:13-50
+	android:name
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:77:13-48
+service#com.najmi.oreamnos.services.ContentGenerationService
+ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:84:9-87:56
+	android:exported
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:86:13-37
+	android:foregroundServiceType
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:87:13-53
+	android:name
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:85:13-62
+service#com.najmi.oreamnos.services.GenerateTileService
+ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:90:9-99:19
+	android:label
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:94:13-47
+	android:exported
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:92:13-36
 	android:permission
-		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:79:13-77
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:95:13-77
 	android:icon
-		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:77:13-45
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:93:13-45
 	android:name
-		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:75:13-57
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:91:13-57
 intent-filter#action:name:android.service.quicksettings.action.QS_TILE
-ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:80:13-82:29
+ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:96:13-98:29
 action#android.service.quicksettings.action.QS_TILE
-ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:81:17-87
+ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:97:17-87
 	android:name
-		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:81:25-84
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:97:25-84
 uses-sdk
 INJECTED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml
