@@ -553,7 +553,7 @@ public class MainActivity extends AppCompatActivity {
             outputText.setFocusableInTouchMode(true);
             outputText.requestFocus();
             editButton.setText(R.string.save_edit);
-            editButton.setIconResource(android.R.drawable.ic_menu_save);
+            editButton.setIconResource(R.drawable.ic_check);
             // Disable scrolling in edit mode to allow text selection
             outputText.setMovementMethod(null);
         } else {
@@ -561,7 +561,7 @@ public class MainActivity extends AppCompatActivity {
             outputText.setFocusable(false);
             outputText.setFocusableInTouchMode(false);
             editButton.setText(R.string.edit_button);
-            editButton.setIconResource(android.R.drawable.ic_menu_edit);
+            editButton.setIconResource(R.drawable.ic_edit);
 
             // Save edited version
             if (outputText.getText() != null) {
@@ -1018,7 +1018,7 @@ public class MainActivity extends AppCompatActivity {
         originalInputText = "";
         isEditMode = false;
         editButton.setText(R.string.edit_button);
-        editButton.setIconResource(android.R.drawable.ic_menu_edit);
+        editButton.setIconResource(R.drawable.ic_edit);
         editedIndicator.setVisibility(View.GONE);
 
         Toast.makeText(this, R.string.all_reset, Toast.LENGTH_SHORT).show();
@@ -1072,7 +1072,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Reset FAB to normal state
             generateFab.setText(R.string.generate_button);
-            generateFab.setIconResource(android.R.drawable.ic_menu_send);
+            generateFab.setIconResource(R.drawable.ic_sparkle);
             generateFab.setEnabled(true);
         }
     }
@@ -1421,7 +1421,7 @@ public class MainActivity extends AppCompatActivity {
         showOutputCard();
         isEditMode = false;
         editButton.setText(R.string.edit_button);
-        editButton.setIconResource(android.R.drawable.ic_menu_edit);
+        editButton.setIconResource(R.drawable.ic_edit);
         editedIndicator.setVisibility(View.GONE);
 
         // Show refinement section with stagger animation
