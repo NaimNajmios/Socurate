@@ -897,7 +897,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Handles the copy button click.
+     * Handles the copy button click with a polished morph animation.
      */
     private void onCopyClick() {
         String textToCopy = getFinalText();
@@ -910,7 +910,71 @@ public class MainActivity extends AppCompatActivity {
         ClipData clip = ClipData.newPlainText("Oreamnos Post", textToCopy);
         clipboard.setPrimaryClip(clip);
         Log.i(TAG, "Text copied to clipboard");
-        Toast.makeText(this, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
+
+        // Capture original state for robust restoration
+        final android.graphics.drawable.Drawable originalIcon = copyButton.getIcon();
+        final CharSequence originalText = copyButton.getText();
+        final android.content.res.ColorStateList originalBgTint = copyButton.getBackgroundTintList();
+        final android.content.res.ColorStateList originalTextColors = copyButton.getTextColors();
+        final android.content.res.ColorStateList originalIconTint = copyButton.getIconTint();
+
+        // Polished Feedback Animation
+        // 1. Scale down slightly
+        copyButton.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .setDuration(100)
+                .withEndAction(() -> {
+                    // 2. Change state to Success
+                    copyButton.setIconResource(R.drawable.ic_check);
+                    copyButton.setText(R.string.copied_to_clipboard);
+
+                    // Change colors
+                    int successColor = androidx.core.content.ContextCompat.getColor(this, R.color.success);
+                    int onSuccessColor = androidx.core.content.ContextCompat.getColor(this, R.color.on_success);
+
+                    copyButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(successColor));
+                    copyButton.setTextColor(onSuccessColor);
+                    copyButton.setIconTint(android.content.res.ColorStateList.valueOf(onSuccessColor));
+
+                    // 3. Scale back up (Pop)
+                    copyButton.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(150)
+                            .setInterpolator(new OvershootInterpolator())
+                            .start();
+                })
+                .start();
+
+        // 4. Revert after delay
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (isDestroyed() || isFinishing()) return;
+
+            // Scale down to transition back
+            copyButton.animate()
+                    .scaleX(0.9f)
+                    .scaleY(0.9f)
+                    .setDuration(100)
+                    .withEndAction(() -> {
+                        // Restore original state
+                        copyButton.setIcon(originalIcon);
+                        copyButton.setText(originalText);
+
+                        // Restore colors
+                        copyButton.setBackgroundTintList(originalBgTint);
+                        copyButton.setTextColor(originalTextColors);
+                        copyButton.setIconTint(originalIconTint);
+
+                        // Scale back up
+                        copyButton.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(150)
+                                .start();
+                    })
+                    .start();
+        }, 2000);
     }
 
     /**
