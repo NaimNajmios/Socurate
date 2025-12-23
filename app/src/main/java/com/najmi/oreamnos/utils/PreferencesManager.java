@@ -18,6 +18,7 @@ public class PreferencesManager {
     private static final String KEY_HASHTAGS = "default_hashtags";
     private static final String KEY_HASHTAGS_ENABLED = "hashtags_enabled";
     private static final String KEY_SOURCE_ENABLED = "source_enabled";
+    private static final String KEY_INCLUDE_SOURCE_CHECKED = "include_source_checked";
     private static final String KEY_THEME = "app_theme";
     private static final String KEY_PROVIDER = "ai_provider";
     private static final String KEY_GROQ_API_KEY = "groq_api_key";
@@ -292,6 +293,20 @@ public class PreferencesManager {
      */
     public boolean isSourceEnabled() {
         return securePrefs.getBoolean(KEY_SOURCE_ENABLED, true); // Enabled by default
+    }
+
+    /**
+     * Saves the include source citation checkbox state.
+     */
+    public void saveIncludeSourceChecked(boolean checked) {
+        securePrefs.edit().putBoolean(KEY_INCLUDE_SOURCE_CHECKED, checked).apply();
+    }
+
+    /**
+     * Gets the include source citation checkbox state.
+     */
+    public boolean isIncludeSourceChecked() {
+        return securePrefs.getBoolean(KEY_INCLUDE_SOURCE_CHECKED, true); // Checked by default
     }
 
     // ==================== AI PROVIDER ====================
