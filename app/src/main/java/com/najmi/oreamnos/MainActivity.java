@@ -42,6 +42,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
+import com.bumptech.glide.Glide;
 import com.najmi.oreamnos.curator.CuratorFactory;
 import com.najmi.oreamnos.model.GenerationPill;
 import com.najmi.oreamnos.services.ContentGenerationService;
@@ -800,12 +801,17 @@ public class MainActivity extends AppCompatActivity {
         previewTitle.setText(metadata.title != null ? metadata.title : "No Title");
         previewDomain.setText(metadata.domain);
 
-        // Load favicon (placeholder for now, would need an image loading library like
-        // Glide/Picasso)
-        // Since we don't have Glide, we'll try to load it manually or just show the
-        // domain icon
-        // For this implementation, we'll stick to the default icon but if we had Glide:
-        // Glide.with(this).load(metadata.faviconUrl).into(previewFavicon);
+        // Load favicon with Glide
+        if (metadata.faviconUrl != null && !metadata.faviconUrl.isEmpty()) {
+            Glide.with(this)
+                    .load(metadata.faviconUrl)
+                    .placeholder(R.drawable.ic_document)
+                    .error(R.drawable.ic_document)
+                    .circleCrop()
+                    .into(previewFavicon);
+        } else {
+            previewFavicon.setImageResource(R.drawable.ic_document);
+        }
 
         urlPreviewCard.setVisibility(View.VISIBLE);
 
