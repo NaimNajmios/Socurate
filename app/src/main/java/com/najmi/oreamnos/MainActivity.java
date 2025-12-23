@@ -463,19 +463,14 @@ public class MainActivity extends AppCompatActivity {
         boolean isSourceFeatureEnabled = prefsManager.isSourceEnabled();
         if (isSourceFeatureEnabled) {
             includeSourceCheckbox.setVisibility(View.VISIBLE);
-            // Only set checked if it was previously unchecked (don't override user choice
-            // if they unchecked it manually)
-            // But for now, let's stick to the requirement: "When the source is toggled
-            // on... included"
-            // If we want to persist the user's checkbox choice across sessions, we'd need
-            // another pref.
-            // For now, let's default to TRUE if enabled, as per user implication.
-            if (!includeSourceCheckbox.isChecked()) {
-                includeSourceCheckbox.setChecked(true);
-            }
 
-            // Add listener for dynamic toggling
+            // Restore persistent checkbox state
+            boolean shouldBeChecked = prefsManager.isIncludeSourceChecked();
+            includeSourceCheckbox.setChecked(shouldBeChecked);
+
+            // Add listener for dynamic toggling and persistence
             includeSourceCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                prefsManager.saveIncludeSourceChecked(isChecked);
                 toggleSourceCitation(isChecked);
             });
         } else {
