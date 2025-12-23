@@ -117,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
     private Handler urlCheckHandler = new Handler(Looper.getMainLooper());
     private Runnable urlCheckRunnable;
 
+    // Animation objects (kept as fields to properly cancel them)
+    private ObjectAnimator iconScaleX, iconScaleY, iconTranslateY;
+    private ObjectAnimator pasteBtnScaleX, pasteBtnScaleY;
+
     private PreferencesManager prefsManager;
     private NotificationHelper notificationHelper;
     private MainViewModel viewModel;
@@ -450,6 +454,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        // Restart animations if placeholder is visible
+        if (placeholderView != null && placeholderView.getVisibility() == View.VISIBLE) {
+             showPlaceholder(); // This will restart animations
+        }
+
         // Register broadcast receiver for service results
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 serviceResultReceiver,
@@ -509,6 +518,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
+        // Stop animations to save battery
+        cancelEmptyStateAnimations();
+        cancelPasteButtonAnimations();
 
         // Save current state to ViewModel before pausing
         saveStateToViewModel();
@@ -1151,19 +1164,29 @@ public class MainActivity extends AppCompatActivity {
             Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
             placeholderView.startAnimation(fadeIn);
 
-            // Animate empty state icon (subtle pulse)
+            // Animate empty state icon (continuous subtle breathing)
             if (emptyStateIcon != null) {
-                ObjectAnimator scaleX = ObjectAnimator.ofFloat(emptyStateIcon, "scaleX", 0.9f, 1.0f);
-                ObjectAnimator scaleY = ObjectAnimator.ofFloat(emptyStateIcon, "scaleY", 0.9f, 1.0f);
-                scaleX.setDuration(1000);
-                scaleY.setDuration(1000);
-                scaleX.setRepeatMode(ObjectAnimator.REVERSE);
-                scaleY.setRepeatMode(ObjectAnimator.REVERSE);
-                // Just animate once for entry (one full pulse: 0.9 -> 1.0 -> 0.9)
-                scaleX.setRepeatCount(1);
-                scaleY.setRepeatCount(1);
-                scaleX.start();
-                scaleY.start();
+                // Cancel any previous animations first
+                cancelEmptyStateAnimations();
+
+                // Continuous breathing scale
+                iconScaleX = ObjectAnimator.ofFloat(emptyStateIcon, "scaleX", 0.9f, 1.0f);
+                iconScaleY = ObjectAnimator.ofFloat(emptyStateIcon, "scaleY", 0.9f, 1.0f);
+                iconScaleX.setDuration(2000);
+                iconScaleY.setDuration(2000);
+                iconScaleX.setRepeatMode(ObjectAnimator.REVERSE);
+                iconScaleY.setRepeatMode(ObjectAnimator.REVERSE);
+                iconScaleX.setRepeatCount(ObjectAnimator.INFINITE);
+                iconScaleY.setRepeatCount(ObjectAnimator.INFINITE);
+                iconScaleX.start();
+                iconScaleY.start();
+
+                // Gentle floating effect
+                iconTranslateY = ObjectAnimator.ofFloat(emptyStateIcon, "translationY", 0f, -10f);
+                iconTranslateY.setDuration(2500);
+                iconTranslateY.setRepeatMode(ObjectAnimator.REVERSE);
+                iconTranslateY.setRepeatCount(ObjectAnimator.INFINITE);
+                iconTranslateY.start();
             }
         }
     }
@@ -1173,6 +1196,21 @@ public class MainActivity extends AppCompatActivity {
      */
     private void hidePlaceholder() {
         if (placeholderView.getVisibility() == View.VISIBLE) {
+            // Stop animations to save resources
+            cancelEmptyStateAnimations();
+            cancelPasteButtonAnimations();
+
+            // Reset properties
+            if (emptyStateIcon != null) {
+                emptyStateIcon.setScaleX(1.0f);
+                emptyStateIcon.setScaleY(1.0f);
+                emptyStateIcon.setTranslationY(0f);
+            }
+            if (emptyStatePasteButton != null) {
+                emptyStatePasteButton.setScaleX(1.0f);
+                emptyStatePasteButton.setScaleY(1.0f);
+            }
+
             Animation fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
             fadeOut.setAnimationListener(new Animation.AnimationListener() {
                 @Override
@@ -1189,6 +1227,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             placeholderView.startAnimation(fadeOut);
+        }
+    }
+
+    private void cancelEmptyStateAnimations() {
+        if (iconScaleX != null) { iconScaleX.cancel(); iconScaleX = null; }
+        if (iconScaleY != null) { iconScaleY.cancel(); iconScaleY = null; }
+        if (iconTranslateY != null) { iconTranslateY.cancel(); iconTranslateY = null; }
+    }
+
+    private void cancelPasteButtonAnimations() {
+        if (pasteBtnScaleX != null) { pasteBtnScaleX.cancel(); pasteBtnScaleX = null; }
+        if (pasteBtnScaleY != null) { pasteBtnScaleY.cancel(); pasteBtnScaleY = null; }
+        if (emptyStatePasteButton != null) {
+             emptyStatePasteButton.animate().cancel(); // Cancel ViewPropertyAnimator too
         }
     }
 
@@ -1703,6 +1755,7 @@ public class MainActivity extends AppCompatActivity {
 
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         boolean hasClipboardContent = false;
+        boolean isUrl = false;
 
         if (clipboard != null && clipboard.hasPrimaryClip()) {
             ClipData clip = clipboard.getPrimaryClip();
@@ -1710,13 +1763,30 @@ public class MainActivity extends AppCompatActivity {
                 CharSequence text = clip.getItemAt(0).getText();
                 if (text != null && text.length() > 0) {
                     hasClipboardContent = true;
+                    String textStr = text.toString().trim();
+                    isUrl = android.util.Patterns.WEB_URL.matcher(textStr).matches();
                 }
             }
         }
 
         if (hasClipboardContent) {
-            if (emptyStatePasteButton.getVisibility() != View.VISIBLE) {
+            boolean wasVisible = emptyStatePasteButton.getVisibility() == View.VISIBLE;
+
+            // Always update content
+            if (isUrl) {
+                emptyStatePasteButton.setText(R.string.paste_link);
+                emptyStatePasteButton.setIconResource(R.drawable.ic_document);
+            } else {
+                emptyStatePasteButton.setText(R.string.paste_input);
+                emptyStatePasteButton.setIconResource(R.drawable.ic_paste);
+            }
+
+            if (!wasVisible) {
                 emptyStatePasteButton.setVisibility(View.VISIBLE);
+
+                // Entrance animation
+                cancelPasteButtonAnimations(); // Clear any old ones
+
                 emptyStatePasteButton.setScaleX(0f);
                 emptyStatePasteButton.setScaleY(0f);
                 emptyStatePasteButton.animate()
@@ -1724,14 +1794,22 @@ public class MainActivity extends AppCompatActivity {
                         .scaleY(1f)
                         .setDuration(300)
                         .setInterpolator(new OvershootInterpolator())
+                        .withEndAction(this::startPasteButtonPulseAnimation)
                         .start();
+            } else {
+                // If already visible, ensure pulse is running (e.g. returning from pause)
+                if (pasteBtnScaleX == null || !pasteBtnScaleX.isRunning()) {
+                    startPasteButtonPulseAnimation();
+                }
             }
+
             emptyStatePasteButton.setOnClickListener(v -> {
                 onPasteClick();
                 // Optionally start generation immediately or just focus
             });
         } else {
             emptyStatePasteButton.setVisibility(View.GONE);
+            cancelPasteButtonAnimations();
         }
     }
 

@@ -107,6 +107,7 @@
     <string name="reset_all">Reset all</string>
     <string name="all_reset">Everything has been reset</string>
     <string name="paste_input">Paste</string>
+    <string name="paste_link">Paste Link</string>
     <string name="text_pasted">Text pasted</string>
     <string name="close_preview">Close preview</string>
     
