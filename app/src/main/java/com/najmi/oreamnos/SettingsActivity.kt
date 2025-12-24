@@ -134,13 +134,8 @@ class SettingsActivity : ComponentActivity() {
         
         setContent {
             val currentTheme = remember { mutableStateOf(prefsManager.getTheme()) }
-            val isDarkTheme = when (currentTheme.value) {
-                PreferencesManager.THEME_DARK -> true
-                PreferencesManager.THEME_LIGHT -> false
-                else -> isSystemInDarkTheme()
-            }
 
-            SocurateTheme(darkTheme = isDarkTheme) {
+            SocurateTheme(themeMode = currentTheme.value) {
                 SettingsScreen(
                     prefsManager = prefsManager,
                     onNavigateBack = { finish() },
@@ -375,7 +370,8 @@ fun SettingsScreen(
                     listOf(
                         "System" to PreferencesManager.THEME_SYSTEM,
                         "Light" to PreferencesManager.THEME_LIGHT,
-                        "Dark" to PreferencesManager.THEME_DARK
+                        "Dark" to PreferencesManager.THEME_DARK,
+                        "Deep Blue" to PreferencesManager.THEME_DEEP_BLUE
                     ).forEach { (label, value) ->
                         RadioButton(
                             selected = theme == value,

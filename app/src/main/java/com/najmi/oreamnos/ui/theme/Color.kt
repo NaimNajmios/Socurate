@@ -22,6 +22,13 @@ val InternationalOrangeDark = Color(0xFFCC3700)
 val ErrorRed = Color(0xFFFF0000) // Pure Red
 val SuccessGreen = Color(0xFF00C853) // Sharp Green
 
+// Deep Blue Palette
+val DeepBlueBackground = Color(0xFF0B1120) // Deep Navy
+val DeepBlueSurface = Color(0xFF1E293B) // Slate
+val DeepBlueOnSurface = Color(0xFFFFFFFF) // White
+val DeepBlueAccent = Color(0xFF3B82F6) // Electric Blue
+val DeepBlueBorder = Color(0xFF334155) // Muted Blue Grey
+
 // Theme Mappings
 val LightBackground = NeoWhite
 val LightSurface = NeoWhite

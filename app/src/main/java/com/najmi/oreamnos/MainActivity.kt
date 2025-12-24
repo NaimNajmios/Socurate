@@ -188,13 +188,8 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             val themeValue by currentTheme
-            val isDarkTheme = when (themeValue) {
-                PreferencesManager.THEME_DARK -> true
-                PreferencesManager.THEME_LIGHT -> false
-                else -> isSystemInDarkTheme()
-            }
 
-            SocurateTheme(darkTheme = isDarkTheme) {
+            SocurateTheme(themeMode = themeValue) {
                 MainScreen(
                     prefsManager = prefsManager,
                     generationResult = generationResult.value,
@@ -325,7 +320,11 @@ fun MainScreen(
         if (includeTitle && generatedTitle.isNotEmpty()) {
             builder.append(StringUtils.stripLeadingEmojis(generatedTitle)).append("\n\n")
         }
+        
+        // If title is NOT included, we should check if the body starts with the title to avoid duplication
+        // or if we need to strip it from the body if it was part of the original result
         builder.append(StringUtils.stripLeadingEmojis(generatedBody))
+        
         if (includeSource && generatedSource.isNotEmpty()) {
             builder.append("\n\n").append(generatedSource)
         }
@@ -607,18 +606,28 @@ fun InputCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("PRESERVE STRUCTURE", style = MaterialTheme.typography.labelLarge)
-            Switch(
-                checked = keepStructure, 
-                onCheckedChange = onKeepStructureChange,
-                colors = androidx.compose.material3.SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.primary,
-                    checkedTrackColor = MaterialTheme.colorScheme.surface,
-                    checkedBorderColor = MaterialTheme.colorScheme.primary,
-                    uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                    uncheckedTrackColor = MaterialTheme.colorScheme.surface,
-                    uncheckedBorderColor = MaterialTheme.colorScheme.outline
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Clear Button
+                if (inputText.isNotEmpty()) {
+                    TextButton(onClick = { onInputChange("") }) {
+                        Text("CLEAR", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.error)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                }
+                
+                Switch(
+                    checked = keepStructure, 
+                    onCheckedChange = onKeepStructureChange,
+                    colors = androidx.compose.material3.SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.surface,
+                        checkedBorderColor = MaterialTheme.colorScheme.primary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.surface,
+                        uncheckedBorderColor = MaterialTheme.colorScheme.outline
+                    )
                 )
-            )
+            }
         }
     }
 }
@@ -663,16 +672,24 @@ fun OutputCard(
         Spacer(Modifier.height(16.dp))
         
         // Output text
-        NeoInput(
-            value = outputText,
-            onValueChange = onOutputChange,
-            modifier = Modifier.fillMaxWidth(),
-            readOnly = !isEditMode,
-            minLines = 8,
-            maxLines = 20,
-            label = "GENERATED CONTENT",
-            textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
-        )
+        if (isEditMode) {
+            NeoInput(
+                value = outputText,
+                onValueChange = onOutputChange,
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = false,
+                minLines = 8,
+                maxLines = 20,
+                label = "GENERATED CONTENT",
+                textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+            )
+        } else {
+            com.najmi.oreamnos.ui.components.TypewriterText(
+                text = outputText,
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                style = MaterialTheme.typography.bodyLarge.copy(fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+            )
+        }
         
         // Stats
         val wordCount = if (outputText.isBlank()) 0 else WHITESPACE_PATTERN.split(outputText).size

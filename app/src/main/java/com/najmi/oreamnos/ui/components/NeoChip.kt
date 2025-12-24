@@ -28,9 +28,13 @@ fun NeoChip(
     val contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
     val borderColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
 
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     Surface(
         modifier = modifier
-            .clickable(onClick = onClick),
+            .clickable(onClick = {
+                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                onClick()
+            }),
         shape = RoundedCornerShape(0.dp),
         color = backgroundColor,
         border = BorderStroke(2.dp, borderColor),

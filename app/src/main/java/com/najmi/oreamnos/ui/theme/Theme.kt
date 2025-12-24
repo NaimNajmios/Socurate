@@ -49,6 +49,39 @@ private val DarkColorScheme = darkColorScheme(
     inversePrimary = InternationalOrangeDark
 )
 
+private val DeepBlueColorScheme = darkColorScheme(
+    primary = DeepBlueAccent,
+    onPrimary = DeepBlueOnSurface,
+    primaryContainer = DeepBlueSurface,
+    onPrimaryContainer = DeepBlueOnSurface,
+    
+    secondary = DeepBlueAccent,
+    onSecondary = DeepBlueBackground,
+    secondaryContainer = DeepBlueSurface,
+    onSecondaryContainer = DeepBlueOnSurface,
+    
+    tertiary = DeepBlueBorder,
+    onTertiary = DeepBlueOnSurface,
+    tertiaryContainer = DeepBlueSurface,
+    onTertiaryContainer = DeepBlueOnSurface,
+    
+    error = ErrorRed,
+    onError = DeepBlueOnSurface,
+    
+    background = DeepBlueBackground,
+    onBackground = DeepBlueOnSurface,
+    
+    surface = DeepBlueSurface,
+    onSurface = DeepBlueOnSurface,
+    surfaceVariant = DeepBlueSurface,
+    onSurfaceVariant = DeepBlueOnSurface,
+    
+    outline = DeepBlueBorder,
+    inverseSurface = DeepBlueOnSurface,
+    inverseOnSurface = DeepBlueBackground,
+    inversePrimary = DeepBlueAccent
+)
+
 private val LightColorScheme = lightColorScheme(
     primary = InternationalOrange,
     onPrimary = NeoWhite,
@@ -84,17 +117,23 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun SocurateTheme(
+    themeMode: String = "system", // system, light, dark, deep_blue
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val colorScheme = when (themeMode) {
+        "light" -> LightColorScheme
+        "dark" -> DarkColorScheme
+        "deep_blue" -> DeepBlueColorScheme
+        else -> if (darkTheme) DarkColorScheme else LightColorScheme
+    }
     
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.background.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = themeMode == "light" || (!darkTheme && themeMode == "system")
         }
     }
 

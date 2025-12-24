@@ -376,6 +376,7 @@ class PreferencesManager(context: Context) {
         const val THEME_SYSTEM = "system"
         const val THEME_LIGHT = "light"
         const val THEME_DARK = "dark"
+        const val THEME_DEEP_BLUE = "deep_blue"
 
         // Provider constants
         const val PROVIDER_GEMINI = "gemini"

@@ -28,8 +28,12 @@ fun NeoButton(
     containerColor: Color = MaterialTheme.colorScheme.primary,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary
 ) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     Button(
-        onClick = onClick,
+        onClick = {
+            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+            onClick()
+        },
         modifier = modifier,
         enabled = enabled,
         shape = RoundedCornerShape(0.dp), // Sharp corners
@@ -56,8 +60,12 @@ fun NeoOutlinedButton(
     text: String,
     contentColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     OutlinedButton(
-        onClick = onClick,
+        onClick = {
+            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+            onClick()
+        },
         modifier = modifier,
         enabled = enabled,
         shape = RoundedCornerShape(0.dp),
