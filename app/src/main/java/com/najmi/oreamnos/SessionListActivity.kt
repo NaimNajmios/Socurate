@@ -57,7 +57,8 @@ class SessionListActivity : ComponentActivity() {
         val sessions = prefsManager.getUsageStats().getRecentSessions()
         
         setContent {
-            SocurateTheme {
+            val currentTheme = prefsManager.getTheme()
+            SocurateTheme(themeMode = currentTheme) {
                 SessionListScreen(
                     sessions = sessions,
                     onNavigateBack = { finish() }

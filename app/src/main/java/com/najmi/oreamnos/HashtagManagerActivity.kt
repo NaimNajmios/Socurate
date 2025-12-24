@@ -52,7 +52,8 @@ class HashtagManagerActivity : ComponentActivity() {
         val prefsManager = PreferencesManager(this)
         
         setContent {
-            SocurateTheme {
+            val currentTheme = prefsManager.getTheme()
+            SocurateTheme(themeMode = currentTheme) {
                 HashtagManagerScreen(
                     prefsManager = prefsManager,
                     onNavigateBack = { finish() }

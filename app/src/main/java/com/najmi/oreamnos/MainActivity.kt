@@ -356,23 +356,56 @@ fun MainScreen(
                     generatedSource = matcher.value.trim()
                     val contentWithoutSource = SOURCE_CITATION_PATTERN.replace(result, "").trim()
                     val cleaned = TRAILING_NEWLINES_PATTERN.replace(contentWithoutSource, "").trim()
-                    val parts = cleaned.split("\n\n", limit = 2)
+                    
+                    // Try splitting by double newline first
+                    var parts = cleaned.split("\n\n", limit = 2)
+                    
+                    // If that fails, try splitting by single newline, but only if the first part looks like a title (short enough)
+                    if (parts.size < 2) {
+                        val singleNewlineParts = cleaned.split("\n", limit = 2)
+                        if (singleNewlineParts.size >= 2 && singleNewlineParts[0].length < 100) {
+                            parts = singleNewlineParts
+                        }
+                    }
+                    
                     if (parts.size >= 2 && parts[0].length < 150) {
                         generatedTitle = parts[0].trim()
                         generatedBody = parts[1].trim()
                     } else {
-                        generatedTitle = ""
-                        generatedBody = cleaned
+                        // Fallback: if we can't split, assume the first line might be a title if it's short
+                        val firstLineEnd = cleaned.indexOf('\n')
+                        if (firstLineEnd != -1 && firstLineEnd < 100) {
+                            generatedTitle = cleaned.substring(0, firstLineEnd).trim()
+                            generatedBody = cleaned.substring(firstLineEnd + 1).trim()
+                        } else {
+                            generatedTitle = ""
+                            generatedBody = cleaned
+                        }
                     }
                 } else {
                     generatedSource = ""
-                    val parts = result.split("\n\n", limit = 2)
+                    // Same logic for when no source is found
+                    var parts = result.split("\n\n", limit = 2)
+                    
+                    if (parts.size < 2) {
+                         val singleNewlineParts = result.split("\n", limit = 2)
+                        if (singleNewlineParts.size >= 2 && singleNewlineParts[0].length < 100) {
+                            parts = singleNewlineParts
+                        }
+                    }
+
                     if (parts.size >= 2 && parts[0].length < 150) {
                         generatedTitle = parts[0].trim()
                         generatedBody = parts[1].trim()
                     } else {
-                        generatedTitle = ""
-                        generatedBody = result
+                        val firstLineEnd = result.indexOf('\n')
+                        if (firstLineEnd != -1 && firstLineEnd < 100) {
+                            generatedTitle = result.substring(0, firstLineEnd).trim()
+                            generatedBody = result.substring(firstLineEnd + 1).trim()
+                        } else {
+                            generatedTitle = ""
+                            generatedBody = result
+                        }
                     }
                 }
                 rebuildOutput()

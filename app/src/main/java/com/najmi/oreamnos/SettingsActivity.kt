@@ -27,6 +27,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -37,6 +38,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -231,7 +233,7 @@ fun SettingsScreen(
                     label = "Provider",
                     options = SettingsActivity.PROVIDER_NAMES.toList(),
                     selectedIndex = SettingsActivity.PROVIDER_VALUES.indexOf(provider).coerceAtLeast(0),
-                    onSelect = { index ->
+                    onSelect = { index: Int ->
                         provider = SettingsActivity.PROVIDER_VALUES[index]
                         prefsManager.saveProvider(provider)
                         showSaved()
@@ -274,7 +276,7 @@ fun SettingsScreen(
                     label = "Model",
                     options = modelNames.toList(),
                     selectedIndex = selectedModelIndex,
-                    onSelect = { index ->
+                    onSelect = { index: Int ->
                         selectedModelIndex = index
                         prefsManager.saveModelForProvider(provider, modelIds[index])
                         showSaved()
@@ -367,12 +369,13 @@ fun SettingsScreen(
                 Text("Theme", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    listOf(
+                    val themeOptions = listOf(
                         "System" to PreferencesManager.THEME_SYSTEM,
                         "Light" to PreferencesManager.THEME_LIGHT,
                         "Dark" to PreferencesManager.THEME_DARK,
                         "Deep Blue" to PreferencesManager.THEME_DEEP_BLUE
-                    ).forEach { (label, value) ->
+                    )
+                    themeOptions.forEach { (label, value) ->
                         RadioButton(
                             selected = theme == value,
                             onClick = { theme = value; prefsManager.saveTheme(theme); onThemeChanged(theme); showSaved() }
@@ -398,17 +401,13 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SettingsCard(title: String, content: @Composable () -> Unit) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface
+fun SettingsCard(title: String, content: @Composable ColumnScope.() -> Unit) {
+    com.najmi.oreamnos.ui.components.NeoCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-            Spacer(Modifier.height(12.dp))
-            content()
-        }
+        Text(title, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurface)
+        Spacer(Modifier.height(12.dp))
+        content()
     }
 }
 
@@ -430,9 +429,16 @@ fun DropdownSelector(
             value = options.getOrElse(selectedIndex) { "" },
             onValueChange = {},
             readOnly = true,
-            label = { Text(label) },
+            label = { Text(label, style = MaterialTheme.typography.labelMedium) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor()
+            modifier = Modifier.fillMaxWidth().menuAnchor(),
+            shape = RoundedCornerShape(0.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         )
         ExposedDropdownMenu(
             expanded = expanded,
@@ -440,7 +446,7 @@ fun DropdownSelector(
         ) {
             options.forEachIndexed { index, option ->
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = { Text(option, style = MaterialTheme.typography.bodyMedium) },
                     onClick = { onSelect(index); expanded = false }
                 )
             }
@@ -455,12 +461,12 @@ fun ApiKeyInput(
     onValueChange: (String) -> Unit,
     onSave: () -> Unit
 ) {
-    OutlinedTextField(
+    com.najmi.oreamnos.ui.components.NeoInput(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = label,
         modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
+        maxLines = 1,
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
     )

@@ -25,7 +25,9 @@ fun NeoInput(
     minLines: Int = 1,
     maxLines: Int = 1,
     readOnly: Boolean = false,
-    textStyle: TextStyle = MaterialTheme.typography.bodyLarge
+    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    visualTransformation: androidx.compose.ui.text.input.VisualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
+    keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default
 ) {
     OutlinedTextField(
         value = value,
@@ -37,6 +39,8 @@ fun NeoInput(
         maxLines = maxLines,
         readOnly = readOnly,
         textStyle = textStyle,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
         shape = RoundedCornerShape(0.dp), // Sharp corners
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,

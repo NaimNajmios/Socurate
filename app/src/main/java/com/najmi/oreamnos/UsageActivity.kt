@@ -79,8 +79,9 @@ class UsageActivity : ComponentActivity() {
         
         setContent {
             var stats by remember { mutableStateOf(prefsManager.getUsageStats()) }
+            val currentTheme = prefsManager.getTheme()
             
-            SocurateTheme {
+            SocurateTheme(themeMode = currentTheme) {
                 UsageScreen(
                     stats = stats,
                     onNavigateBack = { finish() },

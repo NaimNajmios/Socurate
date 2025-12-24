@@ -69,8 +69,9 @@ class LogListActivity : ComponentActivity() {
         
         setContent {
             var logs by remember { mutableStateOf(prefsManager.getUsageStats().getLogs()) }
+            val currentTheme = prefsManager.getTheme()
             
-            SocurateTheme {
+            SocurateTheme(themeMode = currentTheme) {
                 LogListScreen(
                     logs = logs,
                     onNavigateBack = { finish() },
