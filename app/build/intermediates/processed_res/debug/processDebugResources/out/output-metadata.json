@@ -1,7 +1,7 @@
 {
   "version": 3,
   "artifactType": {
-    "type": "APK",
+    "type": "PROCESSED_RES",
     "kind": "Directory"
   },
   "applicationId": "com.najmi.oreamnos",
@@ -13,9 +13,8 @@
       "attributes": [],
       "versionCode": 1,
       "versionName": "1.0",
-      "outputFile": "app-debug.apk"
+      "outputFile": "resources-debug.ap_"
     }
   ],
-  "elementType": "File",
-  "minSdkVersionForDexing": 24
+  "elementType": "File"
 }
