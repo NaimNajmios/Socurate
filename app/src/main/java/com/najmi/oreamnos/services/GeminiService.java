@@ -60,6 +60,17 @@ public class GeminiService {
             "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2", "3-4-3"
     };
 
+    private static final java.util.regex.Pattern TACTICAL_KEYWORDS_PATTERN;
+    static {
+        StringBuilder sb = new StringBuilder();
+        for (String k : TACTICAL_KEYWORDS) {
+            if (sb.length() > 0)
+                sb.append("|");
+            sb.append(java.util.regex.Pattern.quote(k));
+        }
+        TACTICAL_KEYWORDS_PATTERN = java.util.regex.Pattern.compile("(?i)" + sb.toString());
+    }
+
     // Bolt Optimization: Move unwanted phrases to static final
     private static final String[] UNWANTED_PHRASES = {
             "Okay, ini percubaan untuk mengubah teks tersebut",
@@ -634,21 +645,18 @@ public class GeminiService {
             return false;
         }
 
-        // Convert to lowercase for keyword matching
-        String lowerText = text.toLowerCase();
-
-        // Count tactical keywords
-        // Bolt Optimization: Use static final array instead of allocating new one each
-        // call
-        int keywordCount = 0;
-        for (String keyword : TACTICAL_KEYWORDS) {
-            if (lowerText.contains(keyword)) {
-                keywordCount++;
+        // Bolt Optimization: Avoid toLowerCase() allocation and multiple passes
+        // Uses single-pass regex matching and early exit
+        java.util.regex.Matcher m = TACTICAL_KEYWORDS_PATTERN.matcher(text);
+        java.util.Set<String> found = new java.util.HashSet<>();
+        while (m.find()) {
+            found.add(m.group().toLowerCase());
+            if (found.size() >= 5) {
+                return true;
             }
         }
 
-        // If it has 5+ tactical keywords and is long, it's technical
-        return keywordCount >= 5;
+        return false;
     }
 
     /**
