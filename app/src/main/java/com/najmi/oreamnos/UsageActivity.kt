@@ -380,6 +380,9 @@ fun ProviderStatsCard(stats: UsageStats) {
             ProviderRow("Groq", groqTokens, totalTokens, Color(0xFFFF6B6B))
             Spacer(Modifier.height(8.dp))
             ProviderRow("OpenRouter", orTokens, totalTokens, Color(0xFF4ECDC4))
+            Spacer(Modifier.height(8.dp))
+            val cerebrasTokens = providerStats["cerebras"]?.totalTokens ?: 0L
+            ProviderRow("Cerebras", cerebrasTokens, totalTokens, Color(0xFF9C27B0)) // Purple for Cerebras
         }
     }
 }

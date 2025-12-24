@@ -21,7 +21,6 @@ fun TypewriterText(
     text: String,
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
-    delayMillis: Long = 10, // Speed of typing
     onFinished: () -> Unit = {}
 ) {
     var displayedText by remember { mutableStateOf("") }
@@ -29,9 +28,13 @@ fun TypewriterText(
     // Reset when text changes
     LaunchedEffect(text) {
         displayedText = ""
-        for (i in text.indices) {
-            displayedText = text.substring(0, i + 1)
-            delay(delayMillis)
+        var currentIndex = 0
+        while (currentIndex < text.length) {
+            // Append 3 characters at a time for "near instant" speed
+            val endIndex = (currentIndex + 3).coerceAtMost(text.length)
+            displayedText = text.substring(0, endIndex)
+            currentIndex = endIndex
+            delay(1) // 1ms delay
         }
         onFinished()
     }

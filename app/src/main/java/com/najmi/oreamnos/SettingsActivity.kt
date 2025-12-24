@@ -12,6 +12,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -162,7 +164,7 @@ class SettingsActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(
     prefsManager: PreferencesManager,
@@ -368,7 +370,11 @@ fun SettingsScreen(
             SettingsCard(title = "Appearance") {
                 Text("Theme", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     val themeOptions = listOf(
                         "System" to PreferencesManager.THEME_SYSTEM,
                         "Light" to PreferencesManager.THEME_LIGHT,
@@ -376,12 +382,13 @@ fun SettingsScreen(
                         "Deep Blue" to PreferencesManager.THEME_DEEP_BLUE
                     )
                     themeOptions.forEach { (label, value) ->
-                        RadioButton(
-                            selected = theme == value,
-                            onClick = { theme = value; prefsManager.saveTheme(theme); onThemeChanged(theme); showSaved() }
-                        )
-                        Text(label, modifier = Modifier.clickable { theme = value; prefsManager.saveTheme(theme); onThemeChanged(theme); showSaved() })
-                        Spacer(Modifier.width(8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = theme == value,
+                                onClick = { theme = value; prefsManager.saveTheme(theme); onThemeChanged(theme); showSaved() }
+                            )
+                            Text(label, modifier = Modifier.clickable { theme = value; prefsManager.saveTheme(theme); onThemeChanged(theme); showSaved() })
+                        }
                     }
                 }
             }
