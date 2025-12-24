@@ -36,9 +36,9 @@ class GeminiService(
     private var _lastCandidateTokens: Int = 0
     private var _lastTotalTokens: Int = 0
 
-    override fun getLastPromptTokens(): Int = _lastPromptTokens
-    override fun getLastCandidateTokens(): Int = _lastCandidateTokens
-    override fun getLastTotalTokens(): Int = _lastTotalTokens
+    override val lastPromptTokens: Int get() = _lastPromptTokens
+    override val lastCandidateTokens: Int get() = _lastCandidateTokens
+    override val lastTotalTokens: Int get() = _lastTotalTokens
 
     /**
      * Curates the input text into a football social media post in Malaysian Malay.
