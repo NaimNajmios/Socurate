@@ -412,20 +412,23 @@ fun MainScreen(
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    TextButton(onClick = {
-                        if (inputText.isBlank()) {
-                            Toast.makeText(context, R.string.input_required, Toast.LENGTH_SHORT).show()
-                        } else if (!prefsManager.hasApiKey()) {
-                            Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
-                            onNavigateToSettings()
-                        } else {
-                            isLoading = true
-                            error = null
-                            onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
-                        }
-                    }) {
-                        Text("GENERATE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
-                    }
+                    NeoButton(
+                        onClick = {
+                            if (inputText.isBlank()) {
+                                Toast.makeText(context, R.string.input_required, Toast.LENGTH_SHORT).show()
+                            } else if (!prefsManager.hasApiKey()) {
+                                Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
+                                onNavigateToSettings()
+                            } else {
+                                isLoading = true
+                                error = null
+                                onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                            }
+                        },
+                        text = "GENERATE",
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(Modifier.width(8.dp))
                     TextButton(onClick = onNavigateToUsage) {
                         Text("USAGE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
                     }
