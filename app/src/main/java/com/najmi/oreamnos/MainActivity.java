@@ -328,8 +328,9 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // Update word count
-                String text = s.toString().trim();
-                int wordCount = text.isEmpty() ? 0 : WHITESPACE_PATTERN.split(text).length;
+                String text = s.toString();
+                // Performance: Use optimized word counting to avoid String.split allocation (O(N) memory)
+                int wordCount = ReadabilityUtils.countWords(text);
                 outputWordCount.setText(wordCount + " words");
 
                 // Update readability score
