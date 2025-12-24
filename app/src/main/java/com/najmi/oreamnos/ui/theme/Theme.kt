@@ -12,51 +12,76 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 /**
- * Socurate Dark Color Scheme - Premium Deep Navy
+ * Socurate Neo-Editorial Theme
+ * High contrast, bold accent.
  */
+
 private val DarkColorScheme = darkColorScheme(
-    primary = ElectricBlue,
-    onPrimary = TextPrimary,
-    primaryContainer = PrimaryContainer,
-    onPrimaryContainer = OnPrimaryContainer,
+    primary = InternationalOrange,
+    onPrimary = NeoWhite,
+    primaryContainer = NeoDarkGrey,
+    onPrimaryContainer = NeoWhite,
     
-    secondary = ElectricBlueLight,
-    onSecondary = DeepNavyBackground,
-    secondaryContainer = SlateSurface,
-    onSecondaryContainer = TextPrimary,
+    secondary = NeoWhite,
+    onSecondary = NeoBlack,
+    secondaryContainer = NeoDarkGrey,
+    onSecondaryContainer = NeoWhite,
     
-    tertiary = TextSecondary,
-    onTertiary = DeepNavyBackground,
-    tertiaryContainer = Outline,
-    onTertiaryContainer = TextTertiary,
+    tertiary = NeoLightGrey,
+    onTertiary = NeoBlack,
+    tertiaryContainer = NeoDarkGrey,
+    onTertiaryContainer = NeoWhite,
     
     error = ErrorRed,
-    onError = OnError,
-    errorContainer = ErrorContainer,
-    onErrorContainer = OnErrorContainer,
+    onError = NeoWhite,
     
-    background = DeepNavyBackground,
-    onBackground = TextPrimary,
+    background = NeoBlack,
+    onBackground = NeoWhite,
     
-    surface = SlateSurface,
-    onSurface = TextPrimary,
-    surfaceVariant = SurfaceVariant,
-    onSurfaceVariant = TextSecondary,
+    surface = NeoBlack,
+    onSurface = NeoWhite,
+    surfaceVariant = NeoDarkGrey,
+    onSurfaceVariant = NeoWhite,
     
-    outline = Outline,
-    inverseSurface = InverseSurface,
-    inverseOnSurface = InverseOnSurface,
-    inversePrimary = InversePrimary
+    outline = NeoWhite,
+    inverseSurface = NeoWhite,
+    inverseOnSurface = NeoBlack,
+    inversePrimary = InternationalOrangeDark
 )
 
-/**
- * Light theme uses same dark palette for now (app is primarily dark-themed)
- */
-private val LightColorScheme = DarkColorScheme
+private val LightColorScheme = lightColorScheme(
+    primary = InternationalOrange,
+    onPrimary = NeoWhite,
+    primaryContainer = NeoOffWhite,
+    onPrimaryContainer = NeoBlack,
+    
+    secondary = NeoBlack,
+    onSecondary = NeoWhite,
+    secondaryContainer = NeoLightGrey,
+    onSecondaryContainer = NeoBlack,
+    
+    tertiary = NeoDarkGrey,
+    onTertiary = NeoWhite,
+    tertiaryContainer = NeoLightGrey,
+    onTertiaryContainer = NeoBlack,
+    
+    error = ErrorRed,
+    onError = NeoWhite,
+    
+    background = NeoWhite,
+    onBackground = NeoBlack,
+    
+    surface = NeoWhite,
+    onSurface = NeoBlack,
+    surfaceVariant = NeoOffWhite,
+    onSurfaceVariant = NeoBlack,
+    
+    outline = NeoBlack,
+    inverseSurface = NeoBlack,
+    inverseOnSurface = NeoWhite,
+    inversePrimary = InternationalOrange
+)
 
-/**
- * Socurate App Theme
- */
 @Composable
 fun SocurateTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

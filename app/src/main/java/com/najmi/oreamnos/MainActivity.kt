@@ -96,6 +96,11 @@ import com.najmi.oreamnos.ui.theme.SocurateTheme
 import com.najmi.oreamnos.utils.PreferencesManager
 import com.najmi.oreamnos.utils.ReadabilityUtils
 import com.najmi.oreamnos.utils.StringUtils
+import com.najmi.oreamnos.ui.components.NeoButton
+import com.najmi.oreamnos.ui.components.NeoCard
+import com.najmi.oreamnos.ui.components.NeoChip
+import com.najmi.oreamnos.ui.components.NeoInput
+import com.najmi.oreamnos.ui.components.NeoOutlinedButton
 import com.najmi.oreamnos.viewmodel.MainViewModel
 
 // File-level regex patterns for use in composables
@@ -394,70 +399,59 @@ fun MainScreen(
     }
     
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Socurate") },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
-                actions = {
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, "Settings")
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            // Neo Bottom Bar
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+                border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    TextButton(onClick = {
+                        if (inputText.isBlank()) {
+                            Toast.makeText(context, R.string.input_required, Toast.LENGTH_SHORT).show()
+                        } else if (!prefsManager.hasApiKey()) {
+                            Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
+                            onNavigateToSettings()
+                        } else {
+                            isLoading = true
+                            error = null
+                            onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                        }
+                    }) {
+                        Text("GENERATE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
+                    }
+                    TextButton(onClick = onNavigateToUsage) {
+                        Text("USAGE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
+                    }
+                    TextButton(onClick = onNavigateToSettings) {
+                        Text("SETTINGS", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
-            )
-        },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.PlayArrow, "Generate") },
-                    label = { Text("Generate") },
-                    selected = true,
-                    onClick = { }
-                )
-                NavigationBarItem(
-                    icon = { Icon(painterResource(R.drawable.ic_usage), "Usage") },
-                    label = { Text("Usage") },
-                    selected = false,
-                    onClick = onNavigateToUsage
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Settings, "Settings") },
-                    label = { Text("Settings") },
-                    selected = false,
-                    onClick = onNavigateToSettings
-                )
             }
-        },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = {
-                    if (inputText.isBlank()) {
-                        Toast.makeText(context, R.string.input_required, Toast.LENGTH_SHORT).show()
-                        return@ExtendedFloatingActionButton
-                    }
-                    if (!prefsManager.hasApiKey()) {
-                        Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
-                        onNavigateToSettings()
-                        return@ExtendedFloatingActionButton
-                    }
-                    isLoading = true
-                    error = null
-                    onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
-                },
-                icon = { if (isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp) else Icon(Icons.AutoMirrored.Filled.Send, "Generate") },
-                text = { Text(if (isLoading) "Generating..." else "Generate") },
-                expanded = !isLoading
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            // Neo Header
+            Text(
+                text = "SOCURATE",
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
             // Input Card
             InputCard(
                 inputText = inputText,
@@ -568,76 +562,46 @@ fun InputCard(
     keepStructure: Boolean,
     onKeepStructureChange: (Boolean) -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp)
+    NeoCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            OutlinedTextField(
-                value = inputText,
-                onValueChange = onInputChange,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Enter text or URL") },
-                placeholder = { Text("Paste article text or news URL...") },
-                minLines = 3,
-                maxLines = 8,
-                trailingIcon = {
-                    if (inputText.isNotEmpty()) {
-                        IconButton(onClick = { onInputChange("") }) {
-                            Icon(Icons.Default.Clear, "Clear")
-                        }
-                    }
-                }
-            )
-            
-            Spacer(Modifier.height(12.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Keep original structure", style = MaterialTheme.typography.bodyMedium)
-                Switch(checked = keepStructure, onCheckedChange = onKeepStructureChange)
-            }
-        }
-    }
-}
-
-@Composable
-fun LoadingCard() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        NeoInput(
+            value = inputText,
+            onValueChange = onInputChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = "SOURCE MATERIAL",
+            placeholder = "Paste article text or URL...",
+            minLines = 5,
+            maxLines = 10
+        )
+        
+        Spacer(Modifier.height(16.dp))
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            CircularProgressIndicator(modifier = Modifier.size(48.dp))
-            Spacer(Modifier.height(16.dp))
-            Text("Generating your post...", style = MaterialTheme.typography.bodyLarge)
+            Text("PRESERVE STRUCTURE", style = MaterialTheme.typography.labelLarge)
+            Switch(
+                checked = keepStructure, 
+                onCheckedChange = onKeepStructureChange,
+                colors = androidx.compose.material3.SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.primary,
+                    checkedTrackColor = MaterialTheme.colorScheme.surface,
+                    checkedBorderColor = MaterialTheme.colorScheme.primary,
+                    uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                    uncheckedTrackColor = MaterialTheme.colorScheme.surface,
+                    uncheckedBorderColor = MaterialTheme.colorScheme.outline
+                )
+            )
         }
     }
 }
 
-@Composable
-fun ErrorCard(error: String, onRetry: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = ErrorRed.copy(alpha = 0.1f))
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("Generation Failed", style = MaterialTheme.typography.titleMedium, color = ErrorRed)
-            Spacer(Modifier.height(8.dp))
-            Text(error, style = MaterialTheme.typography.bodyMedium)
-            Spacer(Modifier.height(12.dp))
-            Button(onClick = onRetry) { Text("Try Again") }
-        }
-    }
-}
+
+
+
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -657,60 +621,54 @@ fun OutputCard(
     onCopyClick: () -> Unit,
     onShareClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp)
+    NeoCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Output toggles
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(selected = includeTitle, onClick = { onIncludeTitleChange(!includeTitle) }, label = { Text("Title") })
-                if (hasHashtags) {
-                    FilterChip(selected = includeHashtags, onClick = { onIncludeHashtagsChange(!includeHashtags) }, label = { Text("Hashtags") })
-                }
-                if (isSourceEnabled) {
-                    FilterChip(selected = includeSource, onClick = { onIncludeSourceChange(!includeSource) }, label = { Text("Source") })
-                }
+        // Output toggles
+        Text("DISPLAY OPTIONS", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(bottom = 8.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            NeoChip(selected = includeTitle, onClick = { onIncludeTitleChange(!includeTitle) }, text = "Title")
+            if (hasHashtags) {
+                NeoChip(selected = includeHashtags, onClick = { onIncludeHashtagsChange(!includeHashtags) }, text = "Hashtags")
             }
-            
-            Spacer(Modifier.height(12.dp))
-            
-            // Output text
-            OutlinedTextField(
-                value = outputText,
-                onValueChange = onOutputChange,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = isEditMode,
-                minLines = 5,
-                maxLines = 15
-            )
-            
-            // Stats
-            val wordCount = if (outputText.isBlank()) 0 else WHITESPACE_PATTERN.split(outputText).size
-            val gradeLevel = ReadabilityUtils.calculateFleschKincaidGradeLevel(outputText)
-            
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("$wordCount words", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text("Grade: ${String.format("%.1f", gradeLevel)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (isSourceEnabled) {
+                NeoChip(selected = includeSource, onClick = { onIncludeSourceChange(!includeSource) }, text = "Source")
             }
-            
-            // Action buttons
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = onEditClick, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.Edit, null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(if (isEditMode) "Save" else "Edit")
-                }
-                OutlinedButton(onClick = onCopyClick, modifier = Modifier.weight(1f)) { Text("Copy") }
-                Button(onClick = onShareClick, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.Share, null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text("Share")
-                }
-            }
+        }
+        
+        Spacer(Modifier.height(16.dp))
+        
+        // Output text
+        NeoInput(
+            value = outputText,
+            onValueChange = onOutputChange,
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = !isEditMode,
+            minLines = 8,
+            maxLines = 20,
+            label = "GENERATED CONTENT",
+            textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+        )
+        
+        // Stats
+        val wordCount = if (outputText.isBlank()) 0 else WHITESPACE_PATTERN.split(outputText).size
+        val gradeLevel = ReadabilityUtils.calculateFleschKincaidGradeLevel(outputText)
+        
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("WORDS: $wordCount", style = MaterialTheme.typography.labelMedium)
+            Text("GRADE: ${String.format("%.1f", gradeLevel)}", style = MaterialTheme.typography.labelMedium)
+        }
+        
+        Spacer(Modifier.height(8.dp))
+        
+        // Action buttons
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            NeoOutlinedButton(onClick = onEditClick, modifier = Modifier.weight(1f), text = if (isEditMode) "Save" else "Edit")
+            NeoOutlinedButton(onClick = onCopyClick, modifier = Modifier.weight(1f), text = "Copy")
+            NeoButton(onClick = onShareClick, modifier = Modifier.weight(1f), text = "Share")
         }
     }
 }
@@ -734,54 +692,79 @@ fun RefinementCard(
         "shorten_detailed" to "Shorten"
     )
     
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    NeoCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("Refine Output", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(12.dp))
-            
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                refinementLabels.forEach { (key, label) ->
-                    FilterChip(
-                        selected = selectedOptions.contains(key),
-                        onClick = { onToggleOption(key) },
-                        label = { Text(label) }
-                    )
-                }
-                
-                // Custom pills
-                customPills.forEach { pill ->
-                    FilterChip(
-                        selected = selectedPillIds.contains(pill.id),
-                        onClick = { onTogglePill(pill.id) },
-                        label = { Text(pill.name) }
-                    )
-                }
+        Text("REFINE OUTPUT", style = MaterialTheme.typography.labelLarge)
+        Spacer(Modifier.height(12.dp))
+        
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            refinementLabels.forEach { (key, label) ->
+                NeoChip(
+                    selected = selectedOptions.contains(key),
+                    onClick = { onToggleOption(key) },
+                    text = label
+                )
             }
             
-            Spacer(Modifier.height(16.dp))
-            
-            Button(
-                onClick = onRegenerate,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Default.Refresh, null, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(8.dp))
-                Text("Regenerate")
+            // Custom pills
+            customPills.forEach { pill ->
+                NeoChip(
+                    selected = selectedPillIds.contains(pill.id),
+                    onClick = { onTogglePill(pill.id) },
+                    text = pill.name
+                )
             }
+        }
+        
+        Spacer(Modifier.height(24.dp))
+        
+        NeoButton(
+            onClick = onRegenerate,
+            modifier = Modifier.fillMaxWidth(),
+            text = "REGENERATE"
+        )
+    }
+}
+
+@Composable
+fun LoadingCard() {
+    NeoCard(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp),
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 4.dp
+            )
+            Spacer(Modifier.height(24.dp))
+            Text("GENERATING...", style = MaterialTheme.typography.titleMedium)
         }
     }
 }
 
 @Composable
-fun EmptyStateCard(onPaste: () -> Unit) {
-    Card(
+fun ErrorCard(error: String, onRetry: () -> Unit) {
+    NeoCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        borderColor = ErrorRed
+    ) {
+        Text("GENERATION FAILED", style = MaterialTheme.typography.titleMedium, color = ErrorRed)
+        Spacer(Modifier.height(8.dp))
+        Text(error, style = MaterialTheme.typography.bodyMedium)
+        Spacer(Modifier.height(16.dp))
+        NeoButton(onClick = onRetry, text = "TRY AGAIN", containerColor = ErrorRed)
+    }
+}
+
+@Composable
+fun EmptyStateCard(onPaste: () -> Unit) {
+    NeoCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(32.dp),
@@ -791,15 +774,13 @@ fun EmptyStateCard(onPaste: () -> Unit) {
                 painter = painterResource(R.drawable.ic_empty_state),
                 contentDescription = null,
                 modifier = Modifier.size(80.dp),
-                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                tint = MaterialTheme.colorScheme.primary
             )
-            Spacer(Modifier.height(16.dp))
-            Text("Ready to generate", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(24.dp))
+            Text("READY TO GENERATE", style = MaterialTheme.typography.titleMedium)
             Text("Paste content or enter a URL above", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(16.dp))
-            OutlinedButton(onClick = onPaste) {
-                Text("Paste from Clipboard")
-            }
+            Spacer(Modifier.height(24.dp))
+            NeoOutlinedButton(onClick = onPaste, text = "PASTE FROM CLIPBOARD")
         }
     }
 }

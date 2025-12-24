@@ -69,7 +69,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.najmi.oreamnos.services.ContentGenerationService
 import com.najmi.oreamnos.services.GeminiService
 import com.najmi.oreamnos.services.WebContentExtractor
-import com.najmi.oreamnos.ui.theme.ElectricBlue
+
 import com.najmi.oreamnos.ui.theme.ErrorRed
 import com.najmi.oreamnos.ui.theme.SocurateTheme
 import com.najmi.oreamnos.utils.HapticHelper

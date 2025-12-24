@@ -57,8 +57,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.najmi.oreamnos.model.UsageStats
-import com.najmi.oreamnos.ui.theme.ElectricBlue
-import com.najmi.oreamnos.ui.theme.ElectricBlueLight
+
 import com.najmi.oreamnos.ui.theme.ErrorRed
 import com.najmi.oreamnos.ui.theme.SocurateTheme
 import com.najmi.oreamnos.ui.theme.SuccessGreen
@@ -282,7 +281,7 @@ fun StatItem(value: String, label: String) {
             text = value,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = ElectricBlue
+            color = MaterialTheme.colorScheme.primary
         )
         Text(
             text = label,
@@ -344,13 +343,13 @@ fun TokenBreakdownCard(stats: UsageStats) {
             Spacer(Modifier.height(12.dp))
             
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Prompt: ${formatNumber(promptTokens)}", style = MaterialTheme.typography.bodySmall, color = ElectricBlue)
+                Text("Prompt: ${formatNumber(promptTokens)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                 Text("Response: ${formatNumber(responseTokens)}", style = MaterialTheme.typography.bodySmall, color = SuccessGreen)
             }
             Spacer(Modifier.height(8.dp))
             
             Row(modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp))) {
-                Box(modifier = Modifier.weight(promptPercent).fillMaxSize().background(ElectricBlue))
+                Box(modifier = Modifier.weight(promptPercent).fillMaxSize().background(MaterialTheme.colorScheme.primary))
                 Box(modifier = Modifier.weight(1f - promptPercent).fillMaxSize().background(SuccessGreen))
             }
         }
@@ -375,7 +374,7 @@ fun ProviderStatsCard(stats: UsageStats) {
             Text("Provider Usage", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
             Spacer(Modifier.height(12.dp))
             
-            ProviderRow("Gemini", geminiTokens, totalTokens, ElectricBlue)
+            ProviderRow("Gemini", geminiTokens, totalTokens, MaterialTheme.colorScheme.primary)
             Spacer(Modifier.height(8.dp))
             ProviderRow("Groq", groqTokens, totalTokens, Color(0xFFFF6B6B))
             Spacer(Modifier.height(8.dp))
