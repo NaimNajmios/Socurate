@@ -1,0 +1,538 @@
+package com.najmi.oreamnos
+
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import com.najmi.oreamnos.curator.OpenAICompatibleCurator
+import com.najmi.oreamnos.services.GeminiService
+import com.najmi.oreamnos.ui.theme.SocurateTheme
+import com.najmi.oreamnos.utils.PreferencesManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+/**
+ * Settings activity for configuring API key, tone, and model selection.
+ * Converted to Jetpack Compose.
+ */
+class SettingsActivity : ComponentActivity() {
+    
+    companion object {
+        private const val TAG = "SettingsActivity"
+        
+        // Gemini models
+        val GEMINI_MODEL_NAMES = arrayOf(
+            "Gemini 2.5 Flash Lite", "Gemini 2.5 Flash", "Gemini 2.0 Flash",
+            "Gemini 2.0 Flash Lite", "Gemini 1.5 Flash", "Gemini 1.5 Flash-8B"
+        )
+        val GEMINI_MODEL_ENDPOINTS = arrayOf(
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent"
+        )
+        
+        // Groq models
+        val GROQ_MODEL_NAMES = arrayOf(
+            "Llama 3.3 70B Versatile", "Llama 3.1 8B Instant", "Llama 3 70B",
+            "Llama 3 8B", "Gemma 2 9B", "Mixtral 8x7B"
+        )
+        val GROQ_MODEL_IDS = arrayOf(
+            "llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama3-70b-8192",
+            "llama3-8b-8192", "gemma2-9b-it", "mixtral-8x7b-32768"
+        )
+        
+        // OpenRouter models
+        val OPENROUTER_MODEL_NAMES = arrayOf(
+            "Llama 3.3 70B Instruct", "Llama 3.1 8B Instruct", "Llama 3.1 405B Instruct",
+            "Llama 3.2 3B Instruct", "Google Gemma 2 9B", "Mistral 7B Instruct",
+            "Qwen 2.5 7B Instruct", "NVIDIA Nemotron 70B", "HuggingFace Zephyr 7B"
+        )
+        val OPENROUTER_MODEL_IDS = arrayOf(
+            "meta-llama/llama-3.3-70b-instruct:free", "meta-llama/llama-3.1-8b-instruct:free",
+            "meta-llama/llama-3.1-405b-instruct:free", "meta-llama/llama-3.2-3b-instruct:free",
+            "google/gemma-2-9b-it:free", "mistralai/mistral-7b-instruct:free",
+            "qwen/qwen-2.5-7b-instruct:free", "nvidia/llama-3.1-nemotron-70b-instruct:free",
+            "huggingfaceh4/zephyr-7b-beta:free"
+        )
+        
+        // Cerebras models
+        val CEREBRAS_MODEL_NAMES = arrayOf(
+            "Llama 3.3 70B", "Llama 3.1 8B", "Qwen 3 32B", "GPT-OSS 120B", "Z.ai GLM 4.6"
+        )
+        val CEREBRAS_MODEL_IDS = arrayOf(
+            "llama-3.3-70b", "llama3.1-8b", "qwen-3-32b", "gpt-oss-120b", "zai-glm-4.6"
+        )
+        
+        val PROVIDER_NAMES = arrayOf("Gemini", "Groq", "OpenRouter", "Cerebras")
+        val PROVIDER_VALUES = arrayOf("gemini", "groq", "openrouter", "cerebras")
+    }
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.i(TAG, "=== SettingsActivity onCreate ===")
+        
+        val prefsManager = PreferencesManager(this)
+        applyTheme(prefsManager.getTheme())
+        
+        setContent {
+            SocurateTheme {
+                SettingsScreen(
+                    prefsManager = prefsManager,
+                    onNavigateBack = { finish() },
+                    onNavigateToHashtags = { startActivity(Intent(this, HashtagManagerActivity::class.java)) },
+                    onNavigateToUsage = { startActivity(Intent(this, UsageActivity::class.java)) },
+                    onThemeChanged = { theme -> applyTheme(theme) }
+                )
+            }
+        }
+    }
+    
+    private fun applyTheme(theme: String) {
+        val mode = when (theme) {
+            PreferencesManager.THEME_LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+            PreferencesManager.THEME_DARK -> AppCompatDelegate.MODE_NIGHT_YES
+            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
+        AppCompatDelegate.setDefaultNightMode(mode)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreen(
+    prefsManager: PreferencesManager,
+    onNavigateBack: () -> Unit,
+    onNavigateToHashtags: () -> Unit,
+    onNavigateToUsage: () -> Unit,
+    onThemeChanged: (String) -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    
+    // State
+    var provider by remember { mutableStateOf(prefsManager.getProvider()) }
+    var geminiKey by remember { mutableStateOf(prefsManager.getApiKey() ?: "") }
+    var groqKey by remember { mutableStateOf(prefsManager.getGroqApiKey() ?: "") }
+    var openRouterKey by remember { mutableStateOf(prefsManager.getOpenRouterApiKey() ?: "") }
+    var cerebrasKey by remember { mutableStateOf(prefsManager.getCerebrasApiKey() ?: "") }
+    var selectedModelIndex by remember { mutableIntStateOf(0) }
+    var tone by remember { mutableStateOf(prefsManager.getTone()) }
+    var theme by remember { mutableStateOf(prefsManager.getTheme()) }
+    var hashtagsEnabled by remember { mutableStateOf(prefsManager.areHashtagsEnabled()) }
+    var sourceEnabled by remember { mutableStateOf(prefsManager.isSourceEnabled()) }
+    var isTesting by remember { mutableStateOf(false) }
+    
+    // Get current model arrays based on provider
+    val (modelNames, modelIds) = remember(provider) {
+        when (provider) {
+            PreferencesManager.PROVIDER_GROQ -> SettingsActivity.GROQ_MODEL_NAMES to SettingsActivity.GROQ_MODEL_IDS
+            PreferencesManager.PROVIDER_OPENROUTER -> SettingsActivity.OPENROUTER_MODEL_NAMES to SettingsActivity.OPENROUTER_MODEL_IDS
+            PreferencesManager.PROVIDER_CEREBRAS -> SettingsActivity.CEREBRAS_MODEL_NAMES to SettingsActivity.CEREBRAS_MODEL_IDS
+            else -> SettingsActivity.GEMINI_MODEL_NAMES to SettingsActivity.GEMINI_MODEL_ENDPOINTS
+        }
+    }
+    
+    // Load saved model index for current provider
+    remember(provider) {
+        val savedModel = prefsManager.getModelForProvider(provider)
+        selectedModelIndex = modelIds.indexOfFirst { it == savedModel }.coerceAtLeast(0)
+    }
+    
+    fun showSaved() = Toast.makeText(context, "Settings saved", Toast.LENGTH_SHORT).show()
+    
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Settings") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // AI Provider Section
+            SettingsCard(title = "AI Provider") {
+                DropdownSelector(
+                    label = "Provider",
+                    options = SettingsActivity.PROVIDER_NAMES.toList(),
+                    selectedIndex = SettingsActivity.PROVIDER_VALUES.indexOf(provider).coerceAtLeast(0),
+                    onSelect = { index ->
+                        provider = SettingsActivity.PROVIDER_VALUES[index]
+                        prefsManager.saveProvider(provider)
+                        showSaved()
+                    }
+                )
+                
+                Spacer(Modifier.height(12.dp))
+                
+                // API Key input based on provider
+                when (provider) {
+                    PreferencesManager.PROVIDER_GROQ -> ApiKeyInput(
+                        label = "Groq API Key",
+                        value = groqKey,
+                        onValueChange = { groqKey = it },
+                        onSave = { prefsManager.saveGroqApiKey(groqKey); showSaved() }
+                    )
+                    PreferencesManager.PROVIDER_OPENROUTER -> ApiKeyInput(
+                        label = "OpenRouter API Key",
+                        value = openRouterKey,
+                        onValueChange = { openRouterKey = it },
+                        onSave = { prefsManager.saveOpenRouterApiKey(openRouterKey); showSaved() }
+                    )
+                    PreferencesManager.PROVIDER_CEREBRAS -> ApiKeyInput(
+                        label = "Cerebras API Key",
+                        value = cerebrasKey,
+                        onValueChange = { cerebrasKey = it },
+                        onSave = { prefsManager.saveCerebrasApiKey(cerebrasKey); showSaved() }
+                    )
+                    else -> ApiKeyInput(
+                        label = "Gemini API Key",
+                        value = geminiKey,
+                        onValueChange = { geminiKey = it },
+                        onSave = { prefsManager.saveApiKey(geminiKey); showSaved() }
+                    )
+                }
+                
+                Spacer(Modifier.height(12.dp))
+                
+                DropdownSelector(
+                    label = "Model",
+                    options = modelNames.toList(),
+                    selectedIndex = selectedModelIndex,
+                    onSelect = { index ->
+                        selectedModelIndex = index
+                        prefsManager.saveModelForProvider(provider, modelIds[index])
+                        showSaved()
+                    }
+                )
+                
+                Spacer(Modifier.height(16.dp))
+                
+                // Test Connection Button
+                Button(
+                    onClick = {
+                        val apiKey = when (provider) {
+                            PreferencesManager.PROVIDER_GROQ -> groqKey
+                            PreferencesManager.PROVIDER_OPENROUTER -> openRouterKey
+                            PreferencesManager.PROVIDER_CEREBRAS -> cerebrasKey
+                            else -> geminiKey
+                        }
+                        if (apiKey.isEmpty()) {
+                            Toast.makeText(context, "Please enter an API key first", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        isTesting = true
+                        scope.launch {
+                            try {
+                                val result = withContext(Dispatchers.IO) {
+                                    testConnection(provider, apiKey, modelIds[selectedModelIndex], tone)
+                                }
+                                Toast.makeText(context, "Connection successful! API key saved.", Toast.LENGTH_LONG).show()
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Test failed: ${e.message}", Toast.LENGTH_LONG).show()
+                            } finally {
+                                isTesting = false
+                            }
+                        }
+                    },
+                    enabled = !isTesting,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (isTesting) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    Text(if (isTesting) "Testing..." else "Test Connection")
+                }
+            }
+            
+            // Writing Style Section
+            SettingsCard(title = "Writing Style") {
+                Text("Tone", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(
+                        selected = tone == PreferencesManager.TONE_CASUAL,
+                        onClick = { tone = PreferencesManager.TONE_CASUAL; prefsManager.saveTone(tone); showSaved() }
+                    )
+                    Text("Casual", modifier = Modifier.clickable { tone = PreferencesManager.TONE_CASUAL; prefsManager.saveTone(tone); showSaved() })
+                    Spacer(Modifier.width(24.dp))
+                    RadioButton(
+                        selected = tone == PreferencesManager.TONE_FORMAL,
+                        onClick = { tone = PreferencesManager.TONE_FORMAL; prefsManager.saveTone(tone); showSaved() }
+                    )
+                    Text("Formal", modifier = Modifier.clickable { tone = PreferencesManager.TONE_FORMAL; prefsManager.saveTone(tone); showSaved() })
+                }
+            }
+            
+            // Output Options Section
+            SettingsCard(title = "Output Options") {
+                SettingsToggle(
+                    title = "Include Source Citation",
+                    subtitle = "Add URL source at the end of posts",
+                    checked = sourceEnabled,
+                    onCheckedChange = { sourceEnabled = it; prefsManager.saveSourceEnabled(it); showSaved() }
+                )
+                Spacer(Modifier.height(16.dp))
+                SettingsToggle(
+                    title = "Auto-append Hashtags",
+                    subtitle = "Add hashtags to generated posts",
+                    checked = hashtagsEnabled,
+                    onCheckedChange = { hashtagsEnabled = it; prefsManager.setHashtagsEnabled(it); showSaved() }
+                )
+                Spacer(Modifier.height(8.dp))
+                NavigationRow(
+                    title = "Manage Hashtags",
+                    onClick = onNavigateToHashtags
+                )
+            }
+            
+            // Theme Section
+            SettingsCard(title = "Appearance") {
+                Text("Theme", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    listOf(
+                        "System" to PreferencesManager.THEME_SYSTEM,
+                        "Light" to PreferencesManager.THEME_LIGHT,
+                        "Dark" to PreferencesManager.THEME_DARK
+                    ).forEach { (label, value) ->
+                        RadioButton(
+                            selected = theme == value,
+                            onClick = { theme = value; prefsManager.saveTheme(theme); onThemeChanged(theme); showSaved() }
+                        )
+                        Text(label, modifier = Modifier.clickable { theme = value; prefsManager.saveTheme(theme); onThemeChanged(theme); showSaved() })
+                        Spacer(Modifier.width(8.dp))
+                    }
+                }
+            }
+            
+            // Usage Stats Navigation
+            SettingsCard(title = "Statistics") {
+                NavigationRow(
+                    title = "Usage Statistics",
+                    subtitle = "View API usage and logs",
+                    onClick = onNavigateToUsage
+                )
+            }
+            
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+fun SettingsCard(title: String, content: @Composable () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+            Spacer(Modifier.height(12.dp))
+            content()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropdownSelector(
+    label: String,
+    options: List<String>,
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        OutlinedTextField(
+            value = options.getOrElse(selectedIndex) { "" },
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+            modifier = Modifier.fillMaxWidth().menuAnchor()
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEachIndexed { index, option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = { onSelect(index); expanded = false }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ApiKeyInput(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onSave: () -> Unit
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
+        visualTransformation = PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+    )
+}
+
+@Composable
+fun SettingsToggle(
+    title: String,
+    subtitle: String? = null,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            subtitle?.let {
+                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        )
+    }
+}
+
+@Composable
+fun NavigationRow(
+    title: String,
+    subtitle: String? = null,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            subtitle?.let {
+                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        Icon(
+            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+private fun testConnection(provider: String, apiKey: String, modelId: String, tone: String): String {
+    return when (provider) {
+        PreferencesManager.PROVIDER_GROQ -> {
+            val curator = OpenAICompatibleCurator(apiKey, "https://api.groq.com/openai/v1/chat/completions", modelId, tone, false)
+            curator.curatePost("Test connection: Manchester United won 3-0.", true, false)
+        }
+        PreferencesManager.PROVIDER_OPENROUTER -> {
+            val curator = OpenAICompatibleCurator(apiKey, "https://openrouter.ai/api/v1/chat/completions", modelId, tone, true)
+            curator.curatePost("Test connection: Manchester United won 3-0.", true, false)
+        }
+        PreferencesManager.PROVIDER_CEREBRAS -> {
+            val curator = OpenAICompatibleCurator(apiKey, "https://api.cerebras.ai/v1/chat/completions", modelId, tone, false)
+            curator.curatePost("Test connection: Manchester United won 3-0.", true, false)
+        }
+        else -> {
+            val gemini = GeminiService(apiKey, modelId, tone)
+            gemini.curatePost("Test connection: Manchester United won 3-0.", true, false)
+        }
+    }
+}
