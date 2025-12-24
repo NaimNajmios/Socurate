@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -132,13 +133,23 @@ class SettingsActivity : ComponentActivity() {
         applyTheme(prefsManager.getTheme())
         
         setContent {
-            SocurateTheme {
+            val currentTheme = remember { mutableStateOf(prefsManager.getTheme()) }
+            val isDarkTheme = when (currentTheme.value) {
+                PreferencesManager.THEME_DARK -> true
+                PreferencesManager.THEME_LIGHT -> false
+                else -> isSystemInDarkTheme()
+            }
+
+            SocurateTheme(darkTheme = isDarkTheme) {
                 SettingsScreen(
                     prefsManager = prefsManager,
                     onNavigateBack = { finish() },
                     onNavigateToHashtags = { startActivity(Intent(this, HashtagManagerActivity::class.java)) },
                     onNavigateToUsage = { startActivity(Intent(this, UsageActivity::class.java)) },
-                    onThemeChanged = { theme -> applyTheme(theme) }
+                    onThemeChanged = { theme -> 
+                        currentTheme.value = theme
+                        applyTheme(theme) 
+                    }
                 )
             }
         }

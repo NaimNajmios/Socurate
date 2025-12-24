@@ -21,6 +21,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -164,13 +165,19 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Theme state
+    private val currentTheme = mutableStateOf(PreferencesManager.THEME_SYSTEM)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.i(TAG, "=== MainActivity onCreate ===")
         
         prefsManager = PreferencesManager(this)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        applyTheme(prefsManager.getTheme())
+        
+        // Initialize theme
+        currentTheme.value = prefsManager.getTheme()
+        applyTheme(currentTheme.value)
         
         // Get incoming intent data
         val sharedText = intent?.getStringExtra("shared_text")
@@ -180,7 +187,14 @@ class MainActivity : ComponentActivity() {
         val intentSource = intent?.getStringExtra("generated_source")
         
         setContent {
-            SocurateTheme {
+            val themeValue by currentTheme
+            val isDarkTheme = when (themeValue) {
+                PreferencesManager.THEME_DARK -> true
+                PreferencesManager.THEME_LIGHT -> false
+                else -> isSystemInDarkTheme()
+            }
+
+            SocurateTheme(darkTheme = isDarkTheme) {
                 MainScreen(
                     prefsManager = prefsManager,
                     generationResult = generationResult.value,
@@ -204,6 +218,13 @@ class MainActivity : ComponentActivity() {
             serviceResultReceiver,
             IntentFilter(ContentGenerationService.BROADCAST_RESULT)
         )
+        
+        // Check for theme changes
+        val savedTheme = prefsManager.getTheme()
+        if (currentTheme.value != savedTheme) {
+            currentTheme.value = savedTheme
+            applyTheme(savedTheme)
+        }
     }
     
     override fun onPause() {
