@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.najmi.oreamnos.app-mergeDebugResources-33:/values-h320dp-port-v13/values-h320dp-port-v13.xml",
+            "outputFile": "com.najmi.oreamnos.app-mergeDebugResources-59:/values-h320dp-port-v13/values-h320dp-port-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\cd613772c624989e6c4dc63fd6d2d609\\transformed\\material-1.11.0\\res\\values-h320dp-port-v13\\values-h320dp-port-v13.xml",
+                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\8ec59684a75d200fc253ec19f6b95bd8\\transformed\\material-1.11.0\\res\\values-h320dp-port-v13\\values-h320dp-port-v13.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

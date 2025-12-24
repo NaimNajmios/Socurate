@@ -129,6 +129,10 @@
             </intent-filter>
         </service>
 
+        <activity
+            android:name="androidx.compose.ui.tooling.PreviewActivity"
+            android:exported="true" />
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="com.najmi.oreamnos.androidx-startup"
