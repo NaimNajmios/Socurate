@@ -43,6 +43,7 @@
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/cancel_edit"
+            android:tooltipText="@string/cancel_edit"
             android:tint="?attr/colorOnSurfaceVariant" />
 
     </LinearLayout>
@@ -632,6 +633,7 @@
                             android:layout_height="48dp"
                             android:layout_marginStart="12dp"
                             android:contentDescription="@string/content_description_share_icon"
+                            android:tooltipText="@string/content_description_share_icon"
                             android:insetTop="0dp"
                             android:insetBottom="0dp"
                             android:backgroundTint="?attr/colorSurfaceVariant"
