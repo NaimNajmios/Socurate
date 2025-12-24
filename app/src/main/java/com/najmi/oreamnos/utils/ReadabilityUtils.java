@@ -1,15 +1,10 @@
 package com.najmi.oreamnos.utils;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Utility class for calculating readability scores.
  */
 public class ReadabilityUtils {
 
-    // Pre-compiled patterns for performance
-    private static final Pattern WORD_SPLIT_PATTERN = Pattern.compile("\\s+");
     // Removed regex patterns used in countSyllables as they are replaced by loop implementation
 
     /**
@@ -27,10 +22,10 @@ public class ReadabilityUtils {
 
         int totalSentences = countSentences(text);
 
-        // Optimization: Split text into words once and reuse the array
-        String[] words = WORD_SPLIT_PATTERN.split(text.trim());
-        int totalWords = words.length;
-        int totalSyllables = countSyllablesInWords(words);
+        // Bolt Optimization: Avoid String.split() allocation
+        int[] stats = countWordsAndSyllables(text);
+        int totalWords = stats[0];
+        int totalSyllables = stats[1];
 
         if (totalWords == 0 || totalSentences == 0) {
             return 0.0;
@@ -83,55 +78,96 @@ public class ReadabilityUtils {
 
     /**
      * Counts the number of words in the text.
+     * Optimized to avoid String.split() allocation.
      */
     public static int countWords(String text) {
         if (text == null || text.trim().isEmpty()) {
             return 0;
         }
-        String[] words = WORD_SPLIT_PATTERN.split(text.trim());
-        return words.length;
-    }
 
-    /**
-     * Counts total syllables in the text.
-     */
-    private static int countSyllablesInText(String text) {
-        if (text == null || text.trim().isEmpty()) {
-            return 0;
-        }
-        String[] words = WORD_SPLIT_PATTERN.split(text.trim());
-        return countSyllablesInWords(words);
-    }
-
-    /**
-     * Counts total syllables in an array of words.
-     * Helper method to avoid re-splitting text.
-     */
-    private static int countSyllablesInWords(String[] words) {
         int count = 0;
-        for (String word : words) {
-            count += countSyllables(word);
+        int len = text.length();
+        boolean inWord = false;
+
+        for (int i = 0; i < len; i++) {
+            char c = text.charAt(i);
+            if (Character.isWhitespace(c)) {
+                if (inWord) {
+                    count++;
+                    inWord = false;
+                }
+            } else {
+                inWord = true;
+            }
         }
+
+        if (inWord) {
+            count++;
+        }
+
         return count;
     }
 
     /**
-     * Counts syllables in a single word.
-     * Uses a heuristic based on vowel groups.
-     * Optimized to iterate characters directly, avoiding regex and object allocation.
+     * Counts words and syllables in one pass.
+     * @return int[] where [0] is word count, [1] is total syllables
+     */
+    private static int[] countWordsAndSyllables(String text) {
+        int wordCount = 0;
+        int syllableCount = 0;
+        int len = text.length();
+        int wordStart = -1;
+
+        for (int i = 0; i < len; i++) {
+             char c = text.charAt(i);
+             if (Character.isWhitespace(c)) {
+                 if (wordStart != -1) {
+                     wordCount++;
+                     syllableCount += countSyllables(text, wordStart, i);
+                     wordStart = -1;
+                 }
+             } else {
+                 if (wordStart == -1) {
+                     wordStart = i;
+                 }
+             }
+        }
+
+        if (wordStart != -1) {
+             wordCount++;
+             syllableCount += countSyllables(text, wordStart, len);
+        }
+
+        return new int[]{wordCount, syllableCount};
+    }
+
+    /**
+     * Counts syllables in a single word (passed as String).
+     * Maintains backward compatibility.
      */
     public static int countSyllables(String word) {
         if (word == null || word.isEmpty()) {
             return 0;
         }
+        return countSyllables(word, 0, word.length());
+    }
 
-        int len = word.length();
+    /**
+     * Counts syllables in a substring of text.
+     * Uses a heuristic based on vowel groups.
+     * Optimized to iterate characters directly, avoiding allocation.
+     */
+    public static int countSyllables(CharSequence text, int start, int end) {
+        if (text == null || start >= end) {
+            return 0;
+        }
+
         int effectiveLength = 0;
         int lastAlphaIndex = -1;
 
         // Pass 1: Calculate effective length (alpha chars only) and find last alpha char
-        for (int i = 0; i < len; i++) {
-            char c = word.charAt(i);
+        for (int i = start; i < end; i++) {
+            char c = text.charAt(i);
             if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
                 effectiveLength++;
                 lastAlphaIndex = i;
@@ -143,7 +179,7 @@ public class ReadabilityUtils {
 
         // Check if the last alpha character is 'e' (silent e logic)
         // If so, we effectively ignore it for vowel counting
-        char lastChar = word.charAt(lastAlphaIndex);
+        char lastChar = text.charAt(lastAlphaIndex);
         boolean skipLast = (lastChar == 'e' || lastChar == 'E');
 
         int count = 0;
@@ -152,11 +188,11 @@ public class ReadabilityUtils {
         // The limit of alpha characters to process
         int limit = skipLast ? effectiveLength - 1 : effectiveLength;
 
-        for (int i = 0; i < len; i++) {
+        for (int i = start; i < end; i++) {
             // If we have processed all relevant alpha characters, stop
             if (processedAlpha >= limit) break;
 
-            char c = word.charAt(i);
+            char c = text.charAt(i);
             // Quick check for alpha and normalize to lower case for vowel check
             if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
                 // 'a' | 32 gives 'a', 'A' | 32 gives 'a'
