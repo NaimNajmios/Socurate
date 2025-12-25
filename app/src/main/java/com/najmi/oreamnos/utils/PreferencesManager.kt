@@ -400,6 +400,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_CEREBRAS_MODEL = "cerebras_model"
         private const val KEY_PILLS = "generation_pills"
         private const val KEY_USAGE_STATS = "usage_stats"
+        private const val KEY_TEXT_SIZE = "output_text_size"
 
         // Defaults
         private const val DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
@@ -424,5 +425,21 @@ class PreferencesManager(context: Context) {
         const val PROVIDER_GROQ = "groq"
         const val PROVIDER_OPENROUTER = "openrouter"
         const val PROVIDER_CEREBRAS = "cerebras"
+        
+        // Text size constants
+        const val TEXT_SIZE_SMALL = 11
+        const val TEXT_SIZE_MEDIUM = 13
+        const val TEXT_SIZE_LARGE = 15
+        const val TEXT_SIZE_EXTRA_LARGE = 17
+    }
+    
+    // ==================== TEXT SIZE PREFERENCE ====================
+    
+    fun saveTextSize(size: Int) {
+        securePrefs.edit().putInt(KEY_TEXT_SIZE, size).apply()
+    }
+    
+    fun getTextSize(): Int {
+        return securePrefs.getInt(KEY_TEXT_SIZE, TEXT_SIZE_MEDIUM)
     }
 }

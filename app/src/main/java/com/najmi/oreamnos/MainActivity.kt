@@ -31,7 +31,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -312,6 +314,10 @@ fun MainScreen(
     
     // Provider selector state
     var showProviderSelector by remember { mutableStateOf(false) }
+    
+    // Reading mode and text size
+    var isReadingMode by remember { mutableStateOf(false) }
+    var textSize by remember { mutableStateOf(prefsManager.getTextSize()) }
     
     // Pill management state
     var showCreatePillDialog by remember { mutableStateOf(false) }
@@ -627,10 +633,13 @@ fun MainScreen(
                         includeSource = includeSource,
                         hasHashtags = prefsManager.getHashtags()?.isNotEmpty() == true,
                         isSourceEnabled = prefsManager.isSourceEnabled(),
-                        onIncludeTitleChange = { includeTitle = it },
-                        onIncludeHashtagsChange = { includeHashtags = it },
-                        onIncludeSourceChange = { includeSource = it },
-                        onEditClick = { isEditMode = !isEditMode },
+                        onIncludeTitleChange = { includeTitle = it; rebuildOutput() },
+                        onIncludeHashtagsChange = { includeHashtags = it; rebuildOutput() },
+                        onIncludeSourceChange = { includeSource = it; rebuildOutput() },
+                        onEditClick = { 
+                            isEditMode = !isEditMode
+                            if (!isEditMode) rebuildOutput()
+                        },
                         onCopyClick = {
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             clipboard.setPrimaryClip(ClipData.newPlainText("Socurate Post", outputText))
@@ -642,6 +651,14 @@ fun MainScreen(
                                 putExtra(Intent.EXTRA_TEXT, outputText)
                             }
                             context.startActivity(Intent.createChooser(intent, "Share"))
+                        },
+                        prefsManager = prefsManager,
+                        isReadingMode = isReadingMode,
+                        onReadingModeToggle = { isReadingMode = it },
+                        textSize = textSize,
+                        onTextSizeChange = { 
+                            textSize = it
+                            prefsManager.saveTextSize(it)
                         }
                     )
                     
@@ -774,27 +791,102 @@ fun OutputCard(
     onIncludeSourceChange: (Boolean) -> Unit,
     onEditClick: () -> Unit,
     onCopyClick: () -> Unit,
-    onShareClick: () -> Unit
+    onShareClick: () -> Unit,
+    prefsManager: PreferencesManager,
+    isReadingMode: Boolean,
+    onReadingModeToggle: (Boolean) -> Unit,
+    textSize: Int,
+    onTextSizeChange: (Int) -> Unit
 ) {
+    val context = LocalContext.current
+    
     NeoCard(
         modifier = Modifier.fillMaxWidth()
     ) {
-        // Output toggles
-        Text("DISPLAY OPTIONS", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(bottom = 8.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            NeoChip(selected = includeTitle, onClick = { onIncludeTitleChange(!includeTitle) }, text = "Title")
-            if (hasHashtags) {
-                NeoChip(selected = includeHashtags, onClick = { onIncludeHashtagsChange(!includeHashtags) }, text = "Hashtags")
-            }
-            if (isSourceEnabled) {
-                NeoChip(selected = includeSource, onClick = { onIncludeSourceChange(!includeSource) }, text = "Source")
+        // Header with Reading Mode toggle
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("DISPLAY OPTIONS", style = MaterialTheme.typography.labelLarge)
+            
+            // Reading Mode toggle
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Reading Mode",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.width(8.dp))
+                Switch(
+                    checked = isReadingMode,
+                    onCheckedChange = onReadingModeToggle,
+                    colors = androidx.compose.material3.SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.surface,
+                        checkedBorderColor = MaterialTheme.colorScheme.primary
+                    )
+                )
             }
         }
         
+        Spacer(Modifier.height(8.dp))
         
-        Spacer(Modifier.height(16.dp))
+        // Output toggles
+        if (!isReadingMode) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                NeoChip(selected = includeTitle, onClick = { onIncludeTitleChange(!includeTitle) }, text = "Title")
+                if (hasHashtags) {
+                    NeoChip(selected = includeHashtags, onClick = { onIncludeHashtagsChange(!includeHashtags) }, text = "Hashtags")
+                }
+                if (isSourceEnabled) {
+                    NeoChip(selected = includeSource, onClick = { onIncludeSourceChange(!includeSource) }, text = "Source")
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+        }
         
-        // Output text with smaller font and markdown support
+        // Text size controls (only in non-reading mode)
+        if (!isReadingMode) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Text Size", style = MaterialTheme.typography.labelSmall)
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    listOf(
+                        "S" to PreferencesManager.TEXT_SIZE_SMALL,
+                        "M" to PreferencesManager.TEXT_SIZE_MEDIUM,
+                        "L" to PreferencesManager.TEXT_SIZE_LARGE,
+                        "XL" to PreferencesManager.TEXT_SIZE_EXTRA_LARGE
+                    ).forEach { (label, size) ->
+                        Surface(
+                            onClick = { onTextSizeChange(size) },
+                            shape = RoundedCornerShape(4.dp),
+                            color = if (textSize == size) MaterialTheme.colorScheme.primary else Color.Transparent,
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                if (textSize == size) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                            ),
+                            modifier = Modifier.padding(0.dp)
+                        ) {
+                            Text(
+                                label,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (textSize == size) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+        }
+        
+        
+        // Output text with selectable text for long-press copy
         if (isEditMode) {
             NeoInput(
                 value = outputText,
@@ -804,62 +896,82 @@ fun OutputCard(
                 minLines = 8,
                 maxLines = 20,
                 label = "GENERATED CONTENT",
-                textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+                textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = textSize.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
             )
         } else {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .then(
+                        if (isReadingMode) Modifier.heightIn(min = 300.dp, max = 600.dp) // Expanded but bounded height
+                        else Modifier.heightIn(max = 400.dp) // Normal max height
+                    )
                     .background(
                         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
                         RoundedCornerShape(4.dp)
                     )
                     .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                com.najmi.oreamnos.ui.components.TypewriterText(
-                    text = parseMarkdownToAnnotatedString(outputText),
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 13.sp, // Smaller font for better overview
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                androidx.compose.foundation.text.selection.SelectionContainer {
+                    com.najmi.oreamnos.ui.components.TypewriterText(
+                        text = parseMarkdownToAnnotatedString(outputText),
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = textSize.sp,
+                            lineHeight = (textSize * 1.5f).sp, // Dynamic line height
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                        )
                     )
-                )
+                }
             }
         }
         
-        // Stats
-        val wordCount = if (outputText.isBlank()) 0 else WHITESPACE_PATTERN.split(outputText).size
-        val gradeLevel = ReadabilityUtils.calculateFleschKincaidGradeLevel(outputText)
-        
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("WORDS: $wordCount", style = MaterialTheme.typography.labelMedium)
-            Text("GRADE: ${String.format("%.1f", gradeLevel)}", style = MaterialTheme.typography.labelMedium)
-        }
-        
-        Spacer(Modifier.height(8.dp))
-        
-        // Action buttons
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            NeoOutlinedButton(onClick = onEditClick, modifier = Modifier.weight(1f), text = if (isEditMode) "Save" else "Edit")
-            NeoCopyButton(
-                onCopy = onCopyClick,
-                modifier = Modifier.weight(1f)
-            )
-            NeoButton(onClick = onShareClick, modifier = Modifier.weight(1f), text = "Share")
+        if (!isReadingMode) {
+            // Stats
+            val wordCount = if (outputText.isBlank()) 0 else WHITESPACE_PATTERN.split(outputText).size
+            val gradeLevel = ReadabilityUtils.calculateFleschKincaidGradeLevel(outputText)
+            
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("WORDS: $wordCount", style = MaterialTheme.typography.labelMedium)
+                Text("GRADE: ${String.format("%.1f", gradeLevel)}", style = MaterialTheme.typography.labelMedium)
+            }
+            
+            Spacer(Modifier.height(8.dp))
+            
+            // Action buttons
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                NeoOutlinedButton(onClick = onEditClick, modifier = Modifier.weight(1f), text = if (isEditMode) "Save" else "Edit")
+                NeoCopyButton(
+                    onCopy = onCopyClick,
+                    modifier = Modifier.weight(1f)
+                )
+                NeoButton(onClick = onShareClick, modifier = Modifier.weight(1f), text = "Share")
+            }
+        } else {
+            // Compact actions in reading mode
+            Spacer(Modifier.height(16.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                NeoCopyButton(
+                    onCopy = onCopyClick,
+                    modifier = Modifier.weight(1f)
+                )
+                NeoButton(onClick = onShareClick, modifier = Modifier.weight(1f), text = "Share")
+            }
         }
     }
 }
 
 /**
  * Parses markdown formatting and converts to AnnotatedString for rich text display.
- * Supports: **bold**, ## Headers
+ * Supports: **bold**, *italic*, _italic_, ## Headers, - lists, * lists
  */
 @Composable
 fun parseMarkdownToAnnotatedString(text: String): androidx.compose.ui.text.AnnotatedString {
-    return androidx.compose.ui.text.buildAnnotatedString {
+    return buildAnnotatedString {
         val lines = text.split("\n")
         
         lines.forEachIndexed { lineIndex, line ->
@@ -867,54 +979,108 @@ fun parseMarkdownToAnnotatedString(text: String): androidx.compose.ui.text.Annot
             if (line.trimStart().startsWith("## ")) {
                 val headerText = line.trimStart().removePrefix("## ")
                 withStyle(
-                    style = androidx.compose.ui.text.SpanStyle(
+                    style = SpanStyle(
                         fontSize = 16.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     append(headerText)
                 }
-            } else {
-                // Parse bold text (**text**)
-                var lineText = line
-                var searchIndex = 0
-                
-                while (searchIndex < lineText.length) {
-                    val boldStart = lineText.indexOf("**", searchIndex)
-                    if (boldStart == -1) {
-                        // No more bold text, append rest of line
-                        append(lineText.substring(searchIndex))
-                        break
-                    }
-                    
-                    val boldEnd = lineText.indexOf("**", boldStart + 2)
-                    if (boldEnd == -1) {
-                        // No closing **, append rest as is
-                        append(lineText.substring(searchIndex))
-                        break
-                    }
-                    
-                    // Append text before bold
-                    append(lineText.substring(searchIndex, boldStart))
-                    
-                    // Append bold text
-                    val boldText = lineText.substring(boldStart + 2, boldEnd)
-                    withStyle(
-                        style = androidx.compose.ui.text.SpanStyle(
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                        )
-                    ) {
-                        append(boldText)
-                    }
-                    
-                    searchIndex = boldEnd + 2
-                }
+            }
+            // Check for bullet list (- item or * item)
+            else if (line.trimStart().startsWith("- ") || line.trimStart().startsWith("* ")) {
+                val bulletText = line.trimStart().drop(2)
+                append("  • ") // Indent with bullet
+                parseInlineFormatting(bulletText)
+            }
+            else {
+                // Parse inline formatting (bold, italic)
+                parseInlineFormatting(line)
             }
             
             // Add newline except for last line
             if (lineIndex < lines.size - 1) {
                 append("\n")
+            }
+        }
+    }
+}
+
+/**
+ * Helper function to parse inline formatting (bold and italic)
+ */
+private fun androidx.compose.ui.text.AnnotatedString.Builder.parseInlineFormatting(text: String) {
+    var currentIndex = 0
+    
+    while (currentIndex < text.length) {
+        // Look for bold (**text**)
+        val boldStart = text.indexOf("**", currentIndex)
+        // Look for italic (*text* or _text_)
+        val italicStarStart = text.indexOf("*", currentIndex).let { 
+            if (it != -1 && it + 1 < text.length && text[it + 1] == '*') -1 else it 
+        }
+        val italicUnderStart = text.indexOf("_", currentIndex).let {
+            if (it != -1 && it + 1 < text.length && text[it + 1] == '_') -1 else it
+        }
+        
+        // Find earliest formatting marker
+        val nextFormat = listOf(
+            boldStart to "bold",
+            italicStarStart to "italic_star",
+            italicUnderStart to "italic_under"
+        ).filter { it.first != -1 }.minByOrNull { it.first }
+        
+        if (nextFormat == null) {
+            // No more formatting, append rest
+            append(text.substring(currentIndex))
+            break
+        }
+        
+        val (formatStart, formatType) = nextFormat
+        
+        // Append text before formatting
+        append(text.substring(currentIndex, formatStart))
+        
+        when (formatType) {
+            "bold" -> {
+                val boldEnd = text.indexOf("**", formatStart + 2)
+                if (boldEnd != -1) {
+                    val boldText = text.substring(formatStart + 2, boldEnd)
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append(boldText)
+                    }
+                    currentIndex = boldEnd + 2
+                } else {
+                    append("**")
+                    currentIndex = formatStart + 2
+                }
+            }
+            "italic_star" -> {
+                val italicEnd = text.indexOf("*", formatStart + 1)
+                if (italicEnd != -1) {
+                    val italicText = text.substring(formatStart + 1, italicEnd)
+                    withStyle(SpanStyle(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)) {
+                        append(italicText)
+                    }
+                    currentIndex = italicEnd + 1
+                } else {
+                    append("*")
+                    currentIndex = formatStart + 1
+                }
+            }
+            "italic_under" -> {
+                val italicEnd = text.indexOf("_", formatStart + 1)
+                if (italicEnd != -1) {
+                    val italicText = text.substring(formatStart + 1, italicEnd)
+                    withStyle(SpanStyle(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)) {
+                        append(italicText)
+                    }
+                    currentIndex = italicEnd + 1
+                } else {
+                    append("_")
+                    currentIndex = formatStart + 1
+                }
             }
         }
     }
