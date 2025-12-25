@@ -17,6 +17,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -24,6 +27,9 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -81,15 +87,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -107,6 +118,7 @@ import com.najmi.oreamnos.services.ContentGenerationService
 import com.najmi.oreamnos.services.WebContentExtractor
 import com.najmi.oreamnos.ui.theme.ErrorRed
 import com.najmi.oreamnos.ui.theme.SocurateTheme
+import com.najmi.oreamnos.utils.HapticHelper
 import com.najmi.oreamnos.utils.PreferencesManager
 import com.najmi.oreamnos.utils.ReadabilityUtils
 import com.najmi.oreamnos.utils.StringUtils
@@ -1049,7 +1061,7 @@ fun OutputCard(
         Spacer(Modifier.height(16.dp))
         
         
-        // Output text with selectable text for long-press copy
+        // Output text with swipe gestures and long-press menu
         if (isEditMode) {
             NeoInput(
                 value = outputText,
@@ -1062,29 +1074,12 @@ fun OutputCard(
                 textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = textSize.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
             )
         } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 400.dp)
-                    .background(
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
-                        RoundedCornerShape(4.dp)
-                    )
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                androidx.compose.foundation.text.selection.SelectionContainer {
-                    com.najmi.oreamnos.ui.components.TypewriterText(
-                        text = parseMarkdownToAnnotatedString(outputText),
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = textSize.sp,
-                            lineHeight = (textSize * 1.5f).sp, // Dynamic line height
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-                        )
-                    )
-                }
-            }
+            SwipeableOutputBox(
+                outputText = outputText,
+                textSize = textSize,
+                onCopy = onCopyClick,
+                onShare = onShareClick
+            )
         }
         
         // Stats
@@ -1110,6 +1105,128 @@ fun OutputCard(
                 )
                 NeoButton(onClick = onShareClick, modifier = Modifier.weight(1f), text = "Share")
             }
+    }
+}
+
+/**
+ * Swipeable output box with gesture support:
+ * - Swipe left to copy
+ * - Swipe right to share
+ */
+@Composable
+fun SwipeableOutputBox(
+    outputText: String,
+    textSize: Int,
+    onCopy: () -> Unit,
+    onShare: () -> Unit
+) {
+    val context = LocalContext.current
+    val hapticHelper = remember { HapticHelper(context) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    val swipeThreshold = 150f
+    
+    // Animate offset back to 0
+    val animatedOffset by animateFloatAsState(
+        targetValue = offsetX,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "swipe_offset"
+    )
+    
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                translationX = animatedOffset
+            }
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onHorizontalDrag = { change, dragAmount ->
+                        change.consume()
+                        offsetX += dragAmount
+                    },
+                    onDragEnd = {
+                        when {
+                            offsetX < -swipeThreshold -> {
+                                // Swipe left = Copy
+                                hapticHelper.onCopy()
+                                onCopy()
+                                offsetX = 0f
+                            }
+                            offsetX > swipeThreshold -> {
+                                // Swipe right = Share
+                                hapticHelper.onCopy()
+                                onShare()
+                                offsetX = 0f
+                            }
+                            else -> {
+                                // Spring back
+                                offsetX = 0f
+                            }
+                        }
+                    }
+                )
+            }
+    ) {
+        // Show swipe indicators
+        if (offsetX < -50f) {
+            // Copy indicator (left)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 16.dp)
+                    .alpha(((-offsetX - 50f) / 100f).coerceIn(0f, 1f))
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_copy),
+                    contentDescription = "Copy",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        } else if (offsetX > 50f) {
+            // Share indicator (right)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 16.dp)
+                    .alpha(  ((offsetX - 50f) / 100f).coerceIn(0f, 1f))
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_share),
+                    contentDescription = "Share",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
+        
+        // Actual output box
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 400.dp)
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+                    RoundedCornerShape(4.dp)
+                )
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            androidx.compose.foundation.text.selection.SelectionContainer {
+                com.najmi.oreamnos.ui.components.TypewriterText(
+                    text = parseMarkdownToAnnotatedString(outputText),
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = textSize.sp,
+                        lineHeight = (textSize * 1.5f).sp,
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                    )
+                )
+            }
+        }
     }
 }
 

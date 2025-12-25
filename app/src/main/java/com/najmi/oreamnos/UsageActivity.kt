@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +64,7 @@ import com.najmi.oreamnos.model.UsageStats
 import com.najmi.oreamnos.ui.theme.ErrorRed
 import com.najmi.oreamnos.ui.theme.SocurateTheme
 import com.najmi.oreamnos.ui.theme.SuccessGreen
+import com.najmi.oreamnos.utils.HapticHelper
 import com.najmi.oreamnos.utils.PreferencesManager
 import java.util.Locale
 
