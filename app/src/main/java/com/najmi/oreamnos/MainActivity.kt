@@ -100,6 +100,7 @@ import com.najmi.oreamnos.utils.StringUtils
 import com.najmi.oreamnos.ui.components.NeoButton
 import com.najmi.oreamnos.ui.components.NeoCard
 import com.najmi.oreamnos.ui.components.NeoChip
+import com.najmi.oreamnos.ui.components.NeoCopyButton
 import com.najmi.oreamnos.ui.components.NeoInput
 import com.najmi.oreamnos.ui.components.NeoOutlinedButton
 import com.najmi.oreamnos.viewmodel.MainViewModel
@@ -824,7 +825,10 @@ fun OutputCard(
         // Action buttons
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             NeoOutlinedButton(onClick = onEditClick, modifier = Modifier.weight(1f), text = if (isEditMode) "Save" else "Edit")
-            NeoOutlinedButton(onClick = onCopyClick, modifier = Modifier.weight(1f), text = "Copy")
+            NeoCopyButton(
+                onCopy = onCopyClick,
+                modifier = Modifier.weight(1f)
+            )
             NeoButton(onClick = onShareClick, modifier = Modifier.weight(1f), text = "Share")
         }
     }
