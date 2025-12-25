@@ -86,6 +86,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.najmi.oreamnos.curator.CuratorFactory
@@ -786,9 +791,10 @@ fun OutputCard(
             }
         }
         
+        
         Spacer(Modifier.height(16.dp))
         
-        // Output text
+        // Output text with smaller font and markdown support
         if (isEditMode) {
             NeoInput(
                 value = outputText,
@@ -798,14 +804,27 @@ fun OutputCard(
                 minLines = 8,
                 maxLines = 20,
                 label = "GENERATED CONTENT",
-                textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+                textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
             )
         } else {
-            com.najmi.oreamnos.ui.components.TypewriterText(
-                text = outputText,
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                style = MaterialTheme.typography.bodyLarge.copy(fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+                        RoundedCornerShape(4.dp)
+                    )
+                    .padding(16.dp)
+            ) {
+                com.najmi.oreamnos.ui.components.TypewriterText(
+                    text = parseMarkdownToAnnotatedString(outputText),
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 13.sp, // Smaller font for better overview
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                    )
+                )
+            }
         }
         
         // Stats
@@ -830,6 +849,73 @@ fun OutputCard(
                 modifier = Modifier.weight(1f)
             )
             NeoButton(onClick = onShareClick, modifier = Modifier.weight(1f), text = "Share")
+        }
+    }
+}
+
+/**
+ * Parses markdown formatting and converts to AnnotatedString for rich text display.
+ * Supports: **bold**, ## Headers
+ */
+@Composable
+fun parseMarkdownToAnnotatedString(text: String): androidx.compose.ui.text.AnnotatedString {
+    return androidx.compose.ui.text.buildAnnotatedString {
+        val lines = text.split("\n")
+        
+        lines.forEachIndexed { lineIndex, line ->
+            // Check for header (## Header)
+            if (line.trimStart().startsWith("## ")) {
+                val headerText = line.trimStart().removePrefix("## ")
+                withStyle(
+                    style = androidx.compose.ui.text.SpanStyle(
+                        fontSize = 16.sp,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    append(headerText)
+                }
+            } else {
+                // Parse bold text (**text**)
+                var lineText = line
+                var searchIndex = 0
+                
+                while (searchIndex < lineText.length) {
+                    val boldStart = lineText.indexOf("**", searchIndex)
+                    if (boldStart == -1) {
+                        // No more bold text, append rest of line
+                        append(lineText.substring(searchIndex))
+                        break
+                    }
+                    
+                    val boldEnd = lineText.indexOf("**", boldStart + 2)
+                    if (boldEnd == -1) {
+                        // No closing **, append rest as is
+                        append(lineText.substring(searchIndex))
+                        break
+                    }
+                    
+                    // Append text before bold
+                    append(lineText.substring(searchIndex, boldStart))
+                    
+                    // Append bold text
+                    val boldText = lineText.substring(boldStart + 2, boldEnd)
+                    withStyle(
+                        style = androidx.compose.ui.text.SpanStyle(
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                        )
+                    ) {
+                        append(boldText)
+                    }
+                    
+                    searchIndex = boldEnd + 2
+                }
+            }
+            
+            // Add newline except for last line
+            if (lineIndex < lines.size - 1) {
+                append("\n")
+            }
         }
     }
 }

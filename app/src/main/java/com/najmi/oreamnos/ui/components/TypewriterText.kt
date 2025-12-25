@@ -9,30 +9,34 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import kotlinx.coroutines.delay
 
 /**
  * Typewriter Text Effect
  * Animates text character by character.
+ * Supports both String and AnnotatedString for markdown formatting.
  */
 @Composable
 fun TypewriterText(
-    text: String,
+    text: AnnotatedString,
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
     onFinished: () -> Unit = {}
 ) {
-    var displayedText by remember { mutableStateOf("") }
+    var displayedText by remember { mutableStateOf(AnnotatedString("")) }
     
     // Reset when text changes
     LaunchedEffect(text) {
-        displayedText = ""
+        displayedText = AnnotatedString("")
         var currentIndex = 0
-        while (currentIndex < text.length) {
+        val plainText = text.text
+        while (currentIndex < plainText.length) {
             // Append 3 characters at a time for "near instant" speed
-            val endIndex = (currentIndex + 3).coerceAtMost(text.length)
-            displayedText = text.substring(0, endIndex)
+            val endIndex = (currentIndex + 3).coerceAtMost(plainText.length)
+            // Preserve styling by using subSequence
+            displayedText = text.subSequence(0, endIndex)
             currentIndex = endIndex
             delay(1) // 1ms delay
         }
