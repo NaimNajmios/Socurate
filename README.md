@@ -28,6 +28,27 @@ A sleek, modern Android application that transforms global football news into po
 - **Request Stats**: Track successful and failed API requests
 - **Reset Option**: Clear all usage statistics anytime
 
+### 📈 Usage Analytics Charts (NEW)
+- **Token Usage Graph**: Interactive line chart showing usage over 7/30/90 days
+  - Prompt vs Response token split visualization
+  - Animated drawing with smooth transitions
+- **Success Rate Chart**: Animated donut chart with:
+  - Overall success/failure ratio
+  - Per-provider breakdown
+- **Response Time Analytics**: Bar chart featuring:
+  - Average response time per provider
+  - Min/Max time indicators
+  - Fastest/Slowest generation highlights with badges
+
+### ✨ Visual Feedback Enhancements (NEW)
+- **Enhanced Loading Animation**: Large 80dp progress indicator with:
+  - Animated percentage display (0% → 100%)
+  - Dynamic text stages ("INITIALIZING..." → "GENERATING..." → "FINALIZING...")
+  - Pulsing animation effect
+- **Success Checkmark Animation**: Green animated checkmark on generation complete
+- **Error Shake Animation**: Horizontal shake effect when generation fails
+- **Pulse Animation on Generate Button**: Button pulses when input text changes to draw attention
+
 ### 🎨 Modern UI/UX Redesign
 - **Premium Dark Theme**: Sleek dark interface with sophisticated Blue Grey accents
 - **Theme Toggle**: Switch between Light, Dark, or System (auto) themes
@@ -100,6 +121,7 @@ A sleek, modern Android application that transforms global football news into po
 ### Technical Excellence
 - **Intelligent Retry Logic**: Automatically retries failed API calls with exponential backoff
 - **Rate Limit Handling**: Parses and respects API's requested retry delays (up to 60s)
+- **Response Time Tracking**: Generation duration tracked for all requests
 - **Interactive Fallback**: Prompts to switch providers when rate limited
 - **Secure Storage**: API keys encrypted using Android's EncryptedSharedPreferences
 - **Markdown Rendering**: Uses Markwon library for rich text display
