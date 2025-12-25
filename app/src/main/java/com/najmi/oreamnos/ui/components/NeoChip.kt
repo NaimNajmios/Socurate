@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
  * Neo-Editorial Chip
  * Rectangular, outlined or filled, sharp corners.
  * Supports optional long-press gesture for editing.
+ * Supports custom colors for visual differentiation (e.g., custom pills).
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -26,11 +27,19 @@ fun NeoChip(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onLongClick: (() -> Unit)? = null
+    onLongClick: (() -> Unit)? = null,
+    unselectedBorderColor: Color? = null,
+    unselectedTextColor: Color? = null
 ) {
     val backgroundColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
-    val contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-    val borderColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+    val contentColor = if (selected) 
+        MaterialTheme.colorScheme.onPrimary 
+    else 
+        unselectedTextColor ?: MaterialTheme.colorScheme.onSurface
+    val borderColor = if (selected) 
+        MaterialTheme.colorScheme.primary 
+    else 
+        unselectedBorderColor ?: MaterialTheme.colorScheme.outline
 
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     Surface(

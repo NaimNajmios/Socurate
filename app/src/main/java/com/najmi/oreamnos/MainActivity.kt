@@ -867,13 +867,15 @@ fun RefinementCard(
                 )
             }
             
-            // Custom pills with long-press to edit
+            // Custom pills with long-press to edit - Orange border for visual distinction
             customPills.forEach { pill ->
                 NeoChip(
                     selected = selectedPillIds.contains(pill.id),
                     onClick = { onTogglePill(pill.id) },
                     onLongClick = { onEditPill(pill) },
-                    text = pill.name
+                    text = pill.name,
+                    unselectedBorderColor = Color(0xFFFF9800), // Orange
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurface
                 )
             }
             
