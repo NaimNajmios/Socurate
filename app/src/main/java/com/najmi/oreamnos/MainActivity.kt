@@ -746,33 +746,6 @@ fun MainScreen(
                 EnhancedLoadingCard()
             }
             
-            // Success Animation
-            AnimatedVisibility(
-                visible = showSuccessAnimation && !isLoading,
-                enter = scaleIn() + fadeIn(),
-                exit = scaleOut() + fadeOut()
-            ) {
-                NeoCard(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(40.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        AnimatedCheckmark(
-                            size = 80.dp,
-                            onAnimationComplete = { }
-                        )
-                        Spacer(Modifier.height(24.dp))
-                        Text(
-                            "GENERATED!",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            color = Color(0xFF22C55E)
-                        )
-                    }
-                }
-            }
-            
             // Error State with Shake Animation
             AnimatedVisibility(visible = error != null && !isLoading, enter = fadeIn(), exit = fadeOut()) {
                 val shakeOffset by animateFloatAsState(
