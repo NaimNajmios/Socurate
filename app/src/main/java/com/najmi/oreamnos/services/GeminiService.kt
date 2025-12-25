@@ -413,8 +413,8 @@ class GeminiService(
             cleaned = cleaned.replace(phrase, "")
         }
 
-        // Remove text between asterisks
-        cleaned = ASTERISK_TEXT_PATTERN.matcher(cleaned).replaceAll("")
+        // Remove text between asterisks (Markdown formatting), preserving content
+        cleaned = ASTERISK_TEXT_PATTERN.matcher(cleaned).replaceAll("$1")
 
         // Clean up spacing
         cleaned = MULTIPLE_NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n")
@@ -499,7 +499,7 @@ class GeminiService(
 
         // Pre-compiled Regex Patterns
         private val HORIZONTAL_RULE_PATTERN: Pattern = Pattern.compile("(?m)^-{3,}\\s*$")
-        private val ASTERISK_TEXT_PATTERN: Pattern = Pattern.compile("\\*.*?\\*")
+        private val ASTERISK_TEXT_PATTERN: Pattern = Pattern.compile("\\*+(.*?)\\*+")
         private val MULTIPLE_NEWLINES_PATTERN: Pattern = Pattern.compile("\\n\\s*\\n\\s*\\n+")
         private val HORIZONTAL_WHITESPACE_PATTERN: Pattern = Pattern.compile("[ \\t]+")
         private val SOURCE_CITATION_PATTERN: Pattern = Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$")
