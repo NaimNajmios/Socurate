@@ -37,7 +37,7 @@
 22-->[androidx.core:core:1.12.0] C:\Users\NAIM\.gradle\caches\transforms-4\789747e16abeb4d1ce2bf836353a844a\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
 23
 24    <application
-24-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:11:5-109:19
+24-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:11:5-110:19
 25        android:allowBackup="true"
 25-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:12:9-35
 26        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
@@ -58,244 +58,246 @@
 35
 36        <!-- Main Activity -->
 37        <activity
-37-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:20:9-29:20
+37-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:20:9-30:20
 38            android:name="com.najmi.oreamnos.MainActivity"
 38-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:21:13-41
-39            android:exported="true"
-39-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:22:13-36
-40            android:label="@string/app_name"
-40-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:23:13-45
-41            android:theme="@style/Theme.Oreamnos" >
-41-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:24:13-50
-42            <intent-filter>
-42-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:25:13-28:29
-43                <action android:name="android.intent.action.MAIN" />
-43-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:26:17-69
-43-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:26:25-66
-44
-45                <category android:name="android.intent.category.LAUNCHER" />
-45-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:27:17-77
-45-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:27:27-74
-46            </intent-filter>
-47        </activity>
-48
-49        <!-- Share Receiver Activity -->
-50        <activity
-50-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:32:9-49:20
-51            android:name="com.najmi.oreamnos.ShareReceiverActivity"
-51-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:33:13-50
-52            android:exported="true"
-52-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:34:13-36
-53            android:label="@string/share_to_oreamnos"
-53-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:35:13-54
-54            android:theme="@style/Theme.Oreamnos.Transparent" >
-54-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:36:13-62
-55
-56            <!-- Receive shared text from share sheet -->
-57            <intent-filter>
-57-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:38:13-42:29
-58                <action android:name="android.intent.action.SEND" />
-58-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:39:17-69
-58-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:39:25-66
-59
-60                <category android:name="android.intent.category.DEFAULT" />
-60-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:40:17-76
-60-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:40:27-73
-61
-62                <data android:mimeType="text/plain" />
-62-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:41:17-55
-62-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:41:23-52
-63            </intent-filter>
-64            <!-- Receive selected text from floating text selection menu -->
-65            <intent-filter>
-65-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:44:13-48:29
-66                <action android:name="android.intent.action.PROCESS_TEXT" />
-66-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:45:17-77
-66-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:45:25-74
-67
-68                <category android:name="android.intent.category.DEFAULT" />
-68-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:40:17-76
-68-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:40:27-73
-69
-70                <data android:mimeType="text/plain" />
-70-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:41:17-55
-70-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:41:23-52
-71            </intent-filter>
-72        </activity>
-73
-74        <!-- Settings Activity -->
-75        <activity
-75-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:52:9-57:53
-76            android:name="com.najmi.oreamnos.SettingsActivity"
-76-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:53:13-45
-77            android:exported="false"
-77-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:54:13-37
-78            android:label="@string/settings"
-78-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:55:13-45
-79            android:parentActivityName="com.najmi.oreamnos.MainActivity"
-79-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:56:13-55
-80            android:theme="@style/Theme.Oreamnos" />
-80-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:57:13-50
-81
-82        <!-- Usage Activity -->
-83        <activity
-83-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:60:9-65:53
-84            android:name="com.najmi.oreamnos.UsageActivity"
-84-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:61:13-42
-85            android:exported="false"
-85-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:62:13-37
-86            android:label="@string/nav_usage"
-86-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:63:13-46
-87            android:parentActivityName="com.najmi.oreamnos.MainActivity"
-87-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:64:13-55
-88            android:theme="@style/Theme.Oreamnos" />
-88-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:65:13-50
-89
-90        <!-- Hashtag Manager Activity -->
-91        <activity
-91-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:68:9-73:53
-92            android:name="com.najmi.oreamnos.HashtagManagerActivity"
-92-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:69:13-51
-93            android:exported="false"
-93-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:70:13-37
-94            android:label="Hashtag Manager"
-94-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:71:13-44
-95            android:parentActivityName="com.najmi.oreamnos.SettingsActivity"
-95-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:72:13-59
-96            android:theme="@style/Theme.Oreamnos" />
-96-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:73:13-50
-97
-98        <!-- Log List Activity -->
-99        <activity
-99-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:76:9-81:53
-100            android:name="com.najmi.oreamnos.LogListActivity"
-100-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:77:13-44
-101            android:exported="false"
-101-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:78:13-37
-102            android:label="@string/all_logs_title"
-102-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:79:13-51
-103            android:parentActivityName="com.najmi.oreamnos.UsageActivity"
-103-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:80:13-56
-104            android:theme="@style/Theme.Oreamnos" />
-104-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:81:13-50
-105
-106        <!-- Session List Activity -->
-107        <activity
-107-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:84:9-89:53
-108            android:name="com.najmi.oreamnos.SessionListActivity"
-108-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:85:13-48
-109            android:exported="false"
-109-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:86:13-37
-110            android:label="@string/all_sessions_title"
-110-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:87:13-55
-111            android:parentActivityName="com.najmi.oreamnos.UsageActivity"
-111-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:88:13-56
-112            android:theme="@style/Theme.Oreamnos" />
-112-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:89:13-50
-113
-114        <!-- Content Generation Foreground Service -->
-115        <service
-115-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:92:9-95:56
-116            android:name="com.najmi.oreamnos.services.ContentGenerationService"
-116-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:93:13-62
-117            android:exported="false"
-117-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:94:13-37
-118            android:foregroundServiceType="dataSync" />
-118-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:95:13-53
-119
-120        <!-- Quick Settings Tile Service -->
-121        <service
-121-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:98:9-107:19
-122            android:name="com.najmi.oreamnos.services.GenerateTileService"
-122-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:99:13-57
-123            android:exported="true"
-123-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:100:13-36
-124            android:icon="@drawable/ic_tile"
-124-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:101:13-45
-125            android:label="@string/tile_label"
-125-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:102:13-47
-126            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" >
-126-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:103:13-77
-127            <intent-filter>
-127-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:104:13-106:29
-128                <action android:name="android.service.quicksettings.action.QS_TILE" />
-128-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:105:17-87
-128-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:105:25-84
-129            </intent-filter>
-130        </service>
-131
-132        <activity
-132-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\NAIM\.gradle\caches\transforms-4\b860b9536a18082d225a2525cc273d3d\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
-133            android:name="androidx.compose.ui.tooling.PreviewActivity"
-133-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\NAIM\.gradle\caches\transforms-4\b860b9536a18082d225a2525cc273d3d\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
-134            android:exported="true" />
-134-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\NAIM\.gradle\caches\transforms-4\b860b9536a18082d225a2525cc273d3d\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
-135
-136        <provider
-136-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-137            android:name="androidx.startup.InitializationProvider"
-137-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
-138            android:authorities="com.najmi.oreamnos.androidx-startup"
-138-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
-139            android:exported="false" >
-139-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
-140            <meta-data
-140-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-141                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-141-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
-142                android:value="androidx.startup" />
-142-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
-143            <meta-data
-143-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\NAIM\.gradle\caches\transforms-4\42673bed0b823a5c01cb7bca67dc6cba\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
-144                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-144-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\NAIM\.gradle\caches\transforms-4\42673bed0b823a5c01cb7bca67dc6cba\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
-145                android:value="androidx.startup" />
-145-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\NAIM\.gradle\caches\transforms-4\42673bed0b823a5c01cb7bca67dc6cba\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
-146            <meta-data
-146-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
-147                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-147-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
-148                android:value="androidx.startup" />
-148-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
-149        </provider>
-150
-151        <receiver
-151-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
-152            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-152-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
-153            android:directBootAware="false"
-153-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
-154            android:enabled="true"
-154-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
-155            android:exported="true"
-155-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
-156            android:permission="android.permission.DUMP" >
-156-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
-157            <intent-filter>
-157-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
-158                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-158-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
-158-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
-159            </intent-filter>
-160            <intent-filter>
-160-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
-161                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-161-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
-161-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
-162            </intent-filter>
-163            <intent-filter>
-163-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
-164                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-164-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
-164-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
-165            </intent-filter>
-166            <intent-filter>
-166-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
-167                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-167-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
-167-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
-168            </intent-filter>
-169        </receiver>
-170    </application>
-171
-172</manifest>
+39            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|keyboard"
+39-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:25:13-96
+40            android:exported="true"
+40-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:22:13-36
+41            android:label="@string/app_name"
+41-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:23:13-45
+42            android:theme="@style/Theme.Oreamnos" >
+42-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:24:13-50
+43            <intent-filter>
+43-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:26:13-29:29
+44                <action android:name="android.intent.action.MAIN" />
+44-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:27:17-69
+44-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:27:25-66
+45
+46                <category android:name="android.intent.category.LAUNCHER" />
+46-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:28:17-77
+46-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:28:27-74
+47            </intent-filter>
+48        </activity>
+49
+50        <!-- Share Receiver Activity -->
+51        <activity
+51-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:33:9-50:20
+52            android:name="com.najmi.oreamnos.ShareReceiverActivity"
+52-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:34:13-50
+53            android:exported="true"
+53-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:35:13-36
+54            android:label="@string/share_to_oreamnos"
+54-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:36:13-54
+55            android:theme="@style/Theme.Oreamnos.Transparent" >
+55-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:37:13-62
+56
+57            <!-- Receive shared text from share sheet -->
+58            <intent-filter>
+58-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:39:13-43:29
+59                <action android:name="android.intent.action.SEND" />
+59-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:40:17-69
+59-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:40:25-66
+60
+61                <category android:name="android.intent.category.DEFAULT" />
+61-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:41:17-76
+61-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:41:27-73
+62
+63                <data android:mimeType="text/plain" />
+63-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:42:17-55
+63-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:42:23-52
+64            </intent-filter>
+65            <!-- Receive selected text from floating text selection menu -->
+66            <intent-filter>
+66-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:45:13-49:29
+67                <action android:name="android.intent.action.PROCESS_TEXT" />
+67-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:46:17-77
+67-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:46:25-74
+68
+69                <category android:name="android.intent.category.DEFAULT" />
+69-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:41:17-76
+69-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:41:27-73
+70
+71                <data android:mimeType="text/plain" />
+71-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:42:17-55
+71-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:42:23-52
+72            </intent-filter>
+73        </activity>
+74
+75        <!-- Settings Activity -->
+76        <activity
+76-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:53:9-58:53
+77            android:name="com.najmi.oreamnos.SettingsActivity"
+77-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:54:13-45
+78            android:exported="false"
+78-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:55:13-37
+79            android:label="@string/settings"
+79-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:56:13-45
+80            android:parentActivityName="com.najmi.oreamnos.MainActivity"
+80-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:57:13-55
+81            android:theme="@style/Theme.Oreamnos" />
+81-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:58:13-50
+82
+83        <!-- Usage Activity -->
+84        <activity
+84-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:61:9-66:53
+85            android:name="com.najmi.oreamnos.UsageActivity"
+85-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:62:13-42
+86            android:exported="false"
+86-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:63:13-37
+87            android:label="@string/nav_usage"
+87-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:64:13-46
+88            android:parentActivityName="com.najmi.oreamnos.MainActivity"
+88-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:65:13-55
+89            android:theme="@style/Theme.Oreamnos" />
+89-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:66:13-50
+90
+91        <!-- Hashtag Manager Activity -->
+92        <activity
+92-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:69:9-74:53
+93            android:name="com.najmi.oreamnos.HashtagManagerActivity"
+93-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:70:13-51
+94            android:exported="false"
+94-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:71:13-37
+95            android:label="Hashtag Manager"
+95-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:72:13-44
+96            android:parentActivityName="com.najmi.oreamnos.SettingsActivity"
+96-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:73:13-59
+97            android:theme="@style/Theme.Oreamnos" />
+97-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:74:13-50
+98
+99        <!-- Log List Activity -->
+100        <activity
+100-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:77:9-82:53
+101            android:name="com.najmi.oreamnos.LogListActivity"
+101-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:78:13-44
+102            android:exported="false"
+102-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:79:13-37
+103            android:label="@string/all_logs_title"
+103-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:80:13-51
+104            android:parentActivityName="com.najmi.oreamnos.UsageActivity"
+104-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:81:13-56
+105            android:theme="@style/Theme.Oreamnos" />
+105-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:82:13-50
+106
+107        <!-- Session List Activity -->
+108        <activity
+108-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:85:9-90:53
+109            android:name="com.najmi.oreamnos.SessionListActivity"
+109-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:86:13-48
+110            android:exported="false"
+110-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:87:13-37
+111            android:label="@string/all_sessions_title"
+111-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:88:13-55
+112            android:parentActivityName="com.najmi.oreamnos.UsageActivity"
+112-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:89:13-56
+113            android:theme="@style/Theme.Oreamnos" />
+113-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:90:13-50
+114
+115        <!-- Content Generation Foreground Service -->
+116        <service
+116-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:93:9-96:56
+117            android:name="com.najmi.oreamnos.services.ContentGenerationService"
+117-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:94:13-62
+118            android:exported="false"
+118-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:95:13-37
+119            android:foregroundServiceType="dataSync" />
+119-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:96:13-53
+120
+121        <!-- Quick Settings Tile Service -->
+122        <service
+122-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:99:9-108:19
+123            android:name="com.najmi.oreamnos.services.GenerateTileService"
+123-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:100:13-57
+124            android:exported="true"
+124-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:101:13-36
+125            android:icon="@drawable/ic_tile"
+125-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:102:13-45
+126            android:label="@string/tile_label"
+126-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:103:13-47
+127            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" >
+127-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:104:13-77
+128            <intent-filter>
+128-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:105:13-107:29
+129                <action android:name="android.service.quicksettings.action.QS_TILE" />
+129-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:106:17-87
+129-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:106:25-84
+130            </intent-filter>
+131        </service>
+132
+133        <activity
+133-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\NAIM\.gradle\caches\transforms-4\b860b9536a18082d225a2525cc273d3d\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
+134            android:name="androidx.compose.ui.tooling.PreviewActivity"
+134-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\NAIM\.gradle\caches\transforms-4\b860b9536a18082d225a2525cc273d3d\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+135            android:exported="true" />
+135-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\NAIM\.gradle\caches\transforms-4\b860b9536a18082d225a2525cc273d3d\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
+136
+137        <provider
+137-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+138            android:name="androidx.startup.InitializationProvider"
+138-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+139            android:authorities="com.najmi.oreamnos.androidx-startup"
+139-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+140            android:exported="false" >
+140-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+141            <meta-data
+141-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+142                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+142-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+143                android:value="androidx.startup" />
+143-->[androidx.emoji2:emoji2:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\2372289bb3f2abbcd39c9fa534cebf54\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+144            <meta-data
+144-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\NAIM\.gradle\caches\transforms-4\42673bed0b823a5c01cb7bca67dc6cba\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+145                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+145-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\NAIM\.gradle\caches\transforms-4\42673bed0b823a5c01cb7bca67dc6cba\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+146                android:value="androidx.startup" />
+146-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\NAIM\.gradle\caches\transforms-4\42673bed0b823a5c01cb7bca67dc6cba\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+147            <meta-data
+147-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+148                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+148-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+149                android:value="androidx.startup" />
+149-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+150        </provider>
+151
+152        <receiver
+152-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+153            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+153-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+154            android:directBootAware="false"
+154-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+155            android:enabled="true"
+155-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+156            android:exported="true"
+156-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+157            android:permission="android.permission.DUMP" >
+157-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+158            <intent-filter>
+158-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+159                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+159-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+159-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+160            </intent-filter>
+161            <intent-filter>
+161-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+162                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+162-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+162-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+163            </intent-filter>
+164            <intent-filter>
+164-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+165                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+165-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+165-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+166            </intent-filter>
+167            <intent-filter>
+167-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+168                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+168-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+168-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\NAIM\.gradle\caches\transforms-4\38e8c02769b859658ed60c17ee672f02\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+169            </intent-filter>
+170        </receiver>
+171    </application>
+172
+173</manifest>

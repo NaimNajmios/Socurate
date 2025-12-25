@@ -121,9 +121,12 @@ class ShareBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val prefsManager = PreferencesManager(requireContext())
+        val themeMode = prefsManager.getTheme()
+        
         return ComposeView(requireContext()).apply {
             setContent {
-                SocurateTheme {
+                SocurateTheme(themeMode = themeMode) {
                     ShareBottomSheetContent(
                         sharedText = arguments?.getString(ARG_SHARED_TEXT) ?: "",
                         onDismiss = { dismiss() },
