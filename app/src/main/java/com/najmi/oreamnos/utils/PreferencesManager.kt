@@ -215,6 +215,47 @@ class PreferencesManager(context: Context) {
             else -> hasApiKey()
         }
     }
+    
+    /**
+     * Checks if a specific provider has an API key configured.
+     */
+    fun hasApiKeyForProvider(provider: String): Boolean {
+        return when (provider) {
+            PROVIDER_GROQ -> !getGroqApiKey().isNullOrBlank()
+            PROVIDER_OPENROUTER -> !getOpenRouterApiKey().isNullOrBlank()
+            PROVIDER_CEREBRAS -> !getCerebrasApiKey().isNullOrBlank()
+            PROVIDER_GEMINI -> hasApiKey()
+            else -> false
+        }
+    }
+    
+    /**
+     * Gets the recommended fallback provider based on the current provider.
+     * Follows the fallback chain: Gemini -> Groq -> OpenRouter -> Cerebras -> Gemini
+     */
+    fun getRecommendedFallbackProvider(currentProvider: String): String {
+        return when (currentProvider) {
+            PROVIDER_GEMINI -> PROVIDER_GROQ
+            PROVIDER_GROQ -> PROVIDER_OPENROUTER
+            PROVIDER_OPENROUTER -> PROVIDER_CEREBRAS
+            PROVIDER_CEREBRAS -> PROVIDER_GEMINI
+            else -> PROVIDER_GROQ
+        }
+    }
+    
+    /**
+     * Gets all providers with their configuration status.
+     * Returns a list of Triple(providerValue, displayName, hasApiKey)
+     */
+    fun getAllProvidersWithStatus(): List<Triple<String, String, Boolean>> {
+        return listOf(
+            Triple(PROVIDER_GEMINI, "Gemini (Google)", hasApiKey()),
+            Triple(PROVIDER_GROQ, "Groq (Llama 3.3)", !getGroqApiKey().isNullOrBlank()),
+            Triple(PROVIDER_OPENROUTER, "OpenRouter (Free Models)", !getOpenRouterApiKey().isNullOrBlank()),
+            Triple(PROVIDER_CEREBRAS, "Cerebras (Fast Inference)", !getCerebrasApiKey().isNullOrBlank())
+        )
+    }
+
 
     // ==================== MODELS PER PROVIDER ====================
 

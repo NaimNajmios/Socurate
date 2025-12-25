@@ -304,9 +304,13 @@ fun MainScreen(
     var showRateLimitDialog by remember { mutableStateOf(false) }
     var rateLimitInfo by remember { mutableStateOf<MainActivity.GenerationResult?>(null) }
     
+    // Provider selector state
+    var showProviderSelector by remember { mutableStateOf(false) }
+    
     // Custom pills
     val customPills = remember { mutableStateListOf<GenerationPill>() }
     val selectedPillIds = remember { mutableStateListOf<String>() }
+
     
     // Load custom pills
     LaunchedEffect(Unit) {
@@ -451,6 +455,23 @@ fun MainScreen(
         )
     }
     
+    // Provider selector sheet
+    if (showProviderSelector) {
+        ProviderSelectorSheet(
+            prefsManager = prefsManager,
+            onProviderSelected = { newProvider ->
+                prefsManager.saveProvider(newProvider)
+                // Retry the last operation
+                if (error != null) {
+                    error = null
+                    isLoading = true
+                    onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                }
+            },
+            onDismiss = { showProviderSelector = false }
+        )
+    }
+    
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
@@ -529,6 +550,9 @@ fun MainScreen(
                         error = null
                         isLoading = true
                         onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                    },
+                    onChangeProvider = {
+                        showProviderSelector = true
                     }
                 )
             }
@@ -822,7 +846,7 @@ fun LoadingCard() {
 }
 
 @Composable
-fun ErrorCard(error: String, onRetry: () -> Unit) {
+fun ErrorCard(error: String, onRetry: () -> Unit, onChangeProvider: () -> Unit) {
     NeoCard(
         modifier = Modifier.fillMaxWidth(),
         borderColor = ErrorRed
@@ -831,7 +855,19 @@ fun ErrorCard(error: String, onRetry: () -> Unit) {
         Spacer(Modifier.height(8.dp))
         Text(error, style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.height(16.dp))
-        NeoButton(onClick = onRetry, text = "TRY AGAIN", containerColor = ErrorRed)
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            NeoOutlinedButton(
+                onClick = onChangeProvider,
+                modifier = Modifier.weight(1f),
+                text = "CHANGE PROVIDER"
+            )
+            NeoButton(
+                onClick = onRetry,
+                text = "TRY AGAIN",
+                containerColor = ErrorRed,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 
@@ -859,6 +895,7 @@ fun EmptyStateCard(onPaste: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RateLimitDialog(
     currentProvider: String,
@@ -868,53 +905,292 @@ fun RateLimitDialog(
     onSwitchAndRetry: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val fallbackProvider = when (currentProvider) {
-        PreferencesManager.PROVIDER_GEMINI -> PreferencesManager.PROVIDER_GROQ
-        PreferencesManager.PROVIDER_GROQ -> PreferencesManager.PROVIDER_OPENROUTER
-        else -> PreferencesManager.PROVIDER_GEMINI
-    }
+    val context = LocalContext.current
+    val allProviders = remember { prefsManager.getAllProvidersWithStatus() }
+    val recommendedFallback = remember { prefsManager.getRecommendedFallbackProvider(currentProvider) }
     
-    val fallbackName = CuratorFactory.getProviderDisplayName(fallbackProvider)
-    val hasFallbackKey = when (fallbackProvider) {
-        PreferencesManager.PROVIDER_GROQ -> prefsManager.getGroqApiKey()?.isNotEmpty() == true
-        PreferencesManager.PROVIDER_OPENROUTER -> prefsManager.getOpenRouterApiKey()?.isNotEmpty() == true
-        else -> prefsManager.getApiKey()?.isNotEmpty() == true
+    val waitTime = remember(retryDelayMs) {
+        if (retryDelayMs > 60000) "${retryDelayMs / 60000} minutes" 
+        else if (retryDelayMs > 0) "${retryDelayMs / 1000} seconds"
+        else "a minute"
     }
-    
-    val waitTime = if (retryDelayMs > 60000) "${retryDelayMs / 60000} minutes" else "${retryDelayMs / 1000} seconds"
     
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Rate Limit Hit") },
+        title = { 
+            Text(
+                "⚠️ Rate Limit Hit",
+                style = MaterialTheme.typography.titleLarge
+            ) 
+        },
         text = {
-            Column {
-                Text("${CuratorFactory.getProviderDisplayName(currentProvider)} is rate limited.")
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                // Current status
+                Text(
+                    "${CuratorFactory.getProviderDisplayName(currentProvider)} is currently rate limited.",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                
                 if (retryDelayMs > 0) {
-                    Text("Wait time: ~$waitTime")
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Estimated wait time: ~$waitTime",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
+                
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Switch to another provider:",
+                    style = MaterialTheme.typography.titleSmall
+                )
                 Spacer(Modifier.height(8.dp))
-                if (hasFallbackKey) {
-                    Text("Switch to $fallbackName and retry?")
-                } else {
-                    Text("Configure $fallbackName API key in Settings to use as fallback.")
+                
+                // Provider options
+                allProviders.forEach { (providerValue, displayName, hasApiKey) ->
+                    if (providerValue != currentProvider) {
+                        val isRecommended = providerValue == recommendedFallback
+                        
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable(enabled = hasApiKey) {
+                                    onSwitchAndRetry(providerValue)
+                                },
+                            shape = RoundedCornerShape(8.dp),
+                            color = when {
+                                !hasApiKey -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                isRecommended -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                                else -> MaterialTheme.colorScheme.surfaceVariant
+                            },
+                            border = if (isRecommended) androidx.compose.foundation.BorderStroke(
+                                2.dp,
+                                MaterialTheme.colorScheme.primary
+                            ) else null
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            displayName,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = if (hasApiKey) MaterialTheme.colorScheme.onSurface
+                                                   else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        if (isRecommended) {
+                                            Spacer(Modifier.width(8.dp))
+                                            Text(
+                                                "RECOMMENDED",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier
+                                                    .background(
+                                                        MaterialTheme.colorScheme.primaryContainer,
+                                                        RoundedCornerShape(4.dp)
+                                                    )
+                                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                                            )
+                                        }
+                                    }
+                                    Spacer(Modifier.height(2.dp))
+                                    Text(
+                                        if (hasApiKey) "✓ API Key Configured" else "⚠ API Key Required",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (hasApiKey) MaterialTheme.colorScheme.primary
+                                               else MaterialTheme.colorScheme.error
+                                    )
+                                }
+                                
+                                if (hasApiKey) {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.Send,
+                                        contentDescription = "Switch",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Check if no alternatives available
+                val hasAlternatives = allProviders.any { it.first != currentProvider && it.third }
+                if (!hasAlternatives) {
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        "Configure API keys for other providers in Settings to enable fallback.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         },
         confirmButton = {
-            if (hasFallbackKey) {
-                TextButton(onClick = { onSwitchAndRetry(fallbackProvider) }) {
-                    Text("Switch & Retry")
+            TextButton(
+                onClick = {
+                    context.startActivity(Intent(context, SettingsActivity::class.java))
+                    onDismiss()
                 }
-            } else {
-                TextButton(onClick = onDismiss) {
-                    Text("OK")
+            ) {
+                Text("SETTINGS")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("WAIT")
+            }
+        }
+    )
+}
+
+/**
+ * Provider selector sheet for changing AI provider and model.
+ * Shown when user encounters errors or wants to manually switch providers.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProviderSelectorSheet(
+    prefsManager: PreferencesManager,
+    onProviderSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val currentProvider = remember { prefsManager.getProvider() }
+    val allProviders = remember { prefsManager.getAllProvidersWithStatus() }
+    var selectedProvider by remember { mutableStateOf(currentProvider) }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                "Select AI Provider",
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(
+                    "Current: ${CuratorFactory.getProviderDisplayName(currentProvider)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                Spacer(Modifier.height(16.dp))
+                
+                allProviders.forEach { (providerValue, displayName, hasApiKey) ->
+                    val isSelected = providerValue == selectedProvider
+                    
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clickable {
+                                selectedProvider = providerValue
+                            },
+                        shape = RoundedCornerShape(8.dp),
+                        color = when {
+                            isSelected -> MaterialTheme.colorScheme.primaryContainer
+                            !hasApiKey -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            else -> MaterialTheme.colorScheme.surfaceVariant
+                        },
+                        border = if (isSelected) androidx.compose.foundation.BorderStroke(
+                            2.dp,
+                            MaterialTheme.colorScheme.primary
+                        ) else null
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    displayName,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = if (isSelected || hasApiKey) 
+                                        MaterialTheme.colorScheme.onSurface
+                                    else 
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    if (hasApiKey) "✓ Ready to use" else "⚠ API Key Required",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = if (hasApiKey) 
+                                        MaterialTheme.colorScheme.primary
+                                    else 
+                                        MaterialTheme.colorScheme.error
+                                )
+                            }
+                            
+                            if (isSelected) {
+                                Icon(
+                                    painter = painterResource(android.R.drawable.radiobutton_on_background),
+                                    contentDescription = "Selected",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+                
+                Spacer(Modifier.height(16.dp))
+                
+                // Help text
+                Text(
+                    "Tip: Configure API keys for multiple providers in Settings for automatic fallback during rate limits.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+        confirmButton = {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(
+                    onClick = {
+                        context.startActivity(Intent(context, SettingsActivity::class.java))
+                        onDismiss()
+                    }
+                ) {
+                    Text("SETTINGS")
+                }
+                
+                Button(
+                    onClick = {
+                        if (prefsManager.hasApiKeyForProvider(selectedProvider)) {
+                            onProviderSelected(selectedProvider)
+                            onDismiss()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Please configure API key for this provider first",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    enabled = prefsManager.hasApiKeyForProvider(selectedProvider)
+                ) {
+                    Text("SWITCH")
                 }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Wait")
+                Text("CANCEL")
             }
         }
     )
 }
+
