@@ -129,7 +129,8 @@ class UsageStats {
         val responseTokens: Int = 0,
         val totalTokens: Int = 0,
         val success: Boolean = true,
-        val errorMessage: String? = null
+        val errorMessage: String? = null,
+        val durationMs: Long = 0 // Response time in milliseconds
     ) {
         val formattedTime: String
             get() {
@@ -142,13 +143,14 @@ class UsageStats {
 
         companion object {
             @JvmStatic
-            fun failure(provider: String?, modelId: String?, modelName: String?, error: String?): SessionEntry {
+            fun failure(provider: String?, modelId: String?, modelName: String?, error: String?, durationMs: Long = 0): SessionEntry {
                 return SessionEntry(
                     provider = provider,
                     modelId = modelId,
                     modelName = modelName,
                     success = false,
-                    errorMessage = error
+                    errorMessage = error,
+                    durationMs = durationMs
                 )
             }
         }
@@ -244,7 +246,8 @@ class UsageStats {
         totalTokensUsed: Int,
         provider: String? = null,
         modelId: String? = null,
-        modelName: String? = null
+        modelName: String? = null,
+        durationMs: Long = 0
     ) {
         checkAndResetTimePeriods()
 
@@ -289,7 +292,8 @@ class UsageStats {
             promptTokens = promptTokens,
             responseTokens = candidateTokens,
             totalTokens = totalTokensUsed,
-            success = true
+            success = true,
+            durationMs = durationMs
         )
         addSession(session)
     }
@@ -302,7 +306,8 @@ class UsageStats {
         provider: String? = null,
         modelId: String? = null,
         modelName: String? = null,
-        error: String? = null
+        error: String? = null,
+        durationMs: Long = 0
     ) {
         checkAndResetTimePeriods()
 
@@ -320,7 +325,7 @@ class UsageStats {
         }
 
         // Add session entry
-        val session = SessionEntry.failure(provider, modelId, modelName, error)
+        val session = SessionEntry.failure(provider, modelId, modelName, error, durationMs)
         addSession(session)
     }
 
@@ -430,6 +435,111 @@ class UsageStats {
 
     val successRate: Float
         get() = if (totalRequests == 0) 100.0f else successfulRequests.toFloat() / totalRequests * 100
+
+    // ==================== CHART DATA METHODS ====================
+
+    /**
+     * Get sessions from the last N days for chart data.
+     */
+    fun getSessionsLastNDays(days: Int): List<SessionEntry> {
+        val cutoff = System.currentTimeMillis() - (days * 24 * 60 * 60 * 1000L)
+        return recentSessions.filter { it.timestamp >= cutoff }
+    }
+
+    /**
+     * Get daily token aggregation for line charts.
+     * Returns a map of date string to token count.
+     */
+    fun getTokensPerDay(days: Int): Map<String, Long> {
+        val sdf = SimpleDateFormat("MM/dd", Locale.US)
+        val cutoff = System.currentTimeMillis() - (days * 24 * 60 * 60 * 1000L)
+        val filtered = recentSessions.filter { it.timestamp >= cutoff && it.success }
+        
+        return filtered.groupBy { sdf.format(Date(it.timestamp)) }
+            .mapValues { (_, sessions) -> sessions.sumOf { it.totalTokens.toLong() } }
+    }
+
+    /**
+     * Get daily prompt vs response token split for charts.
+     */
+    data class DailyTokenSplit(val promptTokens: Long, val responseTokens: Long)
+    
+    fun getTokenSplitPerDay(days: Int): Map<String, DailyTokenSplit> {
+        val sdf = SimpleDateFormat("MM/dd", Locale.US)
+        val cutoff = System.currentTimeMillis() - (days * 24 * 60 * 60 * 1000L)
+        val filtered = recentSessions.filter { it.timestamp >= cutoff && it.success }
+        
+        return filtered.groupBy { sdf.format(Date(it.timestamp)) }
+            .mapValues { (_, sessions) -> 
+                DailyTokenSplit(
+                    promptTokens = sessions.sumOf { it.promptTokens.toLong() },
+                    responseTokens = sessions.sumOf { it.responseTokens.toLong() }
+                )
+            }
+    }
+
+    /**
+     * Get success rate breakdown by provider for pie chart.
+     */
+    data class ProviderSuccessRate(
+        val provider: String,
+        val successful: Int,
+        val failed: Int,
+        val rate: Float
+    )
+    
+    fun getSuccessRateByProvider(): List<ProviderSuccessRate> {
+        return providerStats.map { (provider, stats) ->
+            val total = stats.successfulRequests + stats.failedRequests
+            val rate = if (total > 0) stats.successfulRequests.toFloat() / total * 100 else 0f
+            ProviderSuccessRate(provider, stats.successfulRequests, stats.failedRequests, rate)
+        }
+    }
+
+    /**
+     * Get average response time per provider for bar chart.
+     */
+    data class ProviderResponseTime(
+        val provider: String,
+        val averageMs: Long,
+        val minMs: Long,
+        val maxMs: Long,
+        val requestCount: Int
+    )
+    
+    fun getAverageResponseTimeByProvider(): List<ProviderResponseTime> {
+        val grouped = recentSessions
+            .filter { it.success && it.durationMs > 0 && it.provider != null }
+            .groupBy { it.provider!! }
+        
+        return grouped.map { (provider, sessions) ->
+            val durations = sessions.map { it.durationMs }
+            ProviderResponseTime(
+                provider = provider,
+                averageMs = if (durations.isNotEmpty()) durations.average().toLong() else 0L,
+                minMs = durations.minOrNull() ?: 0L,
+                maxMs = durations.maxOrNull() ?: 0L,
+                requestCount = sessions.size
+            )
+        }
+    }
+
+    /**
+     * Get fastest and slowest generation for highlights.
+     */
+    fun getFastestGeneration(): SessionEntry? = 
+        recentSessions.filter { it.success && it.durationMs > 0 }.minByOrNull { it.durationMs }
+    
+    fun getSlowestGeneration(): SessionEntry? = 
+        recentSessions.filter { it.success && it.durationMs > 0 }.maxByOrNull { it.durationMs }
+
+    /**
+     * Get error timeline for chart.
+     */
+    fun getErrorTimeline(days: Int): List<SessionEntry> {
+        val cutoff = System.currentTimeMillis() - (days * 24 * 60 * 60 * 1000L)
+        return recentSessions.filter { !it.success && it.timestamp >= cutoff }
+    }
 
     // ==================== SERIALIZATION ====================
 

@@ -17,12 +17,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -97,6 +105,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -129,6 +138,8 @@ import com.najmi.oreamnos.ui.components.NeoChip
 import com.najmi.oreamnos.ui.components.NeoCopyButton
 import com.najmi.oreamnos.ui.components.NeoInput
 import com.najmi.oreamnos.ui.components.NeoOutlinedButton
+import com.najmi.oreamnos.ui.components.AnimatedCheckmark
+import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
 import com.najmi.oreamnos.viewmodel.MainViewModel
 
 // File-level regex patterns for use in composables
@@ -355,6 +366,12 @@ fun MainScreen(
     // Custom pills
     val customPills = remember { mutableStateListOf<GenerationPill>() }
     val selectedPillIds = remember { mutableStateListOf<String>() }
+    
+    // Visual feedback states
+    var showSuccessAnimation by remember { mutableStateOf(false) }
+    var inputHasChanged by remember { mutableStateOf(false) }
+    var previousInput by remember { mutableStateOf(initialSharedText ?: "") }
+    var triggerShakeAnimation by remember { mutableStateOf(false) }
 
     
     // Load custom pills
@@ -422,6 +439,8 @@ fun MainScreen(
                 showRateLimitDialog = true
             }
             generationResult.success && generationResult.result != null -> {
+                // Trigger success animation before showing result
+                showSuccessAnimation = true
                 // Extract source citation
                 val result = generationResult.result
                 val matcher = SOURCE_CITATION_PATTERN.find(result)
@@ -484,9 +503,14 @@ fun MainScreen(
                 rebuildOutput()
                 hasResult = true
                 error = null
+                // Reset input changed flag
+                inputHasChanged = false
+                previousInput = inputText
             }
             !generationResult.success -> {
                 error = generationResult.error ?: "Generation failed"
+                // Trigger shake animation on error
+                triggerShakeAnimation = true
             }
         }
         onClearResult()
@@ -500,6 +524,29 @@ fun MainScreen(
     // Initialize output if we have initial data
     LaunchedEffect(Unit) {
         if (hasResult) rebuildOutput()
+    }
+    
+    // Track input changes for pulse animation
+    LaunchedEffect(inputText) {
+        if (inputText != previousInput && inputText.isNotBlank() && !isLoading) {
+            inputHasChanged = true
+        }
+    }
+    
+    // Reset shake animation after it triggers
+    LaunchedEffect(triggerShakeAnimation) {
+        if (triggerShakeAnimation) {
+            kotlinx.coroutines.delay(500)
+            triggerShakeAnimation = false
+        }
+    }
+    
+    // Success animation timeout
+    LaunchedEffect(showSuccessAnimation) {
+        if (showSuccessAnimation) {
+            kotlinx.coroutines.delay(1000)
+            showSuccessAnimation = false
+        }
     }
     
     // Rate limit dialog
@@ -602,8 +649,30 @@ fun MainScreen(
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
+                    // Pulse animation for Generate button when input changes
+                    val infiniteTransition = rememberInfiniteTransition(label = "generatePulse")
+                    val pulseScale by infiniteTransition.animateFloat(
+                        initialValue = 1f,
+                        targetValue = if (inputHasChanged) 1.05f else 1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(600, easing = LinearEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "pulse_scale"
+                    )
+                    val pulseAlpha by infiniteTransition.animateFloat(
+                        initialValue = 1f,
+                        targetValue = if (inputHasChanged) 0.85f else 1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(600, easing = LinearEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "pulse_alpha"
+                    )
+                    
                     NeoButton(
                         onClick = {
+                            inputHasChanged = false // Stop pulsing when clicked
                             if (inputText.isBlank()) {
                                 Toast.makeText(context, R.string.input_required, Toast.LENGTH_SHORT).show()
                             } else if (!prefsManager.hasApiKey()) {
@@ -616,7 +685,10 @@ fun MainScreen(
                             }
                         },
                         text = "GENERATE",
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .scale(if (inputHasChanged) pulseScale else 1f)
+                            .alpha(if (inputHasChanged) pulseAlpha else 1f)
                     )
                     Spacer(Modifier.width(8.dp))
                     TextButton(onClick = onNavigateToUsage) {
@@ -671,22 +743,68 @@ fun MainScreen(
             
             // Loading State
             AnimatedVisibility(visible = isLoading, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
-                LoadingCard()
+                EnhancedLoadingCard()
             }
             
-            // Error State
-            AnimatedVisibility(visible = error != null && !isLoading, enter = fadeIn(), exit = fadeOut()) {
-                ErrorCard(
-                    error = error ?: "",
-                    onRetry = {
-                        error = null
-                        isLoading = true
-                        onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
-                    },
-                    onChangeProvider = {
-                        showProviderSelector = true
+            // Success Animation
+            AnimatedVisibility(
+                visible = showSuccessAnimation && !isLoading,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut()
+            ) {
+                NeoCard(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(40.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        AnimatedCheckmark(
+                            size = 80.dp,
+                            onAnimationComplete = { }
+                        )
+                        Spacer(Modifier.height(24.dp))
+                        Text(
+                            "GENERATED!",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color(0xFF22C55E)
+                        )
                     }
+                }
+            }
+            
+            // Error State with Shake Animation
+            AnimatedVisibility(visible = error != null && !isLoading, enter = fadeIn(), exit = fadeOut()) {
+                val shakeOffset by animateFloatAsState(
+                    targetValue = if (triggerShakeAnimation) 1f else 0f,
+                    animationSpec = if (triggerShakeAnimation) {
+                        spring(
+                            dampingRatio = Spring.DampingRatioHighBouncy,
+                            stiffness = Spring.StiffnessHigh
+                        )
+                    } else {
+                        tween(0)
+                    },
+                    label = "shake"
                 )
+                
+                Box(
+                    modifier = Modifier.graphicsLayer {
+                        translationX = kotlin.math.sin(shakeOffset * 8 * kotlin.math.PI.toFloat()) * 10f
+                    }
+                ) {
+                    ErrorCard(
+                        error = error ?: "",
+                        onRetry = {
+                            error = null
+                            isLoading = true
+                            onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                        },
+                        onChangeProvider = {
+                            showProviderSelector = true
+                        }
+                    )
+                }
             }
             
             // Output Card

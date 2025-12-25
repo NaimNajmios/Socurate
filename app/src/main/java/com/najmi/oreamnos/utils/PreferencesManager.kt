@@ -323,24 +323,26 @@ class PreferencesManager(context: Context) {
         promptTokens: Int,
         candidateTokens: Int,
         totalTokens: Int,
+        durationMs: Long = 0,
         provider: String? = getProvider(),
         modelId: String? = null,
         modelName: String? = null
     ) {
         val stats = getUsageStats()
-        stats.recordSuccess(promptTokens, candidateTokens, totalTokens, provider, modelId, modelName)
+        stats.recordSuccess(promptTokens, candidateTokens, totalTokens, provider, modelId, modelName, durationMs)
         saveUsageStats(stats)
     }
 
     @JvmOverloads
     fun recordApiFailure(
+        durationMs: Long = 0,
         provider: String? = getProvider(),
         modelId: String? = null,
         modelName: String? = null,
         error: String? = null
     ) {
         val stats = getUsageStats()
-        stats.recordFailure(provider, modelId, modelName, error)
+        stats.recordFailure(provider, modelId, modelName, error, durationMs)
         saveUsageStats(stats)
     }
 

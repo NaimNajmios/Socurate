@@ -64,6 +64,9 @@ import com.najmi.oreamnos.model.UsageStats
 import com.najmi.oreamnos.ui.theme.ErrorRed
 import com.najmi.oreamnos.ui.theme.SocurateTheme
 import com.najmi.oreamnos.ui.theme.SuccessGreen
+import com.najmi.oreamnos.ui.components.TokenUsageChart
+import com.najmi.oreamnos.ui.components.SuccessRateChart
+import com.najmi.oreamnos.ui.components.ResponseTimeChart
 import com.najmi.oreamnos.utils.HapticHelper
 import com.najmi.oreamnos.utils.PreferencesManager
 import java.util.Locale
@@ -224,6 +227,13 @@ fun UsageScreen(
             
             // Request Stats
             item { RequestStatsCard(stats) }
+            
+            // Analytics Charts
+            item { TokenUsageChart(stats) }
+            
+            item { SuccessRateChart(stats) }
+            
+            item { ResponseTimeChart(stats) }
             
             // Recent Sessions
             item {

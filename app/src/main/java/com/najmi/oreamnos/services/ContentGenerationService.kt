@@ -81,6 +81,7 @@ class ContentGenerationService : Service() {
         }
 
         executor.execute {
+            val startTime = System.currentTimeMillis()
             try {
                 Log.i(TAG, "Starting content generation...")
                 var content = inputText
@@ -103,21 +104,25 @@ class ContentGenerationService : Service() {
                 val curator = CuratorFactory.create(this@ContentGenerationService)
                 val result = curator.curatePost(content, includeSource, keepStructure)
 
-                // Record token usage
+                // Calculate duration
+                val durationMs = System.currentTimeMillis() - startTime
+
+                // Record token usage with duration
                 val promptTokens = curator.lastPromptTokens
                 val candidateTokens = curator.lastCandidateTokens
                 val totalTokens = curator.lastTotalTokens
-                prefsManager.recordApiSuccess(promptTokens, candidateTokens, totalTokens)
+                prefsManager.recordApiSuccess(promptTokens, candidateTokens, totalTokens, durationMs)
 
                 // Log success
-                prefsManager.logInfo("API", "Request successful via $providerDisplay ($totalTokens tokens)")
+                prefsManager.logInfo("API", "Request successful via $providerDisplay ($totalTokens tokens, ${durationMs}ms)")
 
                 Log.i(TAG, "Content generation successful")
                 broadcastSuccess(result, false)
 
             } catch (rle: RateLimitException) {
                 Log.w(TAG, "Rate limit hit: ${rle.message}")
-                prefsManager.recordApiFailure()
+                val durationMs = System.currentTimeMillis() - startTime
+                prefsManager.recordApiFailure(durationMs)
 
                 // Log rate limit error
                 val providerName = rle.providerName ?: "Unknown"
@@ -128,7 +133,8 @@ class ContentGenerationService : Service() {
                 broadcastRateLimit(rle, false)
             } catch (e: Exception) {
                 Log.e(TAG, "Content generation failed: ${e.message}", e)
-                prefsManager.recordApiFailure()
+                val durationMs = System.currentTimeMillis() - startTime
+                prefsManager.recordApiFailure(durationMs)
 
                 // Log error
                 val errorMsg = e.message ?: "Unknown error"
@@ -167,6 +173,7 @@ class ContentGenerationService : Service() {
         }
 
         executor.execute {
+            val startTime = System.currentTimeMillis()
             try {
                 Log.i(TAG, "Starting content refinement with options: $refinements")
 
@@ -181,21 +188,25 @@ class ContentGenerationService : Service() {
                 val curator = CuratorFactory.create(this@ContentGenerationService)
                 val result = curator.refinePost(originalPost, refinements, includeSource)
 
-                // Record token usage
+                // Calculate duration
+                val durationMs = System.currentTimeMillis() - startTime
+
+                // Record token usage with duration
                 val promptTokens = curator.lastPromptTokens
                 val candidateTokens = curator.lastCandidateTokens
                 val totalTokens = curator.lastTotalTokens
-                prefsManager.recordApiSuccess(promptTokens, candidateTokens, totalTokens)
+                prefsManager.recordApiSuccess(promptTokens, candidateTokens, totalTokens, durationMs)
 
                 // Log success
-                prefsManager.logInfo("API", "Refinement successful via $providerDisplay ($totalTokens tokens)")
+                prefsManager.logInfo("API", "Refinement successful via $providerDisplay ($totalTokens tokens, ${durationMs}ms)")
 
                 Log.i(TAG, "Content refinement successful")
                 broadcastSuccess(result, true)
 
             } catch (rle: RateLimitException) {
                 Log.w(TAG, "Rate limit hit during refinement: ${rle.message}")
-                prefsManager.recordApiFailure()
+                val durationMs = System.currentTimeMillis() - startTime
+                prefsManager.recordApiFailure(durationMs)
 
                 // Log rate limit error
                 val providerName = rle.providerName ?: "Unknown"
@@ -206,7 +217,8 @@ class ContentGenerationService : Service() {
                 broadcastRateLimit(rle, true)
             } catch (e: Exception) {
                 Log.e(TAG, "Content refinement failed: ${e.message}", e)
-                prefsManager.recordApiFailure()
+                val durationMs = System.currentTimeMillis() - startTime
+                prefsManager.recordApiFailure(durationMs)
 
                 // Log error
                 val errorMsg = e.message ?: "Unknown error"
