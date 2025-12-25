@@ -187,6 +187,7 @@ fun SettingsScreen(
     var theme by remember { mutableStateOf(prefsManager.getTheme()) }
     var hashtagsEnabled by remember { mutableStateOf(prefsManager.areHashtagsEnabled()) }
     var sourceEnabled by remember { mutableStateOf(prefsManager.isSourceEnabled()) }
+    var textSize by remember { mutableIntStateOf(prefsManager.getTextSize()) }
     var isTesting by remember { mutableStateOf(false) }
     
     // Get current model arrays based on provider
@@ -350,7 +351,7 @@ fun SettingsScreen(
                 DropdownSelector(
                     label = "Text Size",
                     options = listOf("Small (11sp)", "Medium (13sp)", "Large (15sp)", "Extra Large (17sp)"),
-                    selectedIndex = when (prefsManager.getTextSize()) {
+                    selectedIndex = when (textSize) {
                         PreferencesManager.TEXT_SIZE_SMALL -> 0
                         PreferencesManager.TEXT_SIZE_MEDIUM -> 1
                         PreferencesManager.TEXT_SIZE_LARGE -> 2
@@ -358,7 +359,7 @@ fun SettingsScreen(
                         else -> 1
                     },
                     onSelect = { index ->
-                        val textSize = when (index) {
+                        textSize = when (index) {
                             0 -> PreferencesManager.TEXT_SIZE_SMALL
                             1 -> PreferencesManager.TEXT_SIZE_MEDIUM
                             2 -> PreferencesManager.TEXT_SIZE_LARGE

@@ -76,6 +76,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -319,6 +320,10 @@ fun MainScreen(
     
     // Reading mode dialog
     var showReadingDialog by remember { mutableStateOf(false) }
+    
+    // Text size - track as state to update when returning from settings
+    val textSizeState = remember { mutableIntStateOf(prefsManager.getTextSize()) }
+    textSizeState.intValue = prefsManager.getTextSize()
     
     // Pill management state
     var showCreatePillDialog by remember { mutableStateOf(false) }
@@ -654,7 +659,7 @@ fun MainScreen(
                             context.startActivity(Intent.createChooser(intent, "Share"))
                         },
                         onExpandClick = { showReadingDialog = true },
-                        textSize = prefsManager.getTextSize()
+                        textSize = textSizeState.intValue
                     )
                     
                     // Refinement Card
@@ -714,7 +719,7 @@ fun MainScreen(
         if (showReadingDialog) {
             ReadingModeDialog(
                 outputText = outputText,
-                textSize = prefsManager.getTextSize(),
+                textSize = textSizeState.intValue,
                 onDismiss = { showReadingDialog = false }
             )
         }
