@@ -19,6 +19,10 @@ object ReadabilityUtils {
         if (text.isNullOrBlank()) return 0.0
 
         val totalSentences = countSentences(text)
+        // Optimize: Avoid split if possible, but syllable count logic depends on words array.
+        // For now, keep split here or refactor countSyllablesInWords to iterate.
+        // Since this is less frequent than word count display, priority is low.
+        // However, we can use the optimized countWords for the totalWords count if we trust it matches split.size.
         val words = WORD_SPLIT_PATTERN.split(text.trim())
         val totalWords = words.size
         val totalSyllables = countSyllablesInWords(words)
@@ -62,11 +66,24 @@ object ReadabilityUtils {
 
     /**
      * Counts the number of words in the text.
+     * Optimized to avoid array allocation from String.split().
      */
     @JvmStatic
     fun countWords(text: String?): Int {
         if (text.isNullOrBlank()) return 0
-        return WORD_SPLIT_PATTERN.split(text.trim()).size
+
+        var count = 0
+        var inWord = false
+
+        for (c in text) {
+            if (c.isWhitespace()) {
+                inWord = false
+            } else if (!inWord) {
+                inWord = true
+                count++
+            }
+        }
+        return count
     }
 
     /**

@@ -1174,8 +1174,12 @@ fun OutputCard(
         }
         
         // Stats
-            val wordCount = if (outputText.isBlank()) 0 else WHITESPACE_PATTERN.split(outputText).size
-            val gradeLevel = ReadabilityUtils.calculateFleschKincaidGradeLevel(outputText)
+            val wordCount = remember(outputText) {
+                ReadabilityUtils.countWords(outputText)
+            }
+            val gradeLevel = remember(outputText) {
+                ReadabilityUtils.calculateFleschKincaidGradeLevel(outputText)
+            }
             
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
@@ -1306,9 +1310,15 @@ fun SwipeableOutputBox(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            // Memoize parsed text to avoid re-parsing on every frame during swipe
+            val primaryColor = MaterialTheme.colorScheme.primary
+            val parsedText = remember(outputText, primaryColor) {
+                parseMarkdownToAnnotatedString(outputText, primaryColor)
+            }
+
             androidx.compose.foundation.text.selection.SelectionContainer {
                 com.najmi.oreamnos.ui.components.TypewriterText(
-                    text = parseMarkdownToAnnotatedString(outputText),
+                    text = parsedText,
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = textSize.sp,
@@ -1325,8 +1335,7 @@ fun SwipeableOutputBox(
  * Parses markdown formatting and converts to AnnotatedString for rich text display.
  * Supports: **bold**, *italic*, _italic_, ## Headers, - lists, * lists
  */
-@Composable
-fun parseMarkdownToAnnotatedString(text: String): androidx.compose.ui.text.AnnotatedString {
+fun parseMarkdownToAnnotatedString(text: String, primaryColor: Color): androidx.compose.ui.text.AnnotatedString {
     return buildAnnotatedString {
         val lines = text.split("\n")
         
@@ -1338,7 +1347,7 @@ fun parseMarkdownToAnnotatedString(text: String): androidx.compose.ui.text.Annot
                     style = SpanStyle(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        color = primaryColor
                     )
                 ) {
                     append(headerText)
