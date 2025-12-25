@@ -10,6 +10,9 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
@@ -44,6 +47,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
@@ -292,6 +296,7 @@ fun MainScreen(
     initialSource: String? = null
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     
     // State
     var inputText by remember { mutableStateOf(initialSharedText ?: "") }
@@ -325,6 +330,11 @@ fun MainScreen(
     val textSizeState = remember { mutableIntStateOf(prefsManager.getTextSize()) }
     textSizeState.intValue = prefsManager.getTextSize()
     
+    // Link preview state
+    var linkPreviewData by remember { mutableStateOf<WebContentExtractor.UrlMetadata?>(null) }
+    var isLoadingPreview by remember { mutableStateOf(false) }
+    var previewError by remember { mutableStateOf<String?>(null) }
+    
     // Pill management state
     var showCreatePillDialog by remember { mutableStateOf(false) }
     var showEditPillDialog by remember { mutableStateOf(false) }
@@ -339,6 +349,30 @@ fun MainScreen(
     LaunchedEffect(Unit) {
         customPills.clear()
         customPills.addAll(prefsManager.getPills())
+    }
+    
+    // Detect URL and fetch metadata
+    LaunchedEffect(inputText) {
+        if (WebContentExtractor.isUrl(inputText.trim())) {
+            isLoadingPreview = true
+            previewError = null
+            try {
+                val extractor = WebContentExtractor()
+                val metadata = withContext(Dispatchers.IO) {
+                    extractor.extractMetadata(inputText.trim())
+                }
+                linkPreviewData = metadata
+                isLoadingPreview = false
+            } catch (e: Exception) {
+                previewError = e.message
+                isLoadingPreview = false
+            }
+        } else {
+            // Clear preview if input is not a URL
+            linkPreviewData = null
+            isLoadingPreview = false
+            previewError = null
+        }
     }
     
     // Helper function to rebuild output
@@ -607,6 +641,43 @@ fun MainScreen(
                 onKeepStructureChange = { keepStructure = it }
             )
             
+            // Link Preview Card
+            if (linkPreviewData != null) {
+                LinkPreviewCard(
+                    metadata = linkPreviewData!!,
+                    isLoading = false,
+                    onExtract = {
+                        kotlinx.coroutines.MainScope().launch {
+                            try {
+                                val extractor = WebContentExtractor()
+                                val extractedContent = withContext(Dispatchers.IO) {
+                                    extractor.extractContent(linkPreviewData!!.originalUrl)
+                                }
+                                inputText = extractedContent
+                            } catch (e: Exception) {
+                                error = "Failed to extract content: ${e.message}"
+                            }
+                        }
+                    },
+                    onDismiss = { linkPreviewData = null }
+                )
+            } else if (isLoadingPreview) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        Text("Loading preview...", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
+            
             // Loading State
             AnimatedVisibility(visible = isLoading, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
                 LoadingCard()
@@ -780,7 +851,78 @@ fun InputCard(
     }
 }
 
-
+@Composable
+fun LinkPreviewCard(
+    metadata: WebContentExtractor.UrlMetadata,
+    isLoading: Boolean,
+    onExtract: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    NeoCard(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Content row with icon and text
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = metadata.domain.take(1).uppercase(),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = metadata.title ?: "Link",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 20.sp
+                    )
+                    Text(
+                        text = metadata.domain,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            // Action buttons row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                NeoButton(
+                    onClick = onExtract,
+                    text = "EXTRACT",
+                    modifier = Modifier.weight(1f),
+                    enabled = !isLoading
+                )
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(Icons.Default.Close, "Dismiss", modifier = Modifier.size(20.dp))
+                }
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
