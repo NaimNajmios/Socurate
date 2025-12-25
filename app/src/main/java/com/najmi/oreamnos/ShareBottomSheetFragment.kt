@@ -218,12 +218,10 @@ fun ShareBottomSheetContent(
                 
                 loadingText = "Generating post..."
                 val tone = if (isFormalTone) PreferencesManager.TONE_FORMAL else PreferencesManager.TONE_CASUAL
-                val apiKey = prefsManager.getApiKey()
-                val endpoint = prefsManager.getApiEndpoint()
                 
                 val result: String? = withContext(Dispatchers.IO) {
-                    val gemini = GeminiService(apiKey.orEmpty(), endpoint.orEmpty(), tone)
-                    gemini.curatePost(textToProcess, prefsManager.isSourceEnabled(), false)
+                    val curator = com.najmi.oreamnos.curator.CuratorFactory.create(context)
+                    curator.curatePost(textToProcess, prefsManager.isSourceEnabled(), false)
                 }
                 
                 // Extract source citation
