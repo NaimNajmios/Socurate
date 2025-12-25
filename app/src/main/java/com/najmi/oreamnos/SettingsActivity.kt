@@ -346,6 +346,32 @@ fun SettingsScreen(
             
             // Output Options Section
             SettingsCard(title = "Output Options") {
+                // Text Size Selector
+                DropdownSelector(
+                    label = "Text Size",
+                    options = listOf("Small (11sp)", "Medium (13sp)", "Large (15sp)", "Extra Large (17sp)"),
+                    selectedIndex = when (prefsManager.getTextSize()) {
+                        PreferencesManager.TEXT_SIZE_SMALL -> 0
+                        PreferencesManager.TEXT_SIZE_MEDIUM -> 1
+                        PreferencesManager.TEXT_SIZE_LARGE -> 2
+                        PreferencesManager.TEXT_SIZE_EXTRA_LARGE -> 3
+                        else -> 1
+                    },
+                    onSelect = { index ->
+                        val textSize = when (index) {
+                            0 -> PreferencesManager.TEXT_SIZE_SMALL
+                            1 -> PreferencesManager.TEXT_SIZE_MEDIUM
+                            2 -> PreferencesManager.TEXT_SIZE_LARGE
+                            3 -> PreferencesManager.TEXT_SIZE_EXTRA_LARGE
+                            else -> PreferencesManager.TEXT_SIZE_MEDIUM
+                        }
+                        prefsManager.saveTextSize(textSize)
+                        showSaved()
+                    }
+                )
+                
+                Spacer(Modifier.height(16.dp))
+                
                 SettingsToggle(
                     title = "Include Source Citation",
                     subtitle = "Add URL source at the end of posts",

@@ -83,6 +83,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -104,6 +105,7 @@ import com.najmi.oreamnos.ui.theme.SocurateTheme
 import com.najmi.oreamnos.utils.PreferencesManager
 import com.najmi.oreamnos.utils.ReadabilityUtils
 import com.najmi.oreamnos.utils.StringUtils
+import com.najmi.oreamnos.utils.MarkdownUtils
 import com.najmi.oreamnos.ui.components.NeoButton
 import com.najmi.oreamnos.ui.components.NeoCard
 import com.najmi.oreamnos.ui.components.NeoChip
@@ -315,9 +317,8 @@ fun MainScreen(
     // Provider selector state
     var showProviderSelector by remember { mutableStateOf(false) }
     
-    // Reading mode and text size
-    var isReadingMode by remember { mutableStateOf(false) }
-    var textSize by remember { mutableStateOf(prefsManager.getTextSize()) }
+    // Reading mode dialog
+    var showReadingDialog by remember { mutableStateOf(false) }
     
     // Pill management state
     var showCreatePillDialog by remember { mutableStateOf(false) }
@@ -652,14 +653,8 @@ fun MainScreen(
                             }
                             context.startActivity(Intent.createChooser(intent, "Share"))
                         },
-                        prefsManager = prefsManager,
-                        isReadingMode = isReadingMode,
-                        onReadingModeToggle = { isReadingMode = it },
-                        textSize = textSize,
-                        onTextSizeChange = { 
-                            textSize = it
-                            prefsManager.saveTextSize(it)
-                        }
+                        onExpandClick = { showReadingDialog = true },
+                        textSize = prefsManager.getTextSize()
                     )
                     
                     // Refinement Card
@@ -713,6 +708,15 @@ fun MainScreen(
             }
             
             Spacer(Modifier.height(80.dp)) // Space for FAB
+        }
+        
+        // Reading mode dialog
+        if (showReadingDialog) {
+            ReadingModeDialog(
+                outputText = outputText,
+                textSize = prefsManager.getTextSize(),
+                onDismiss = { showReadingDialog = false }
+            )
         }
     }
 }
@@ -773,8 +777,6 @@ fun InputCard(
 
 
 
-
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun OutputCard(
@@ -792,18 +794,13 @@ fun OutputCard(
     onEditClick: () -> Unit,
     onCopyClick: () -> Unit,
     onShareClick: () -> Unit,
-    prefsManager: PreferencesManager,
-    isReadingMode: Boolean,
-    onReadingModeToggle: (Boolean) -> Unit,
-    textSize: Int,
-    onTextSizeChange: (Int) -> Unit
+    onExpandClick: () -> Unit,
+    textSize: Int
 ) {
-    val context = LocalContext.current
-    
     NeoCard(
         modifier = Modifier.fillMaxWidth()
     ) {
-        // Header with Reading Mode toggle
+        // Header with Expand button
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -811,22 +808,13 @@ fun OutputCard(
         ) {
             Text("DISPLAY OPTIONS", style = MaterialTheme.typography.labelLarge)
             
-            // Reading Mode toggle
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    "Reading Mode",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(Modifier.width(8.dp))
-                Switch(
-                    checked = isReadingMode,
-                    onCheckedChange = onReadingModeToggle,
-                    colors = androidx.compose.material3.SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.primary,
-                        checkedTrackColor = MaterialTheme.colorScheme.surface,
-                        checkedBorderColor = MaterialTheme.colorScheme.primary
-                    )
+            // Expand button for reading mode
+            IconButton(onClick = onExpandClick) {
+                Icon(
+                    Icons.Default.PlayArrow,
+                    contentDescription = "Expand to reading mode",
+                    modifier = Modifier.rotate(90f),
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -834,56 +822,17 @@ fun OutputCard(
         Spacer(Modifier.height(8.dp))
         
         // Output toggles
-        if (!isReadingMode) {
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                NeoChip(selected = includeTitle, onClick = { onIncludeTitleChange(!includeTitle) }, text = "Title")
-                if (hasHashtags) {
-                    NeoChip(selected = includeHashtags, onClick = { onIncludeHashtagsChange(!includeHashtags) }, text = "Hashtags")
-                }
-                if (isSourceEnabled) {
-                    NeoChip(selected = includeSource, onClick = { onIncludeSourceChange(!includeSource) }, text = "Source")
-                }
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            NeoChip(selected = includeTitle, onClick = { onIncludeTitleChange(!includeTitle) }, text = "Title")
+            if (hasHashtags) {
+                NeoChip(selected = includeHashtags, onClick = { onIncludeHashtagsChange(!includeHashtags) }, text = "Hashtags")
             }
-            Spacer(Modifier.height(16.dp))
+            if (isSourceEnabled) {
+                NeoChip(selected = includeSource, onClick = { onIncludeSourceChange(!includeSource) }, text = "Source")
+            }
         }
         
-        // Text size controls (only in non-reading mode)
-        if (!isReadingMode) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Text Size", style = MaterialTheme.typography.labelSmall)
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    listOf(
-                        "S" to PreferencesManager.TEXT_SIZE_SMALL,
-                        "M" to PreferencesManager.TEXT_SIZE_MEDIUM,
-                        "L" to PreferencesManager.TEXT_SIZE_LARGE,
-                        "XL" to PreferencesManager.TEXT_SIZE_EXTRA_LARGE
-                    ).forEach { (label, size) ->
-                        Surface(
-                            onClick = { onTextSizeChange(size) },
-                            shape = RoundedCornerShape(4.dp),
-                            color = if (textSize == size) MaterialTheme.colorScheme.primary else Color.Transparent,
-                            border = androidx.compose.foundation.BorderStroke(
-                                1.dp,
-                                if (textSize == size) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
-                            ),
-                            modifier = Modifier.padding(0.dp)
-                        ) {
-                            Text(
-                                label,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = if (textSize == size) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            )
-                        }
-                    }
-                }
-            }
-            Spacer(Modifier.height(16.dp))
-        }
+        Spacer(Modifier.height(16.dp))
         
         
         // Output text with selectable text for long-press copy
@@ -902,10 +851,7 @@ fun OutputCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .then(
-                        if (isReadingMode) Modifier.heightIn(min = 300.dp, max = 600.dp) // Expanded but bounded height
-                        else Modifier.heightIn(max = 400.dp) // Normal max height
-                    )
+                    .heightIn(max = 400.dp)
                     .background(
                         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
                         RoundedCornerShape(4.dp)
@@ -927,8 +873,7 @@ fun OutputCard(
             }
         }
         
-        if (!isReadingMode) {
-            // Stats
+        // Stats
             val wordCount = if (outputText.isBlank()) 0 else WHITESPACE_PATTERN.split(outputText).size
             val gradeLevel = ReadabilityUtils.calculateFleschKincaidGradeLevel(outputText)
             
@@ -951,17 +896,6 @@ fun OutputCard(
                 )
                 NeoButton(onClick = onShareClick, modifier = Modifier.weight(1f), text = "Share")
             }
-        } else {
-            // Compact actions in reading mode
-            Spacer(Modifier.height(16.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                NeoCopyButton(
-                    onCopy = onCopyClick,
-                    modifier = Modifier.weight(1f)
-                )
-                NeoButton(onClick = onShareClick, modifier = Modifier.weight(1f), text = "Share")
-            }
-        }
     }
 }
 
