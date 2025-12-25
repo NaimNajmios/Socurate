@@ -307,6 +307,11 @@ fun MainScreen(
     // Provider selector state
     var showProviderSelector by remember { mutableStateOf(false) }
     
+    // Pill management state
+    var showCreatePillDialog by remember { mutableStateOf(false) }
+    var showEditPillDialog by remember { mutableStateOf(false) }
+    var pillToEdit by remember { mutableStateOf<GenerationPill?>(null) }
+    
     // Custom pills
     val customPills = remember { mutableStateListOf<GenerationPill>() }
     val selectedPillIds = remember { mutableStateListOf<String>() }
@@ -472,6 +477,53 @@ fun MainScreen(
         )
     }
     
+    // Pill creation dialog
+    if (showCreatePillDialog) {
+        CreatePillDialog(
+            onDismiss = { showCreatePillDialog = false },
+            onConfirm = { name, command ->
+                val newPill = GenerationPill(name = name, command = command)
+                prefsManager.savePill(newPill)
+                customPills.clear()
+                customPills.addAll(prefsManager.getPills())
+                showCreatePillDialog = false
+                Toast.makeText(context, "Custom refinement created", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+    
+    // Pill edit dialog
+    if (showEditPillDialog && pillToEdit != null) {
+        EditPillDialog(
+            pill = pillToEdit!!,
+            onDismiss = { 
+                showEditPillDialog = false
+                pillToEdit = null
+            },
+            onSave = { name, command ->
+                val updatedPill = pillToEdit!!.copy(name = name, command = command)
+                prefsManager.savePill(updatedPill)
+                customPills.clear()
+                customPills.addAll(prefsManager.getPills())
+                showEditPillDialog = false
+                pillToEdit = null
+                Toast.makeText(context, "Custom refinement updated", Toast.LENGTH_SHORT).show()
+            },
+            onDelete = {
+                prefsManager.deletePill(pillToEdit!!.id)
+                customPills.clear()
+                customPills.addAll(prefsManager.getPills())
+                // Deselect if it was selected
+                if (selectedPillIds.contains(pillToEdit!!.id)) {
+                    selectedPillIds.remove(pillToEdit!!.id)
+                }
+                showEditPillDialog = false
+                pillToEdit = null
+                Toast.makeText(context, "Custom refinement deleted", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+    
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
@@ -610,6 +662,13 @@ fun MainScreen(
                             isLoading = true
                             hasResult = false
                             onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
+                        },
+                        onCreatePill = {
+                            showCreatePillDialog = true
+                        },
+                        onEditPill = { pill ->
+                            pillToEdit = pill
+                            showEditPillDialog = true
                         }
                     )
                 }
@@ -779,7 +838,9 @@ fun RefinementCard(
     selectedPillIds: List<String>,
     onToggleOption: (String) -> Unit,
     onTogglePill: (String) -> Unit,
-    onRegenerate: () -> Unit
+    onRegenerate: () -> Unit,
+    onCreatePill: () -> Unit,
+    onEditPill: (GenerationPill) -> Unit
 ) {
     val refinementLabels = listOf(
         "rephrase" to "Rephrase",
@@ -797,6 +858,7 @@ fun RefinementCard(
         Spacer(Modifier.height(12.dp))
         
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Built-in refinements
             refinementLabels.forEach { (key, label) ->
                 NeoChip(
                     selected = selectedOptions.contains(key),
@@ -805,15 +867,47 @@ fun RefinementCard(
                 )
             }
             
-            // Custom pills
+            // Custom pills with long-press to edit
             customPills.forEach { pill ->
                 NeoChip(
                     selected = selectedPillIds.contains(pill.id),
                     onClick = { onTogglePill(pill.id) },
+                    onLongClick = { onEditPill(pill) },
                     text = pill.name
                 )
             }
+            
+            // Add button for creating new pills - Neo style with sharp corners
+            Surface(
+                onClick = onCreatePill,
+                shape = RoundedCornerShape(0.dp),
+                color = Color.Transparent,
+                border = androidx.compose.foundation.BorderStroke(
+                    2.dp,
+                    MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.padding(0.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Add custom refinement",
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        "CUSTOM",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
         }
+
         
         Spacer(Modifier.height(24.dp))
         
@@ -1193,4 +1287,197 @@ fun ProviderSelectorSheet(
         }
     )
 }
+
+/**
+ * Dialog for creating a new custom refinement pill.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CreatePillDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (name: String, command: String) -> Unit
+) {
+    var pillName by remember { mutableStateOf("") }
+    var pillCommand by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { 
+            Text(
+                "Create Custom Refinement",
+                style = MaterialTheme.typography.titleLarge
+            ) 
+        },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(
+                    "Create a reusable refinement command that appears as a chip alongside built-in options.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                Spacer(Modifier.height(16.dp))
+                
+                NeoInput(
+                    value = pillName,
+                    onValueChange = { pillName = it; showError = false },
+                    label = "NAME",
+                    placeholder = "e.g., Make it punchy",
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 1
+                )
+                
+                Spacer(Modifier.height(12.dp))
+                
+                NeoInput(
+                    value = pillCommand,
+                    onValueChange = { pillCommand = it; showError = false },
+                    label = "COMMAND",
+                    placeholder = "e.g., Make the text punchy and energetic",
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 2,
+                    maxLines = 4
+                )
+                
+                if (showError) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Both name and command are required",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (pillName.isBlank() || pillCommand.isBlank()) {
+                        showError = true
+                    } else {
+                        onConfirm(pillName.trim(), pillCommand.trim())
+                    }
+                }
+            ) {
+                Text("CREATE")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("CANCEL")
+            }
+        }
+    )
+}
+
+/**
+ * Dialog for editing or deleting an existing custom pill.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditPillDialog(
+    pill: GenerationPill,
+    onDismiss: () -> Unit,
+    onSave: (name: String, command: String) -> Unit,
+    onDelete: () -> Unit
+) {
+    var pillName by remember { mutableStateOf(pill.name) }
+    var pillCommand by remember { mutableStateOf(pill.command) }
+    var showError by remember { mutableStateOf(false) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+    
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            title = { Text("Delete Refinement?") },
+            text = { Text("Are you sure you want to delete \"${pill.name}\"?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteConfirm = false
+                        onDelete()
+                    }
+                ) {
+                    Text("DELETE", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = false }) {
+                    Text("CANCEL")
+                }
+            }
+        )
+    }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { 
+            Text(
+                "Edit Custom Refinement",
+                style = MaterialTheme.typography.titleLarge
+            ) 
+        },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                NeoInput(
+                    value = pillName,
+                    onValueChange = { pillName = it; showError = false },
+                    label = "NAME",
+                    placeholder = "e.g., Make it punchy",
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 1
+                )
+                
+                Spacer(Modifier.height(12.dp))
+                
+                NeoInput(
+                    value = pillCommand,
+                    onValueChange = { pillCommand = it; showError = false },
+                    label = "COMMAND",
+                    placeholder = "e.g., Make the text punchy and energetic",
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 2,
+                    maxLines = 4
+                )
+                
+                if (showError) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Both name and command are required",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(
+                    onClick = { showDeleteConfirm = true }
+                ) {
+                    Text("DELETE", color = MaterialTheme.colorScheme.error)
+                }
+                
+                Button(
+                    onClick = {
+                        if (pillName.isBlank() || pillCommand.isBlank()) {
+                            showError = true
+                        } else {
+                            onSave(pillName.trim(), pillCommand.trim())
+                        }
+                    }
+                ) {
+                    Text("SAVE")
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("CANCEL")
+            }
+        }
+    )
+}
+
 

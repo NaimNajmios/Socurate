@@ -1,7 +1,8 @@
 package com.najmi.oreamnos.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -16,13 +17,16 @@ import androidx.compose.ui.unit.dp
 /**
  * Neo-Editorial Chip
  * Rectangular, outlined or filled, sharp corners.
+ * Supports optional long-press gesture for editing.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NeoChip(
     text: String,
     selected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null
 ) {
     val backgroundColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
     val contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
@@ -31,10 +35,18 @@ fun NeoChip(
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     Surface(
         modifier = modifier
-            .clickable(onClick = {
-                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                onClick()
-            }),
+            .combinedClickable(
+                onClick = {
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                    onClick()
+                },
+                onLongClick = onLongClick?.let {
+                    {
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                        it()
+                    }
+                }
+            ),
         shape = RoundedCornerShape(0.dp),
         color = backgroundColor,
         border = BorderStroke(2.dp, borderColor),
