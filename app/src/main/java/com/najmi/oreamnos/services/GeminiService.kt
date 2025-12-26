@@ -337,6 +337,7 @@ class GeminiService(
         prompt.append("\n---\n\n")
         prompt.append("Provide ONLY the refined Bahasa Malaysia post. ")
         prompt.append("Maintain the same length and structure. ")
+        prompt.append("If there are bullet points, use • character only. ")
         prompt.append("Do NOT include any hashtags or explanations. ")
         prompt.append("Do NOT include any emojis in the output.")
 

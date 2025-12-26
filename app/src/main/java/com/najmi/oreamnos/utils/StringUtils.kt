@@ -8,9 +8,11 @@ import java.util.regex.Pattern
 object StringUtils {
 
     // Comprehensive emoji regex pattern that matches most emojis
+    // IMPORTANT: U+2022 (•) is excluded to preserve bullet points
     private const val EMOJI_PATTERN = "[" +
             "\u00a9\u00ae" + // © ®
-            "\u2000-\u3300" + // Various symbols
+            "\u2000-\u2021" + // Various symbols before bullet (U+2022 excluded)
+            "\u2023-\u3300" + // Various symbols after bullet
             "\ud83c\ud000-\ud83c\udfff" + // Enclosed chars, flags, etc.
             "\ud83d\ud000-\ud83d\udfff" + // Emoticons, misc
             "\ud83e\ud000-\ud83e\udfff" + // Extended-A, chess, etc.

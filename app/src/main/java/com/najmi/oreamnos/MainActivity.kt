@@ -1354,10 +1354,18 @@ fun parseMarkdownToAnnotatedString(text: String, primaryColor: Color): androidx.
                     append(headerText)
                 }
             }
-            // Check for bullet list (- item or * item)
+            // Check for bullet list (- item, * item, or • item)
             else if (line.trimStart().startsWith("- ") || line.trimStart().startsWith("* ")) {
                 val bulletText = line.trimStart().drop(2)
-                append("  • ") // Indent with bullet
+                append("• ") // Convert to bullet
+                parseInlineFormatting(bulletText)
+            }
+            // Check for already-bulleted line (• U+2022)
+            else if (line.trimStart().startsWith("\u2022 ") || line.trimStart().startsWith("\u2022")) {
+                // Keep the bullet character and parse the rest
+                val trimmed = line.trimStart()
+                val bulletText = if (trimmed.length > 1 && trimmed[1] == ' ') trimmed.drop(2) else trimmed.drop(1)
+                append("• ")
                 parseInlineFormatting(bulletText)
             }
             else {

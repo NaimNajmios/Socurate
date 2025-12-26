@@ -100,9 +100,12 @@ class PromptManager {
         prompt.append(nextNum).append(". Preserve key facts, names, dates, and statistics from the original\n")
         prompt.append(nextNum + 1).append(". Make the content engaging but maintain journalistic objectivity\n")
         prompt.append(nextNum + 2).append(
-            ". Start the Title with a HIGHLY context-specific and diverse emoji (e.g., 🏥, 🌬️, 💰, 🚨). ALSO start the FIRST paragraph of the body with a context-specific emoji. Do NOT use emojis elsewhere.\n"
+            ". Do NOT include any emojis anywhere in the output.\n"
         )
-        prompt.append(nextNum + 3)
+        prompt.append(nextNum + 3).append(
+            ". If you need to create a list, always use the bullet point character • (not -, *, or other characters).\n"
+        )
+        prompt.append(nextNum + 4)
             .append(". The tone should be that of an official club announcement or news update\n\n")
 
         prompt.append("ORIGINAL ENGLISH TEXT:\n---\n")
@@ -110,13 +113,13 @@ class PromptManager {
 
         when {
             keepStructure -> prompt.append(
-                "Provide ONLY the Bahasa Malaysia social media post. STRICTLY PRESERVE the original formatting (lists, bullets, spacing). Do NOT include any hashtags."
+                "Provide ONLY the Bahasa Malaysia social media post. STRICTLY PRESERVE the original formatting (lists, bullets, spacing). Use • for any bullet points. Do NOT include any hashtags or emojis."
             )
             isTechnicalArticle -> prompt.append(
-                "Provide ONLY the Bahasa Malaysia social media post. Structure it with a headline followed by Key Stats, Formations, and Tactical Shifts sections. Separate sections with blank lines. Do NOT include any hashtags."
+                "Provide ONLY the Bahasa Malaysia social media post. Structure it with a headline followed by Key Stats, Formations, and Tactical Shifts sections. Use • for bullet points in lists. Separate sections with blank lines. Do NOT include any hashtags or emojis."
             )
             else -> prompt.append(
-                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Do NOT include any hashtags."
+                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Use • for any bullet points. Do NOT include any hashtags or emojis."
             )
         }
 
@@ -180,6 +183,7 @@ class PromptManager {
         prompt.append("\n---\n\n")
         prompt.append("Provide ONLY the refined Bahasa Malaysia post. ")
         prompt.append("Maintain the same length and structure. ")
+        prompt.append("If there are bullet points, use • character only. ")
         prompt.append("Do NOT include any hashtags or explanations. ")
         prompt.append("Do NOT include any emojis in the output.\n")
 
