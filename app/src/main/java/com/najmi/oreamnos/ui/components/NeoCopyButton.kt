@@ -90,21 +90,12 @@ fun NeoCopyButton(
             label = "CopyContent"
         ) { copied ->
             if (copied) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "COPIED!",
-                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Copied",
+                    modifier = Modifier.size(20.dp),
+                    tint = Color(0xFF4CAF50) // Green color
+                )
             } else {
                 Text(
                     text = text.uppercase(),

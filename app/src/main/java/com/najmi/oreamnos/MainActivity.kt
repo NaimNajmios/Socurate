@@ -1475,10 +1475,7 @@ fun RefinementCard(
     val refinementLabels = listOf(
         "rephrase" to "Rephrase",
         "recheck_flow" to "Check Flow",
-        "recheck_wording" to "Check Wording",
-        "formal" to "More Formal",
-        "conversational" to "More Casual",
-        "shorten_detailed" to "Shorten"
+        "recheck_wording" to "Check Wording"
     )
     
     FluidRefinementFlow(

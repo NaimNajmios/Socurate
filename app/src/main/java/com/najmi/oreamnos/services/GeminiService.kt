@@ -321,9 +321,6 @@ class GeminiService(
                 "rephrase" -> prompt.append("- Rephrase: Rewrite the post with different wording while maintaining the same meaning and facts\n")
                 "recheck_flow" -> prompt.append("- Recheck Flow: Improve the logical flow and structure of ideas\n")
                 "recheck_wording" -> prompt.append("- Recheck Wording: Improve word choice and phrasing for better clarity\n")
-                "formal" -> prompt.append("- Make it more Formal: Use formal language suitable for official club communication\n")
-                "conversational" -> prompt.append("- Make it more Conversational: Use engaging, conversational tone suitable for fan communities\n")
-                "shorten_detailed" -> prompt.append("- Shorten But Detailed: Make the post more concise while retaining all important details, facts, and key information. Remove redundant or filler words but keep the substance.\n")
                 else -> {
                     if (refinement.isNotBlank()) {
                         prompt.append("- Custom Instruction: $refinement\n")
