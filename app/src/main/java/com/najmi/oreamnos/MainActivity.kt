@@ -383,7 +383,8 @@ fun MainScreen(
     
     // Detect URL and fetch metadata
     LaunchedEffect(inputText) {
-        if (WebContentExtractor.isUrl(inputText.trim())) {
+        // Optimized: Remove redundant trim(), isUrl handles CharSequence efficiently
+        if (WebContentExtractor.isUrl(inputText)) {
             isLoadingPreview = true
             previewError = null
             try {

@@ -246,16 +246,47 @@ class WebContentExtractor {
 
         /**
          * Checks if a string looks like a URL.
+         * Optimized to avoid allocations (no trim() or lowercase() calls).
+         * Used in high-frequency text input paths.
          */
         @JvmStatic
-        fun isUrl(text: String?): Boolean {
+        fun isUrl(text: CharSequence?): Boolean {
             if (text.isNullOrBlank()) return false
 
-            val lower = text.trim().lowercase()
-            return lower.startsWith("http://") ||
-                    lower.startsWith("https://") ||
-                    lower.startsWith("www.") ||
-                    (lower.contains(".") && !lower.contains(" ") && lower.length > 5)
+            // Skip leading whitespace
+            var start = 0
+            val len = text.length
+            while (start < len && text[start].isWhitespace()) {
+                start++
+            }
+
+            // Skip trailing whitespace
+            var end = len - 1
+            while (end >= start && text[end].isWhitespace()) {
+                end--
+            }
+
+            if (start > end) return false
+
+            // Effective length
+            val effectiveLen = end - start + 1
+
+            // Check startsWith "http://", "https://", "www." (case insensitive)
+            if (effectiveLen >= 7 && text.regionMatches(start, "http://", 0, 7, ignoreCase = true)) return true
+            if (effectiveLen >= 8 && text.regionMatches(start, "https://", 0, 8, ignoreCase = true)) return true
+            if (effectiveLen >= 4 && text.regionMatches(start, "www.", 0, 4, ignoreCase = true)) return true
+
+            // Fallback: contains dot, no space, len > 5
+            if (effectiveLen <= 5) return false
+
+            var hasDot = false
+            for (i in start..end) {
+                val c = text[i]
+                if (c == ' ') return false // Contains space
+                if (c == '.') hasDot = true
+            }
+
+            return hasDot
         }
     }
 }
