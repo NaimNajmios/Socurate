@@ -18,7 +18,8 @@ object StringUtils {
             "\ufe0f" + // Variation selector
             "]+"
 
-    private val LEADING_EMOJI_PATTERN: Pattern = Pattern.compile("^($EMOJI_PATTERN)+\\s*")
+    // (?m) enables multiline mode where ^ matches start of line
+    private val LEADING_EMOJI_PATTERN: Pattern = Pattern.compile("(?m)^($EMOJI_PATTERN)+\\s*")
 
     /**
      * Strips ALL emojis from the text (anywhere in the text, not just leading).
@@ -35,9 +36,6 @@ object StringUtils {
     @JvmStatic
     fun stripLeadingEmojis(text: String?): String {
         if (text.isNullOrEmpty()) return ""
-
-        return text.split("\n").joinToString("\n") { line ->
-            LEADING_EMOJI_PATTERN.matcher(line).replaceFirst("")
-        }
+        return LEADING_EMOJI_PATTERN.matcher(text).replaceAll("")
     }
 }
