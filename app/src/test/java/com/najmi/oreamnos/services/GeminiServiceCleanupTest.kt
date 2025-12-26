@@ -13,46 +13,48 @@ class GeminiServiceCleanupTest {
     // but here we want to test the regex logic specifically.
 
     companion object {
-        // The fixed regex from GeminiService
-        private val ASTERISK_TEXT_PATTERN = Pattern.compile("\\*+(.*?)\\*+")
+        // Updated simulation to reflect the removal of asterisk stripping.
+        // In the actual service, the regex was completely removed.
+        // So the simulation should simply return the input as is regarding asterisks.
 
         fun cleanUpResponseSimulation(input: String): String {
-            return ASTERISK_TEXT_PATTERN.matcher(input).replaceAll("$1")
+            // No operation on asterisks anymore
+            return input
         }
     }
 
     @Test
-    fun `test cleanup preserves content in asterisks`() {
+    fun `test cleanup preserves markdown asterisks`() {
         val input = "This is *important* info."
-        val expected = "This is important info."
+        val expected = "This is *important* info."
         assertEquals(expected, cleanUpResponseSimulation(input))
     }
 
     @Test
-    fun `test cleanup preserves bold content`() {
+    fun `test cleanup preserves bold markdown`() {
         val input = "Check out **this bold** text."
-        val expected = "Check out this bold text."
+        val expected = "Check out **this bold** text."
         assertEquals(expected, cleanUpResponseSimulation(input))
     }
 
     @Test
-    fun `test cleanup preserves source citation`() {
+    fun `test cleanup preserves source citation formatting`() {
         val input = "Source: *Bernama*"
-        val expected = "Source: Bernama"
+        val expected = "Source: *Bernama*"
         assertEquals(expected, cleanUpResponseSimulation(input))
     }
 
     @Test
-    fun `test cleanup preserves score`() {
+    fun `test cleanup preserves score formatting`() {
         val input = "Score: *2-1*"
-        val expected = "Score: 2-1"
+        val expected = "Score: *2-1*"
         assertEquals(expected, cleanUpResponseSimulation(input))
     }
 
     @Test
-    fun `test cleanup preserves content with mixed formatting`() {
+    fun `test cleanup preserves mixed formatting`() {
         val input = "Mixed *italic* and **bold** together."
-        val expected = "Mixed italic and bold together."
+        val expected = "Mixed *italic* and **bold** together."
         assertEquals(expected, cleanUpResponseSimulation(input))
     }
 }
