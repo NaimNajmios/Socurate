@@ -34,6 +34,9 @@ class PromptManager {
         // Detect quotes in input
         val hasQuotes = containsQuotes(inputText)
 
+        // Detect if original has bullet points/lists
+        val hasBulletPoints = containsBulletPoints(inputText)
+
         // Detect long/technical content
         val isTechnicalArticle = isLongTechnicalContent(inputText)
 
@@ -102,9 +105,15 @@ class PromptManager {
         prompt.append(nextNum + 2).append(
             ". Do NOT include any emojis anywhere in the output.\n"
         )
-        prompt.append(nextNum + 3).append(
-            ". If you need to create a list, always use the bullet point character • (not -, *, or other characters).\n"
-        )
+        if (hasBulletPoints) {
+            prompt.append(nextNum + 3).append(
+                ". The original content contains bullet points/lists - preserve this format using the • character only.\n"
+            )
+        } else {
+            prompt.append(nextNum + 3).append(
+                ". Do NOT use bullet points or lists. Write in flowing paragraph format only.\n"
+            )
+        }
         prompt.append(nextNum + 4)
             .append(". The tone should be that of an official club announcement or news update\n\n")
 
@@ -115,11 +124,17 @@ class PromptManager {
             keepStructure -> prompt.append(
                 "Provide ONLY the Bahasa Malaysia social media post. STRICTLY PRESERVE the original formatting (lists, bullets, spacing). Use • for any bullet points. Do NOT include any hashtags or emojis."
             )
-            isTechnicalArticle -> prompt.append(
+            isTechnicalArticle && hasBulletPoints -> prompt.append(
                 "Provide ONLY the Bahasa Malaysia social media post. Structure it with a headline followed by Key Stats, Formations, and Tactical Shifts sections. Use • for bullet points in lists. Separate sections with blank lines. Do NOT include any hashtags or emojis."
             )
+            isTechnicalArticle -> prompt.append(
+                "Provide ONLY the Bahasa Malaysia social media post. Structure it with a headline followed by Key Stats, Formations, and Tactical Shifts paragraphs. Write in flowing paragraph format, do NOT use bullet points. Separate sections with blank lines. Do NOT include any hashtags or emojis."
+            )
+            hasBulletPoints -> prompt.append(
+                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Use • for any bullet points from the original. Do NOT include any hashtags or emojis."
+            )
             else -> prompt.append(
-                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Use • for any bullet points. Do NOT include any hashtags or emojis."
+                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Do NOT use bullet points or lists - write in paragraph format only. Do NOT include any hashtags or emojis."
             )
         }
 
@@ -232,5 +247,26 @@ class PromptManager {
 
         // If it has 5+ tactical keywords and is long, it's technical
         return keywordCount >= 5
+    }
+
+    /**
+     * Detects if the input text contains bullet points or list markers.
+     */
+    fun containsBulletPoints(text: String?): Boolean {
+        if (text.isNullOrEmpty()) return false
+        
+        // Check for various bullet point and list markers
+        val lines = text.lines()
+        return lines.any { line ->
+            val trimmed = line.trim()
+            // Check for common bullet/list patterns
+            trimmed.startsWith("•") ||
+            trimmed.startsWith("- ") ||
+            trimmed.startsWith("* ") ||
+            trimmed.startsWith("· ") ||
+            trimmed.matches(Regex("^\\d+\\.\\s.*")) || // Numbered list: "1. item"
+            trimmed.matches(Regex("^\\d+\\)\\s.*")) || // Numbered list: "1) item"
+            trimmed.matches(Regex("^[a-z]\\)\\s.*"))   // Letter list: "a) item"
+        }
     }
 }

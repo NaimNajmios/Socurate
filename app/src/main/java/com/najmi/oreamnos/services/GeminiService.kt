@@ -202,7 +202,7 @@ class GeminiService(
         Log.i(TAG, "[$requestId] Refinements: $refinements")
         Log.i(TAG, "[$requestId] Include source: $includeSource")
 
-        val prompt = buildRefinementPrompt(originalPost, refinements, includeSource)
+        val prompt = PromptManager().buildRefinementPrompt(originalPost, refinements, includeSource)
         val requestJson = buildRequestJson(prompt)
         val requestBodyString = gson.toJson(requestJson)
 
@@ -307,45 +307,7 @@ class GeminiService(
         return TRAILING_NEWLINES_PATTERN.matcher(cleaned).replaceAll("").trim()
     }
 
-    private fun buildRefinementPrompt(
-        originalPost: String,
-        refinements: List<String>,
-        includeSource: Boolean
-    ): String {
-        val prompt = StringBuilder()
-        prompt.append("You are refining a Malaysian Malay (Bahasa Malaysia) social media post about football. ")
-        prompt.append("Apply the following improvements to the post:\n\n")
 
-        for (refinement in refinements) {
-            when (refinement) {
-                "rephrase" -> prompt.append("- Rephrase: Rewrite the post with different wording while maintaining the same meaning and facts\n")
-                "recheck_flow" -> prompt.append("- Recheck Flow: Improve the logical flow and structure of ideas\n")
-                "recheck_wording" -> prompt.append("- Recheck Wording: Improve word choice and phrasing for better clarity\n")
-                else -> {
-                    if (refinement.isNotBlank()) {
-                        prompt.append("- Custom Instruction: $refinement\n")
-                    }
-                }
-            }
-        }
-
-        prompt.append("\nORIGINAL POST:\n---\n")
-        prompt.append(originalPost)
-        prompt.append("\n---\n\n")
-        prompt.append("Provide ONLY the refined Bahasa Malaysia post. ")
-        prompt.append("Maintain the same length and structure. ")
-        prompt.append("If there are bullet points, use • character only. ")
-        prompt.append("Do NOT include any hashtags or explanations. ")
-        prompt.append("Do NOT include any emojis in the output.")
-
-        if (includeSource) {
-            prompt.append("\nEnsure the post ends with 'Sumber: [Source Name]' if the original post had one or if the source is known.")
-        } else {
-            prompt.append("\nDo NOT include any 'Sumber:' citation in the output. Do NOT mention the source name, publication, or author anywhere in the post.")
-        }
-
-        return prompt.toString()
-    }
 
     private fun extractTextFromJson(root: JsonObject?): String? {
         if (root == null) return null
