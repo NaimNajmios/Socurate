@@ -140,6 +140,7 @@ import com.najmi.oreamnos.ui.components.NeoInput
 import com.najmi.oreamnos.ui.components.NeoOutlinedButton
 import com.najmi.oreamnos.ui.components.AnimatedCheckmark
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
+import com.najmi.oreamnos.ui.components.FluidRefinementFlow
 import com.najmi.oreamnos.viewmodel.MainViewModel
 
 // File-level regex patterns for use in composables
@@ -1472,74 +1473,17 @@ fun RefinementCard(
         "shorten_detailed" to "Shorten"
     )
     
-    NeoCard(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text("REFINE OUTPUT", style = MaterialTheme.typography.labelLarge)
-        Spacer(Modifier.height(12.dp))
-        
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            // Built-in refinements
-            refinementLabels.forEach { (key, label) ->
-                NeoChip(
-                    selected = selectedOptions.contains(key),
-                    onClick = { onToggleOption(key) },
-                    text = label
-                )
-            }
-            
-            // Custom pills with long-press to edit - Orange border for visual distinction
-            customPills.forEach { pill ->
-                NeoChip(
-                    selected = selectedPillIds.contains(pill.id),
-                    onClick = { onTogglePill(pill.id) },
-                    onLongClick = { onEditPill(pill) },
-                    text = pill.name,
-                    unselectedBorderColor = Color(0xFFFF9800), // Orange
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            
-            // Add button for creating new pills - Neo style with sharp corners
-            Surface(
-                onClick = onCreatePill,
-                shape = RoundedCornerShape(0.dp),
-                color = Color.Transparent,
-                border = androidx.compose.foundation.BorderStroke(
-                    2.dp,
-                    MaterialTheme.colorScheme.primary
-                ),
-                modifier = Modifier.padding(0.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Add custom refinement",
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        "CUSTOM",
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        }
-
-        
-        Spacer(Modifier.height(24.dp))
-        
-        NeoButton(
-            onClick = onRegenerate,
-            modifier = Modifier.fillMaxWidth(),
-            text = "REGENERATE"
-        )
-    }
+    FluidRefinementFlow(
+        options = refinementLabels,
+        selectedOptions = selectedOptions,
+        customPills = customPills,
+        selectedPillIds = selectedPillIds,
+        onToggleOption = onToggleOption,
+        onTogglePill = onTogglePill,
+        onCreatePill = onCreatePill,
+        onEditPill = onEditPill,
+        onRegenerate = onRegenerate
+    )
 }
 
 @Composable
