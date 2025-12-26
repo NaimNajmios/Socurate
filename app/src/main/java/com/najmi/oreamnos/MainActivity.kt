@@ -686,6 +686,7 @@ fun MainScreen(
                             }
                         },
                         text = "GENERATE",
+                        isLoading = isLoading,
                         modifier = Modifier
                             .weight(1f)
                             .scale(if (inputHasChanged) pulseScale else 1f)
