@@ -334,7 +334,8 @@ class GeminiService(
         prompt.append("\n---\n\n")
         prompt.append("Provide ONLY the refined Bahasa Malaysia post. ")
         prompt.append("Maintain the same length and structure. ")
-        prompt.append("Do NOT include any hashtags or explanations.")
+        prompt.append("Do NOT include any hashtags or explanations. ")
+        prompt.append("Do NOT include any emojis in the output.")
 
         if (includeSource) {
             prompt.append("\nEnsure the post ends with 'Sumber: [Source Name]' if the original post had one or if the source is known.")

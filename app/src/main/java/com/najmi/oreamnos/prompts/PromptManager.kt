@@ -181,9 +181,7 @@ class PromptManager {
         prompt.append("Provide ONLY the refined Bahasa Malaysia post. ")
         prompt.append("Maintain the same length and structure. ")
         prompt.append("Do NOT include any hashtags or explanations. ")
-        prompt.append(
-            "CRITICAL: You MUST include a context-relevant emoji at the start of the Title AND at the start of the First Paragraph of the body. Even if it seems redundant, you MUST do this.\n"
-        )
+        prompt.append("Do NOT include any emojis in the output.\n")
 
         if (includeSource) {
             prompt.append(
