@@ -10,6 +10,7 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import java.util.regex.Pattern
 
 /**
  * OpenAI-compatible API curator that works with Groq, OpenRouter, and Cerebras.
@@ -32,6 +33,15 @@ class OpenAICompatibleCurator(
         private const val TAG = "OpenAICompatibleCurator"
         private const val MAX_RETRIES = 3
         private const val INITIAL_RETRY_DELAY_MS = 1000L
+        
+        // Pre-compiled Regex Patterns for response cleanup
+        private val HORIZONTAL_RULE_PATTERN: Pattern = Pattern.compile("(?m)^-{3,}\\s*$")
+        private val ASTERISK_TEXT_PATTERN: Pattern = Pattern.compile("\\*+(.*?)\\*+")
+        private val MULTIPLE_NEWLINES_PATTERN: Pattern = Pattern.compile("\\n\\s*\\n\\s*\\n+")
+        private val HORIZONTAL_WHITESPACE_PATTERN: Pattern = Pattern.compile("[ \\t]+")
+        private val SOURCE_CITATION_PATTERN: Pattern = Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$")
+        private val TRAILING_NEWLINES_PATTERN: Pattern = Pattern.compile("\\n+$")
+        private val BULLET_POINT_PATTERN: Pattern = Pattern.compile("(?m)^(\\s*)[-*>\u2022\u25e6\u25aa\u25ab\u2023\u2043](\\s+)")
     }
 
     private val promptManager = PromptManager()
@@ -48,17 +58,19 @@ class OpenAICompatibleCurator(
     @Throws(Exception::class)
     override fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
         val systemPrompt = "You are a professional social media content writer for a Malaysian football club. " +
-                "Write in Malaysian Malay (Bahasa Malaysia) only. Do not include hashtags."
+                "Write in Malaysian Malay (Bahasa Malaysia) only. Do not include hashtags. Do not include emojis."
         val userPrompt = promptManager.buildInitialPrompt(tone, inputText, includeSource, keepStructure)
-        return callApi(systemPrompt, userPrompt)
+        val rawResult = callApi(systemPrompt, userPrompt)
+        return cleanUpResponse(rawResult, includeSource)
     }
 
     @Throws(Exception::class)
     override fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String {
         val systemPrompt = "You are refining a Malaysian Malay social media post about football. " +
-                "Apply improvements while maintaining Bahasa Malaysia. Do not include hashtags."
+                "Apply improvements while maintaining Bahasa Malaysia. Do not include hashtags. Do not include emojis."
         val userPrompt = promptManager.buildRefinementPrompt(originalPost, refinements, includeSource)
-        return callApi(systemPrompt, userPrompt)
+        val rawResult = callApi(systemPrompt, userPrompt)
+        return cleanUpResponse(rawResult, includeSource)
     }
 
     /**
@@ -230,6 +242,43 @@ class OpenAICompatibleCurator(
         val content = message.getString("content")
 
         return content.trim()
+    }
+
+    /**
+     * Cleans up the AI response by removing unwanted formatting and content.
+     */
+    private fun cleanUpResponse(response: String, includeSource: Boolean): String {
+        if (response.isBlank()) return response
+
+        var cleaned = response.trim()
+
+        // Remove horizontal rule markers
+        cleaned = HORIZONTAL_RULE_PATTERN.matcher(cleaned).replaceAll("")
+
+        // Remove markdown asterisks while preserving content
+        cleaned = ASTERISK_TEXT_PATTERN.matcher(cleaned).replaceAll("$1")
+
+        // Normalize bullet points to use • character
+        cleaned = BULLET_POINT_PATTERN.matcher(cleaned).replaceAll("$1•$2")
+
+        // Clean up spacing
+        cleaned = MULTIPLE_NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n")
+        cleaned = HORIZONTAL_WHITESPACE_PATTERN.matcher(cleaned).replaceAll(" ")
+        cleaned = cleaned.trim()
+
+        // Remove source citation if not requested
+        if (!includeSource) {
+            cleaned = SOURCE_CITATION_PATTERN.matcher(cleaned).replaceAll("")
+            cleaned = TRAILING_NEWLINES_PATTERN.matcher(cleaned).replaceAll("").trim()
+        }
+
+        // If too short after cleaning, return original
+        if (cleaned.length < 50) {
+            Log.w(TAG, "Response too short after cleaning, returning original")
+            return response
+        }
+
+        return cleaned
     }
 
     /**

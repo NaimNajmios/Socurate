@@ -244,6 +244,9 @@ class GeminiService(
                 }
             }
 
+            // Extract token usage for stats tracking
+            extractUsageMetadata(root)
+
             val totalTime = System.currentTimeMillis() - startTime
             Log.i(TAG, "[$requestId] Refinement success! (time: ${totalTime}ms)")
             Log.i(TAG, "=== GEMINI REFINEMENT END [$requestId] ===")
@@ -417,6 +420,9 @@ class GeminiService(
         // Remove text between asterisks (Markdown formatting), preserving content
         cleaned = ASTERISK_TEXT_PATTERN.matcher(cleaned).replaceAll("$1")
 
+        // Normalize bullet points to use • character
+        cleaned = BULLET_POINT_PATTERN.matcher(cleaned).replaceAll("$1•$2")
+
         // Clean up spacing
         cleaned = MULTIPLE_NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n")
         cleaned = HORIZONTAL_WHITESPACE_PATTERN.matcher(cleaned).replaceAll(" ")
@@ -505,6 +511,7 @@ class GeminiService(
         private val HORIZONTAL_WHITESPACE_PATTERN: Pattern = Pattern.compile("[ \\t]+")
         private val SOURCE_CITATION_PATTERN: Pattern = Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$")
         private val TRAILING_NEWLINES_PATTERN: Pattern = Pattern.compile("\\n+$")
+        private val BULLET_POINT_PATTERN: Pattern = Pattern.compile("(?m)^(\\s*)[-*>\u2022\u25e6\u25aa\u25ab\u2023\u2043](\\s+)")
 
         // Tactical keywords for content detection
         private val TACTICAL_KEYWORDS = arrayOf(
