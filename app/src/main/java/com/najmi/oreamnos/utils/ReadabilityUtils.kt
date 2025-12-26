@@ -8,24 +8,45 @@ import kotlin.math.max
  */
 object ReadabilityUtils {
 
-    private val WORD_SPLIT_PATTERN: Pattern = Pattern.compile("\\s+")
-
     /**
      * Calculates the Flesch-Kincaid Grade Level for the given text.
      * Formula: 0.39 * (total words / total sentences) + 11.8 * (total syllables / total words) - 15.59
+     *
+     * Optimization: Uses a single pass character iteration to count words and syllables
+     * without creating intermediate String or Array objects (no split()).
      */
     @JvmStatic
     fun calculateFleschKincaidGradeLevel(text: String?): Double {
         if (text.isNullOrBlank()) return 0.0
 
         val totalSentences = countSentences(text)
-        // Optimize: Avoid split if possible, but syllable count logic depends on words array.
-        // For now, keep split here or refactor countSyllablesInWords to iterate.
-        // Since this is less frequent than word count display, priority is low.
-        // However, we can use the optimized countWords for the totalWords count if we trust it matches split.size.
-        val words = WORD_SPLIT_PATTERN.split(text.trim())
-        val totalWords = words.size
-        val totalSyllables = countSyllablesInWords(words)
+
+        var totalWords = 0
+        var totalSyllables = 0
+        var wordStart = -1
+
+        val len = text.length
+        for (i in 0 until len) {
+            val c = text[i]
+            if (!c.isWhitespace()) {
+                if (wordStart == -1) {
+                    wordStart = i
+                }
+            } else {
+                if (wordStart != -1) {
+                    // Word boundary found
+                    totalSyllables += countSyllables(text, wordStart, i)
+                    totalWords++
+                    wordStart = -1
+                }
+            }
+        }
+
+        // Handle the last word
+        if (wordStart != -1) {
+            totalSyllables += countSyllables(text, wordStart, len)
+            totalWords++
+        }
 
         if (totalWords == 0 || totalSentences == 0) return 0.0
 
@@ -87,27 +108,30 @@ object ReadabilityUtils {
     }
 
     /**
-     * Counts total syllables in an array of words.
-     */
-    private fun countSyllablesInWords(words: Array<String>): Int {
-        return words.sumOf { countSyllables(it) }
-    }
-
-    /**
-     * Counts syllables in a single word.
-     * Uses a heuristic based on vowel groups.
+     * Counts syllables in a single word string.
+     * Delegates to the efficient CharSequence version.
      */
     @JvmStatic
     fun countSyllables(word: String?): Int {
         if (word.isNullOrEmpty()) return 0
+        return countSyllables(word, 0, word.length)
+    }
+
+    /**
+     * Counts syllables in a substring of a CharSequence (zero-allocation).
+     * Uses a heuristic based on vowel groups.
+     */
+    fun countSyllables(text: CharSequence, start: Int, end: Int): Int {
+        val length = end - start
+        if (length == 0) return 0
 
         var effectiveLength = 0
         var lastAlphaIndex = -1
 
         // Pass 1: Calculate effective length (alpha chars only) and find last alpha char
-        for (i in word.indices) {
-            val c = word[i]
-            if (c in 'a'..'z' || c in 'A'..'Z') {
+        for (i in start until end) {
+            val c = text[i]
+            if ((c in 'a'..'z') || (c in 'A'..'Z')) {
                 effectiveLength++
                 lastAlphaIndex = i
             }
@@ -117,7 +141,7 @@ object ReadabilityUtils {
         if (effectiveLength <= 3) return 1
 
         // Check if the last alpha character is 'e' (silent e logic)
-        val lastChar = word[lastAlphaIndex]
+        val lastChar = text[lastAlphaIndex]
         val skipLast = lastChar == 'e' || lastChar == 'E'
 
         var count = 0
@@ -125,10 +149,11 @@ object ReadabilityUtils {
         var processedAlpha = 0
         val limit = if (skipLast) effectiveLength - 1 else effectiveLength
 
-        for (c in word) {
+        for (i in start until end) {
+            val c = text[i]
             if (processedAlpha >= limit) break
 
-            if (c in 'a'..'z' || c in 'A'..'Z') {
+            if ((c in 'a'..'z') || (c in 'A'..'Z')) {
                 val lowerC = c.lowercaseChar()
                 val isVowel = lowerC in "aeiouy"
 
