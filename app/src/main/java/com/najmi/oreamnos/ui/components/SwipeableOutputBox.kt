@@ -198,16 +198,36 @@ fun SwipeableOutputBox(
 /**
  * Parses markdown formatting and converts to AnnotatedString for rich text display.
  * Supports: **bold**, *italic*, _italic_, ## Headers, - lists, * lists.
- * Kept private to this file or component to allow usage inside remember block without @Composable constraint.
+ *
+ * OPTIMIZATION: Uses line-by-line scanning with index pointers instead of String.split("\n")
+ * to avoid allocating a large List and many substrings.
  */
 private fun parseMarkdownToAnnotatedString(text: String, primaryColor: Color): AnnotatedString {
     return buildAnnotatedString {
-        val lines = text.split("\n")
+        val length = text.length
+        var index = 0
 
-        lines.forEachIndexed { lineIndex, line ->
+        while (index < length) {
+            // Find end of current line
+            var lineEnd = text.indexOf('\n', index)
+            if (lineEnd == -1) lineEnd = length
+
+            // Calculate start of content (skipping whitespace)
+            var contentStart = index
+            while (contentStart < lineEnd && text[contentStart].isWhitespace()) {
+                contentStart++
+            }
+
+            // If line is empty or just whitespace
+            if (contentStart == lineEnd) {
+                // Just append the content (which is empty) and the newline if needed
+            }
             // Check for header (## Header)
-            if (line.trimStart().startsWith("## ")) {
-                val headerText = line.trimStart().removePrefix("## ")
+            else if (text.startsWith("## ", contentStart)) {
+                // Extract content after "## "
+                val headerStart = contentStart + 3 // "## ".length
+                val headerText = if (headerStart < lineEnd) text.substring(headerStart, lineEnd) else ""
+
                 withStyle(
                     style = SpanStyle(
                         fontSize = 16.sp,
@@ -218,28 +238,40 @@ private fun parseMarkdownToAnnotatedString(text: String, primaryColor: Color): A
                     append(headerText)
                 }
             }
-            // Check for bullet list (- item, * item, or • item)
-            else if (line.trimStart().startsWith("- ") || line.trimStart().startsWith("* ")) {
-                val bulletText = line.trimStart().drop(2)
+            // Check for bullet list (- item, * item)
+            else if (text.startsWith("- ", contentStart) || text.startsWith("* ", contentStart)) {
+                val bulletContentStart = contentStart + 2 // "- ".length
+                val bulletText = if (bulletContentStart < lineEnd) text.substring(bulletContentStart, lineEnd) else ""
+
                 append("• ") // Convert to bullet
                 parseInlineFormatting(bulletText)
             }
             // Check for already-bulleted line (• U+2022)
-            else if (line.trimStart().startsWith("\u2022 ") || line.trimStart().startsWith("\u2022")) {
-                // Keep the bullet character and parse the rest
-                val trimmed = line.trimStart()
-                val bulletText = if (trimmed.length > 1 && trimmed[1] == ' ') trimmed.drop(2) else trimmed.drop(1)
+            else if (text.startsWith("\u2022", contentStart)) {
+                // Handle "• " (with space) or "•" (no space)
+                var bulletContentStart = contentStart + 1 // "•".length
+                if (bulletContentStart < lineEnd && text[bulletContentStart] == ' ') {
+                    bulletContentStart++
+                }
+
+                val bulletText = if (bulletContentStart < lineEnd) text.substring(bulletContentStart, lineEnd) else ""
                 append("• ")
                 parseInlineFormatting(bulletText)
             }
             else {
-                // Parse inline formatting (bold, italic)
-                parseInlineFormatting(line)
+                // Normal line - parse inline formatting for the whole line content
+                // We use substring here because parseInlineFormatting expects a String
+                // Future optimization: make parseInlineFormatting accept (CharSequence, start, end)
+                val lineContent = text.substring(index, lineEnd)
+                parseInlineFormatting(lineContent)
             }
 
-            // Add newline except for last line
-            if (lineIndex < lines.size - 1) {
+            // Move to next line
+            if (lineEnd < length) {
                 append("\n")
+                index = lineEnd + 1
+            } else {
+                index = length
             }
         }
     }
