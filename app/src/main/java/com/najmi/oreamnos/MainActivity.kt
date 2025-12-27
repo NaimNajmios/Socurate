@@ -142,6 +142,7 @@ import com.najmi.oreamnos.ui.components.SwipeableOutputBox
 import com.najmi.oreamnos.ui.components.AnimatedCheckmark
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
 import com.najmi.oreamnos.ui.components.FluidRefinementFlow
+import com.najmi.oreamnos.ui.components.InputClearButton
 import com.najmi.oreamnos.viewmodel.MainViewModel
 
 // File-level regex patterns for use in composables
@@ -855,7 +856,7 @@ fun MainScreen(
             }
             
             // Empty State
-            AnimatedVisibility(visible = !hasResult && !isLoading && error == null, enter = fadeIn(), exit = fadeOut()) {
+            AnimatedVisibility(visible = !hasResult && !isLoading && error == null && inputText.isBlank(), enter = fadeIn(), exit = fadeOut()) {
                 EmptyStateCard(
                     onPaste = {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -863,7 +864,10 @@ fun MainScreen(
                             val text = clipboard.primaryClip?.getItemAt(0)?.text
                             if (text != null) {
                                 inputText = text.toString()
+                                Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
                             }
+                        } else {
+                            Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
                         }
                     }
                 )
@@ -918,9 +922,9 @@ fun InputCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Clear Button
                 if (inputText.isNotEmpty()) {
-                    TextButton(onClick = { onInputChange("") }) {
-                        Text("CLEAR", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.error)
-                    }
+                    InputClearButton(
+                        onClear = { onInputChange("") }
+                    )
                     Spacer(Modifier.width(8.dp))
                 }
                 
