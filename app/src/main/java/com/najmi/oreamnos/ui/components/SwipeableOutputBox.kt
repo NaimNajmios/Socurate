@@ -26,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -89,7 +88,7 @@ fun SwipeableOutputBox(
                 .alpha(if (offsetX > 0) (offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f)
         ) {
             val isActive = offsetX > swipeThreshold
-            val scale by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "share_scale")
+            val scaleState = animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "share_scale")
             val color by animateColorAsState(
                 if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 label = "share_color"
@@ -101,7 +100,10 @@ fun SwipeableOutputBox(
                 tint = color,
                 modifier = Modifier
                     .size(32.dp)
-                    .scale(scale)
+                    .graphicsLayer {
+                        scaleX = scaleState.value
+                        scaleY = scaleState.value
+                    }
             )
         }
 
@@ -113,7 +115,7 @@ fun SwipeableOutputBox(
                 .alpha(if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f)
         ) {
             val isActive = offsetX < -swipeThreshold
-            val scale by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
+            val scaleState = animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
             val color by animateColorAsState(
                 if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 label = "copy_color"
@@ -125,7 +127,10 @@ fun SwipeableOutputBox(
                 tint = color,
                 modifier = Modifier
                     .size(32.dp)
-                    .scale(scale)
+                    .graphicsLayer {
+                        scaleX = scaleState.value
+                        scaleY = scaleState.value
+                    }
             )
         }
 
