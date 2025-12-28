@@ -211,26 +211,26 @@ class PromptManager {
     fun isLongTechnicalContent(text: String?): Boolean {
         if (text == null || text.length < 2000) return false
 
-        // Convert to lowercase for keyword matching
-        val lowerText = text.lowercase()
+        var keywordCount = 0
+        for (keyword in TACTICAL_KEYWORDS) {
+            // Check directly with ignoreCase = true to avoid allocating .lowercase() string
+            if (text.contains(keyword, ignoreCase = true)) {
+                keywordCount++
+                // Early exit if we found enough keywords
+                if (keywordCount >= 5) return true
+            }
+        }
 
-        // Count tactical keywords
-        val tacticalKeywords = arrayOf(
+        return false
+    }
+
+    private companion object {
+        val TACTICAL_KEYWORDS = arrayOf(
             "formation", "tactical", "pressing", "possession", "xg", "expected goals",
             "pass completion", "progressive passes", "defensive line", "build-up",
             "counter-attack", "high press", "low block", "transition", "shape",
             "midfielder", "forward", "defender", "fullback", "winger",
             "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2", "3-4-3"
         )
-
-        var keywordCount = 0
-        for (keyword in tacticalKeywords) {
-            if (lowerText.contains(keyword)) {
-                keywordCount++
-            }
-        }
-
-        // If it has 5+ tactical keywords and is long, it's technical
-        return keywordCount >= 5
     }
 }
