@@ -116,8 +116,9 @@ fun ReadingModeDialog(
                         .verticalScroll(rememberScrollState())
                 ) {
                     androidx.compose.foundation.text.selection.SelectionContainer {
+                        val primaryColor = MaterialTheme.colorScheme.primary
                         com.najmi.oreamnos.ui.components.TypewriterText(
-                            text = com.najmi.oreamnos.utils.MarkdownUtils.parseMarkdownToAnnotatedString(outputText),
+                            text = com.najmi.oreamnos.utils.MarkdownUtils.parseMarkdownToAnnotatedString(outputText, primaryColor),
                             modifier = Modifier.fillMaxWidth(),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontSize = textSize.sp,
