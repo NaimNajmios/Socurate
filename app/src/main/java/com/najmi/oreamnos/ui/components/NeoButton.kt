@@ -23,8 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -48,7 +48,7 @@ fun NeoButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val scale by animateFloatAsState(
+    val scaleState = animateFloatAsState(
         targetValue = if (isPressed) 0.95f else 1f,
         animationSpec = tween(durationMillis = 100),
         label = "buttonScale"
@@ -59,7 +59,11 @@ fun NeoButton(
             haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
             onClick()
         },
-        modifier = modifier.scale(scale),
+        // OPTIMIZATION: Use graphicsLayer to avoid recomposition during animation
+        modifier = modifier.graphicsLayer {
+            scaleX = scaleState.value
+            scaleY = scaleState.value
+        },
         enabled = enabled && !isLoading,
         shape = RoundedCornerShape(0.dp), // Sharp corners
         colors = ButtonDefaults.buttonColors(
@@ -106,7 +110,7 @@ fun NeoOutlinedButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val scale by animateFloatAsState(
+    val scaleState = animateFloatAsState(
         targetValue = if (isPressed) 0.95f else 1f,
         animationSpec = tween(durationMillis = 100),
         label = "buttonScale"
@@ -117,7 +121,11 @@ fun NeoOutlinedButton(
             haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
             onClick()
         },
-        modifier = modifier.scale(scale),
+        // OPTIMIZATION: Use graphicsLayer to avoid recomposition during animation
+        modifier = modifier.graphicsLayer {
+            scaleX = scaleState.value
+            scaleY = scaleState.value
+        },
         enabled = enabled,
         shape = RoundedCornerShape(0.dp),
         border = BorderStroke(2.dp, contentColor),

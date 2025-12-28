@@ -17,8 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -63,7 +63,7 @@ fun NeoChip(
     // Interaction State for Tactile Feedback
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
+    val scaleState = animateFloatAsState(
         targetValue = if (isPressed) 0.95f else 1f,
         animationSpec = scaleSpec,
         label = "scale"
@@ -73,7 +73,11 @@ fun NeoChip(
 
     Surface(
         modifier = modifier
-            .scale(scale)
+            // OPTIMIZATION: Use graphicsLayer to avoid recomposition during animation
+            .graphicsLayer {
+                scaleX = scaleState.value
+                scaleY = scaleState.value
+            }
             .combinedClickable(
                 interactionSource = interactionSource,
                 indication = null, // We handle visual feedback via scale/color
