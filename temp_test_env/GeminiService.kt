@@ -87,55 +87,50 @@ class GeminiService(
                     .build()
 
                 val connectionStart = System.currentTimeMillis()
+                val response = client.newCall(request).execute()
+                val connectionEnd = System.currentTimeMillis()
 
-                // Execute request and use 'use' block to ensure response is closed
-                client.newCall(request).execute().use { response ->
-                    val connectionEnd = System.currentTimeMillis()
-                    val code = response.code
-                    Log.i(TAG, "[$requestId] Response code: $code (time: ${connectionEnd - connectionStart}ms) on attempt $attempt")
+                val code = response.code
+                Log.i(TAG, "[$requestId] Response code: $code (time: ${connectionEnd - connectionStart}ms) on attempt $attempt")
 
-                    if (code >= 400) {
-                        val errorBody = response.body?.string() ?: ""
+                if (code >= 400) {
+                    val errorBody = response.body?.string() ?: ""
+                    response.close()
 
-                        // Check if transient error (retry)
-                        if (code == 503 || code == 429 || code in 500..599) {
-                            val errorType = if (code == 429) "Rate limit (quota)" else "Server error"
-                            Log.w(TAG, "[$requestId] $errorType $code - will retry (attempt $attempt)")
+                    // Check if transient error (retry)
+                    if (code == 503 || code == 429 || code in 500..599) {
+                        val errorType = if (code == 429) "Rate limit (quota)" else "Server error"
+                        Log.w(TAG, "[$requestId] $errorType $code - will retry (attempt $attempt)")
 
-                            // For 429, parse retry delay from API response
-                            var apiSuggestedDelay: Long = 0
-                            if (code == 429) {
-                                apiSuggestedDelay = parseRetryDelay(errorBody, requestId)
-                                if (apiSuggestedDelay > 0) {
-                                    Log.i(TAG, "[$requestId] API requests wait of ${apiSuggestedDelay}ms")
-                                } else {
-                                    Log.w(TAG, "[$requestId] Could not parse retry delay, using default backoff")
-                                }
+                        // For 429, parse retry delay from API response
+                        var apiSuggestedDelay: Long = 0
+                        if (code == 429) {
+                            apiSuggestedDelay = parseRetryDelay(errorBody, requestId)
+                            if (apiSuggestedDelay > 0) {
+                                Log.i(TAG, "[$requestId] API requests wait of ${apiSuggestedDelay}ms")
+                            } else {
+                                Log.w(TAG, "[$requestId] Could not parse retry delay, using default backoff")
                             }
-
-                            lastException = RateLimitException(
-                                "Gemini ${errorType.lowercase()}: $code. $errorBody",
-                                apiSuggestedDelay,
-                                "gemini"
-                            )
-                        } else {
-                            // Permanent error
-                            Log.e(TAG, "[$requestId] Permanent error: $code - $errorBody")
-                            throw Exception("Gemini API error: $code. $errorBody")
                         }
-                    } else {
-                        // Success
-                        rawResult = response.body?.string()
-                        Log.d(TAG, "[$requestId] Raw response length: ${rawResult?.length ?: 0}")
-                        lastException = null
-                    }
-                } // Response is automatically closed here
 
-                // Break if success
-                if (rawResult != null) {
+                        lastException = RateLimitException(
+                            "Gemini ${errorType.lowercase()}: $code. $errorBody",
+                            apiSuggestedDelay,
+                            "gemini"
+                        )
+                    } else {
+                        // Permanent error
+                        Log.e(TAG, "[$requestId] Permanent error: $code - $errorBody")
+                        throw Exception("Gemini API error: $code. $errorBody")
+                    }
+                } else {
+                    // Success
+                    rawResult = response.body?.string()
+                    response.close()
+                    Log.d(TAG, "[$requestId] Raw response length: ${rawResult?.length ?: 0}")
+                    lastException = null
                     break
                 }
-
             } catch (ioe: IOException) {
                 Log.w(TAG, "[$requestId] Network error on attempt $attempt: ${ioe.message}")
                 lastException = ioe
@@ -222,17 +217,18 @@ class GeminiService(
                 .addHeader("Content-Type", "application/json")
                 .build()
 
-            // Use 'use' to ensure response closure
-            client.newCall(request).execute().use { response ->
-                val code = response.code
+            val response = client.newCall(request).execute()
+            val code = response.code
 
-                if (code >= 400) {
-                    val errorBody = response.body?.string() ?: ""
-                    throw Exception("Gemini API error: $code. $errorBody")
-                }
-
-                response.body?.string()
+            if (code >= 400) {
+                val errorBody = response.body?.string() ?: ""
+                response.close()
+                throw Exception("Gemini API error: $code. $errorBody")
             }
+
+            val result = response.body?.string()
+            response.close()
+            result
         } catch (ioe: IOException) {
             throw Exception("Network error: ${ioe.message}", ioe)
         }
