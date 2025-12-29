@@ -143,7 +143,9 @@ import com.najmi.oreamnos.ui.components.AnimatedCheckmark
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
 import com.najmi.oreamnos.ui.components.FluidRefinementFlow
 import com.najmi.oreamnos.ui.components.InputClearButton
+import com.najmi.oreamnos.ui.components.LinkPreviewSection
 import com.najmi.oreamnos.viewmodel.MainViewModel
+import androidx.compose.animation.animateContentSize
 
 // File-level regex patterns for use in composables
 private val SOURCE_CITATION_PATTERN = Regex("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$")
@@ -901,201 +903,93 @@ fun InputCard(
     NeoCard(
         modifier = Modifier.fillMaxWidth()
     ) {
-        NeoInput(
-            value = inputText,
-            onValueChange = onInputChange,
-            modifier = Modifier.fillMaxWidth(),
-            label = "SOURCE MATERIAL",
-            placeholder = "Paste article text or URL...",
-            minLines = 5,
-            maxLines = 10
-        )
-        
-        Spacer(Modifier.height(16.dp))
-        
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("PRESERVE STRUCTURE", style = MaterialTheme.typography.labelLarge)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Clear Button
-                if (inputText.isNotEmpty()) {
-                    InputClearButton(
-                        onClear = { onInputChange("") }
-                    )
-                    Spacer(Modifier.width(8.dp))
-                }
-                
-                Switch(
-                    checked = keepStructure, 
-                    onCheckedChange = onKeepStructureChange,
-                    colors = androidx.compose.material3.SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.primary,
-                        checkedTrackColor = MaterialTheme.colorScheme.surface,
-                        checkedBorderColor = MaterialTheme.colorScheme.primary,
-                        uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.surface,
-                        uncheckedBorderColor = MaterialTheme.colorScheme.outline
-                    )
-                )
-            }
-        }
-        
-        // Link Preview Section (just below preserve structure)
-        if (linkPreviewData != null) {
-            Spacer(Modifier.height(16.dp))
-            androidx.compose.material3.Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-            Spacer(Modifier.height(16.dp))
-            
-            // Link preview content
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Content row with icon and text
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = linkPreviewData.domain.take(1).uppercase(),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = linkPreviewData.title ?: "Link",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            lineHeight = 20.sp
-                        )
-                        Text(
-                            text = linkPreviewData.domain,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                
-                // Action buttons row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    NeoButton(
-                        onClick = { onExtractContent(linkPreviewData.originalUrl) },
-                        text = "EXTRACT",
-                        modifier = Modifier.weight(1f),
-                        enabled = true
-                    )
-                    IconButton(
-                        onClick = onDismissPreview,
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(Icons.Default.Close, "Dismiss", modifier = Modifier.size(20.dp))
-                    }
-                }
-            }
-        } else if (isLoadingPreview) {
-            Spacer(Modifier.height(16.dp))
-            androidx.compose.material3.Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-            Spacer(Modifier.height(16.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
-                Text("Loading preview...", style = MaterialTheme.typography.bodyMedium)
-            }
-        }
-    }
-}
-
-@Composable
-fun LinkPreviewCard(
-    metadata: WebContentExtractor.UrlMetadata,
-    isLoading: Boolean,
-    onExtract: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    NeoCard(modifier = Modifier.fillMaxWidth()) {
+        // Animate content size change when preview appears
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
         ) {
-            // Content row with icon and text
+            NeoInput(
+                value = inputText,
+                onValueChange = onInputChange,
+                modifier = Modifier.fillMaxWidth(),
+                label = "SOURCE MATERIAL",
+                placeholder = "Paste article text or URL...",
+                minLines = 5,
+                maxLines = 10
+            )
+
+            Spacer(Modifier.height(16.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = metadata.domain.take(1).uppercase(),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = metadata.title ?: "Link",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        lineHeight = 20.sp
-                    )
-                    Text(
-                        text = metadata.domain,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                Text("PRESERVE STRUCTURE", style = MaterialTheme.typography.labelLarge)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Clear Button
+                    if (inputText.isNotEmpty()) {
+                        InputClearButton(
+                            onClear = { onInputChange("") }
+                        )
+                        Spacer(Modifier.width(8.dp))
+                    }
+
+                    Switch(
+                        checked = keepStructure,
+                        onCheckedChange = onKeepStructureChange,
+                        colors = androidx.compose.material3.SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.primary,
+                            checkedTrackColor = MaterialTheme.colorScheme.surface,
+                            checkedBorderColor = MaterialTheme.colorScheme.primary,
+                            uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                            uncheckedTrackColor = MaterialTheme.colorScheme.surface,
+                            uncheckedBorderColor = MaterialTheme.colorScheme.outline
+                        )
                     )
                 }
             }
-            
-            // Action buttons row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+
+            // Animated Link Preview Section
+            AnimatedVisibility(
+                visible = linkPreviewData != null,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
             ) {
-                NeoButton(
-                    onClick = onExtract,
-                    text = "EXTRACT",
-                    modifier = Modifier.weight(1f),
-                    enabled = !isLoading
-                )
-                IconButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(Icons.Default.Close, "Dismiss", modifier = Modifier.size(20.dp))
+                if (linkPreviewData != null) {
+                    LinkPreviewSection(
+                        linkPreviewData = linkPreviewData,
+                        onExtract = { onExtractContent(linkPreviewData.originalUrl) },
+                        onDismiss = onDismissPreview
+                    )
+                }
+            }
+
+            // Animated Loading State
+            AnimatedVisibility(
+                visible = isLoadingPreview,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column {
+                    Spacer(Modifier.height(16.dp))
+                    androidx.compose.material3.Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                    Spacer(Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        Text("Loading preview...", style = MaterialTheme.typography.bodyMedium)
+                    }
                 }
             }
         }
