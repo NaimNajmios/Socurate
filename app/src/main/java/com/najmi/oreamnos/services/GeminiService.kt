@@ -68,7 +68,7 @@ class GeminiService(
         Log.d(TAG, "[$requestId] Request body length: ${requestBodyString.length}")
 
         // Retry loop
-        var rawResult: String? = null
+        var responseJson: JsonObject? = null
         var lastException: Exception? = null
         val rnd = Random()
 
@@ -122,10 +122,21 @@ class GeminiService(
                         throw Exception("Gemini API error: $code. $errorBody")
                     }
                 } else {
-                    // Success
-                    rawResult = response.body?.string()
-                    response.close()
-                    Log.d(TAG, "[$requestId] Raw response length: ${rawResult?.length ?: 0}")
+                    // Success: Stream parse JSON directly to avoid large String allocation
+                    try {
+                        responseJson = gson.fromJson(response.body?.charStream(), JsonObject::class.java)
+                        Log.d(TAG, "[$requestId] Response parsed successfully via stream")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "[$requestId] Error parsing JSON stream", e)
+                        // If it's an IOException (network interruption during stream), rethrow to trigger retry
+                        if (e is IOException || (e.cause is IOException)) {
+                            throw if (e is IOException) e else (e.cause as IOException)
+                        }
+                        // Otherwise it's a parse error (bad server response), stop retrying
+                        throw e
+                    } finally {
+                        response.close()
+                    }
                     lastException = null
                     break
                 }
@@ -148,7 +159,7 @@ class GeminiService(
         }
 
         // Check if we got a result
-        if (rawResult == null) {
+        if (responseJson == null) {
             val totalTime = System.currentTimeMillis() - startTime
             Log.i(TAG, "[$requestId] API exhausted retries after ${totalTime}ms")
 
@@ -162,9 +173,9 @@ class GeminiService(
             }
         }
 
-        // Parse response
+        // Process response
         return try {
-            val root = gson.fromJson(rawResult, JsonObject::class.java)
+            val root = responseJson
             var curatedText = extractTextFromJson(root)
 
             if (curatedText.isNullOrBlank()) {
@@ -177,7 +188,7 @@ class GeminiService(
                 }
             }
 
-            extractUsageMetadata(root)
+            extractUsageMetadata(root!!)
 
             val totalTime = System.currentTimeMillis() - startTime
             Log.i(TAG, "[$requestId] Success! Output: ${curatedText.length} chars (total time: ${totalTime}ms)")
@@ -206,7 +217,7 @@ class GeminiService(
         val requestJson = buildRequestJson(prompt)
         val requestBodyString = gson.toJson(requestJson)
 
-        val rawResult = try {
+        val responseJson: JsonObject? = try {
             val urlWithKey = "$endpoint?key=$apiKey"
             val body = requestBodyString.toRequestBody(JSON)
             val request = Request.Builder()
@@ -224,15 +235,22 @@ class GeminiService(
                 throw Exception("Gemini API error: $code. $errorBody")
             }
 
-            val result = response.body?.string()
-            response.close()
-            result
+            val root: JsonObject? = try {
+                gson.fromJson(response.body?.charStream(), JsonObject::class.java)
+            } catch (e: Exception) {
+                Log.e(TAG, "[$requestId] Error parsing JSON stream", e)
+                if (e is IOException) throw e
+                null // Return null on parse error to trigger fallback later
+            } finally {
+                response.close()
+            }
+            root
         } catch (ioe: IOException) {
             throw Exception("Network error: ${ioe.message}", ioe)
         }
 
         return try {
-            val root = gson.fromJson(rawResult, JsonObject::class.java)
+            val root = responseJson
             var refinedText = extractTextFromJson(root)
 
             if (refinedText.isNullOrBlank()) {
@@ -245,7 +263,9 @@ class GeminiService(
             }
 
             // Extract token usage for stats tracking
-            extractUsageMetadata(root)
+            if (root != null) {
+                extractUsageMetadata(root)
+            }
 
             val totalTime = System.currentTimeMillis() - startTime
             Log.i(TAG, "[$requestId] Refinement success! (time: ${totalTime}ms)")
