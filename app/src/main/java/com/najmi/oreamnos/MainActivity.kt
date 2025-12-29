@@ -378,6 +378,10 @@ fun MainScreen(
     var previousInput by remember { mutableStateOf(initialSharedText ?: "") }
     var triggerShakeAnimation by remember { mutableStateOf(false) }
 
+    // Input validation state
+    var isInputError by remember { mutableStateOf(false) }
+    var triggerInputShake by remember { mutableStateOf(false) }
+
     
     // Load custom pills
     LaunchedEffect(Unit) {
@@ -546,6 +550,14 @@ fun MainScreen(
             triggerShakeAnimation = false
         }
     }
+
+    // Reset input shake animation after it triggers
+    LaunchedEffect(triggerInputShake) {
+        if (triggerInputShake) {
+            kotlinx.coroutines.delay(500)
+            triggerInputShake = false
+        }
+    }
     
     // Success animation timeout
     LaunchedEffect(showSuccessAnimation) {
@@ -680,7 +692,9 @@ fun MainScreen(
                         onClick = {
                             inputHasChanged = false // Stop pulsing when clicked
                             if (inputText.isBlank()) {
-                                Toast.makeText(context, R.string.input_required, Toast.LENGTH_SHORT).show()
+                                isInputError = true
+                                triggerInputShake = true
+                                HapticHelper(context).onError()
                             } else if (!prefsManager.hasApiKey()) {
                                 Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
                                 onNavigateToSettings()
@@ -725,28 +739,52 @@ fun MainScreen(
             )
 
             // Input Card
-            InputCard(
-                inputText = inputText,
-                onInputChange = { inputText = it },
-                keepStructure = keepStructure,
-                onKeepStructureChange = { keepStructure = it },
-                linkPreviewData = linkPreviewData,
-                isLoadingPreview = isLoadingPreview,
-                onExtractContent = { url ->
-                    kotlinx.coroutines.MainScope().launch {
-                        try {
-                            val extractor = WebContentExtractor()
-                            val extractedContent = withContext(Dispatchers.IO) {
-                                extractor.extractContent(url)
-                            }
-                            inputText = extractedContent
-                        } catch (e: Exception) {
-                            error = "Failed to extract content: ${e.message}"
-                        }
-                    }
+            val inputShakeOffset by animateFloatAsState(
+                targetValue = if (triggerInputShake) 1f else 0f,
+                animationSpec = if (triggerInputShake) {
+                    spring(
+                        dampingRatio = Spring.DampingRatioHighBouncy,
+                        stiffness = Spring.StiffnessHigh
+                    )
+                } else {
+                    tween(0)
                 },
-                onDismissPreview = { linkPreviewData = null }
+                label = "inputShake"
             )
+
+            Box(
+                modifier = Modifier.graphicsLayer {
+                    translationX = kotlin.math.sin(inputShakeOffset * 8 * kotlin.math.PI.toFloat()) * 10f
+                }
+            ) {
+                InputCard(
+                    inputText = inputText,
+                    onInputChange = {
+                        inputText = it
+                        if (isInputError) isInputError = false
+                    },
+                    keepStructure = keepStructure,
+                    onKeepStructureChange = { keepStructure = it },
+                    linkPreviewData = linkPreviewData,
+                    isLoadingPreview = isLoadingPreview,
+                    onExtractContent = { url ->
+                        kotlinx.coroutines.MainScope().launch {
+                            try {
+                                val extractor = WebContentExtractor()
+                                val extractedContent = withContext(Dispatchers.IO) {
+                                    extractor.extractContent(url)
+                                }
+                                inputText = extractedContent
+                                if (isInputError) isInputError = false
+                            } catch (e: Exception) {
+                                error = "Failed to extract content: ${e.message}"
+                            }
+                        }
+                    },
+                    onDismissPreview = { linkPreviewData = null },
+                    isError = isInputError
+                )
+            }
             
             // Loading State
             AnimatedVisibility(visible = isLoading, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
@@ -898,10 +936,12 @@ fun InputCard(
     linkPreviewData: WebContentExtractor.UrlMetadata?,
     isLoadingPreview: Boolean,
     onExtractContent: (String) -> Unit,
-    onDismissPreview: () -> Unit
+    onDismissPreview: () -> Unit,
+    isError: Boolean = false
 ) {
     NeoCard(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        borderColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
     ) {
         // Animate content size change when preview appears
         Column(
@@ -921,7 +961,8 @@ fun InputCard(
                 label = "SOURCE MATERIAL",
                 placeholder = "Paste article text or URL...",
                 minLines = 5,
-                maxLines = 10
+                maxLines = 10,
+                isError = isError
             )
 
             Spacer(Modifier.height(16.dp))
