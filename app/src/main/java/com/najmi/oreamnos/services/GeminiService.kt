@@ -215,18 +215,16 @@ class GeminiService(
                 .addHeader("Content-Type", "application/json")
                 .build()
 
-            val response = sharedClient.newCall(request).execute()
-            val code = response.code
+            sharedClient.newCall(request).execute().use { response ->
+                val code = response.code
 
-            if (code >= 400) {
-                val errorBody = response.body?.string() ?: ""
-                response.close()
-                throw Exception("Gemini API error: $code. $errorBody")
+                if (code >= 400) {
+                    val errorBody = response.body?.string() ?: ""
+                    throw Exception("Gemini API error: $code. $errorBody")
+                }
+
+                response.body?.string()
             }
-
-            val result = response.body?.string()
-            response.close()
-            result
         } catch (ioe: IOException) {
             throw Exception("Network error: ${ioe.message}", ioe)
         }
@@ -411,9 +409,7 @@ class GeminiService(
         cleaned = HORIZONTAL_RULE_PATTERN.matcher(cleaned).replaceAll("")
 
         // Remove unwanted explanatory phrases
-        for (phrase in UNWANTED_PHRASES) {
-            cleaned = cleaned.replace(phrase, "")
-        }
+        cleaned = UNWANTED_PHRASES_PATTERN.matcher(cleaned).replaceAll("")
 
         // Normalize bullet points to use • character
         cleaned = BULLET_POINT_PATTERN.matcher(cleaned).replaceAll("$1•$2")
@@ -535,6 +531,14 @@ class GeminiService(
             "Tukar perkataan",
             "Semoga ini"
         )
+
+        // Compiled regex for unwanted phrases (sorted by length desc to prioritize longer matches)
+        private val UNWANTED_PHRASES_PATTERN: Pattern by lazy {
+            val patternString = UNWANTED_PHRASES
+                .sortedByDescending { it.length }
+                .joinToString("|") { Pattern.quote(it) }
+            Pattern.compile(patternString, Pattern.CASE_INSENSITIVE)
+        }
 
         // Retry configuration
         private const val MAX_RETRIES = 4
