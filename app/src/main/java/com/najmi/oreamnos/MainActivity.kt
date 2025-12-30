@@ -142,8 +142,9 @@ import com.najmi.oreamnos.ui.components.SwipeableOutputBox
 import com.najmi.oreamnos.ui.components.AnimatedCheckmark
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
 import com.najmi.oreamnos.ui.components.FluidRefinementFlow
-import com.najmi.oreamnos.ui.components.InputClearButton
 import com.najmi.oreamnos.ui.components.LinkPreviewSection
+import com.najmi.oreamnos.ui.components.PasteAction
+import com.najmi.oreamnos.ui.components.ClearAction
 import com.najmi.oreamnos.viewmodel.MainViewModel
 import androidx.compose.animation.animateContentSize
 
@@ -927,6 +928,7 @@ fun MainScreen(
     }
 }
 
+@OptIn(androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 fun InputCard(
     inputText: String,
@@ -939,6 +941,8 @@ fun InputCard(
     onDismissPreview: () -> Unit,
     isError: Boolean = false
 ) {
+    val context = LocalContext.current
+
     NeoCard(
         modifier = Modifier.fillMaxWidth(),
         borderColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
@@ -962,7 +966,33 @@ fun InputCard(
                 placeholder = "Paste article text or URL...",
                 minLines = 5,
                 maxLines = 10,
-                isError = isError
+                isError = isError,
+                trailingIcon = {
+                    androidx.compose.animation.AnimatedContent(
+                        targetState = inputText.isNotEmpty(),
+                        transitionSpec = {
+                            (scaleIn() + fadeIn()) with (scaleOut() + fadeOut())
+                        },
+                        label = "input_action"
+                    ) { hasText ->
+                        if (hasText) {
+                            ClearAction(onClear = { onInputChange("") })
+                        } else {
+                            PasteAction(onPaste = {
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                if (clipboard.hasPrimaryClip()) {
+                                    val text = clipboard.primaryClip?.getItemAt(0)?.text
+                                    if (text != null) {
+                                        onInputChange(text.toString())
+                                        Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
+                                    }
+                                } else {
+                                    Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                        }
+                    }
+                }
             )
 
             Spacer(Modifier.height(16.dp))
@@ -973,28 +1003,19 @@ fun InputCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("PRESERVE STRUCTURE", style = MaterialTheme.typography.labelLarge)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Clear Button
-                    if (inputText.isNotEmpty()) {
-                        InputClearButton(
-                            onClear = { onInputChange("") }
-                        )
-                        Spacer(Modifier.width(8.dp))
-                    }
 
-                    Switch(
-                        checked = keepStructure,
-                        onCheckedChange = onKeepStructureChange,
-                        colors = androidx.compose.material3.SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.primary,
-                            checkedTrackColor = MaterialTheme.colorScheme.surface,
-                            checkedBorderColor = MaterialTheme.colorScheme.primary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.surface,
-                            uncheckedBorderColor = MaterialTheme.colorScheme.outline
-                        )
+                Switch(
+                    checked = keepStructure,
+                    onCheckedChange = onKeepStructureChange,
+                    colors = androidx.compose.material3.SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.surface,
+                        checkedBorderColor = MaterialTheme.colorScheme.primary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.surface,
+                        uncheckedBorderColor = MaterialTheme.colorScheme.outline
                     )
-                }
+                )
             }
 
             // Animated Link Preview Section

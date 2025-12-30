@@ -1,0 +1,140 @@
+package com.najmi.oreamnos.ui.components
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.with
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.najmi.oreamnos.R
+import kotlinx.coroutines.delay
+
+/**
+ * Animated Paste Action Icon.
+ * Pulses gently to invite interaction when the input is empty.
+ */
+@Composable
+fun PasteAction(
+    onPaste: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val haptic = LocalHapticFeedback.current
+
+    // Pulse animation
+    val infiniteTransition = rememberInfiniteTransition(label = "paste_pulse")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "paste_scale"
+    )
+
+    IconButton(
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            onPaste()
+        },
+        modifier = modifier.scale(scale)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add, // Using Add as a "Add Content" metaphor
+            contentDescription = "Paste from clipboard",
+            tint = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+/**
+ * Fluid Clear Action Icon.
+ * Morphs from Close (X) to Delete (Trash) for confirmation.
+ */
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun ClearAction(
+    onClear: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var isConfirming by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
+
+    // Reset confirmation state after 3 seconds
+    LaunchedEffect(isConfirming) {
+        if (isConfirming) {
+            delay(3000)
+            isConfirming = false
+        }
+    }
+
+    val iconColor by animateColorAsState(
+        targetValue = if (isConfirming) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+        label = "clear_color"
+    )
+
+    IconButton(
+        onClick = {
+            if (isConfirming) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClear()
+                isConfirming = false
+            } else {
+                haptic.performHapticFeedback(HapticFeedbackType.ClockTick)
+                isConfirming = true
+            }
+        },
+        modifier = modifier
+    ) {
+        AnimatedContent(
+            targetState = isConfirming,
+            transitionSpec = {
+                (scaleIn() + fadeIn()) with (scaleOut() + fadeOut())
+            },
+            label = "clear_icon_morph"
+        ) { confirming ->
+            if (confirming) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Confirm clear",
+                    tint = iconColor
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Clear text",
+                    tint = iconColor
+                )
+            }
+        }
+    }
+}
