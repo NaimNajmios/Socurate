@@ -27,3 +27,31 @@ private class Deserializer : JsonDeserializer<GenerationPill> {
 }
 // Result: id is never null
 ```
+
+## 2024-05-23 - [Null Safety/Integration]
+
+**Context:** `OpenAICompatibleCurator.kt` handling of `HttpURLConnection` error streams.
+**Symptoms:** Potential `NullPointerException` when API returns an error but `errorStream` is null (which is valid according to Java docs).
+**Root Cause:** `InputStreamReader` constructor throws NPE if the input stream is null. `HttpURLConnection.getErrorStream()` returns null if no error data is available.
+**Fix Applied:** Introduced a `readStream` helper method that checks if the stream is null before creating the reader.
+**Prevention:** Always check if `getErrorStream()` returns null before reading from it. Use defensive helper methods for stream reading.
+**Tests Added:** Verified via manual analysis and reproduction script (`TestNPE.java`) confirming `InputStreamReader(null)` crashes.
+
+**Code Example (Before):**
+```kotlin
+// Read error response
+BufferedReader(InputStreamReader(conn.errorStream, StandardCharsets.UTF_8)).use { br ->
+    // ...
+}
+```
+
+**Code Example (After):**
+```kotlin
+// Read error response safely
+val errorResponse = readStream(conn.errorStream)
+
+private fun readStream(stream: java.io.InputStream?): String {
+    if (stream == null) return ""
+    // ... safe reading ...
+}
+```
