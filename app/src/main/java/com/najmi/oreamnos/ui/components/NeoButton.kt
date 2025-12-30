@@ -54,9 +54,18 @@ fun NeoButton(
         label = "buttonScale"
     )
 
+    // Neo-brutalist interaction: Darken on press for immediate visual feedback
+    // This creates a "heavy" mechanical feel without relying on soft ripples
+    val animatedContainerColor by androidx.compose.animation.animateColorAsState(
+        targetValue = if (isPressed) containerColor.copy(alpha = 0.8f) else containerColor,
+        animationSpec = tween(durationMillis = 50),
+        label = "buttonColor"
+    )
+
     Button(
         onClick = {
-            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+            // Lighter haptic feedback for snappy response (Standard click vs Long Press)
+            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
             onClick()
         },
         // OPTIMIZATION: Use graphicsLayer to avoid recomposition during animation
@@ -67,7 +76,7 @@ fun NeoButton(
         enabled = enabled && !isLoading,
         shape = RoundedCornerShape(0.dp), // Sharp corners
         colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
+            containerColor = animatedContainerColor,
             contentColor = contentColor,
             disabledContainerColor = containerColor.copy(alpha = 0.5f),
             disabledContentColor = contentColor.copy(alpha = 0.5f)
@@ -118,7 +127,7 @@ fun NeoOutlinedButton(
 
     OutlinedButton(
         onClick = {
-            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
             onClick()
         },
         // OPTIMIZATION: Use graphicsLayer to avoid recomposition during animation

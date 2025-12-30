@@ -69,7 +69,7 @@ fun NeoCopyButton(
     OutlinedButton(
         onClick = {
             if (!isCopied) {
-                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
                 onCopy()
                 isCopied = true
             }

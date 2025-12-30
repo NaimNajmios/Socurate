@@ -234,7 +234,7 @@ fun NeoAddButton(
 
     Surface(
         onClick = {
-            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
             onClick()
         },
         shape = RoundedCornerShape(0.dp),
