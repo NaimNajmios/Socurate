@@ -119,54 +119,53 @@ object ReadabilityUtils {
 
     /**
      * Counts syllables in a substring of a CharSequence (zero-allocation).
-     * Uses a heuristic based on vowel groups.
+     * Uses a single-pass heuristic based on vowel groups.
+     * Optimized to avoid iterating the string multiple times.
      */
     fun countSyllables(text: CharSequence, start: Int, end: Int): Int {
-        val length = end - start
-        if (length == 0) return 0
-
+        var count = 0
+        var inVowel = false
         var effectiveLength = 0
-        var lastAlphaIndex = -1
+        var lastAlphaChar = '\u0000'
+        var lastGroupStartedByThisChar = false
 
-        // Pass 1: Calculate effective length (alpha chars only) and find last alpha char
         for (i in start until end) {
             val c = text[i]
+            // Check alpha (ASCII only)
             if ((c in 'a'..'z') || (c in 'A'..'Z')) {
                 effectiveLength++
-                lastAlphaIndex = i
+                lastAlphaChar = c
+
+                // Fast lowercasing for ASCII
+                // 'A' is 65 (0x41), 'a' is 97 (0x61). Difference is 0x20.
+                val lowerC = (c.code or 0x20).toChar()
+
+                val isVowel = lowerC == 'a' || lowerC == 'e' || lowerC == 'i' ||
+                        lowerC == 'o' || lowerC == 'u' || lowerC == 'y'
+
+                if (isVowel) {
+                    if (!inVowel) {
+                        count++
+                        inVowel = true
+                        lastGroupStartedByThisChar = true
+                    } else {
+                        lastGroupStartedByThisChar = false
+                    }
+                } else {
+                    inVowel = false
+                    lastGroupStartedByThisChar = false
+                }
             }
         }
 
         if (effectiveLength == 0) return 0
         if (effectiveLength <= 3) return 1
 
-        // Check if the last alpha character is 'e' (silent e logic)
-        val lastChar = text[lastAlphaIndex]
-        val skipLast = lastChar == 'e' || lastChar == 'E'
-
-        var count = 0
-        var inVowel = false
-        var processedAlpha = 0
-        val limit = if (skipLast) effectiveLength - 1 else effectiveLength
-
-        for (i in start until end) {
-            val c = text[i]
-            if (processedAlpha >= limit) break
-
-            if ((c in 'a'..'z') || (c in 'A'..'Z')) {
-                val lowerC = c.lowercaseChar()
-                val isVowel = lowerC in "aeiouy"
-
-                if (isVowel) {
-                    if (!inVowel) {
-                        count++
-                        inVowel = true
-                    }
-                } else {
-                    inVowel = false
-                }
-                processedAlpha++
-            }
+        // Handle silent 'e'
+        // If last alpha is 'e', and it started its own vowel group (e.g., "ate", "rate"),
+        // then it is likely silent, so we decrement.
+        if ((lastAlphaChar == 'e' || lastAlphaChar == 'E') && lastGroupStartedByThisChar) {
+            count--
         }
 
         return max(1, count)

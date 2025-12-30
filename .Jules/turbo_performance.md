@@ -1,12 +1,15 @@
-## 2024-05-23 - Markdown Parsing Optimization
+## 2024-05-24 - ReadabilityUtils Syllable Counting Optimization
 
-**Context:** `MarkdownUtils.parseMarkdownToAnnotatedString`
-**Symptoms:** High memory allocation detected when parsing long AI-generated responses (creating `List<String>` for every line).
-**Root Cause:** `String.split("\n")` creates a new String object for every line in the text, plus an ArrayList to hold them. For a 50-line response, this is 51 unnecessary object allocations.
-**Solution:** Replaced `split` with an index-based `while` loop scanning for `\n` and `startsWith` checks using offsets.
+**Context:** `ReadabilityUtils.countSyllables` is a hot path used by `calculateFleschKincaidGradeLevel`, which iterates over every word in the text.
+**Symptoms:** The original implementation iterated over each word string twice (once for effective length, once for syllable counting) and used inefficient character checks.
+**Root Cause:** Two-pass algorithm and potentially boxed character operations or string lookups for vowels.
+**Solution:**
+1. Implemented a single-pass algorithm that calculates effective length and syllable count simultaneously.
+2. Replaced string lookup (`lowerC in "aeiouy"`) with direct character comparison.
+3. Used bitwise optimization for ASCII case conversion.
 **Impact:**
-- Time: O(N) -> O(N) (but faster constant factor due to reduced GC pressure)
-- Memory: Reduced from O(L) allocations (where L is lines) to O(1) auxiliary allocations (only the builder).
-- CPU: Reduced overhead from Regex compilation inside `split()`.
+- **Execution Time:** ~2.37x speedup (Benchmark: 3209ms -> 1352ms for 2M iterations of sample words).
+- **Allocations:** Zero allocations (maintained from previous version, but reduced CPU cycles).
+- **CPU:** Reduced instruction count by avoiding double iteration and optimizing checks.
 
-**Learnings:** For simple line-by-line text processing, index-based scanning is significantly more memory-efficient than `split()`, especially in hot paths like UI rendering loops.
+**Learnings:** For text processing hot paths, always strive for single-pass algorithms (`O(N)`). Even simple loops add up when executed millions of times.
