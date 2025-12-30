@@ -4,7 +4,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -26,17 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.R
@@ -65,10 +59,11 @@ fun SwipeableOutputBox(
     var isPastThreshold by remember { mutableStateOf(false) }
 
     // Animate offset back to 0 when released
+    // Changed to LowBouncy for a more rubber-band feel
     val animatedOffset by animateFloatAsState(
         targetValue = offsetX,
         animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
+            dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessMedium
         ),
         label = "swipe_offset"
@@ -85,24 +80,40 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(start = 24.dp)
-                .alpha(if (offsetX > 0) (offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f)
+                .alpha(if (offsetX > 0) (offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
+            contentAlignment = Alignment.Center
         ) {
             val isActive = offsetX > swipeThreshold
-            val scaleState = animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "share_scale")
-            val color by animateColorAsState(
-                if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                label = "share_color"
+            val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "share_scale")
+            val rotateState by animateFloatAsState(if (isActive) 15f else 0f, label = "share_rotate")
+            val iconColor by animateColorAsState(
+                if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                label = "share_icon_color"
+            )
+            val bgScale by animateFloatAsState(if (isActive) 1f else 0f, label = "share_bg_scale")
+
+            // Background Circle for visual pop
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .graphicsLayer {
+                        scaleX = bgScale
+                        scaleY = bgScale
+                    }
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
             )
 
             Icon(
                 painter = painterResource(R.drawable.ic_share),
                 contentDescription = "Share",
-                tint = color,
+                tint = iconColor,
                 modifier = Modifier
                     .size(32.dp)
                     .graphicsLayer {
-                        scaleX = scaleState.value
-                        scaleY = scaleState.value
+                        scaleX = scaleState
+                        scaleY = scaleState
+                        rotationZ = rotateState
                     }
             )
         }
@@ -112,24 +123,40 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(end = 24.dp)
-                .alpha(if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f)
+                .alpha(if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
+            contentAlignment = Alignment.Center
         ) {
             val isActive = offsetX < -swipeThreshold
-            val scaleState = animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
-            val color by animateColorAsState(
-                if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                label = "copy_color"
+            val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
+            val rotateState by animateFloatAsState(if (isActive) -15f else 0f, label = "copy_rotate")
+            val iconColor by animateColorAsState(
+                if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                label = "copy_icon_color"
+            )
+             val bgScale by animateFloatAsState(if (isActive) 1f else 0f, label = "copy_bg_scale")
+
+             // Background Circle for visual pop
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .graphicsLayer {
+                        scaleX = bgScale
+                        scaleY = bgScale
+                    }
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
             )
 
             Icon(
                 painter = painterResource(R.drawable.ic_copy),
                 contentDescription = "Copy",
-                tint = color,
+                tint = iconColor,
                 modifier = Modifier
                     .size(32.dp)
                     .graphicsLayer {
-                        scaleX = scaleState.value
-                        scaleY = scaleState.value
+                        scaleX = scaleState
+                        scaleY = scaleState
+                        rotationZ = rotateState
                     }
             )
         }
@@ -161,7 +188,7 @@ fun SwipeableOutputBox(
                         onDragEnd = {
                             if (abs(offsetX) > swipeThreshold) {
                                 // Trigger action
-                                hapticHelper.onCopy() // Success haptic
+                                hapticHelper.onCopy() // Success haptic (works for both copy and share as a success indicator)
                                 if (offsetX > 0) onShare() else onCopy()
                             }
                             // Reset
@@ -199,4 +226,3 @@ fun SwipeableOutputBox(
         }
     }
 }
-
