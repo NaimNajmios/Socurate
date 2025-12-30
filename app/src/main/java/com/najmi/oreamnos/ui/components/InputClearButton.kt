@@ -52,7 +52,7 @@ fun InputClearButton(
                 onClear()
                 isConfirming = false
             } else {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 isConfirming = true
             }
         },

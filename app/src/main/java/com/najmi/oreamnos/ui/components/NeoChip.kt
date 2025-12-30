@@ -82,7 +82,7 @@ fun NeoChip(
                 interactionSource = interactionSource,
                 indication = null, // We handle visual feedback via scale/color
                 onClick = {
-                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
                     onClick()
                 },
                 onLongClick = onLongClick?.let {
