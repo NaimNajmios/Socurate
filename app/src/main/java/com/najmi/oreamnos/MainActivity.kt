@@ -83,6 +83,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -145,6 +147,7 @@ import com.najmi.oreamnos.ui.components.FluidRefinementFlow
 import com.najmi.oreamnos.ui.components.LinkPreviewSection
 import com.najmi.oreamnos.ui.components.PasteAction
 import com.najmi.oreamnos.ui.components.ClearAction
+import com.najmi.oreamnos.ui.components.NeoSnackbar
 import com.najmi.oreamnos.viewmodel.MainViewModel
 import androidx.compose.animation.animateContentSize
 
@@ -326,6 +329,15 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Helper for showing consistent feedback
+    val showFeedback: (String) -> Unit = { message ->
+        scope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar(message)
+        }
+    }
     
     // State
     var inputText by remember { mutableStateOf(initialSharedText ?: "") }
@@ -617,7 +629,7 @@ fun MainScreen(
                 customPills.clear()
                 customPills.addAll(prefsManager.getPills())
                 showCreatePillDialog = false
-                Toast.makeText(context, "Custom refinement created", Toast.LENGTH_SHORT).show()
+                showFeedback("Custom refinement created")
             }
         )
     }
@@ -637,7 +649,7 @@ fun MainScreen(
                 customPills.addAll(prefsManager.getPills())
                 showEditPillDialog = false
                 pillToEdit = null
-                Toast.makeText(context, "Custom refinement updated", Toast.LENGTH_SHORT).show()
+                showFeedback("Custom refinement updated")
             },
             onDelete = {
                 prefsManager.deletePill(pillToEdit!!.id)
@@ -649,13 +661,14 @@ fun MainScreen(
                 }
                 showEditPillDialog = false
                 pillToEdit = null
-                Toast.makeText(context, "Custom refinement deleted", Toast.LENGTH_SHORT).show()
+                showFeedback("Custom refinement deleted")
             }
         )
     }
     
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(snackbarHostState) { data -> NeoSnackbar(data) } },
         bottomBar = {
             // Neo Bottom Bar
             Surface(
@@ -697,7 +710,7 @@ fun MainScreen(
                                 triggerInputShake = true
                                 HapticHelper(context).onError()
                             } else if (!prefsManager.hasApiKey()) {
-                                Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
+                                showFeedback(context.getString(R.string.api_key_required))
                                 onNavigateToSettings()
                             } else {
                                 isLoading = true
@@ -783,7 +796,8 @@ fun MainScreen(
                         }
                     },
                     onDismissPreview = { linkPreviewData = null },
-                    isError = isInputError
+                    isError = isInputError,
+                    onShowFeedback = showFeedback
                 )
             }
             
@@ -848,7 +862,7 @@ fun MainScreen(
                         onCopyClick = {
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             clipboard.setPrimaryClip(ClipData.newPlainText("Socurate Post", outputText))
-                            Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
+                            showFeedback(context.getString(R.string.copied_to_clipboard))
                         },
                         onShareClick = {
                             val intent = Intent(Intent.ACTION_SEND).apply {
@@ -878,7 +892,7 @@ fun MainScreen(
                             val allRefinements = refinementOptions.toList() + 
                                 customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
                             if (allRefinements.isEmpty()) {
-                                Toast.makeText(context, "Please select at least one refinement", Toast.LENGTH_SHORT).show()
+                                showFeedback("Please select at least one refinement")
                                 return@RefinementCard
                             }
                             isLoading = true
@@ -905,10 +919,10 @@ fun MainScreen(
                             val text = clipboard.primaryClip?.getItemAt(0)?.text
                             if (text != null) {
                                 inputText = text.toString()
-                                Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
+                                showFeedback("Content pasted")
                             }
                         } else {
-                            Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
+                            showFeedback("Clipboard is empty")
                         }
                     }
                 )
@@ -939,7 +953,8 @@ fun InputCard(
     isLoadingPreview: Boolean,
     onExtractContent: (String) -> Unit,
     onDismissPreview: () -> Unit,
-    isError: Boolean = false
+    isError: Boolean = false,
+    onShowFeedback: (String) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -984,10 +999,10 @@ fun InputCard(
                                     val text = clipboard.primaryClip?.getItemAt(0)?.text
                                     if (text != null) {
                                         onInputChange(text.toString())
-                                        Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
+                                        onShowFeedback("Content pasted")
                                     }
                                 } else {
-                                    Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
+                                    onShowFeedback("Clipboard is empty")
                                 }
                             })
                         }
@@ -1759,5 +1774,3 @@ fun EditPillDialog(
         }
     )
 }
-
-
