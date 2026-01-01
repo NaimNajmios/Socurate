@@ -415,27 +415,30 @@ fun MainScreen(
         }
     }
     
-    // Helper function to rebuild output
-    fun rebuildOutput() {
-        val builder = StringBuilder()
-        if (includeTitle && generatedTitle.isNotEmpty()) {
-            builder.append(StringUtils.stripLeadingEmojis(generatedTitle)).append("\n\n")
-        }
-        
-        // If title is NOT included, we should check if the body starts with the title to avoid duplication
-        // or if we need to strip it from the body if it was part of the original result
-        builder.append(StringUtils.stripLeadingEmojis(generatedBody))
-        
-        if (includeSource && generatedSource.isNotEmpty()) {
-            builder.append("\n\n").append(generatedSource)
-        }
-        if (includeHashtags && prefsManager.areHashtagsEnabled()) {
-            val hashtags = prefsManager.getFormattedHashtags()
-            if (hashtags.isNotEmpty()) {
-                builder.append("\n\n").append(hashtags)
+    // Helper function to rebuild output - remembered to stay stable across recompositions
+    // This prevents OutputCard from recomposing when unrelated state (like inputText) changes
+    val rebuildOutput = remember(generatedTitle, generatedBody, generatedSource, includeTitle, includeHashtags, includeSource) {
+        {
+            val builder = StringBuilder()
+            if (includeTitle && generatedTitle.isNotEmpty()) {
+                builder.append(StringUtils.stripLeadingEmojis(generatedTitle)).append("\n\n")
             }
+
+            // If title is NOT included, we should check if the body starts with the title to avoid duplication
+            // or if we need to strip it from the body if it was part of the original result
+            builder.append(StringUtils.stripLeadingEmojis(generatedBody))
+
+            if (includeSource && generatedSource.isNotEmpty()) {
+                builder.append("\n\n").append(generatedSource)
+            }
+            if (includeHashtags && prefsManager.areHashtagsEnabled()) {
+                val hashtags = prefsManager.getFormattedHashtags()
+                if (hashtags.isNotEmpty()) {
+                    builder.append("\n\n").append(hashtags)
+                }
+            }
+            outputText = builder.toString().trim()
         }
-        outputText = builder.toString().trim()
     }
     
     // Process generation result
@@ -769,7 +772,7 @@ fun MainScreen(
                     linkPreviewData = linkPreviewData,
                     isLoadingPreview = isLoadingPreview,
                     onExtractContent = { url ->
-                        kotlinx.coroutines.MainScope().launch {
+                        scope.launch {
                             try {
                                 val extractor = WebContentExtractor()
                                 val extractedContent = withContext(Dispatchers.IO) {
@@ -829,69 +832,92 @@ fun MainScreen(
             // Output Card
             AnimatedVisibility(visible = hasResult && !isLoading, enter = fadeIn() + expandVertically()) {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    OutputCard(
-                        outputText = outputText,
-                        isEditMode = isEditMode,
-                        onOutputChange = { if (isEditMode) outputText = it },
-                        includeTitle = includeTitle,
-                        includeHashtags = includeHashtags,
-                        includeSource = includeSource,
-                        hasHashtags = prefsManager.getHashtags()?.isNotEmpty() == true,
-                        isSourceEnabled = prefsManager.isSourceEnabled(),
-                        onIncludeTitleChange = { includeTitle = it; rebuildOutput() },
-                        onIncludeHashtagsChange = { includeHashtags = it; rebuildOutput() },
-                        onIncludeSourceChange = { includeSource = it; rebuildOutput() },
-                        onEditClick = { 
+                    // Stable callbacks to prevent OutputCard recomposition on input change
+                    val onOutputChange = remember { { it: String -> if (isEditMode) outputText = it } }
+                    val onIncludeTitleChange = remember(rebuildOutput) { { it: Boolean -> includeTitle = it; rebuildOutput() } }
+                    val onIncludeHashtagsChange = remember(rebuildOutput) { { it: Boolean -> includeHashtags = it; rebuildOutput() } }
+                    val onIncludeSourceChange = remember(rebuildOutput) { { it: Boolean -> includeSource = it; rebuildOutput() } }
+                    val onEditClick = remember(rebuildOutput) {
+                        {
                             isEditMode = !isEditMode
                             if (!isEditMode) rebuildOutput()
-                        },
-                        onCopyClick = {
+                        }
+                    }
+                    val onCopyClick = remember {
+                        {
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             clipboard.setPrimaryClip(ClipData.newPlainText("Socurate Post", outputText))
                             Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
-                        },
-                        onShareClick = {
+                        }
+                    }
+                    val onShareClick = remember(outputText) {
+                        {
                             val intent = Intent(Intent.ACTION_SEND).apply {
                                 type = "text/plain"
                                 putExtra(Intent.EXTRA_TEXT, outputText)
                             }
                             context.startActivity(Intent.createChooser(intent, "Share"))
-                        },
-                        onExpandClick = { showReadingDialog = true },
+                        }
+                    }
+                    val onExpandClick = remember { { showReadingDialog = true } }
+
+                    OutputCard(
+                        outputText = outputText,
+                        isEditMode = isEditMode,
+                        onOutputChange = onOutputChange,
+                        includeTitle = includeTitle,
+                        includeHashtags = includeHashtags,
+                        includeSource = includeSource,
+                        hasHashtags = prefsManager.getHashtags()?.isNotEmpty() == true,
+                        isSourceEnabled = prefsManager.isSourceEnabled(),
+                        onIncludeTitleChange = onIncludeTitleChange,
+                        onIncludeHashtagsChange = onIncludeHashtagsChange,
+                        onIncludeSourceChange = onIncludeSourceChange,
+                        onEditClick = onEditClick,
+                        onCopyClick = onCopyClick,
+                        onShareClick = onShareClick,
+                        onExpandClick = onExpandClick,
                         textSize = textSizeState.intValue
                     )
                     
                     // Refinement Card
-                    RefinementCard(
-                        selectedOptions = refinementOptions,
-                        customPills = customPills,
-                        selectedPillIds = selectedPillIds,
-                        onToggleOption = { option ->
+                    val onToggleOption = remember {
+                        { option: String ->
                             if (refinementOptions.contains(option)) refinementOptions.remove(option)
                             else refinementOptions.add(option)
-                        },
-                        onTogglePill = { pillId ->
+                        }
+                    }
+                    val onTogglePill = remember {
+                        { pillId: String ->
                             if (selectedPillIds.contains(pillId)) selectedPillIds.remove(pillId)
                             else selectedPillIds.add(pillId)
-                        },
-                        onRegenerate = {
+                        }
+                    }
+                    val onRegenerateAction = remember(outputText) {
+                        {
                             val allRefinements = refinementOptions.toList() + 
                                 customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
                             if (allRefinements.isEmpty()) {
                                 Toast.makeText(context, "Please select at least one refinement", Toast.LENGTH_SHORT).show()
-                                return@RefinementCard
+                            } else {
+                                isLoading = true
+                                hasResult = false
+                                onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
                             }
-                            isLoading = true
-                            hasResult = false
-                            onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
-                        },
-                        onCreatePill = {
-                            showCreatePillDialog = true
-                        },
-                        onEditPill = { pill ->
-                            pillToEdit = pill
-                            showEditPillDialog = true
                         }
+                    }
+                    val onCreatePill = remember { { showCreatePillDialog = true } }
+                    val onEditPill = remember { { pill: GenerationPill -> pillToEdit = pill; showEditPillDialog = true } }
+
+                    RefinementCard(
+                        selectedOptions = refinementOptions,
+                        customPills = customPills,
+                        selectedPillIds = selectedPillIds,
+                        onToggleOption = onToggleOption,
+                        onTogglePill = onTogglePill,
+                        onRegenerate = onRegenerateAction,
+                        onCreatePill = onCreatePill,
+                        onEditPill = onEditPill
                     )
                 }
             }

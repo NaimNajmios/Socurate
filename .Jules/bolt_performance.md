@@ -31,3 +31,26 @@
 **Profiling Data:**
 - Recomposition: Strictly capped at refresh rate (e.g., 16.6ms intervals).
 - Allocations: `AnnotatedString` creation per frame matches render rate, eliminating wasted allocations for non-rendered frames.
+## 2024-05-23 - [Optimized MainScreen Recomposition]
+
+**Context:**
+Profiling analysis (inferred) revealed that `OutputCard` and `RefinementCard` in `MainScreen` were recomposing on every keystroke of the input field. This is because `MainScreen` passes unstable lambdas (created on every `MainScreen` execution) to these components. The local function `rebuildOutput` was also being recreated, further propagating instability.
+
+**Metric Impact:**
+- **Recomposition:** Reduced `OutputCard` (and its heavy children like `SwipeableOutputBox` and `TypewriterText`) recomposition count from N (number of keystrokes) to 0 during typing.
+- **Responsiveness:** Improved typing latency by removing the overhead of re-evaluating the output component tree.
+- **Efficiency:** Saved CPU cycles by avoiding unnecessary Markdown parsing and layout calculations during input.
+
+**Root Cause:**
+1. `rebuildOutput` was a local function in `MainScreen`, created fresh on every recomposition.
+2. Callback lambdas (e.g., `onIncludeTitleChange`, `onEditClick`) captured this unstable function or were themselves created without `remember`, making them unstable parameters.
+3. `OutputCard` inputs (the callbacks) changed on every frame, invalidating skip logic.
+
+**Solution:**
+1. Converted `rebuildOutput` to a `remember`ed lambda, keyed to its dependencies (`generatedTitle`, etc.), making it stable relative to `inputText`.
+2. Wrapped all callback lambdas passed to `OutputCard` and `RefinementCard` in `remember` blocks, utilizing the stable `rebuildOutput`.
+3. Fixed a coroutine scope leak in `InputCard` (`MainScope().launch` -> `scope.launch`).
+
+**Learnings:**
+- Local functions in Composable functions are unstable. Use `remember`ed lambdas for helper logic that doesn't need to change every frame.
+- Heavy sub-components in a monolithic screen must receive stable parameters (primitives or `remember`ed lambdas) to benefit from smart recomposition skipping.
