@@ -145,6 +145,7 @@ import com.najmi.oreamnos.ui.components.FluidRefinementFlow
 import com.najmi.oreamnos.ui.components.LinkPreviewSection
 import com.najmi.oreamnos.ui.components.PasteAction
 import com.najmi.oreamnos.ui.components.ClearAction
+import com.najmi.oreamnos.ui.components.EmptyStateCard
 import com.najmi.oreamnos.viewmodel.MainViewModel
 import androidx.compose.animation.animateContentSize
 
@@ -1267,30 +1268,6 @@ fun ErrorCard(error: String, onRetry: () -> Unit, onChangeProvider: () -> Unit) 
                 containerColor = ErrorRed,
                 modifier = Modifier.weight(1f)
             )
-        }
-    }
-}
-
-@Composable
-fun EmptyStateCard(onPaste: () -> Unit) {
-    NeoCard(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_empty_state),
-                contentDescription = null,
-                modifier = Modifier.size(80.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(Modifier.height(24.dp))
-            Text("READY TO GENERATE", style = MaterialTheme.typography.titleMedium)
-            Text("Paste content or enter a URL above", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(24.dp))
-            NeoOutlinedButton(onClick = onPaste, text = "PASTE FROM CLIPBOARD")
         }
     }
 }
