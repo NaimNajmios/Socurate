@@ -11,6 +11,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
+// Define Shape as a constant to avoid allocation on every recomposition
+private val NeoInputShape = RoundedCornerShape(0.dp)
+
 /**
  * Neo-Editorial Input
  * Monospace text, sharp corners, thick borders.
@@ -45,7 +48,7 @@ fun NeoInput(
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         trailingIcon = trailingIcon,
-        shape = RoundedCornerShape(0.dp), // Sharp corners
+        shape = NeoInputShape, // Sharp corners
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,

@@ -54,3 +54,26 @@ Profiling analysis (inferred) revealed that `OutputCard` and `RefinementCard` in
 **Learnings:**
 - Local functions in Composable functions are unstable. Use `remember`ed lambdas for helper logic that doesn't need to change every frame.
 - Heavy sub-components in a monolithic screen must receive stable parameters (primitives or `remember`ed lambdas) to benefit from smart recomposition skipping.
+
+## 2024-05-24 - String Allocation Optimization in Text Analysis
+
+**Context:** `ShareBottomSheetFragment` was utilizing `WHITESPACE_PATTERN.split(outputText).size` to count words during text editing.
+**Metric Impact:**
+- Allocations: Reduced transient `List<String>` and `String` allocations to zero during word counting.
+- Efficiency: Replaced O(N) allocation-heavy regex split with O(N) single-pass character counting.
+**Root Cause:** `String.split()` creates a new list and substring objects for every segment. This was being called on every recomposition/text change in the share sheet.
+**Solution:** Replaced with `ReadabilityUtils.countWords(outputText)`, which uses a loop to count words without allocation.
+**Learnings:** Avoid `String.split()` for counting or simple iteration. Use character traversal or index-based methods.
+
+**Profiling Data:**
+- Memory: Eliminated array allocations proportional to word count on every keystroke in share sheet.
+
+## 2024-05-24 - Compose Object Reuse in NeoInput
+
+**Context:** `NeoInput` was creating new `RoundedCornerShape(0.dp)` objects on every recomposition.
+**Metric Impact:**
+- Allocations: Reduced frequent object churn during typing.
+**Root Cause:** `RoundedCornerShape` was called directly inside the Composable function.
+**Solution:**
+1. Moved `Shape` to a top-level private constant.
+**Learnings:** Lift constant objects out of Composables to avoid allocation.
