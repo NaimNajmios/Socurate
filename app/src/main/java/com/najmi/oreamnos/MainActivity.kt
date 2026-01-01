@@ -141,6 +141,7 @@ import com.najmi.oreamnos.ui.components.NeoOutlinedButton
 import com.najmi.oreamnos.ui.components.SwipeableOutputBox
 import com.najmi.oreamnos.ui.components.AnimatedCheckmark
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
+import com.najmi.oreamnos.ui.components.EmptyStateCard
 import com.najmi.oreamnos.ui.components.FluidRefinementFlow
 import com.najmi.oreamnos.ui.components.LinkPreviewSection
 import com.najmi.oreamnos.ui.components.PasteAction
@@ -1271,29 +1272,6 @@ fun ErrorCard(error: String, onRetry: () -> Unit, onChangeProvider: () -> Unit) 
     }
 }
 
-@Composable
-fun EmptyStateCard(onPaste: () -> Unit) {
-    NeoCard(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_empty_state),
-                contentDescription = null,
-                modifier = Modifier.size(80.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(Modifier.height(24.dp))
-            Text("READY TO GENERATE", style = MaterialTheme.typography.titleMedium)
-            Text("Paste content or enter a URL above", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(24.dp))
-            NeoOutlinedButton(onClick = onPaste, text = "PASTE FROM CLIPBOARD")
-        }
-    }
-}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
