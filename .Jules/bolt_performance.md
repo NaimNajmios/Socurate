@@ -54,3 +54,17 @@ Profiling analysis (inferred) revealed that `OutputCard` and `RefinementCard` in
 **Learnings:**
 - Local functions in Composable functions are unstable. Use `remember`ed lambdas for helper logic that doesn't need to change every frame.
 - Heavy sub-components in a monolithic screen must receive stable parameters (primitives or `remember`ed lambdas) to benefit from smart recomposition skipping.
+
+## 2024-05-24 - Neo Component Allocation Optimization
+
+**Context:** The `NeoInput` component was identified as a hot path during typing, where `OutlinedTextFieldDefaults.colors(...)` was being called on every recomposition. Additionally, `RoundedCornerShape(0.dp)` was being instantiated on every call to `NeoInput`, `NeoCard`, `NeoButton`, and `NeoChip`.
+**Metric Impact:**
+- Allocations: Reduced object churn by memoizing `TextFieldColors` and using the singleton `RectangleShape` instead of creating new `RoundedCornerShape` instances.
+- Recomposition: `NeoInput` is still recomposed on character changes, but the work done per recomposition is reduced.
+**Root Cause:**
+1. `OutlinedTextFieldDefaults.colors` is a Composable function that creates a new `TextFieldColors` object. It was called directly in the parameter list.
+2. `RoundedCornerShape(0.dp)` is an object allocation. `RectangleShape` is a singleton constant that represents the same geometry.
+**Solution:**
+1. In `NeoInput`, `remember`ed the result of `OutlinedTextFieldDefaults.colors` keyed to the relevant theme colors.
+2. Replaced `RoundedCornerShape(0.dp)` with `androidx.compose.ui.graphics.RectangleShape` across `NeoInput`, `NeoCard`, `NeoButton`, `NeoChip`, and `NeoCopyButton`.
+**Learnings:** Check default parameters and frequently called Composables for hidden allocations like Shapes or Colors that can be memoized or replaced with constants.

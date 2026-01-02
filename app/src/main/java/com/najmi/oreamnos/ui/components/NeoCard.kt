@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun NeoCard(
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(0.dp), // Sharp corners
+    shape: Shape = RectangleShape, // OPTIMIZATION: Use singleton RectangleShape default
     borderWidth: Dp = 2.dp,
     borderColor: Color = MaterialTheme.colorScheme.outline,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,

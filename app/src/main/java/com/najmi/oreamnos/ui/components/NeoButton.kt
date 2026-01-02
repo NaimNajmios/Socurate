@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,7 @@ fun NeoButton(
             scaleY = scaleState.value
         },
         enabled = enabled && !isLoading,
-        shape = RoundedCornerShape(0.dp), // Sharp corners
+        shape = RectangleShape, // Sharp corners
         colors = ButtonDefaults.buttonColors(
             containerColor = animatedContainerColor,
             contentColor = contentColor,
@@ -136,7 +137,7 @@ fun NeoOutlinedButton(
             scaleY = scaleState.value
         },
         enabled = enabled,
-        shape = RoundedCornerShape(0.dp),
+        shape = RectangleShape,
         border = BorderStroke(2.dp, contentColor),
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = contentColor

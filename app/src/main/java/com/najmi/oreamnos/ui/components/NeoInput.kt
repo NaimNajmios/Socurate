@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
@@ -31,6 +32,9 @@ fun NeoInput(
     keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default,
     trailingIcon: @Composable (() -> Unit)? = null
 ) {
+    // OPTIMIZATION: Use singleton RectangleShape instead of allocating RoundedCornerShape(0.dp)
+    // Note: OutlinedTextFieldDefaults.colors is Composable so it handles its own internal memoization/theming access.
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -45,7 +49,7 @@ fun NeoInput(
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
         trailingIcon = trailingIcon,
-        shape = RoundedCornerShape(0.dp), // Sharp corners
+        shape = RectangleShape,
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
