@@ -14,6 +14,9 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+// Define default shape as constant
+private val DefaultNeoShape = RoundedCornerShape(0.dp)
+
 /**
  * Neo-Editorial Card
  * High contrast, thick border, sharp corners.
@@ -21,7 +24,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun NeoCard(
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(0.dp), // Sharp corners
+    shape: Shape = DefaultNeoShape, // Sharp corners
     borderWidth: Dp = 2.dp,
     borderColor: Color = MaterialTheme.colorScheme.outline,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
