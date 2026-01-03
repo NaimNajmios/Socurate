@@ -139,6 +139,7 @@ import com.najmi.oreamnos.ui.components.NeoChip
 import com.najmi.oreamnos.ui.components.NeoCopyButton
 import com.najmi.oreamnos.ui.components.NeoInput
 import com.najmi.oreamnos.ui.components.NeoOutlinedButton
+import com.najmi.oreamnos.ui.components.NeoSwitch
 import com.najmi.oreamnos.ui.components.SwipeableOutputBox
 import com.najmi.oreamnos.ui.components.AnimatedCheckmark
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
@@ -1032,17 +1033,9 @@ fun InputCard(
             ) {
                 Text("PRESERVE STRUCTURE", style = MaterialTheme.typography.labelLarge)
 
-                Switch(
+                NeoSwitch(
                     checked = keepStructure,
-                    onCheckedChange = onKeepStructureChange,
-                    colors = androidx.compose.material3.SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.primary,
-                        checkedTrackColor = MaterialTheme.colorScheme.surface,
-                        checkedBorderColor = MaterialTheme.colorScheme.primary,
-                        uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.surface,
-                        uncheckedBorderColor = MaterialTheme.colorScheme.outline
-                    )
+                    onCheckedChange = onKeepStructureChange
                 )
             }
 
