@@ -26,6 +26,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -1085,7 +1086,7 @@ fun InputCard(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 fun OutputCard(
     outputText: String,
@@ -1144,24 +1145,42 @@ fun OutputCard(
         
         
         // Output text with swipe gestures and long-press menu
-        if (isEditMode) {
-            NeoInput(
-                value = outputText,
-                onValueChange = onOutputChange,
-                modifier = Modifier.fillMaxWidth(),
-                readOnly = false,
-                minLines = 8,
-                maxLines = 20,
-                label = "GENERATED CONTENT",
-                textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = textSize.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
-            )
-        } else {
-            SwipeableOutputBox(
-                outputText = outputText,
-                textSize = textSize,
-                onCopy = onCopyClick,
-                onShare = onShareClick
-            )
+        Box(modifier = Modifier.fillMaxWidth().animateContentSize()) {
+            AnimatedContent(
+                targetState = isEditMode,
+                transitionSpec = {
+                    if (targetState) {
+                        // Entering Edit Mode: Subtle expansion feel
+                        (fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.98f)) with
+                        (fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.98f))
+                    } else {
+                        // Exiting Edit Mode: Subtle collapse feel
+                        (fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.98f)) with
+                        (fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.98f))
+                    }
+                },
+                label = "edit_mode_transition"
+            ) { editing ->
+                if (editing) {
+                    NeoInput(
+                        value = outputText,
+                        onValueChange = onOutputChange,
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = false,
+                        minLines = 8,
+                        maxLines = 20,
+                        label = "GENERATED CONTENT",
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = textSize.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+                    )
+                } else {
+                    SwipeableOutputBox(
+                        outputText = outputText,
+                        textSize = textSize,
+                        onCopy = onCopyClick,
+                        onShare = onShareClick
+                    )
+                }
+            }
         }
         
         // Stats
