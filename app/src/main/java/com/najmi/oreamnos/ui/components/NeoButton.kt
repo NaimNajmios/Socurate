@@ -62,6 +62,10 @@ fun NeoButton(
         label = "buttonColor"
     )
 
+    // OPTIMIZATION: Remember derived colors to avoid allocation on every recomposition
+    val disabledContainerColor = remember(containerColor) { containerColor.copy(alpha = 0.5f) }
+    val disabledContentColor = remember(contentColor) { contentColor.copy(alpha = 0.5f) }
+
     Button(
         onClick = {
             // Lighter haptic feedback for snappy response (Standard click vs Long Press)
@@ -78,8 +82,8 @@ fun NeoButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = animatedContainerColor,
             contentColor = contentColor,
-            disabledContainerColor = containerColor.copy(alpha = 0.5f),
-            disabledContentColor = contentColor.copy(alpha = 0.5f)
+            disabledContainerColor = disabledContainerColor,
+            disabledContentColor = disabledContentColor
         ),
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
         interactionSource = interactionSource
