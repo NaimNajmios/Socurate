@@ -23,13 +23,15 @@ object StringUtils {
     // (?m) enables multiline mode where ^ matches start of line
     private val LEADING_EMOJI_PATTERN: Pattern = Pattern.compile("(?m)^($EMOJI_PATTERN)+\\s*")
 
+    private val ALL_EMOJI_REGEX = Regex(EMOJI_PATTERN)
+
     /**
      * Strips ALL emojis from the text (anywhere in the text, not just leading).
      */
     @JvmStatic
     fun stripAllEmojis(text: String?): String {
         if (text.isNullOrEmpty()) return ""
-        return text.replace(Regex(EMOJI_PATTERN), "").trim()
+        return text.replace(ALL_EMOJI_REGEX, "").trim()
     }
 
     /**

@@ -484,7 +484,7 @@ class GeminiService(
         if (delayStr.isNullOrEmpty()) return 0
 
         return try {
-            val secondsStr = delayStr.replace(Regex("[^0-9.]"), "")
+            val secondsStr = delayStr.replace(NUMERIC_CLEANUP_REGEX, "")
             val seconds = secondsStr.toDouble()
             (seconds * 1000).toLong()
         } catch (e: Exception) {
@@ -568,5 +568,8 @@ class GeminiService(
             .readTimeout(20, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
             .build()
+
+        // Clean up regex for delay parsing
+        private val NUMERIC_CLEANUP_REGEX = Regex("[^0-9.]")
     }
 }
