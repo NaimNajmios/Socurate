@@ -1200,7 +1200,11 @@ fun OutputCard(
             
             // Action buttons
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                NeoOutlinedButton(onClick = onEditClick, modifier = Modifier.weight(1f), text = if (isEditMode) "Save" else "Edit")
+                com.najmi.oreamnos.ui.components.FluidEditButton(
+                    isEditing = isEditMode,
+                    onToggle = onEditClick,
+                    modifier = Modifier.weight(1f)
+                )
                 NeoCopyButton(
                     onCopy = onCopyClick,
                     modifier = Modifier.weight(1f)
