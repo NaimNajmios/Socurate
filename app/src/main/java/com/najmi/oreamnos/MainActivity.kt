@@ -715,8 +715,12 @@ fun MainScreen(
                         isLoading = isLoading,
                         modifier = Modifier
                             .weight(1f)
-                            .scale(if (inputHasChanged) pulseScale else 1f)
-                            .alpha(if (inputHasChanged) pulseAlpha else 1f)
+                            .graphicsLayer {
+                                val currentScale = if (inputHasChanged) pulseScale else 1f
+                                scaleX = currentScale
+                                scaleY = currentScale
+                                alpha = if (inputHasChanged) pulseAlpha else 1f
+                            }
                     )
                     Spacer(Modifier.width(8.dp))
                     TextButton(onClick = onNavigateToUsage) {
