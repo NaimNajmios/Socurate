@@ -1,57 +1,45 @@
-## 2024-05-23 - [Null Safety/Integration]
+## 2024-05-23 - Concurrency Bug in Service Lifecycle
 
-**Context:** `GenerationPill.kt` data class used for custom refinement options.
-**Symptoms:** Potential `NullPointerException` at runtime when accessing non-nullable fields (`id`, `name`, `command`) if the backing JSON source is malformed or missing fields.
-**Root Cause:** Gson uses `UnsafeAllocator` to instantiate classes, which bypasses Kotlin's constructor and property initializers. If a field is missing in the JSON, it remains `null` even if the Kotlin property is non-nullable (`String`).
-**Fix Applied:** Implemented a custom `JsonDeserializer` that manually parses the JSON object. It checks for the existence and non-nullity of each field and provides the correct default values (including generating a new UUID for `id`) if data is missing. The `Gson` instance is cached in a `lazy` companion object property for efficiency.
-**Prevention:** Always use custom deserializers or Moshi (which supports Kotlin defaults natively) when dealing with external JSON sources that might not perfectly match the Kotlin data model.
-**Tests Added:** Verified via code review and pattern matching against known Gson behavior. (Unit tests blocked by environment constraints).
+**Context:** `ContentGenerationService.kt`, which uses a `SingleThreadExecutor` to queue and process generation requests sequentially.
+**Symptoms:** If a user triggers a second generation request (e.g., "Refine") while the first one is still running, the second request is often silently dropped or never completes.
+**Root Cause:** The service was calling `stopSelf()` unconditionally in the `finally` block of the first task. This instructs the Android system to destroy the Service immediately (`onDestroy` shuts down the executor), even if there are other tasks queued in the executor or subsequent `onStartCommand` calls have occurred.
+**Fix Applied:** Changed `stopSelf()` to `stopSelf(startId)`. This conditional stop only terminates the service if the `startId` matches the most recent start request received by the service.
+**Prevention:** Always use `stopSelf(startId)` in Services that handle multiple asynchronous requests to ensure proper lifecycle management. Avoid unconditional `stopSelf()` unless you are certain no other work is pending.
 
 **Code Example (Before):**
 ```kotlin
-data class GenerationPill(
-    var id: String = UUID.randomUUID().toString(), // Ignored by Gson if missing in JSON
-    var name: String = ""
-)
-// Result: id is null at runtime if JSON is "{}"
-```
-
-**Code Example (After):**
-```kotlin
-private class Deserializer : JsonDeserializer<GenerationPill> {
-    override fun deserialize(...): GenerationPill {
-        val id = if (obj.has("id")) obj.get("id").asString else UUID.randomUUID().toString()
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // ...
-        return GenerationPill(id, ...)
+        handleGenerate(intent) // startId ignored
+        return START_NOT_STICKY
     }
-}
-// Result: id is never null
-```
 
-## 2024-05-23 - [Null Safety/Integration]
-
-**Context:** `OpenAICompatibleCurator.kt` handling of `HttpURLConnection` error streams.
-**Symptoms:** Potential `NullPointerException` when API returns an error but `errorStream` is null (which is valid according to Java docs).
-**Root Cause:** `InputStreamReader` constructor throws NPE if the input stream is null. `HttpURLConnection.getErrorStream()` returns null if no error data is available.
-**Fix Applied:** Introduced a `readStream` helper method that checks if the stream is null before creating the reader.
-**Prevention:** Always check if `getErrorStream()` returns null before reading from it. Use defensive helper methods for stream reading.
-**Tests Added:** Verified via manual analysis and reproduction script (`TestNPE.java`) confirming `InputStreamReader(null)` crashes.
-
-**Code Example (Before):**
-```kotlin
-// Read error response
-BufferedReader(InputStreamReader(conn.errorStream, StandardCharsets.UTF_8)).use { br ->
-    // ...
-}
+    private fun handleGenerate(intent: Intent) {
+        executor.execute {
+            try {
+                // process...
+            } finally {
+                stopSelf() // BUG: Stops service even if new requests came in
+            }
+        }
+    }
 ```
 
 **Code Example (After):**
 ```kotlin
-// Read error response safely
-val errorResponse = readStream(conn.errorStream)
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // ...
+        handleGenerate(intent, startId) // Pass startId
+        return START_NOT_STICKY
+    }
 
-private fun readStream(stream: java.io.InputStream?): String {
-    if (stream == null) return ""
-    // ... safe reading ...
-}
+    private fun handleGenerate(intent: Intent, startId: Int) {
+        executor.execute {
+            try {
+                // process...
+            } finally {
+                stopSelf(startId) // FIX: Only stops if this was the last request
+            }
+        }
+    }
 ```
