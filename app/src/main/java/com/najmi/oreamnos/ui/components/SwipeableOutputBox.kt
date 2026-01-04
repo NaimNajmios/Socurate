@@ -15,9 +15,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.R
 import com.najmi.oreamnos.utils.HapticHelper
+import kotlinx.coroutines.delay
 import kotlin.math.abs
 
 /**
@@ -42,6 +47,7 @@ import kotlin.math.abs
  * - Swipe left to reveal Copy action
  * - Swipe right to reveal Share action
  * - Features haptic feedback, scaling animations, and threshold snapping
+ * - UX Improvement: "Shimmy" hint animation on entry to teach the gesture
  */
 @Composable
 fun SwipeableOutputBox(
@@ -58,6 +64,28 @@ fun SwipeableOutputBox(
     // State to track if we've crossed the threshold to trigger haptics only once
     var isPastThreshold by remember { mutableStateOf(false) }
 
+    // UX: Hints visibility and animation state
+    var showHints by remember { mutableStateOf(true) }
+    var isShimmyActive by remember { mutableStateOf(true) }
+
+    // UX: "Shimmy" animation to hint at swipeability
+    // Checks isShimmyActive at each step to cancel immediately if user interacts
+    LaunchedEffect(Unit) {
+        delay(600) // Wait for entrance animation
+
+        if (isShimmyActive) offsetX = 40f
+        delay(300)
+
+        if (isShimmyActive) offsetX = -40f
+        delay(300)
+
+        if (isShimmyActive) offsetX = 0f
+        delay(1000)
+
+        // Fade out visual hints
+        showHints = false
+    }
+
     // Animate offset back to 0 when released
     // Changed to LowBouncy for a more rubber-band feel
     val animatedOffset by animateFloatAsState(
@@ -67,6 +95,13 @@ fun SwipeableOutputBox(
             stiffness = Spring.StiffnessMedium
         ),
         label = "swipe_offset"
+    )
+
+    // Fade out hints
+    val hintAlpha by animateFloatAsState(
+        targetValue = if (showHints) 0.5f else 0f,
+        animationSpec = spring(stiffness = Spring.StiffnessLow),
+        label = "hint_alpha"
     )
 
     Box(
@@ -172,6 +207,10 @@ fun SwipeableOutputBox(
                     detectHorizontalDragGestures(
                         onHorizontalDrag = { change, dragAmount ->
                             change.consume()
+                            // UX: Cancel shimmy animation immediately on interaction
+                            isShimmyActive = false
+                            showHints = false
+
                             // Add resistance as we drag further
                             val resistance = 1f - (abs(offsetX) / (swipeThreshold * 2)).coerceIn(0f, 0.5f)
                             offsetX += dragAmount * resistance
@@ -223,6 +262,34 @@ fun SwipeableOutputBox(
                     )
                 )
             }
+        }
+
+        // --- UX HINTS LAYER ---
+        // Subtle arrows that fade out, indicating swipeability
+        if (hintAlpha > 0f) {
+            // Left Hint (for Right Swipe)
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 4.dp)
+                    .alpha(hintAlpha)
+                    .size(16.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            // Right Hint (for Left Swipe)
+             Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 4.dp)
+                    .alpha(hintAlpha)
+                    .size(16.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
