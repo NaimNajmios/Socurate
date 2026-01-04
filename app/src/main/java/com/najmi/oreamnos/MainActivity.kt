@@ -397,6 +397,9 @@ fun MainScreen(
     LaunchedEffect(inputText) {
         // Optimized: Remove redundant trim(), isUrl handles CharSequence efficiently
         if (WebContentExtractor.isUrl(inputText)) {
+            // Debounce to prevent network spam while typing a URL
+            kotlinx.coroutines.delay(800)
+
             isLoadingPreview = true
             previewError = null
             try {
