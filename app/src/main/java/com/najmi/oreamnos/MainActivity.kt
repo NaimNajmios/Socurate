@@ -1028,6 +1028,24 @@ fun InputCard(
                             })
                         }
                     }
+                },
+                supportingText = {
+                    AnimatedVisibility(
+                        visible = inputText.isNotEmpty(),
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        val charCount = inputText.length
+                        val wordCount = remember(inputText) { ReadabilityUtils.countWords(inputText) }
+
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            Text(
+                                text = "$charCount chars / $wordCount words",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             )
 
