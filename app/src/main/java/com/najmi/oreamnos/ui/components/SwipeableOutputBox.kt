@@ -15,13 +15,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.R
 import com.najmi.oreamnos.utils.HapticHelper
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 /**
@@ -42,6 +49,7 @@ import kotlin.math.abs
  * - Swipe left to reveal Copy action
  * - Swipe right to reveal Share action
  * - Features haptic feedback, scaling animations, and threshold snapping
+ * - Includes "Shimmy" entrance animation to teach gestures
  */
 @Composable
 fun SwipeableOutputBox(
@@ -57,6 +65,21 @@ fun SwipeableOutputBox(
 
     // State to track if we've crossed the threshold to trigger haptics only once
     var isPastThreshold by remember { mutableStateOf(false) }
+
+    // Track user interaction to cancel the shimmy animation
+    var isInteracted by remember { mutableStateOf(false) }
+
+    // "Shimmy" Entrance Animation: Teaches the user that the card is swipeable
+    LaunchedEffect(Unit) {
+        delay(600) // Wait for card entrance
+        if (!isInteracted) offsetX = 50f // Slide Right (Reveal Share)
+        delay(500)
+        if (!isInteracted) offsetX = 0f
+        delay(200)
+        if (!isInteracted) offsetX = -50f // Slide Left (Reveal Copy)
+        delay(500)
+        if (!isInteracted) offsetX = 0f
+    }
 
     // Animate offset back to 0 when released
     // Changed to LowBouncy for a more rubber-band feel
@@ -170,8 +193,12 @@ fun SwipeableOutputBox(
                 }
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
+                        onDragStart = {
+                            isInteracted = true // Cancel shimmy on first touch
+                        },
                         onHorizontalDrag = { change, dragAmount ->
                             change.consume()
+                            isInteracted = true
                             // Add resistance as we drag further
                             val resistance = 1f - (abs(offsetX) / (swipeThreshold * 2)).coerceIn(0f, 0.5f)
                             offsetX += dragAmount * resistance
@@ -188,7 +215,7 @@ fun SwipeableOutputBox(
                         onDragEnd = {
                             if (abs(offsetX) > swipeThreshold) {
                                 // Trigger action
-                                hapticHelper.onCopy() // Success haptic (works for both copy and share as a success indicator)
+                                hapticHelper.onCopy() // Success haptic
                                 if (offsetX > 0) onShare() else onCopy()
                             }
                             // Reset
@@ -211,7 +238,7 @@ fun SwipeableOutputBox(
                 com.najmi.oreamnos.utils.MarkdownUtils.parseMarkdownToAnnotatedString(outputText, primaryColor)
             }
 
-            // Using fully qualified name to avoid import ambiguity if TypewriterText isn't imported
+            // Using fully qualified name to avoid import ambiguity
             androidx.compose.foundation.text.selection.SelectionContainer {
                 com.najmi.oreamnos.ui.components.TypewriterText(
                     text = parsedText,
@@ -221,6 +248,34 @@ fun SwipeableOutputBox(
                         lineHeight = (textSize * 1.5f).sp,
                         fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                     )
+                )
+            }
+
+            // Fading Chevron Hints - Visible only during shimmy to teach direction
+            val shimmyVisible = !isInteracted && abs(animatedOffset) > 10f
+            val hintAlpha by animateFloatAsState(if (shimmyVisible) 0.6f else 0f, label = "hint_alpha")
+
+            if (hintAlpha > 0f) {
+                // Left Hint (Pointing Right to indicate Swipe Right)
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 8.dp)
+                        .alpha(hintAlpha)
+                )
+
+                // Right Hint (Pointing Left to indicate Swipe Left)
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 8.dp)
+                        .alpha(hintAlpha)
                 )
             }
         }
