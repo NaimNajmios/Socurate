@@ -74,13 +74,15 @@ class ContentGenerationService : Service() {
         val includeSource = intent.getBooleanExtra(EXTRA_INCLUDE_SOURCE, false)
         val keepStructure = intent.getBooleanExtra(EXTRA_KEEP_STRUCTURE, false)
 
-        if (inputText.isNullOrEmpty()) {
-            broadcastError("Input text is required", false)
-            stopSelf(startId)
-            return
-        }
-
         executor.execute {
+            // Validation moved inside executor to prevent race conditions with stopSelf
+            // This ensures validation failures don't kill the service while previous tasks are running
+            if (inputText.isNullOrEmpty()) {
+                broadcastError("Input text is required", false)
+                stopSelf(startId)
+                return@execute
+            }
+
             val startTime = System.currentTimeMillis()
             try {
                 Log.i(TAG, "Starting content generation...")
@@ -160,19 +162,20 @@ class ContentGenerationService : Service() {
         val refinements = intent.getStringArrayListExtra(EXTRA_REFINEMENTS)
         val includeSource = intent.getBooleanExtra(EXTRA_INCLUDE_SOURCE, false)
 
-        if (originalPost.isNullOrEmpty()) {
-            broadcastError("Original post is required", true)
-            stopSelf(startId)
-            return
-        }
-
-        if (refinements.isNullOrEmpty()) {
-            broadcastError("At least one refinement option is required", true)
-            stopSelf(startId)
-            return
-        }
-
         executor.execute {
+            // Validation moved inside executor to prevent race conditions with stopSelf
+            if (originalPost.isNullOrEmpty()) {
+                broadcastError("Original post is required", true)
+                stopSelf(startId)
+                return@execute
+            }
+
+            if (refinements.isNullOrEmpty()) {
+                broadcastError("At least one refinement option is required", true)
+                stopSelf(startId)
+                return@execute
+            }
+
             val startTime = System.currentTimeMillis()
             try {
                 Log.i(TAG, "Starting content refinement with options: $refinements")
