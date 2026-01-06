@@ -143,6 +143,7 @@ import com.najmi.oreamnos.ui.components.NeoOutlinedButton
 import com.najmi.oreamnos.ui.components.NeoSwitch
 import com.najmi.oreamnos.ui.components.SwipeableOutputBox
 import com.najmi.oreamnos.ui.components.AnimatedCheckmark
+import com.najmi.oreamnos.ui.components.SuccessOverlay
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
 import com.najmi.oreamnos.ui.components.EmptyStateCard
 import com.najmi.oreamnos.ui.components.FluidRefinementFlow
@@ -573,7 +574,7 @@ fun MainScreen(
     // Success animation timeout
     LaunchedEffect(showSuccessAnimation) {
         if (showSuccessAnimation) {
-            kotlinx.coroutines.delay(1000)
+            kotlinx.coroutines.delay(1200) // Slightly longer to allow explosion to finish
             showSuccessAnimation = false
         }
     }
@@ -972,6 +973,12 @@ fun MainScreen(
                 onDismiss = { showReadingDialog = false }
             )
         }
+
+        // Success Overlay (Highest Z-index)
+        SuccessOverlay(
+            visible = showSuccessAnimation,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 
