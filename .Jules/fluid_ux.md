@@ -1,40 +1,28 @@
-## 2024-05-23 - Animated Expansion for Contextual Actions
+## 2024-05-23 - Shimmy Entrance Animation
 
-**Context:** The `InputCard` displays contextual actions (Link Preview) based on user input (URL detection).
-**Observation:** Previously, the Link Preview would appear instantly, causing a jarring layout shift and pushing content down without warning.
-**Solution:** Integrated `AnimatedVisibility` with `expandVertically` + `fadeIn` for the content, and applied `animateContentSize` with a `spring` spec to the parent container. This ensures the card expands fluidly to accommodate the new content.
-**Impact:** The UI feels more organic and responsive. The user is guided to the new options rather than being surprised by them.
+**Context:** Swipeable Output Card (Swipe to Copy/Share)
+**Observation:** Users often missed the swipe functionality on the output card because the actions (Copy/Share) were hidden behind the content layer with no affordance.
+**Solution:** Implemented a "Shimmy" entrance animation that automatically slides the content layer back and forth (Right then Left) to peek the hidden actions. Added fading chevron hints during the animation to reinforce directionality.
+**Impact:** Drastically improves discoverability of the swipe gestures without permanent visual clutter.
 
 **Code Pattern:**
 ```kotlin
-Column(
-    modifier = Modifier
-        .fillMaxWidth()
-        .animateContentSize(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessLow
-            )
-        )
-) {
-    // Permanent Content
-    NeoInput(...)
+// Track interaction to cancel animation
+var isInteracted by remember { mutableStateOf(false) }
 
-    // Contextual Content
-    AnimatedVisibility(
-        visible = showContextualContent,
-        enter = expandVertically() + fadeIn(),
-        exit = shrinkVertically() + fadeOut()
-    ) {
-        ContextualContent(...)
-    }
+// Shimmy Sequence
+LaunchedEffect(Unit) {
+    delay(600) // Wait for entrance
+    if (!isInteracted) offsetX = 50f // Reveal Left Action
+    delay(500)
+    if (!isInteracted) offsetX = 0f
+    delay(200)
+    if (!isInteracted) offsetX = -50f // Reveal Right Action
+    delay(500)
+    if (!isInteracted) offsetX = 0f
 }
-```
 
-Animation Spec:
-```kotlin
-spring(
-    dampingRatio = Spring.DampingRatioLowBouncy,
-    stiffness = Spring.StiffnessLow
-)
+// Hint Visibility
+val shimmyVisible = !isInteracted && abs(animatedOffset) > 10f
+val hintAlpha by animateFloatAsState(if (shimmyVisible) 0.6f else 0f)
 ```
