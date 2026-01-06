@@ -148,6 +148,7 @@ import com.najmi.oreamnos.ui.components.FluidRefinementFlow
 import com.najmi.oreamnos.ui.components.LinkPreviewSection
 import com.najmi.oreamnos.ui.components.PasteAction
 import com.najmi.oreamnos.ui.components.ClearAction
+import com.najmi.oreamnos.ui.components.SuccessOverlay
 import com.najmi.oreamnos.viewmodel.MainViewModel
 import androidx.compose.animation.animateContentSize
 
@@ -736,17 +737,21 @@ fun MainScreen(
             }
         }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Neo Header
-            Text(
-                text = "SOCURATE",
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                // Neo Header
+                Text(
+                    text = "SOCURATE",
                 style = MaterialTheme.typography.displayMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -950,7 +955,14 @@ fun MainScreen(
                 )
             }
             
-            Spacer(Modifier.height(80.dp)) // Space for FAB
+                Spacer(Modifier.height(80.dp)) // Space for FAB
+            }
+
+            // Success Overlay
+            SuccessOverlay(
+                visible = showSuccessAnimation,
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
         
         // Reading mode dialog
