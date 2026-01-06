@@ -93,6 +93,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -679,7 +680,7 @@ fun MainScreen(
                 ) {
                     // Pulse animation for Generate button when input changes
                     val infiniteTransition = rememberInfiniteTransition(label = "generatePulse")
-                    val pulseScale by infiniteTransition.animateFloat(
+                    val pulseScale = infiniteTransition.animateFloat(
                         initialValue = 1f,
                         targetValue = if (inputHasChanged) 1.05f else 1f,
                         animationSpec = infiniteRepeatable(
@@ -688,7 +689,7 @@ fun MainScreen(
                         ),
                         label = "pulse_scale"
                     )
-                    val pulseAlpha by infiniteTransition.animateFloat(
+                    val pulseAlpha = infiniteTransition.animateFloat(
                         initialValue = 1f,
                         targetValue = if (inputHasChanged) 0.85f else 1f,
                         animationSpec = infiniteRepeatable(
@@ -719,10 +720,10 @@ fun MainScreen(
                         modifier = Modifier
                             .weight(1f)
                             .graphicsLayer {
-                                val currentScale = if (inputHasChanged) pulseScale else 1f
+                                val currentScale = if (inputHasChanged) pulseScale.value else 1f
                                 scaleX = currentScale
                                 scaleY = currentScale
-                                alpha = if (inputHasChanged) pulseAlpha else 1f
+                                alpha = if (inputHasChanged) pulseAlpha.value else 1f
                             }
                     )
                     Spacer(Modifier.width(8.dp))
@@ -753,7 +754,7 @@ fun MainScreen(
             )
 
             // Input Card
-            val inputShakeOffset by animateFloatAsState(
+            val inputShakeOffset = animateFloatAsState(
                 targetValue = if (triggerInputShake) 1f else 0f,
                 animationSpec = if (triggerInputShake) {
                     spring(
@@ -766,36 +767,46 @@ fun MainScreen(
                 label = "inputShake"
             )
 
+            val onInputChange = remember {
+                { newText: String ->
+                    inputText = newText
+                    if (isInputError) isInputError = false
+                }
+            }
+            val onKeepStructureChange = remember { { it: Boolean -> keepStructure = it } }
+            val onExtractContent = remember {
+                { url: String ->
+                    scope.launch {
+                        try {
+                            val extractor = WebContentExtractor()
+                            val extractedContent = withContext(Dispatchers.IO) {
+                                extractor.extractContent(url)
+                            }
+                            inputText = extractedContent
+                            if (isInputError) isInputError = false
+                        } catch (e: Exception) {
+                            error = "Failed to extract content: ${e.message}"
+                        }
+                    }
+                    Unit
+                }
+            }
+            val onDismissPreview = remember { { linkPreviewData = null } }
+
             Box(
                 modifier = Modifier.graphicsLayer {
-                    translationX = kotlin.math.sin(inputShakeOffset * 8 * kotlin.math.PI.toFloat()) * 10f
+                    translationX = kotlin.math.sin(inputShakeOffset.value * 8 * kotlin.math.PI.toFloat()) * 10f
                 }
             ) {
                 InputCard(
                     inputText = inputText,
-                    onInputChange = {
-                        inputText = it
-                        if (isInputError) isInputError = false
-                    },
+                    onInputChange = onInputChange,
                     keepStructure = keepStructure,
-                    onKeepStructureChange = { keepStructure = it },
+                    onKeepStructureChange = onKeepStructureChange,
                     linkPreviewData = linkPreviewData,
                     isLoadingPreview = isLoadingPreview,
-                    onExtractContent = { url ->
-                        scope.launch {
-                            try {
-                                val extractor = WebContentExtractor()
-                                val extractedContent = withContext(Dispatchers.IO) {
-                                    extractor.extractContent(url)
-                                }
-                                inputText = extractedContent
-                                if (isInputError) isInputError = false
-                            } catch (e: Exception) {
-                                error = "Failed to extract content: ${e.message}"
-                            }
-                        }
-                    },
-                    onDismissPreview = { linkPreviewData = null },
+                    onExtractContent = onExtractContent,
+                    onDismissPreview = onDismissPreview,
                     isError = isInputError
                 )
             }
@@ -807,7 +818,7 @@ fun MainScreen(
             
             // Error State with Shake Animation
             AnimatedVisibility(visible = error != null && !isLoading, enter = fadeIn(), exit = fadeOut()) {
-                val shakeOffset by animateFloatAsState(
+                val shakeOffset = animateFloatAsState(
                     targetValue = if (triggerShakeAnimation) 1f else 0f,
                     animationSpec = if (triggerShakeAnimation) {
                         spring(
@@ -822,7 +833,7 @@ fun MainScreen(
                 
                 Box(
                     modifier = Modifier.graphicsLayer {
-                        translationX = kotlin.math.sin(shakeOffset * 8 * kotlin.math.PI.toFloat()) * 10f
+                        translationX = kotlin.math.sin(shakeOffset.value * 8 * kotlin.math.PI.toFloat()) * 10f
                     }
                 ) {
                     ErrorCard(
