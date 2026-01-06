@@ -1,45 +1,50 @@
-## 2024-05-23 - Concurrency Bug in Service Lifecycle
+## 2024-05-24 - Service Lifecycle Race Condition
 
-**Context:** `ContentGenerationService.kt`, which uses a `SingleThreadExecutor` to queue and process generation requests sequentially.
-**Symptoms:** If a user triggers a second generation request (e.g., "Refine") while the first one is still running, the second request is often silently dropped or never completes.
-**Root Cause:** The service was calling `stopSelf()` unconditionally in the `finally` block of the first task. This instructs the Android system to destroy the Service immediately (`onDestroy` shuts down the executor), even if there are other tasks queued in the executor or subsequent `onStartCommand` calls have occurred.
-**Fix Applied:** Changed `stopSelf()` to `stopSelf(startId)`. This conditional stop only terminates the service if the `startId` matches the most recent start request received by the service.
-**Prevention:** Always use `stopSelf(startId)` in Services that handle multiple asynchronous requests to ensure proper lifecycle management. Avoid unconditional `stopSelf()` unless you are certain no other work is pending.
+**Context:** `ContentGenerationService` handles asynchronous AI generation tasks using a `SingleThreadExecutor`.
+**Symptoms:** If a user triggers a second request that fails validation (e.g., empty input) immediately after a valid request, the service stops, potentially killing the valid request's execution environment.
+**Root Cause:**
+The `onStartCommand` method calls `handleGenerate` (or `handleRefine`) on the main thread.
+Inside `handleGenerate`, input validation happens *synchronously*.
+If validation fails, `stopSelf(startId)` is called immediately.
+If a previous valid request is running in the background thread (executor), the `stopSelf(startId)` call (where `startId` corresponds to the *failed* request, which is the most recent one) tells the system "I'm done with the latest work".
+The system then destroys the service (`onDestroy`), shutting down the executor and potentially killing the process, terminating the running valid request.
 
 **Code Example (Before):**
 ```kotlin
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // ...
-        handleGenerate(intent) // startId ignored
-        return START_NOT_STICKY
-    }
+    private fun handleGenerate(intent: Intent, startId: Int) {
+        val inputText = intent.getStringExtra(EXTRA_INPUT_TEXT)
+        // Validation on Main Thread
+        if (inputText.isNullOrEmpty()) {
+            broadcastError("Input text is required", false)
+            stopSelf(startId) // BUG: Stops service even if older tasks are running
+            return
+        }
 
-    private fun handleGenerate(intent: Intent) {
         executor.execute {
-            try {
-                // process...
-            } finally {
-                stopSelf() // BUG: Stops service even if new requests came in
-            }
+            // ... long running task ...
+            stopSelf(startId)
         }
     }
 ```
 
+**Fix Applied:**
+Move the validation logic *inside* the `executor.execute` block. This ensures that the validation (and subsequent `stopSelf` call) is processed sequentially in the queue, only after the previous task has completed.
+
 **Code Example (After):**
 ```kotlin
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // ...
-        handleGenerate(intent, startId) // Pass startId
-        return START_NOT_STICKY
-    }
-
     private fun handleGenerate(intent: Intent, startId: Int) {
+        val inputText = intent.getStringExtra(EXTRA_INPUT_TEXT)
+
         executor.execute {
-            try {
-                // process...
-            } finally {
-                stopSelf(startId) // FIX: Only stops if this was the last request
+             // Validation inside background thread (sequential)
+            if (inputText.isNullOrEmpty()) {
+                broadcastError("Input text is required", false)
+                stopSelf(startId) // SAFE: Only called when this task's turn arrives
+                return@execute
             }
+
+            // ... long running task ...
+            stopSelf(startId)
         }
     }
 ```
