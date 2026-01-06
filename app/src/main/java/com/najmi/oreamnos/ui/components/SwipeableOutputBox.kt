@@ -18,10 +18,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.R
 import com.najmi.oreamnos.utils.HapticHelper
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 /**
@@ -52,22 +55,16 @@ fun SwipeableOutputBox(
 ) {
     val context = LocalContext.current
     val hapticHelper = remember { HapticHelper(context) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
+    // OPTIMIZATION: Use Animatable to avoid recomposition during drag
+    val offsetX = remember { androidx.compose.animation.core.Animatable(0f) }
+    val scope = rememberCoroutineScope()
     val swipeThreshold = 150f
 
     // State to track if we've crossed the threshold to trigger haptics only once
     var isPastThreshold by remember { mutableStateOf(false) }
 
-    // Animate offset back to 0 when released
-    // Changed to LowBouncy for a more rubber-band feel
-    val animatedOffset by animateFloatAsState(
-        targetValue = offsetX,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "swipe_offset"
-    )
+    // Derived state for discrete logic changes to prevent recomposition on every frame
+    val isPastThresholdState by remember { derivedStateOf { abs(offsetX.value) > swipeThreshold } }
 
     Box(
         modifier = Modifier
@@ -80,10 +77,15 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(start = 24.dp)
-                .alpha(if (offsetX > 0) (offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
+                // OPTIMIZATION: Move alpha calculation to graphicsLayer
+                .graphicsLayer {
+                    val currentOffset = offsetX.value
+                    alpha = if (currentOffset > 0) (currentOffset / swipeThreshold).coerceIn(0f, 1f) else 0f
+                },
             contentAlignment = Alignment.Center
         ) {
-            val isActive = offsetX > swipeThreshold
+            // Use derived state for visual pop animations
+            val isActive = isPastThresholdState && offsetX.value > 0
             val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "share_scale")
             val rotateState by animateFloatAsState(if (isActive) 15f else 0f, label = "share_rotate")
             val iconColor by animateColorAsState(
@@ -123,10 +125,15 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(end = 24.dp)
-                .alpha(if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
+                // OPTIMIZATION: Move alpha calculation to graphicsLayer
+                .graphicsLayer {
+                    val currentOffset = offsetX.value
+                    alpha = if (currentOffset < 0) (-currentOffset / swipeThreshold).coerceIn(0f, 1f) else 0f
+                },
             contentAlignment = Alignment.Center
         ) {
-            val isActive = offsetX < -swipeThreshold
+            // Use derived state for visual pop animations
+            val isActive = isPastThresholdState && offsetX.value < 0
             val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
             val rotateState by animateFloatAsState(if (isActive) -15f else 0f, label = "copy_rotate")
             val iconColor by animateColorAsState(
@@ -165,19 +172,24 @@ fun SwipeableOutputBox(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                // OPTIMIZATION: Read offset in graphicsLayer phase only
                 .graphicsLayer {
-                    translationX = animatedOffset
+                    translationX = offsetX.value
                 }
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
                         onHorizontalDrag = { change, dragAmount ->
                             change.consume()
                             // Add resistance as we drag further
-                            val resistance = 1f - (abs(offsetX) / (swipeThreshold * 2)).coerceIn(0f, 0.5f)
-                            offsetX += dragAmount * resistance
+                            val current = offsetX.value
+                            val resistance = 1f - (abs(current) / (swipeThreshold * 2)).coerceIn(0f, 0.5f)
+                            val target = current + dragAmount * resistance
+
+                            // OPTIMIZATION: Update Animatable via coroutine
+                            scope.launch { offsetX.snapTo(target) }
 
                             // Haptic feedback logic
-                            val currentlyPastThreshold = abs(offsetX) > swipeThreshold
+                            val currentlyPastThreshold = abs(target) > swipeThreshold
                             if (currentlyPastThreshold != isPastThreshold) {
                                 if (currentlyPastThreshold) {
                                     hapticHelper.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
@@ -186,13 +198,22 @@ fun SwipeableOutputBox(
                             }
                         },
                         onDragEnd = {
-                            if (abs(offsetX) > swipeThreshold) {
+                            val current = offsetX.value
+                            if (abs(current) > swipeThreshold) {
                                 // Trigger action
-                                hapticHelper.onCopy() // Success haptic (works for both copy and share as a success indicator)
-                                if (offsetX > 0) onShare() else onCopy()
+                                hapticHelper.onCopy() // Success haptic
+                                if (current > 0) onShare() else onCopy()
                             }
-                            // Reset
-                            offsetX = 0f
+                            // Animate offset back to 0 when released
+                            scope.launch {
+                                offsetX.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioLowBouncy,
+                                        stiffness = Spring.StiffnessMedium
+                                    )
+                                )
+                            }
                             isPastThreshold = false
                         }
                     )

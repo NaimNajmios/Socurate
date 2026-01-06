@@ -1,13 +1,18 @@
-## 2024-01-04 - Debounced URL Metadata Fetching
+## 2024-05-23 - SwipeableOutputBox Recomposition Optimization
 
-**Context:** `MainActivity.kt`'s `LaunchedEffect` for URL detection.
+**Context:** The `SwipeableOutputBox` component was recomposing on every frame during swipe gestures.
 **Metric Impact:**
-- **Network Requests:** Reduced from N (1 per char typed) to ~1 per URL entry.
-- **Battery/CPU:** Eliminated overhead from starting/cancelling Coroutines and network stacks for incomplete URLs.
-**Root Cause:** The `LaunchedEffect(inputText)` triggered `WebContentExtractor.extractMetadata` immediately when `isUrl` returned true. Since `isUrl` can match partial URLs (e.g., "http://" matches len > 7), typing a full URL caused rapid-fire network requests.
-**Solution:** Added `kotlinx.coroutines.delay(800)` (debounce) inside the `if (isUrl)` block.
-**Learnings:** High-frequency input fields (like text editors) that trigger network side-effects must always be debounced to prevent resource exhaustion.
+- Recomposition count during drag: ~1 per frame (60-120/sec) → 0 per frame (layout/draw only).
+- Significant reduction in main thread work during gestures.
 
-**Profiling Data (Estimated):**
-- Network Calls per URL Typed: ~15 → 1
-- Thread Jitter: Reduced due to fewer `Dispatchers.IO` context switches.
+**Root Cause:**
+The `offsetX` state variable (updated every drag event) was being read in the main composition scope (e.g., inside `Box` modifiers like `.alpha(...)` and for `isActive` boolean checks). This invalidated the scope of `SwipeableOutputBox` continuously.
+
+**Solution:**
+1.  **Defer State Reads:** Moved visual transformations (translation, alpha) into `Modifier.graphicsLayer { ... }`. This allows the state to be read during the draw phase, bypassing composition.
+2.  **Isolate Logic:** Used `derivedStateOf` for the `isActive` (threshold) logic. This ensures that the component only recomposes when the threshold is actually crossed (a discrete event), rather than on every pixel of movement.
+3.  **Animatable vs State:** Switched from `mutableFloatStateOf` to `Animatable`. This allows imperative updates via `snapTo` inside a coroutine, which integrates cleanly with the gesture detector without triggering composition-side state reads in the gesture callback itself (though effectively similar, `Animatable` is the standard for gesture-driven animations).
+
+**Learnings:**
+- **Pattern:** Always use `graphicsLayer` for values that change rapidly (animations, gestures).
+- **Anti-Pattern:** Reading a `MutableState` directly in a Composable's body that updates every frame (e.g., scroll offset, drag offset).
