@@ -26,6 +26,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -92,6 +93,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -138,10 +140,17 @@ import com.najmi.oreamnos.ui.components.NeoChip
 import com.najmi.oreamnos.ui.components.NeoCopyButton
 import com.najmi.oreamnos.ui.components.NeoInput
 import com.najmi.oreamnos.ui.components.NeoOutlinedButton
+import com.najmi.oreamnos.ui.components.NeoSwitch
+import com.najmi.oreamnos.ui.components.SwipeableOutputBox
 import com.najmi.oreamnos.ui.components.AnimatedCheckmark
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
+import com.najmi.oreamnos.ui.components.EmptyStateCard
 import com.najmi.oreamnos.ui.components.FluidRefinementFlow
+import com.najmi.oreamnos.ui.components.LinkPreviewSection
+import com.najmi.oreamnos.ui.components.PasteAction
+import com.najmi.oreamnos.ui.components.ClearAction
 import com.najmi.oreamnos.viewmodel.MainViewModel
+import androidx.compose.animation.animateContentSize
 
 // File-level regex patterns for use in composables
 private val SOURCE_CITATION_PATTERN = Regex("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$")
@@ -374,6 +383,10 @@ fun MainScreen(
     var previousInput by remember { mutableStateOf(initialSharedText ?: "") }
     var triggerShakeAnimation by remember { mutableStateOf(false) }
 
+    // Input validation state
+    var isInputError by remember { mutableStateOf(false) }
+    var triggerInputShake by remember { mutableStateOf(false) }
+
     
     // Load custom pills
     LaunchedEffect(Unit) {
@@ -383,7 +396,11 @@ fun MainScreen(
     
     // Detect URL and fetch metadata
     LaunchedEffect(inputText) {
-        if (WebContentExtractor.isUrl(inputText.trim())) {
+        // Optimized: Remove redundant trim(), isUrl handles CharSequence efficiently
+        if (WebContentExtractor.isUrl(inputText)) {
+            // Debounce to prevent network spam while typing a URL
+            kotlinx.coroutines.delay(800)
+
             isLoadingPreview = true
             previewError = null
             try {
@@ -405,27 +422,30 @@ fun MainScreen(
         }
     }
     
-    // Helper function to rebuild output
-    fun rebuildOutput() {
-        val builder = StringBuilder()
-        if (includeTitle && generatedTitle.isNotEmpty()) {
-            builder.append(StringUtils.stripLeadingEmojis(generatedTitle)).append("\n\n")
-        }
-        
-        // If title is NOT included, we should check if the body starts with the title to avoid duplication
-        // or if we need to strip it from the body if it was part of the original result
-        builder.append(StringUtils.stripLeadingEmojis(generatedBody))
-        
-        if (includeSource && generatedSource.isNotEmpty()) {
-            builder.append("\n\n").append(generatedSource)
-        }
-        if (includeHashtags && prefsManager.areHashtagsEnabled()) {
-            val hashtags = prefsManager.getFormattedHashtags()
-            if (hashtags.isNotEmpty()) {
-                builder.append("\n\n").append(hashtags)
+    // Helper function to rebuild output - remembered to stay stable across recompositions
+    // This prevents OutputCard from recomposing when unrelated state (like inputText) changes
+    val rebuildOutput = remember(generatedTitle, generatedBody, generatedSource, includeTitle, includeHashtags, includeSource) {
+        {
+            val builder = StringBuilder()
+            if (includeTitle && generatedTitle.isNotEmpty()) {
+                builder.append(StringUtils.stripLeadingEmojis(generatedTitle)).append("\n\n")
             }
+
+            // If title is NOT included, we should check if the body starts with the title to avoid duplication
+            // or if we need to strip it from the body if it was part of the original result
+            builder.append(StringUtils.stripLeadingEmojis(generatedBody))
+
+            if (includeSource && generatedSource.isNotEmpty()) {
+                builder.append("\n\n").append(generatedSource)
+            }
+            if (includeHashtags && prefsManager.areHashtagsEnabled()) {
+                val hashtags = prefsManager.getFormattedHashtags()
+                if (hashtags.isNotEmpty()) {
+                    builder.append("\n\n").append(hashtags)
+                }
+            }
+            outputText = builder.toString().trim()
         }
-        outputText = builder.toString().trim()
     }
     
     // Process generation result
@@ -541,6 +561,14 @@ fun MainScreen(
             triggerShakeAnimation = false
         }
     }
+
+    // Reset input shake animation after it triggers
+    LaunchedEffect(triggerInputShake) {
+        if (triggerInputShake) {
+            kotlinx.coroutines.delay(500)
+            triggerInputShake = false
+        }
+    }
     
     // Success animation timeout
     LaunchedEffect(showSuccessAnimation) {
@@ -652,7 +680,7 @@ fun MainScreen(
                 ) {
                     // Pulse animation for Generate button when input changes
                     val infiniteTransition = rememberInfiniteTransition(label = "generatePulse")
-                    val pulseScale by infiniteTransition.animateFloat(
+                    val pulseScale = infiniteTransition.animateFloat(
                         initialValue = 1f,
                         targetValue = if (inputHasChanged) 1.05f else 1f,
                         animationSpec = infiniteRepeatable(
@@ -661,7 +689,7 @@ fun MainScreen(
                         ),
                         label = "pulse_scale"
                     )
-                    val pulseAlpha by infiniteTransition.animateFloat(
+                    val pulseAlpha = infiniteTransition.animateFloat(
                         initialValue = 1f,
                         targetValue = if (inputHasChanged) 0.85f else 1f,
                         animationSpec = infiniteRepeatable(
@@ -675,7 +703,9 @@ fun MainScreen(
                         onClick = {
                             inputHasChanged = false // Stop pulsing when clicked
                             if (inputText.isBlank()) {
-                                Toast.makeText(context, R.string.input_required, Toast.LENGTH_SHORT).show()
+                                isInputError = true
+                                triggerInputShake = true
+                                HapticHelper(context).onError()
                             } else if (!prefsManager.hasApiKey()) {
                                 Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
                                 onNavigateToSettings()
@@ -686,10 +716,15 @@ fun MainScreen(
                             }
                         },
                         text = "GENERATE",
+                        isLoading = isLoading,
                         modifier = Modifier
                             .weight(1f)
-                            .scale(if (inputHasChanged) pulseScale else 1f)
-                            .alpha(if (inputHasChanged) pulseAlpha else 1f)
+                            .graphicsLayer {
+                                val currentScale = if (inputHasChanged) pulseScale.value else 1f
+                                scaleX = currentScale
+                                scaleY = currentScale
+                                alpha = if (inputHasChanged) pulseAlpha.value else 1f
+                            }
                     )
                     Spacer(Modifier.width(8.dp))
                     TextButton(onClick = onNavigateToUsage) {
@@ -719,28 +754,62 @@ fun MainScreen(
             )
 
             // Input Card
-            InputCard(
-                inputText = inputText,
-                onInputChange = { inputText = it },
-                keepStructure = keepStructure,
-                onKeepStructureChange = { keepStructure = it },
-                linkPreviewData = linkPreviewData,
-                isLoadingPreview = isLoadingPreview,
-                onExtractContent = { url ->
-                    kotlinx.coroutines.MainScope().launch {
+            val inputShakeOffset = animateFloatAsState(
+                targetValue = if (triggerInputShake) 1f else 0f,
+                animationSpec = if (triggerInputShake) {
+                    spring(
+                        dampingRatio = Spring.DampingRatioHighBouncy,
+                        stiffness = Spring.StiffnessHigh
+                    )
+                } else {
+                    tween(0)
+                },
+                label = "inputShake"
+            )
+
+            val onInputChange = remember {
+                { newText: String ->
+                    inputText = newText
+                    if (isInputError) isInputError = false
+                }
+            }
+            val onKeepStructureChange = remember { { it: Boolean -> keepStructure = it } }
+            val onExtractContent = remember {
+                { url: String ->
+                    scope.launch {
                         try {
                             val extractor = WebContentExtractor()
                             val extractedContent = withContext(Dispatchers.IO) {
                                 extractor.extractContent(url)
                             }
                             inputText = extractedContent
+                            if (isInputError) isInputError = false
                         } catch (e: Exception) {
                             error = "Failed to extract content: ${e.message}"
                         }
                     }
-                },
-                onDismissPreview = { linkPreviewData = null }
-            )
+                    Unit
+                }
+            }
+            val onDismissPreview = remember { { linkPreviewData = null } }
+
+            Box(
+                modifier = Modifier.graphicsLayer {
+                    translationX = kotlin.math.sin(inputShakeOffset.value * 8 * kotlin.math.PI.toFloat()) * 10f
+                }
+            ) {
+                InputCard(
+                    inputText = inputText,
+                    onInputChange = onInputChange,
+                    keepStructure = keepStructure,
+                    onKeepStructureChange = onKeepStructureChange,
+                    linkPreviewData = linkPreviewData,
+                    isLoadingPreview = isLoadingPreview,
+                    onExtractContent = onExtractContent,
+                    onDismissPreview = onDismissPreview,
+                    isError = isInputError
+                )
+            }
             
             // Loading State
             AnimatedVisibility(visible = isLoading, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
@@ -749,7 +818,7 @@ fun MainScreen(
             
             // Error State with Shake Animation
             AnimatedVisibility(visible = error != null && !isLoading, enter = fadeIn(), exit = fadeOut()) {
-                val shakeOffset by animateFloatAsState(
+                val shakeOffset = animateFloatAsState(
                     targetValue = if (triggerShakeAnimation) 1f else 0f,
                     animationSpec = if (triggerShakeAnimation) {
                         spring(
@@ -764,7 +833,7 @@ fun MainScreen(
                 
                 Box(
                     modifier = Modifier.graphicsLayer {
-                        translationX = kotlin.math.sin(shakeOffset * 8 * kotlin.math.PI.toFloat()) * 10f
+                        translationX = kotlin.math.sin(shakeOffset.value * 8 * kotlin.math.PI.toFloat()) * 10f
                     }
                 ) {
                     ErrorCard(
@@ -784,75 +853,98 @@ fun MainScreen(
             // Output Card
             AnimatedVisibility(visible = hasResult && !isLoading, enter = fadeIn() + expandVertically()) {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    OutputCard(
-                        outputText = outputText,
-                        isEditMode = isEditMode,
-                        onOutputChange = { if (isEditMode) outputText = it },
-                        includeTitle = includeTitle,
-                        includeHashtags = includeHashtags,
-                        includeSource = includeSource,
-                        hasHashtags = prefsManager.getHashtags()?.isNotEmpty() == true,
-                        isSourceEnabled = prefsManager.isSourceEnabled(),
-                        onIncludeTitleChange = { includeTitle = it; rebuildOutput() },
-                        onIncludeHashtagsChange = { includeHashtags = it; rebuildOutput() },
-                        onIncludeSourceChange = { includeSource = it; rebuildOutput() },
-                        onEditClick = { 
+                    // Stable callbacks to prevent OutputCard recomposition on input change
+                    val onOutputChange = remember { { it: String -> if (isEditMode) outputText = it } }
+                    val onIncludeTitleChange = remember(rebuildOutput) { { it: Boolean -> includeTitle = it; rebuildOutput() } }
+                    val onIncludeHashtagsChange = remember(rebuildOutput) { { it: Boolean -> includeHashtags = it; rebuildOutput() } }
+                    val onIncludeSourceChange = remember(rebuildOutput) { { it: Boolean -> includeSource = it; rebuildOutput() } }
+                    val onEditClick = remember(rebuildOutput) {
+                        {
                             isEditMode = !isEditMode
                             if (!isEditMode) rebuildOutput()
-                        },
-                        onCopyClick = {
+                        }
+                    }
+                    val onCopyClick = remember {
+                        {
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             clipboard.setPrimaryClip(ClipData.newPlainText("Socurate Post", outputText))
                             Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
-                        },
-                        onShareClick = {
+                        }
+                    }
+                    val onShareClick = remember(outputText) {
+                        {
                             val intent = Intent(Intent.ACTION_SEND).apply {
                                 type = "text/plain"
                                 putExtra(Intent.EXTRA_TEXT, outputText)
                             }
                             context.startActivity(Intent.createChooser(intent, "Share"))
-                        },
-                        onExpandClick = { showReadingDialog = true },
+                        }
+                    }
+                    val onExpandClick = remember { { showReadingDialog = true } }
+
+                    OutputCard(
+                        outputText = outputText,
+                        isEditMode = isEditMode,
+                        onOutputChange = onOutputChange,
+                        includeTitle = includeTitle,
+                        includeHashtags = includeHashtags,
+                        includeSource = includeSource,
+                        hasHashtags = prefsManager.getHashtags()?.isNotEmpty() == true,
+                        isSourceEnabled = prefsManager.isSourceEnabled(),
+                        onIncludeTitleChange = onIncludeTitleChange,
+                        onIncludeHashtagsChange = onIncludeHashtagsChange,
+                        onIncludeSourceChange = onIncludeSourceChange,
+                        onEditClick = onEditClick,
+                        onCopyClick = onCopyClick,
+                        onShareClick = onShareClick,
+                        onExpandClick = onExpandClick,
                         textSize = textSizeState.intValue
                     )
                     
                     // Refinement Card
-                    RefinementCard(
-                        selectedOptions = refinementOptions,
-                        customPills = customPills,
-                        selectedPillIds = selectedPillIds,
-                        onToggleOption = { option ->
+                    val onToggleOption = remember {
+                        { option: String ->
                             if (refinementOptions.contains(option)) refinementOptions.remove(option)
                             else refinementOptions.add(option)
-                        },
-                        onTogglePill = { pillId ->
+                        }
+                    }
+                    val onTogglePill = remember {
+                        { pillId: String ->
                             if (selectedPillIds.contains(pillId)) selectedPillIds.remove(pillId)
                             else selectedPillIds.add(pillId)
-                        },
-                        onRegenerate = {
+                        }
+                    }
+                    val onRegenerateAction = remember(outputText) {
+                        {
                             val allRefinements = refinementOptions.toList() + 
                                 customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
                             if (allRefinements.isEmpty()) {
                                 Toast.makeText(context, "Please select at least one refinement", Toast.LENGTH_SHORT).show()
-                                return@RefinementCard
+                            } else {
+                                isLoading = true
+                                hasResult = false
+                                onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
                             }
-                            isLoading = true
-                            hasResult = false
-                            onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
-                        },
-                        onCreatePill = {
-                            showCreatePillDialog = true
-                        },
-                        onEditPill = { pill ->
-                            pillToEdit = pill
-                            showEditPillDialog = true
                         }
+                    }
+                    val onCreatePill = remember { { showCreatePillDialog = true } }
+                    val onEditPill = remember { { pill: GenerationPill -> pillToEdit = pill; showEditPillDialog = true } }
+
+                    RefinementCard(
+                        selectedOptions = refinementOptions,
+                        customPills = customPills,
+                        selectedPillIds = selectedPillIds,
+                        onToggleOption = onToggleOption,
+                        onTogglePill = onTogglePill,
+                        onRegenerate = onRegenerateAction,
+                        onCreatePill = onCreatePill,
+                        onEditPill = onEditPill
                     )
                 }
             }
             
             // Empty State
-            AnimatedVisibility(visible = !hasResult && !isLoading && error == null, enter = fadeIn(), exit = fadeOut()) {
+            AnimatedVisibility(visible = !hasResult && !isLoading && error == null && inputText.isBlank(), enter = fadeIn(), exit = fadeOut()) {
                 EmptyStateCard(
                     onPaste = {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -860,7 +952,10 @@ fun MainScreen(
                             val text = clipboard.primaryClip?.getItemAt(0)?.text
                             if (text != null) {
                                 inputText = text.toString()
+                                Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
                             }
+                        } else {
+                            Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
                         }
                     }
                 )
@@ -880,6 +975,7 @@ fun MainScreen(
     }
 }
 
+@OptIn(androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 fun InputCard(
     inputText: String,
@@ -889,213 +985,137 @@ fun InputCard(
     linkPreviewData: WebContentExtractor.UrlMetadata?,
     isLoadingPreview: Boolean,
     onExtractContent: (String) -> Unit,
-    onDismissPreview: () -> Unit
+    onDismissPreview: () -> Unit,
+    isError: Boolean = false
 ) {
+    val context = LocalContext.current
+
     NeoCard(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        borderColor = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
     ) {
-        NeoInput(
-            value = inputText,
-            onValueChange = onInputChange,
-            modifier = Modifier.fillMaxWidth(),
-            label = "SOURCE MATERIAL",
-            placeholder = "Paste article text or URL...",
-            minLines = 5,
-            maxLines = 10
-        )
-        
-        Spacer(Modifier.height(16.dp))
-        
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("PRESERVE STRUCTURE", style = MaterialTheme.typography.labelLarge)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Clear Button
-                if (inputText.isNotEmpty()) {
-                    TextButton(onClick = { onInputChange("") }) {
-                        Text("CLEAR", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.error)
-                    }
-                    Spacer(Modifier.width(8.dp))
-                }
-                
-                Switch(
-                    checked = keepStructure, 
-                    onCheckedChange = onKeepStructureChange,
-                    colors = androidx.compose.material3.SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.primary,
-                        checkedTrackColor = MaterialTheme.colorScheme.surface,
-                        checkedBorderColor = MaterialTheme.colorScheme.primary,
-                        uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.surface,
-                        uncheckedBorderColor = MaterialTheme.colorScheme.outline
-                    )
-                )
-            }
-        }
-        
-        // Link Preview Section (just below preserve structure)
-        if (linkPreviewData != null) {
-            Spacer(Modifier.height(16.dp))
-            androidx.compose.material3.Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-            Spacer(Modifier.height(16.dp))
-            
-            // Link preview content
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Content row with icon and text
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = linkPreviewData.domain.take(1).uppercase(),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = linkPreviewData.title ?: "Link",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            lineHeight = 20.sp
-                        )
-                        Text(
-                            text = linkPreviewData.domain,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                
-                // Action buttons row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    NeoButton(
-                        onClick = { onExtractContent(linkPreviewData.originalUrl) },
-                        text = "EXTRACT",
-                        modifier = Modifier.weight(1f),
-                        enabled = true
-                    )
-                    IconButton(
-                        onClick = onDismissPreview,
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(Icons.Default.Close, "Dismiss", modifier = Modifier.size(20.dp))
-                    }
-                }
-            }
-        } else if (isLoadingPreview) {
-            Spacer(Modifier.height(16.dp))
-            androidx.compose.material3.Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-            Spacer(Modifier.height(16.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
-                Text("Loading preview...", style = MaterialTheme.typography.bodyMedium)
-            }
-        }
-    }
-}
-
-@Composable
-fun LinkPreviewCard(
-    metadata: WebContentExtractor.UrlMetadata,
-    isLoading: Boolean,
-    onExtract: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    NeoCard(modifier = Modifier.fillMaxWidth()) {
+        // Animate content size change when preview appears
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                )
         ) {
-            // Content row with icon and text
+            NeoInput(
+                value = inputText,
+                onValueChange = onInputChange,
+                modifier = Modifier.fillMaxWidth(),
+                label = "SOURCE MATERIAL",
+                placeholder = "Paste article text or URL...",
+                minLines = 5,
+                maxLines = 10,
+                isError = isError,
+                trailingIcon = {
+                    androidx.compose.animation.AnimatedContent(
+                        targetState = inputText.isNotEmpty(),
+                        transitionSpec = {
+                            (scaleIn() + fadeIn()) with (scaleOut() + fadeOut())
+                        },
+                        label = "input_action"
+                    ) { hasText ->
+                        if (hasText) {
+                            ClearAction(onClear = { onInputChange("") })
+                        } else {
+                            PasteAction(onPaste = {
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                if (clipboard.hasPrimaryClip()) {
+                                    val text = clipboard.primaryClip?.getItemAt(0)?.text
+                                    if (text != null) {
+                                        onInputChange(text.toString())
+                                        Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
+                                    }
+                                } else {
+                                    Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                        }
+                    }
+                },
+                supportingText = {
+                    AnimatedVisibility(
+                        visible = inputText.isNotEmpty(),
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        val charCount = inputText.length
+                        val wordCount = remember(inputText) { ReadabilityUtils.countWords(inputText) }
+
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            Text(
+                                text = "$charCount chars / $wordCount words",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            )
+
+            Spacer(Modifier.height(16.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = metadata.domain.take(1).uppercase(),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = metadata.title ?: "Link",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        lineHeight = 20.sp
-                    )
-                    Text(
-                        text = metadata.domain,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                Text("PRESERVE STRUCTURE", style = MaterialTheme.typography.labelLarge)
+
+                NeoSwitch(
+                    checked = keepStructure,
+                    onCheckedChange = onKeepStructureChange
+                )
+            }
+
+            // Animated Link Preview Section
+            AnimatedVisibility(
+                visible = linkPreviewData != null,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                if (linkPreviewData != null) {
+                    LinkPreviewSection(
+                        linkPreviewData = linkPreviewData,
+                        onExtract = { onExtractContent(linkPreviewData.originalUrl) },
+                        onDismiss = onDismissPreview
                     )
                 }
             }
-            
-            // Action buttons row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+
+            // Animated Loading State
+            AnimatedVisibility(
+                visible = isLoadingPreview,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
             ) {
-                NeoButton(
-                    onClick = onExtract,
-                    text = "EXTRACT",
-                    modifier = Modifier.weight(1f),
-                    enabled = !isLoading
-                )
-                IconButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(Icons.Default.Close, "Dismiss", modifier = Modifier.size(20.dp))
+                Column {
+                    Spacer(Modifier.height(16.dp))
+                    androidx.compose.material3.Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                    Spacer(Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        Text("Loading preview...", style = MaterialTheme.typography.bodyMedium)
+                    }
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 fun OutputCard(
     outputText: String,
@@ -1154,24 +1174,42 @@ fun OutputCard(
         
         
         // Output text with swipe gestures and long-press menu
-        if (isEditMode) {
-            NeoInput(
-                value = outputText,
-                onValueChange = onOutputChange,
-                modifier = Modifier.fillMaxWidth(),
-                readOnly = false,
-                minLines = 8,
-                maxLines = 20,
-                label = "GENERATED CONTENT",
-                textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = textSize.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
-            )
-        } else {
-            SwipeableOutputBox(
-                outputText = outputText,
-                textSize = textSize,
-                onCopy = onCopyClick,
-                onShare = onShareClick
-            )
+        Box(modifier = Modifier.fillMaxWidth().animateContentSize()) {
+            AnimatedContent(
+                targetState = isEditMode,
+                transitionSpec = {
+                    if (targetState) {
+                        // Entering Edit Mode: Subtle expansion feel
+                        (fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.98f)) with
+                        (fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.98f))
+                    } else {
+                        // Exiting Edit Mode: Subtle collapse feel
+                        (fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.98f)) with
+                        (fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.98f))
+                    }
+                },
+                label = "edit_mode_transition"
+            ) { editing ->
+                if (editing) {
+                    NeoInput(
+                        value = outputText,
+                        onValueChange = onOutputChange,
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = false,
+                        minLines = 8,
+                        maxLines = 20,
+                        label = "GENERATED CONTENT",
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = textSize.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+                    )
+                } else {
+                    SwipeableOutputBox(
+                        outputText = outputText,
+                        textSize = textSize,
+                        onCopy = onCopyClick,
+                        onShare = onShareClick
+                    )
+                }
+            }
         }
         
         // Stats
@@ -1194,7 +1232,11 @@ fun OutputCard(
             
             // Action buttons
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                NeoOutlinedButton(onClick = onEditClick, modifier = Modifier.weight(1f), text = if (isEditMode) "Save" else "Edit")
+                com.najmi.oreamnos.ui.components.FluidEditButton(
+                    isEditing = isEditMode,
+                    onToggle = onEditClick,
+                    modifier = Modifier.weight(1f)
+                )
                 NeoCopyButton(
                     onCopy = onCopyClick,
                     modifier = Modifier.weight(1f)
@@ -1204,261 +1246,6 @@ fun OutputCard(
     }
 }
 
-/**
- * Swipeable output box with gesture support:
- * - Swipe left to copy
- * - Swipe right to share
- */
-@Composable
-fun SwipeableOutputBox(
-    outputText: String,
-    textSize: Int,
-    onCopy: () -> Unit,
-    onShare: () -> Unit
-) {
-    val context = LocalContext.current
-    val hapticHelper = remember { HapticHelper(context) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    val swipeThreshold = 150f
-    
-    // Animate offset back to 0
-    val animatedOffset by animateFloatAsState(
-        targetValue = offsetX,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "swipe_offset"
-    )
-    
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .graphicsLayer {
-                translationX = animatedOffset
-            }
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures(
-                    onHorizontalDrag = { change, dragAmount ->
-                        change.consume()
-                        offsetX += dragAmount
-                    },
-                    onDragEnd = {
-                        when {
-                            offsetX < -swipeThreshold -> {
-                                // Swipe left = Copy
-                                hapticHelper.onCopy()
-                                onCopy()
-                                offsetX = 0f
-                            }
-                            offsetX > swipeThreshold -> {
-                                // Swipe right = Share
-                                hapticHelper.onCopy()
-                                onShare()
-                                offsetX = 0f
-                            }
-                            else -> {
-                                // Spring back
-                                offsetX = 0f
-                            }
-                        }
-                    }
-                )
-            }
-    ) {
-        // Show swipe indicators
-        if (offsetX < -50f) {
-            // Copy indicator (left)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 16.dp)
-                    .alpha(((-offsetX - 50f) / 100f).coerceIn(0f, 1f))
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_copy),
-                    contentDescription = "Copy",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-        } else if (offsetX > 50f) {
-            // Share indicator (right)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = 16.dp)
-                    .alpha(  ((offsetX - 50f) / 100f).coerceIn(0f, 1f))
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_share),
-                    contentDescription = "Share",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-        }
-        
-        // Actual output box
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 400.dp)
-                .background(
-                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
-                    RoundedCornerShape(4.dp)
-                )
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // Memoize parsed text to avoid re-parsing on every frame during swipe
-            val primaryColor = MaterialTheme.colorScheme.primary
-            val parsedText = remember(outputText, primaryColor) {
-                parseMarkdownToAnnotatedString(outputText, primaryColor)
-            }
-
-            androidx.compose.foundation.text.selection.SelectionContainer {
-                com.najmi.oreamnos.ui.components.TypewriterText(
-                    text = parsedText,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = textSize.sp,
-                        lineHeight = (textSize * 1.5f).sp,
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-                    )
-                )
-            }
-        }
-    }
-}
-
-/**
- * Parses markdown formatting and converts to AnnotatedString for rich text display.
- * Supports: **bold**, *italic*, _italic_, ## Headers, - lists, * lists
- */
-fun parseMarkdownToAnnotatedString(text: String, primaryColor: Color): androidx.compose.ui.text.AnnotatedString {
-    return buildAnnotatedString {
-        val lines = text.split("\n")
-        
-        lines.forEachIndexed { lineIndex, line ->
-            // Check for header (## Header)
-            if (line.trimStart().startsWith("## ")) {
-                val headerText = line.trimStart().removePrefix("## ")
-                withStyle(
-                    style = SpanStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = primaryColor
-                    )
-                ) {
-                    append(headerText)
-                }
-            }
-            // Check for bullet list (- item, * item, or • item)
-            else if (line.trimStart().startsWith("- ") || line.trimStart().startsWith("* ")) {
-                val bulletText = line.trimStart().drop(2)
-                append("• ") // Convert to bullet
-                parseInlineFormatting(bulletText)
-            }
-            // Check for already-bulleted line (• U+2022)
-            else if (line.trimStart().startsWith("\u2022 ") || line.trimStart().startsWith("\u2022")) {
-                // Keep the bullet character and parse the rest
-                val trimmed = line.trimStart()
-                val bulletText = if (trimmed.length > 1 && trimmed[1] == ' ') trimmed.drop(2) else trimmed.drop(1)
-                append("• ")
-                parseInlineFormatting(bulletText)
-            }
-            else {
-                // Parse inline formatting (bold, italic)
-                parseInlineFormatting(line)
-            }
-            
-            // Add newline except for last line
-            if (lineIndex < lines.size - 1) {
-                append("\n")
-            }
-        }
-    }
-}
-
-/**
- * Helper function to parse inline formatting (bold and italic)
- */
-private fun androidx.compose.ui.text.AnnotatedString.Builder.parseInlineFormatting(text: String) {
-    var currentIndex = 0
-    
-    while (currentIndex < text.length) {
-        // Look for bold (**text**)
-        val boldStart = text.indexOf("**", currentIndex)
-        // Look for italic (*text* or _text_)
-        val italicStarStart = text.indexOf("*", currentIndex).let { 
-            if (it != -1 && it + 1 < text.length && text[it + 1] == '*') -1 else it 
-        }
-        val italicUnderStart = text.indexOf("_", currentIndex).let {
-            if (it != -1 && it + 1 < text.length && text[it + 1] == '_') -1 else it
-        }
-        
-        // Find earliest formatting marker
-        val nextFormat = listOf(
-            boldStart to "bold",
-            italicStarStart to "italic_star",
-            italicUnderStart to "italic_under"
-        ).filter { it.first != -1 }.minByOrNull { it.first }
-        
-        if (nextFormat == null) {
-            // No more formatting, append rest
-            append(text.substring(currentIndex))
-            break
-        }
-        
-        val (formatStart, formatType) = nextFormat
-        
-        // Append text before formatting
-        append(text.substring(currentIndex, formatStart))
-        
-        when (formatType) {
-            "bold" -> {
-                val boldEnd = text.indexOf("**", formatStart + 2)
-                if (boldEnd != -1) {
-                    val boldText = text.substring(formatStart + 2, boldEnd)
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(boldText)
-                    }
-                    currentIndex = boldEnd + 2
-                } else {
-                    append("**")
-                    currentIndex = formatStart + 2
-                }
-            }
-            "italic_star" -> {
-                val italicEnd = text.indexOf("*", formatStart + 1)
-                if (italicEnd != -1) {
-                    val italicText = text.substring(formatStart + 1, italicEnd)
-                    withStyle(SpanStyle(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)) {
-                        append(italicText)
-                    }
-                    currentIndex = italicEnd + 1
-                } else {
-                    append("*")
-                    currentIndex = formatStart + 1
-                }
-            }
-            "italic_under" -> {
-                val italicEnd = text.indexOf("_", formatStart + 1)
-                if (italicEnd != -1) {
-                    val italicText = text.substring(formatStart + 1, italicEnd)
-                    withStyle(SpanStyle(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)) {
-                        append(italicText)
-                    }
-                    currentIndex = italicEnd + 1
-                } else {
-                    append("_")
-                    currentIndex = formatStart + 1
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -1537,29 +1324,6 @@ fun ErrorCard(error: String, onRetry: () -> Unit, onChangeProvider: () -> Unit) 
     }
 }
 
-@Composable
-fun EmptyStateCard(onPaste: () -> Unit) {
-    NeoCard(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_empty_state),
-                contentDescription = null,
-                modifier = Modifier.size(80.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(Modifier.height(24.dp))
-            Text("READY TO GENERATE", style = MaterialTheme.typography.titleMedium)
-            Text("Paste content or enter a URL above", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(24.dp))
-            NeoOutlinedButton(onClick = onPaste, text = "PASTE FROM CLIPBOARD")
-        }
-    }
-}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

@@ -146,23 +146,11 @@ class OpenAICompatibleCurator(
 
             return if (responseCode == HttpURLConnection.HTTP_OK) {
                 // Read response
-                val response = StringBuilder()
-                BufferedReader(InputStreamReader(conn.inputStream, StandardCharsets.UTF_8)).use { br ->
-                    var line: String?
-                    while (br.readLine().also { line = it } != null) {
-                        response.append(line)
-                    }
-                }
-                parseResponse(response.toString())
+                val response = readStream(conn.inputStream)
+                parseResponse(response)
             } else {
-                // Read error response
-                val errorResponse = StringBuilder()
-                BufferedReader(InputStreamReader(conn.errorStream, StandardCharsets.UTF_8)).use { br ->
-                    var line: String?
-                    while (br.readLine().also { line = it } != null) {
-                        errorResponse.append(line)
-                    }
-                }
+                // Read error response safely (errorStream can be null)
+                val errorResponse = readStream(conn.errorStream)
 
                 Log.e(TAG, "API Error: $errorResponse")
 
@@ -181,6 +169,22 @@ class OpenAICompatibleCurator(
         } finally {
             conn.disconnect()
         }
+    }
+
+    /**
+     * Safely reads an input stream into a String.
+     * Returns empty string if stream is null.
+     */
+    private fun readStream(stream: java.io.InputStream?): String {
+        if (stream == null) return ""
+        val response = StringBuilder()
+        BufferedReader(InputStreamReader(stream, StandardCharsets.UTF_8)).use { br ->
+            var line: String?
+            while (br.readLine().also { line = it } != null) {
+                response.append(line)
+            }
+        }
+        return response.toString()
     }
 
     /**

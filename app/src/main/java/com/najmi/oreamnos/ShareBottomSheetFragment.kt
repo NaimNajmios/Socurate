@@ -414,7 +414,7 @@ fun ShareBottomSheetContent(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val wordCount = if (outputText.isEmpty()) 0 else WHITESPACE_PATTERN.split(outputText).size
+                    val wordCount = ReadabilityUtils.countWords(outputText)
                     val gradeLevel = ReadabilityUtils.calculateFleschKincaidGradeLevel(outputText)
                     Text("$wordCount words", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text("Grade: ${String.format("%.1f", gradeLevel)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

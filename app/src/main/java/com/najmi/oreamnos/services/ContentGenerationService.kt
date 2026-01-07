@@ -55,11 +55,11 @@ class ContentGenerationService : Service() {
         )
 
         when (action) {
-            ACTION_GENERATE -> handleGenerate(intent)
-            ACTION_REFINE -> handleRefine(intent)
+            ACTION_GENERATE -> handleGenerate(intent, startId)
+            ACTION_REFINE -> handleRefine(intent, startId)
             else -> {
                 Log.w(TAG, "Unknown action: $action")
-                stopSelf()
+                stopSelf(startId)
             }
         }
 
@@ -69,18 +69,20 @@ class ContentGenerationService : Service() {
     /**
      * Handles content generation request.
      */
-    private fun handleGenerate(intent: Intent) {
+    private fun handleGenerate(intent: Intent, startId: Int) {
         val inputText = intent.getStringExtra(EXTRA_INPUT_TEXT)
         val includeSource = intent.getBooleanExtra(EXTRA_INCLUDE_SOURCE, false)
         val keepStructure = intent.getBooleanExtra(EXTRA_KEEP_STRUCTURE, false)
 
-        if (inputText.isNullOrEmpty()) {
-            broadcastError("Input text is required", false)
-            stopSelf()
-            return
-        }
-
         executor.execute {
+            // Validation moved inside executor to prevent race conditions with stopSelf
+            // This ensures validation failures don't kill the service while previous tasks are running
+            if (inputText.isNullOrEmpty()) {
+                broadcastError("Input text is required", false)
+                stopSelf(startId)
+                return@execute
+            }
+
             val startTime = System.currentTimeMillis()
             try {
                 Log.i(TAG, "Starting content generation...")
@@ -147,7 +149,7 @@ class ContentGenerationService : Service() {
                     getString(R.string.notification_complete_title),
                     getString(R.string.notification_complete_message)
                 )
-                stopSelf()
+                stopSelf(startId)
             }
         }
     }
@@ -155,24 +157,25 @@ class ContentGenerationService : Service() {
     /**
      * Handles content refinement request.
      */
-    private fun handleRefine(intent: Intent) {
+    private fun handleRefine(intent: Intent, startId: Int) {
         val originalPost = intent.getStringExtra(EXTRA_ORIGINAL_POST)
         val refinements = intent.getStringArrayListExtra(EXTRA_REFINEMENTS)
         val includeSource = intent.getBooleanExtra(EXTRA_INCLUDE_SOURCE, false)
 
-        if (originalPost.isNullOrEmpty()) {
-            broadcastError("Original post is required", true)
-            stopSelf()
-            return
-        }
-
-        if (refinements.isNullOrEmpty()) {
-            broadcastError("At least one refinement option is required", true)
-            stopSelf()
-            return
-        }
-
         executor.execute {
+            // Validation moved inside executor to prevent race conditions with stopSelf
+            if (originalPost.isNullOrEmpty()) {
+                broadcastError("Original post is required", true)
+                stopSelf(startId)
+                return@execute
+            }
+
+            if (refinements.isNullOrEmpty()) {
+                broadcastError("At least one refinement option is required", true)
+                stopSelf(startId)
+                return@execute
+            }
+
             val startTime = System.currentTimeMillis()
             try {
                 Log.i(TAG, "Starting content refinement with options: $refinements")
@@ -231,7 +234,7 @@ class ContentGenerationService : Service() {
                     getString(R.string.notification_complete_title),
                     getString(R.string.notification_complete_message)
                 )
-                stopSelf()
+                stopSelf(startId)
             }
         }
     }

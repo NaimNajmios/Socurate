@@ -68,7 +68,7 @@ class GeminiService(
         Log.d(TAG, "[$requestId] Request body length: ${requestBodyString.length}")
 
         // Retry loop
-        var rawResult: String? = null
+        var responseJson: JsonObject? = null
         var lastException: Exception? = null
         val rnd = Random()
 
@@ -85,47 +85,60 @@ class GeminiService(
                     .build()
 
                 val connectionStart = System.currentTimeMillis()
-                val response = sharedClient.newCall(request).execute()
-                val connectionEnd = System.currentTimeMillis()
 
-                val code = response.code
-                Log.i(TAG, "[$requestId] Response code: $code (time: ${connectionEnd - connectionStart}ms) on attempt $attempt")
+                // Use 'use' to guarantee closure of Response (fixes potential resource leak)
+                sharedClient.newCall(request).execute().use { response ->
+                    val connectionEnd = System.currentTimeMillis()
+                    val code = response.code
+                    Log.i(TAG, "[$requestId] Response code: $code (time: ${connectionEnd - connectionStart}ms) on attempt $attempt")
 
-                if (code >= 400) {
-                    val errorBody = response.body?.string() ?: ""
-                    response.close()
+                    if (code >= 400) {
+                        val errorBody = response.body?.string() ?: ""
 
-                    // Check if transient error (retry)
-                    if (code == 503 || code == 429 || code in 500..599) {
-                        val errorType = if (code == 429) "Rate limit (quota)" else "Server error"
-                        Log.w(TAG, "[$requestId] $errorType $code - will retry (attempt $attempt)")
+                        // Check if transient error (retry)
+                        if (code == 503 || code == 429 || code in 500..599) {
+                            val errorType = if (code == 429) "Rate limit (quota)" else "Server error"
+                            Log.w(TAG, "[$requestId] $errorType $code - will retry (attempt $attempt)")
 
-                        // For 429, parse retry delay from API response
-                        var apiSuggestedDelay: Long = 0
-                        if (code == 429) {
-                            apiSuggestedDelay = parseRetryDelay(errorBody, requestId)
-                            if (apiSuggestedDelay > 0) {
-                                Log.i(TAG, "[$requestId] API requests wait of ${apiSuggestedDelay}ms")
-                            } else {
-                                Log.w(TAG, "[$requestId] Could not parse retry delay, using default backoff")
+                            // For 429, parse retry delay from API response
+                            var apiSuggestedDelay: Long = 0
+                            if (code == 429) {
+                                apiSuggestedDelay = parseRetryDelay(errorBody, requestId)
+                                if (apiSuggestedDelay > 0) {
+                                    Log.i(TAG, "[$requestId] API requests wait of ${apiSuggestedDelay}ms")
+                                } else {
+                                    Log.w(TAG, "[$requestId] Could not parse retry delay, using default backoff")
+                                }
                             }
-                        }
 
-                        lastException = RateLimitException(
-                            "Gemini ${errorType.lowercase()}: $code. $errorBody",
-                            apiSuggestedDelay,
-                            "gemini"
-                        )
+                            lastException = RateLimitException(
+                                "Gemini ${errorType.lowercase()}: $code. $errorBody",
+                                apiSuggestedDelay,
+                                "gemini"
+                            )
+                        } else {
+                            // Permanent error
+                            Log.e(TAG, "[$requestId] Permanent error: $code - $errorBody")
+                            throw Exception("Gemini API error: $code. $errorBody")
+                        }
                     } else {
-                        // Permanent error
-                        Log.e(TAG, "[$requestId] Permanent error: $code - $errorBody")
-                        throw Exception("Gemini API error: $code. $errorBody")
+                        // Success: Stream parse JSON directly to avoid large String allocation
+                        try {
+                            responseJson = gson.fromJson(response.body?.charStream(), JsonObject::class.java)
+                            Log.d(TAG, "[$requestId] Response parsed successfully via stream")
+                        } catch (e: Exception) {
+                            Log.e(TAG, "[$requestId] Error parsing JSON stream", e)
+                            // If it's an IOException (network interruption during stream), rethrow to trigger retry
+                            if (e is IOException || (e.cause is IOException)) {
+                                throw if (e is IOException) e else (e.cause as IOException)
+                            }
+                            // Otherwise it's a parse error (bad server response), stop retrying
+                            throw e
+                        }
                     }
-                } else {
-                    // Success
-                    rawResult = response.body?.string()
-                    response.close()
-                    Log.d(TAG, "[$requestId] Raw response length: ${rawResult?.length ?: 0}")
+                }
+
+                if (responseJson != null) {
                     lastException = null
                     break
                 }
@@ -148,7 +161,7 @@ class GeminiService(
         }
 
         // Check if we got a result
-        if (rawResult == null) {
+        if (responseJson == null) {
             val totalTime = System.currentTimeMillis() - startTime
             Log.i(TAG, "[$requestId] API exhausted retries after ${totalTime}ms")
 
@@ -162,9 +175,9 @@ class GeminiService(
             }
         }
 
-        // Parse response
+        // Process response
         return try {
-            val root = gson.fromJson(rawResult, JsonObject::class.java)
+            val root = responseJson
             var curatedText = extractTextFromJson(root)
 
             if (curatedText.isNullOrBlank()) {
@@ -177,7 +190,7 @@ class GeminiService(
                 }
             }
 
-            extractUsageMetadata(root)
+            extractUsageMetadata(root!!)
 
             val totalTime = System.currentTimeMillis() - startTime
             Log.i(TAG, "[$requestId] Success! Output: ${curatedText.length} chars (total time: ${totalTime}ms)")
@@ -206,7 +219,7 @@ class GeminiService(
         val requestJson = buildRequestJson(prompt)
         val requestBodyString = gson.toJson(requestJson)
 
-        val rawResult = try {
+        val responseJson: JsonObject? = try {
             val urlWithKey = "$endpoint?key=$apiKey"
             val body = requestBodyString.toRequestBody(JSON)
             val request = Request.Builder()
@@ -215,24 +228,28 @@ class GeminiService(
                 .addHeader("Content-Type", "application/json")
                 .build()
 
-            val response = sharedClient.newCall(request).execute()
-            val code = response.code
+            sharedClient.newCall(request).execute().use { response ->
+                val code = response.code
 
-            if (code >= 400) {
-                val errorBody = response.body?.string() ?: ""
-                response.close()
-                throw Exception("Gemini API error: $code. $errorBody")
+                if (code >= 400) {
+                    val errorBody = response.body?.string() ?: ""
+                    throw Exception("Gemini API error: $code. $errorBody")
+                }
+
+                try {
+                    gson.fromJson(response.body?.charStream(), JsonObject::class.java)
+                } catch (e: Exception) {
+                    Log.e(TAG, "[$requestId] Error parsing JSON stream", e)
+                    if (e is IOException) throw e
+                    null // Return null on parse error to trigger fallback later
+                }
             }
-
-            val result = response.body?.string()
-            response.close()
-            result
         } catch (ioe: IOException) {
             throw Exception("Network error: ${ioe.message}", ioe)
         }
 
         return try {
-            val root = gson.fromJson(rawResult, JsonObject::class.java)
+            val root = responseJson
             var refinedText = extractTextFromJson(root)
 
             if (refinedText.isNullOrBlank()) {
@@ -245,7 +262,9 @@ class GeminiService(
             }
 
             // Extract token usage for stats tracking
-            extractUsageMetadata(root)
+            if (root != null) {
+                extractUsageMetadata(root)
+            }
 
             val totalTime = System.currentTimeMillis() - startTime
             Log.i(TAG, "[$requestId] Refinement success! (time: ${totalTime}ms)")
@@ -377,9 +396,6 @@ class GeminiService(
             cleaned = cleaned.replace(phrase, "")
         }
 
-        // Remove text between asterisks (Markdown formatting), preserving content
-        cleaned = ASTERISK_TEXT_PATTERN.matcher(cleaned).replaceAll("$1")
-
         // Normalize bullet points to use • character
         cleaned = BULLET_POINT_PATTERN.matcher(cleaned).replaceAll("$1•$2")
 
@@ -429,7 +445,7 @@ class GeminiService(
         if (delayStr.isNullOrEmpty()) return 0
 
         return try {
-            val secondsStr = delayStr.replace(Regex("[^0-9.]"), "")
+            val secondsStr = delayStr.replace(NUMERIC_CLEANUP_REGEX, "")
             val seconds = secondsStr.toDouble()
             (seconds * 1000).toLong()
         } catch (e: Exception) {
@@ -466,7 +482,6 @@ class GeminiService(
 
         // Pre-compiled Regex Patterns
         private val HORIZONTAL_RULE_PATTERN: Pattern = Pattern.compile("(?m)^-{3,}\\s*$")
-        private val ASTERISK_TEXT_PATTERN: Pattern = Pattern.compile("\\*+(.*?)\\*+")
         private val MULTIPLE_NEWLINES_PATTERN: Pattern = Pattern.compile("\\n\\s*\\n\\s*\\n+")
         private val HORIZONTAL_WHITESPACE_PATTERN: Pattern = Pattern.compile("[ \\t]+")
         private val SOURCE_CITATION_PATTERN: Pattern = Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$")
@@ -514,5 +529,8 @@ class GeminiService(
             .readTimeout(20, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
             .build()
+
+        // Clean up regex for delay parsing
+        private val NUMERIC_CLEANUP_REGEX = Regex("[^0-9.]")
     }
 }

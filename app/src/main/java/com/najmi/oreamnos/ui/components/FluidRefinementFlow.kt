@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -73,6 +74,10 @@ fun FluidRefinementFlow(
     // Combine all items to index them for staggering
     val totalItems = options.size + customPills.size + 1 // +1 for Add button
 
+    // OPTIMIZATION: Convert lists to Sets for O(1) lookup performance
+    val selectedOptionsSet = remember(selectedOptions) { selectedOptions.toSet() }
+    val selectedPillIdsSet = remember(selectedPillIds) { selectedPillIds.toSet() }
+
     NeoCard(modifier = modifier.fillMaxWidth()) {
         Text("REFINE OUTPUT", style = MaterialTheme.typography.labelLarge)
         Spacer(Modifier.height(12.dp))
@@ -83,44 +88,60 @@ fun FluidRefinementFlow(
         ) {
             // Built-in Options
             options.forEachIndexed { index, (key, label) ->
-                StaggeredEntranceItem(
-                    visible = isVisible,
-                    index = index,
-                    totalItems = totalItems
-                ) {
-                    NeoChip(
-                        selected = selectedOptions.contains(key),
-                        onClick = { onToggleOption(key) },
-                        text = label
-                    )
+                // OPTIMIZATION: Use key to help Compose identify items across recompositions
+                key(key) {
+                    StaggeredEntranceItem(
+                        visible = isVisible,
+                        index = index,
+                        totalItems = totalItems
+                    ) {
+                        // OPTIMIZATION: Memoize onClick to prevent unnecessary recomposition of NeoChip
+                        val isSelected = selectedOptionsSet.contains(key)
+                        val onClick = remember(key, onToggleOption) { { onToggleOption(key) } }
+
+                        NeoChip(
+                            selected = isSelected,
+                            onClick = onClick,
+                            text = label
+                        )
+                    }
                 }
             }
 
             // Custom Pills
             customPills.forEachIndexed { index, pill ->
-                StaggeredEntranceItem(
-                    visible = isVisible,
-                    index = options.size + index,
-                    totalItems = totalItems
-                ) {
-                    NeoChip(
-                        selected = selectedPillIds.contains(pill.id),
-                        onClick = { onTogglePill(pill.id) },
-                        onLongClick = { onEditPill(pill) },
-                        text = pill.name,
-                        unselectedBorderColor = Color(0xFFFF9800), // Orange
-                        unselectedTextColor = MaterialTheme.colorScheme.onSurface
-                    )
+                key(pill.id) {
+                    StaggeredEntranceItem(
+                        visible = isVisible,
+                        index = options.size + index,
+                        totalItems = totalItems
+                    ) {
+                        val isSelected = selectedPillIdsSet.contains(pill.id)
+                        val onClick = remember(pill.id, onTogglePill) { { onTogglePill(pill.id) } }
+                        val onLongClick = remember(pill, onEditPill) { { onEditPill(pill) } }
+
+                        NeoChip(
+                            selected = isSelected,
+                            onClick = onClick,
+                            onLongClick = onLongClick,
+                            text = pill.name,
+                            unselectedBorderColor = Color(0xFFFF9800), // Orange
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
 
             // Add Button
-            StaggeredEntranceItem(
-                visible = isVisible,
-                index = options.size + customPills.size,
-                totalItems = totalItems
-            ) {
-                NeoAddButton(onClick = onCreatePill)
+            key("add_button") {
+                StaggeredEntranceItem(
+                    visible = isVisible,
+                    index = options.size + customPills.size,
+                    totalItems = totalItems
+                ) {
+                    val onClick = remember(onCreatePill) { onCreatePill }
+                    NeoAddButton(onClick = onClick)
+                }
             }
         }
 
@@ -213,7 +234,7 @@ fun NeoAddButton(
 
     Surface(
         onClick = {
-            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
             onClick()
         },
         shape = RoundedCornerShape(0.dp),
