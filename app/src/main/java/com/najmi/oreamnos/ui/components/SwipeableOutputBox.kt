@@ -1,7 +1,10 @@
 package com.najmi.oreamnos.ui.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -22,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +34,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -50,6 +53,11 @@ import kotlin.math.abs
  * - Swipe right to reveal Share action
  * - Features haptic feedback, scaling animations, and threshold snapping
  * - Includes "Shimmy" entrance animation to teach gestures
+ *
+ * Performance Optimization:
+ * - Uses mutableFloatStateOf + graphicsLayer to avoid recomposition during drag gestures.
+ * - Synchronous state updates during drag to prevent coroutine churn.
+ * - Derived state for threshold detection.
  */
 @Composable
 fun SwipeableOutputBox(
@@ -60,6 +68,9 @@ fun SwipeableOutputBox(
 ) {
     val context = LocalContext.current
     val hapticHelper = remember { HapticHelper(context) }
+    val scope = rememberCoroutineScope()
+
+    // OPTIMIZATION: Use mutableFloatStateOf for synchronous updates during drag
     var offsetX by remember { mutableFloatStateOf(0f) }
     val swipeThreshold = 150f
 
@@ -72,25 +83,24 @@ fun SwipeableOutputBox(
     // "Shimmy" Entrance Animation: Teaches the user that the card is swipeable
     LaunchedEffect(Unit) {
         delay(600) // Wait for card entrance
-        if (!isInteracted) offsetX = 50f // Slide Right (Reveal Share)
-        delay(500)
-        if (!isInteracted) offsetX = 0f
-        delay(200)
-        if (!isInteracted) offsetX = -50f // Slide Left (Reveal Copy)
-        delay(500)
-        if (!isInteracted) offsetX = 0f
-    }
 
-    // Animate offset back to 0 when released
-    // Changed to LowBouncy for a more rubber-band feel
-    val animatedOffset by animateFloatAsState(
-        targetValue = offsetX,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "swipe_offset"
-    )
+        // Helper to animate the state manually
+        suspend fun animateOffset(target: Float) {
+            animate(
+                initialValue = offsetX,
+                targetValue = target,
+                animationSpec = spring(stiffness = Spring.StiffnessLow)
+            ) { value, _ -> offsetX = value }
+        }
+
+        if (!isInteracted) animateOffset(50f) // Slide Right (Reveal Share)
+        delay(500)
+        if (!isInteracted) animateOffset(0f)
+        delay(200)
+        if (!isInteracted) animateOffset(-50f) // Slide Left (Reveal Copy)
+        delay(500)
+        if (!isInteracted) animateOffset(0f)
+    }
 
     Box(
         modifier = Modifier
@@ -103,10 +113,15 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(start = 24.dp)
-                .alpha(if (offsetX > 0) (offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
+                // OPTIMIZATION: Use graphicsLayer for alpha to avoid recomposition
+                .graphicsLayer {
+                    alpha = if (offsetX > 0) (offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f
+                },
             contentAlignment = Alignment.Center
         ) {
-            val isActive = offsetX > swipeThreshold
+            // OPTIMIZATION: Use derivedStateOf to only recompose when crossing threshold
+            val isActive by remember { derivedStateOf { offsetX > swipeThreshold } }
+
             val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "share_scale")
             val rotateState by animateFloatAsState(if (isActive) 15f else 0f, label = "share_rotate")
             val iconColor by animateColorAsState(
@@ -146,10 +161,14 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(end = 24.dp)
-                .alpha(if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
+                // OPTIMIZATION: Use graphicsLayer for alpha to avoid recomposition
+                .graphicsLayer {
+                    alpha = if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f
+                },
             contentAlignment = Alignment.Center
         ) {
-            val isActive = offsetX < -swipeThreshold
+            val isActive by remember { derivedStateOf { offsetX < -swipeThreshold } }
+
             val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
             val rotateState by animateFloatAsState(if (isActive) -15f else 0f, label = "copy_rotate")
             val iconColor by animateColorAsState(
@@ -188,8 +207,9 @@ fun SwipeableOutputBox(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                // OPTIMIZATION: Read state inside graphicsLayer lambda to defer read
                 .graphicsLayer {
-                    translationX = animatedOffset
+                    translationX = offsetX
                 }
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
@@ -199,11 +219,12 @@ fun SwipeableOutputBox(
                         onHorizontalDrag = { change, dragAmount ->
                             change.consume()
                             isInteracted = true
-                            // Add resistance as we drag further
+
+                            // Synchronous update avoids coroutine churn and race conditions
                             val resistance = 1f - (abs(offsetX) / (swipeThreshold * 2)).coerceIn(0f, 0.5f)
                             offsetX += dragAmount * resistance
 
-                            // Haptic feedback logic
+                            // Haptic feedback logic uses current synchronous value
                             val currentlyPastThreshold = abs(offsetX) > swipeThreshold
                             if (currentlyPastThreshold != isPastThreshold) {
                                 if (currentlyPastThreshold) {
@@ -218,8 +239,19 @@ fun SwipeableOutputBox(
                                 hapticHelper.onCopy() // Success haptic
                                 if (offsetX > 0) onShare() else onCopy()
                             }
-                            // Reset
-                            offsetX = 0f
+                            // Reset with spring animation
+                            scope.launch {
+                                animate(
+                                    initialValue = offsetX,
+                                    targetValue = 0f,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioLowBouncy,
+                                        stiffness = Spring.StiffnessMedium
+                                    )
+                                ) { value, _ ->
+                                    offsetX = value
+                                }
+                            }
                             isPastThreshold = false
                         }
                     )
@@ -252,7 +284,10 @@ fun SwipeableOutputBox(
             }
 
             // Fading Chevron Hints - Visible only during shimmy to teach direction
-            val shimmyVisible = !isInteracted && abs(animatedOffset) > 10f
+            // OPTIMIZATION: Derived state to avoid checking float diff on every frame in composition
+            val shimmyVisible by remember {
+                derivedStateOf { !isInteracted && abs(offsetX) > 10f }
+            }
             val hintAlpha by animateFloatAsState(if (shimmyVisible) 0.6f else 0f, label = "hint_alpha")
 
             if (hintAlpha > 0f) {
@@ -264,7 +299,7 @@ fun SwipeableOutputBox(
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
-                        .alpha(hintAlpha)
+                        .graphicsLayer { alpha = hintAlpha }
                 )
 
                 // Right Hint (Pointing Left to indicate Swipe Left)
@@ -275,7 +310,7 @@ fun SwipeableOutputBox(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
-                        .alpha(hintAlpha)
+                        .graphicsLayer { alpha = hintAlpha }
                 )
             }
         }
