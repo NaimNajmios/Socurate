@@ -143,6 +143,7 @@ import com.najmi.oreamnos.ui.components.NeoOutlinedButton
 import com.najmi.oreamnos.ui.components.NeoSwitch
 import com.najmi.oreamnos.ui.components.SwipeableOutputBox
 import com.najmi.oreamnos.ui.components.AnimatedCheckmark
+import com.najmi.oreamnos.ui.components.SuccessOverlay
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
 import com.najmi.oreamnos.ui.components.EmptyStateCard
 import com.najmi.oreamnos.ui.components.FluidRefinementFlow
@@ -379,6 +380,7 @@ fun MainScreen(
     
     // Visual feedback states
     var showSuccessAnimation by remember { mutableStateOf(false) }
+    var successMessage by remember { mutableStateOf("GENERATION COMPLETE") }
     var inputHasChanged by remember { mutableStateOf(false) }
     var previousInput by remember { mutableStateOf(initialSharedText ?: "") }
     var triggerShakeAnimation by remember { mutableStateOf(false) }
@@ -461,6 +463,7 @@ fun MainScreen(
             }
             generationResult.success && generationResult.result != null -> {
                 // Trigger success animation before showing result
+                successMessage = if (generationResult.isRefinement) "REFINED SUCCESSFULLY" else "GENERATION COMPLETE"
                 showSuccessAnimation = true
                 // Extract source citation
                 val result = generationResult.result
@@ -663,164 +666,102 @@ fun MainScreen(
             }
         )
     }
-    
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = {
-            // Neo Bottom Bar
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+
+    // Wrap in Box to support SuccessOverlay
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            bottomBar = {
+                // Neo Bottom Bar
+                Surface(
+                    color = MaterialTheme.colorScheme.surface,
+                    border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
                 ) {
-                    // Pulse animation for Generate button when input changes
-                    val infiniteTransition = rememberInfiniteTransition(label = "generatePulse")
-                    val pulseScale = infiniteTransition.animateFloat(
-                        initialValue = 1f,
-                        targetValue = if (inputHasChanged) 1.05f else 1f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(600, easing = LinearEasing),
-                            repeatMode = RepeatMode.Reverse
-                        ),
-                        label = "pulse_scale"
-                    )
-                    val pulseAlpha = infiniteTransition.animateFloat(
-                        initialValue = 1f,
-                        targetValue = if (inputHasChanged) 0.85f else 1f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(600, easing = LinearEasing),
-                            repeatMode = RepeatMode.Reverse
-                        ),
-                        label = "pulse_alpha"
-                    )
-                    
-                    NeoButton(
-                        onClick = {
-                            inputHasChanged = false // Stop pulsing when clicked
-                            if (inputText.isBlank()) {
-                                isInputError = true
-                                triggerInputShake = true
-                                HapticHelper(context).onError()
-                            } else if (!prefsManager.hasApiKey()) {
-                                Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
-                                onNavigateToSettings()
-                            } else {
-                                isLoading = true
-                                error = null
-                                onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
-                            }
-                        },
-                        text = "GENERATE",
-                        isLoading = isLoading,
+                    Row(
                         modifier = Modifier
-                            .weight(1f)
-                            .graphicsLayer {
-                                val currentScale = if (inputHasChanged) pulseScale.value else 1f
-                                scaleX = currentScale
-                                scaleY = currentScale
-                                alpha = if (inputHasChanged) pulseAlpha.value else 1f
-                            }
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    TextButton(onClick = onNavigateToUsage) {
-                        Text("USAGE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
-                    }
-                    TextButton(onClick = onNavigateToSettings) {
-                        Text("SETTINGS", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
-                    }
-                }
-            }
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            // Neo Header
-            Text(
-                text = "SOCURATE",
-                style = MaterialTheme.typography.displayMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        // Pulse animation for Generate button when input changes
+                        val infiniteTransition = rememberInfiniteTransition(label = "generatePulse")
+                        val pulseScale = infiniteTransition.animateFloat(
+                            initialValue = 1f,
+                            targetValue = if (inputHasChanged) 1.05f else 1f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(600, easing = LinearEasing),
+                                repeatMode = RepeatMode.Reverse
+                            ),
+                            label = "pulse_scale"
+                        )
+                        val pulseAlpha = infiniteTransition.animateFloat(
+                            initialValue = 1f,
+                            targetValue = if (inputHasChanged) 0.85f else 1f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(600, easing = LinearEasing),
+                                repeatMode = RepeatMode.Reverse
+                            ),
+                            label = "pulse_alpha"
+                        )
 
-            // Input Card
-            val inputShakeOffset = animateFloatAsState(
-                targetValue = if (triggerInputShake) 1f else 0f,
-                animationSpec = if (triggerInputShake) {
-                    spring(
-                        dampingRatio = Spring.DampingRatioHighBouncy,
-                        stiffness = Spring.StiffnessHigh
-                    )
-                } else {
-                    tween(0)
-                },
-                label = "inputShake"
-            )
-
-            val onInputChange = remember {
-                { newText: String ->
-                    inputText = newText
-                    if (isInputError) isInputError = false
-                }
-            }
-            val onKeepStructureChange = remember { { it: Boolean -> keepStructure = it } }
-            val onExtractContent = remember {
-                { url: String ->
-                    scope.launch {
-                        try {
-                            val extractor = WebContentExtractor()
-                            val extractedContent = withContext(Dispatchers.IO) {
-                                extractor.extractContent(url)
-                            }
-                            inputText = extractedContent
-                            if (isInputError) isInputError = false
-                        } catch (e: Exception) {
-                            error = "Failed to extract content: ${e.message}"
+                        NeoButton(
+                            onClick = {
+                                inputHasChanged = false // Stop pulsing when clicked
+                                if (inputText.isBlank()) {
+                                    isInputError = true
+                                    triggerInputShake = true
+                                    HapticHelper(context).onError()
+                                } else if (!prefsManager.hasApiKey()) {
+                                    Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
+                                    onNavigateToSettings()
+                                } else {
+                                    isLoading = true
+                                    error = null
+                                    onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                                }
+                            },
+                            text = "GENERATE",
+                            isLoading = isLoading,
+                            modifier = Modifier
+                                .weight(1f)
+                                .graphicsLayer {
+                                    val currentScale = if (inputHasChanged) pulseScale.value else 1f
+                                    scaleX = currentScale
+                                    scaleY = currentScale
+                                    alpha = if (inputHasChanged) pulseAlpha.value else 1f
+                                }
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        TextButton(onClick = onNavigateToUsage) {
+                            Text("USAGE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
+                        }
+                        TextButton(onClick = onNavigateToSettings) {
+                            Text("SETTINGS", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
-                    Unit
                 }
             }
-            val onDismissPreview = remember { { linkPreviewData = null } }
-
-            Box(
-                modifier = Modifier.graphicsLayer {
-                    translationX = kotlin.math.sin(inputShakeOffset.value * 8 * kotlin.math.PI.toFloat()) * 10f
-                }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                InputCard(
-                    inputText = inputText,
-                    onInputChange = onInputChange,
-                    keepStructure = keepStructure,
-                    onKeepStructureChange = onKeepStructureChange,
-                    linkPreviewData = linkPreviewData,
-                    isLoadingPreview = isLoadingPreview,
-                    onExtractContent = onExtractContent,
-                    onDismissPreview = onDismissPreview,
-                    isError = isInputError
+                // Neo Header
+                Text(
+                    text = "SOCURATE",
+                    style = MaterialTheme.typography.displayMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
-            }
-            
-            // Loading State
-            AnimatedVisibility(visible = isLoading, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
-                EnhancedLoadingCard()
-            }
-            
-            // Error State with Shake Animation
-            AnimatedVisibility(visible = error != null && !isLoading, enter = fadeIn(), exit = fadeOut()) {
-                val shakeOffset = animateFloatAsState(
-                    targetValue = if (triggerShakeAnimation) 1f else 0f,
-                    animationSpec = if (triggerShakeAnimation) {
+
+                // Input Card
+                val inputShakeOffset = animateFloatAsState(
+                    targetValue = if (triggerInputShake) 1f else 0f,
+                    animationSpec = if (triggerInputShake) {
                         spring(
                             dampingRatio = Spring.DampingRatioHighBouncy,
                             stiffness = Spring.StiffnessHigh
@@ -828,150 +769,221 @@ fun MainScreen(
                     } else {
                         tween(0)
                     },
-                    label = "shake"
+                    label = "inputShake"
                 )
-                
+
+                val onInputChange = remember {
+                    { newText: String ->
+                        inputText = newText
+                        if (isInputError) isInputError = false
+                    }
+                }
+                val onKeepStructureChange = remember { { it: Boolean -> keepStructure = it } }
+                val onExtractContent = remember {
+                    { url: String ->
+                        scope.launch {
+                            try {
+                                val extractor = WebContentExtractor()
+                                val extractedContent = withContext(Dispatchers.IO) {
+                                    extractor.extractContent(url)
+                                }
+                                inputText = extractedContent
+                                if (isInputError) isInputError = false
+                            } catch (e: Exception) {
+                                error = "Failed to extract content: ${e.message}"
+                            }
+                        }
+                        Unit
+                    }
+                }
+                val onDismissPreview = remember { { linkPreviewData = null } }
+
                 Box(
                     modifier = Modifier.graphicsLayer {
-                        translationX = kotlin.math.sin(shakeOffset.value * 8 * kotlin.math.PI.toFloat()) * 10f
+                        translationX = kotlin.math.sin(inputShakeOffset.value * 8 * kotlin.math.PI.toFloat()) * 10f
                     }
                 ) {
-                    ErrorCard(
-                        error = error ?: "",
-                        onRetry = {
-                            error = null
-                            isLoading = true
-                            onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
-                        },
-                        onChangeProvider = {
-                            showProviderSelector = true
-                        }
+                    InputCard(
+                        inputText = inputText,
+                        onInputChange = onInputChange,
+                        keepStructure = keepStructure,
+                        onKeepStructureChange = onKeepStructureChange,
+                        linkPreviewData = linkPreviewData,
+                        isLoadingPreview = isLoadingPreview,
+                        onExtractContent = onExtractContent,
+                        onDismissPreview = onDismissPreview,
+                        isError = isInputError
                     )
                 }
-            }
-            
-            // Output Card
-            AnimatedVisibility(visible = hasResult && !isLoading, enter = fadeIn() + expandVertically()) {
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // Stable callbacks to prevent OutputCard recomposition on input change
-                    val onOutputChange = remember { { it: String -> if (isEditMode) outputText = it } }
-                    val onIncludeTitleChange = remember(rebuildOutput) { { it: Boolean -> includeTitle = it; rebuildOutput() } }
-                    val onIncludeHashtagsChange = remember(rebuildOutput) { { it: Boolean -> includeHashtags = it; rebuildOutput() } }
-                    val onIncludeSourceChange = remember(rebuildOutput) { { it: Boolean -> includeSource = it; rebuildOutput() } }
-                    val onEditClick = remember(rebuildOutput) {
-                        {
-                            isEditMode = !isEditMode
-                            if (!isEditMode) rebuildOutput()
-                        }
-                    }
-                    val onCopyClick = remember {
-                        {
-                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            clipboard.setPrimaryClip(ClipData.newPlainText("Socurate Post", outputText))
-                            Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    val onShareClick = remember(outputText) {
-                        {
-                            val intent = Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, outputText)
-                            }
-                            context.startActivity(Intent.createChooser(intent, "Share"))
-                        }
-                    }
-                    val onExpandClick = remember { { showReadingDialog = true } }
 
-                    OutputCard(
-                        outputText = outputText,
-                        isEditMode = isEditMode,
-                        onOutputChange = onOutputChange,
-                        includeTitle = includeTitle,
-                        includeHashtags = includeHashtags,
-                        includeSource = includeSource,
-                        hasHashtags = prefsManager.getHashtags()?.isNotEmpty() == true,
-                        isSourceEnabled = prefsManager.isSourceEnabled(),
-                        onIncludeTitleChange = onIncludeTitleChange,
-                        onIncludeHashtagsChange = onIncludeHashtagsChange,
-                        onIncludeSourceChange = onIncludeSourceChange,
-                        onEditClick = onEditClick,
-                        onCopyClick = onCopyClick,
-                        onShareClick = onShareClick,
-                        onExpandClick = onExpandClick,
-                        textSize = textSizeState.intValue
-                    )
-                    
-                    // Refinement Card
-                    val onToggleOption = remember {
-                        { option: String ->
-                            if (refinementOptions.contains(option)) refinementOptions.remove(option)
-                            else refinementOptions.add(option)
-                        }
-                    }
-                    val onTogglePill = remember {
-                        { pillId: String ->
-                            if (selectedPillIds.contains(pillId)) selectedPillIds.remove(pillId)
-                            else selectedPillIds.add(pillId)
-                        }
-                    }
-                    val onRegenerateAction = remember(outputText) {
-                        {
-                            val allRefinements = refinementOptions.toList() + 
-                                customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
-                            if (allRefinements.isEmpty()) {
-                                Toast.makeText(context, "Please select at least one refinement", Toast.LENGTH_SHORT).show()
-                            } else {
-                                isLoading = true
-                                hasResult = false
-                                onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
-                            }
-                        }
-                    }
-                    val onCreatePill = remember { { showCreatePillDialog = true } }
-                    val onEditPill = remember { { pill: GenerationPill -> pillToEdit = pill; showEditPillDialog = true } }
-
-                    RefinementCard(
-                        selectedOptions = refinementOptions,
-                        customPills = customPills,
-                        selectedPillIds = selectedPillIds,
-                        onToggleOption = onToggleOption,
-                        onTogglePill = onTogglePill,
-                        onRegenerate = onRegenerateAction,
-                        onCreatePill = onCreatePill,
-                        onEditPill = onEditPill
-                    )
+                // Loading State
+                AnimatedVisibility(visible = isLoading, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+                    EnhancedLoadingCard()
                 }
-            }
-            
-            // Empty State
-            AnimatedVisibility(visible = !hasResult && !isLoading && error == null && inputText.isBlank(), enter = fadeIn(), exit = fadeOut()) {
-                EmptyStateCard(
-                    onPaste = {
-                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        if (clipboard.hasPrimaryClip()) {
-                            val text = clipboard.primaryClip?.getItemAt(0)?.text
-                            if (text != null) {
-                                inputText = text.toString()
-                                Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
-                            }
+
+                // Error State with Shake Animation
+                AnimatedVisibility(visible = error != null && !isLoading, enter = fadeIn(), exit = fadeOut()) {
+                    val shakeOffset = animateFloatAsState(
+                        targetValue = if (triggerShakeAnimation) 1f else 0f,
+                        animationSpec = if (triggerShakeAnimation) {
+                            spring(
+                                dampingRatio = Spring.DampingRatioHighBouncy,
+                                stiffness = Spring.StiffnessHigh
+                            )
                         } else {
-                            Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
+                            tween(0)
+                        },
+                        label = "shake"
+                    )
+
+                    Box(
+                        modifier = Modifier.graphicsLayer {
+                            translationX = kotlin.math.sin(shakeOffset.value * 8 * kotlin.math.PI.toFloat()) * 10f
                         }
+                    ) {
+                        ErrorCard(
+                            error = error ?: "",
+                            onRetry = {
+                                error = null
+                                isLoading = true
+                                onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                            },
+                            onChangeProvider = {
+                                showProviderSelector = true
+                            }
+                        )
                     }
+                }
+
+                // Output Card
+                AnimatedVisibility(visible = hasResult && !isLoading, enter = fadeIn() + expandVertically()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        // Stable callbacks to prevent OutputCard recomposition on input change
+                        val onOutputChange = remember { { it: String -> if (isEditMode) outputText = it } }
+                        val onIncludeTitleChange = remember(rebuildOutput) { { it: Boolean -> includeTitle = it; rebuildOutput() } }
+                        val onIncludeHashtagsChange = remember(rebuildOutput) { { it: Boolean -> includeHashtags = it; rebuildOutput() } }
+                        val onIncludeSourceChange = remember(rebuildOutput) { { it: Boolean -> includeSource = it; rebuildOutput() } }
+                        val onEditClick = remember(rebuildOutput) {
+                            {
+                                isEditMode = !isEditMode
+                                if (!isEditMode) rebuildOutput()
+                            }
+                        }
+                        val onCopyClick = remember {
+                            {
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                clipboard.setPrimaryClip(ClipData.newPlainText("Socurate Post", outputText))
+                                Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        val onShareClick = remember(outputText) {
+                            {
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, outputText)
+                                }
+                                context.startActivity(Intent.createChooser(intent, "Share"))
+                            }
+                        }
+                        val onExpandClick = remember { { showReadingDialog = true } }
+
+                        OutputCard(
+                            outputText = outputText,
+                            isEditMode = isEditMode,
+                            onOutputChange = onOutputChange,
+                            includeTitle = includeTitle,
+                            includeHashtags = includeHashtags,
+                            includeSource = includeSource,
+                            hasHashtags = prefsManager.getHashtags()?.isNotEmpty() == true,
+                            isSourceEnabled = prefsManager.isSourceEnabled(),
+                            onIncludeTitleChange = onIncludeTitleChange,
+                            onIncludeHashtagsChange = onIncludeHashtagsChange,
+                            onIncludeSourceChange = onIncludeSourceChange,
+                            onEditClick = onEditClick,
+                            onCopyClick = onCopyClick,
+                            onShareClick = onShareClick,
+                            onExpandClick = onExpandClick,
+                            textSize = textSizeState.intValue
+                        )
+
+                        // Refinement Card
+                        val onToggleOption = remember {
+                            { option: String ->
+                                if (refinementOptions.contains(option)) refinementOptions.remove(option)
+                                else refinementOptions.add(option)
+                            }
+                        }
+                        val onTogglePill = remember {
+                            { pillId: String ->
+                                if (selectedPillIds.contains(pillId)) selectedPillIds.remove(pillId)
+                                else selectedPillIds.add(pillId)
+                            }
+                        }
+                        val onRegenerateAction = remember(outputText) {
+                            {
+                                val allRefinements = refinementOptions.toList() +
+                                    customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
+                                if (allRefinements.isEmpty()) {
+                                    Toast.makeText(context, "Please select at least one refinement", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    isLoading = true
+                                    hasResult = false
+                                    onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
+                                }
+                            }
+                        }
+                        val onCreatePill = remember { { showCreatePillDialog = true } }
+                        val onEditPill = remember { { pill: GenerationPill -> pillToEdit = pill; showEditPillDialog = true } }
+
+                        RefinementCard(
+                            selectedOptions = refinementOptions,
+                            customPills = customPills,
+                            selectedPillIds = selectedPillIds,
+                            onToggleOption = onToggleOption,
+                            onTogglePill = onTogglePill,
+                            onRegenerate = onRegenerateAction,
+                            onCreatePill = onCreatePill,
+                            onEditPill = onEditPill
+                        )
+                    }
+                }
+
+                // Empty State
+                AnimatedVisibility(visible = !hasResult && !isLoading && error == null && inputText.isBlank(), enter = fadeIn(), exit = fadeOut()) {
+                    EmptyStateCard(
+                        onPaste = {
+                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            if (clipboard.hasPrimaryClip()) {
+                                val text = clipboard.primaryClip?.getItemAt(0)?.text
+                                if (text != null) {
+                                    inputText = text.toString()
+                                    Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    )
+                }
+
+                Spacer(Modifier.height(80.dp)) // Space for FAB
+            }
+            
+            // Reading mode dialog
+            if (showReadingDialog) {
+                ReadingModeDialog(
+                    outputText = outputText,
+                    textSize = textSizeState.intValue,
+                    onDismiss = { showReadingDialog = false }
                 )
             }
-            
-            Spacer(Modifier.height(80.dp)) // Space for FAB
         }
         
-        // Reading mode dialog
-        if (showReadingDialog) {
-            ReadingModeDialog(
-                outputText = outputText,
-                textSize = textSizeState.intValue,
-                onDismiss = { showReadingDialog = false }
-            )
-        }
+        // Success Overlay
+        SuccessOverlay(
+            visible = showSuccessAnimation,
+            message = successMessage
+        )
     }
 }
 

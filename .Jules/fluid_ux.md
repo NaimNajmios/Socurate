@@ -1,28 +1,30 @@
-## 2024-05-23 - Shimmy Entrance Animation
+## 2024-05-23 - Success Overlay Pattern
 
-**Context:** Swipeable Output Card (Swipe to Copy/Share)
-**Observation:** Users often missed the swipe functionality on the output card because the actions (Copy/Share) were hidden behind the content layer with no affordance.
-**Solution:** Implemented a "Shimmy" entrance animation that automatically slides the content layer back and forth (Right then Left) to peek the hidden actions. Added fading chevron hints during the animation to reinforce directionality.
-**Impact:** Drastically improves discoverability of the swipe gestures without permanent visual clutter.
+**Context:** User feedback on successful content generation.
+**Observation:** Standard generation completion lacked "delight" and strong visual confirmation. Users might miss the transition from loading to result.
+**Solution:** Implemented `SuccessOverlay` - a full-screen, semi-transparent overlay with a particle explosion and animated checkmark. It appears briefly (1s) before revealing the result.
+**Impact:** Creates a satisfying "moment of completion," reinforcing the value of the generated content and providing clear system status.
 
 **Code Pattern:**
 ```kotlin
-// Track interaction to cancel animation
-var isInteracted by remember { mutableStateOf(false) }
+// In parent Composable (e.g., MainScreen)
+Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(...) { ... }
 
-// Shimmy Sequence
-LaunchedEffect(Unit) {
-    delay(600) // Wait for entrance
-    if (!isInteracted) offsetX = 50f // Reveal Left Action
-    delay(500)
-    if (!isInteracted) offsetX = 0f
-    delay(200)
-    if (!isInteracted) offsetX = -50f // Reveal Right Action
-    delay(500)
-    if (!isInteracted) offsetX = 0f
+    // Overlay sits on top of Scaffold
+    SuccessOverlay(
+        visible = showSuccessAnimation,
+        message = if (isRefinement) "REFINED SUCCESSFULLY" else "GENERATION COMPLETE"
+    )
 }
+```
 
-// Hint Visibility
-val shimmyVisible = !isInteracted && abs(animatedOffset) > 10f
-val hintAlpha by animateFloatAsState(if (shimmyVisible) 0.6f else 0f)
+Animation Spec:
+```kotlin
+// Particle Explosion uses custom Canvas drawing
+// Checkmark uses Animatable with FastOutSlowInEasing
+scaleProgress.animateTo(
+    targetValue = 1f,
+    animationSpec = tween(200, easing = FastOutSlowInEasing)
+)
 ```
