@@ -48,3 +48,34 @@ Move the validation logic *inside* the `executor.execute` block. This ensures th
         }
     }
 ```
+
+## 2024-05-24 - Regex Logic Error Destroying Structure
+
+**Context:** `WebContentExtractor.cleanContent` normalizes text by collapsing whitespace and normalizing newlines.
+**Symptoms:** Extracted text from URLs loses all paragraph structure, becoming a single massive block of text.
+**Root Cause:**
+The `cleanContent` method used `WHITESPACE_PATTERN` defined as `\s+` to collapse whitespace.
+In Java regex, `\s` includes `\n` (newlines).
+The code ran `WHITESPACE_PATTERN` *before* `NEWLINES_PATTERN`.
+This caused all newlines to be replaced by a single space, destroying paragraph breaks. The subsequent `NEWLINES_PATTERN` (looking for `\n`) found nothing to match.
+
+**Code Example (Before):**
+```kotlin
+private val WHITESPACE_PATTERN: Pattern = Pattern.compile("\\s+") // Matches \n too!
+
+// ...
+cleaned = WHITESPACE_PATTERN.matcher(cleaned).replaceAll(" ")
+cleaned = NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n") // Useless, newlines gone
+```
+
+**Fix Applied:**
+Changed the regex to `[ \t]+` (spaces and tabs only) and renamed it to `HORIZONTAL_WHITESPACE_PATTERN` to clearly communicate intent. This preserves newlines so the subsequent newline normalization logic works correctly.
+
+**Code Example (After):**
+```kotlin
+private val HORIZONTAL_WHITESPACE_PATTERN: Pattern = Pattern.compile("[ \\t]+")
+
+// ...
+cleaned = HORIZONTAL_WHITESPACE_PATTERN.matcher(cleaned).replaceAll(" ") // Preserves \n
+cleaned = NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n") // Works correctly
+```
