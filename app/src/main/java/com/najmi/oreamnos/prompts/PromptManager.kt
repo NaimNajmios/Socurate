@@ -239,6 +239,38 @@ class PromptManager {
         return false
     }
 
+    /**
+     * Detects if the input text contains bullet points or list markers.
+     *
+     * OPTIMIZATION:
+     * - Uses lineSequence() to avoid allocating a large List<String> for the entire text.
+     * - Uses pre-compiled Regex patterns stored in companion object.
+     * - Uses start-anchored checks to avoid scanning entire lines.
+     */
+    fun containsBulletPoints(text: String?): Boolean {
+        if (text.isNullOrEmpty()) return false
+
+        // Use lineSequence to avoid allocating a List for all lines
+        return text.lineSequence().any { line ->
+            val trimmed = line.trim()
+            if (trimmed.isEmpty()) return@any false
+
+            // Fast checks for common bullet characters
+            if (trimmed.startsWith("•") ||
+                trimmed.startsWith("- ") ||
+                trimmed.startsWith("* ") ||
+                trimmed.startsWith("· ")) {
+                return@any true
+            }
+
+            // Regex checks using pre-compiled patterns
+            // Use containsMatchIn which works well with our anchored patterns (^...)
+            NUMBERED_LIST_PATTERN.containsMatchIn(trimmed) ||
+            NUMBERED_PAREN_PATTERN.containsMatchIn(trimmed) ||
+            LETTER_LIST_PATTERN.containsMatchIn(trimmed)
+        }
+    }
+
     private companion object {
         val TACTICAL_KEYWORDS = arrayOf(
             "formation", "tactical", "pressing", "possession", "xg", "expected goals",
@@ -247,26 +279,11 @@ class PromptManager {
             "midfielder", "forward", "defender", "fullback", "winger",
             "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2", "3-4-3"
         )
-    }
 
-    /**
-     * Detects if the input text contains bullet points or list markers.
-     */
-    fun containsBulletPoints(text: String?): Boolean {
-        if (text.isNullOrEmpty()) return false
-        
-        // Check for various bullet point and list markers
-        val lines = text.lines()
-        return lines.any { line ->
-            val trimmed = line.trim()
-            // Check for common bullet/list patterns
-            trimmed.startsWith("•") ||
-            trimmed.startsWith("- ") ||
-            trimmed.startsWith("* ") ||
-            trimmed.startsWith("· ") ||
-            trimmed.matches(Regex("^\\d+\\.\\s.*")) || // Numbered list: "1. item"
-            trimmed.matches(Regex("^\\d+\\)\\s.*")) || // Numbered list: "1) item"
-            trimmed.matches(Regex("^[a-z]\\)\\s.*"))   // Letter list: "a) item"
-        }
+        // Pre-compiled regex patterns for list detection
+        // Anchored at start (^) to fail fast
+        val NUMBERED_LIST_PATTERN = Regex("^\\d+\\.\\s")   // "1. "
+        val NUMBERED_PAREN_PATTERN = Regex("^\\d+\\)\\s")  // "1) "
+        val LETTER_LIST_PATTERN = Regex("^[a-z]\\)\\s")    // "a) "
     }
 }
