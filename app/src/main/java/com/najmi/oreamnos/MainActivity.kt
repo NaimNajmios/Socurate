@@ -84,6 +84,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -140,6 +142,7 @@ import com.najmi.oreamnos.ui.components.NeoChip
 import com.najmi.oreamnos.ui.components.NeoCopyButton
 import com.najmi.oreamnos.ui.components.NeoInput
 import com.najmi.oreamnos.ui.components.NeoOutlinedButton
+import com.najmi.oreamnos.ui.components.NeoSnackbar
 import com.najmi.oreamnos.ui.components.NeoSwitch
 import com.najmi.oreamnos.ui.components.SwipeableOutputBox
 import com.najmi.oreamnos.ui.components.AnimatedCheckmark
@@ -387,6 +390,9 @@ fun MainScreen(
     var isInputError by remember { mutableStateOf(false) }
     var triggerInputShake by remember { mutableStateOf(false) }
 
+    // Snackbar Host State
+    val snackbarHostState = remember { SnackbarHostState() }
+
     
     // Load custom pills
     LaunchedEffect(Unit) {
@@ -613,7 +619,8 @@ fun MainScreen(
                     onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
                 }
             },
-            onDismiss = { showProviderSelector = false }
+            onDismiss = { showProviderSelector = false },
+            onShowSnackbar = { message -> scope.launch { snackbarHostState.showSnackbar(message) } }
         )
     }
     
@@ -627,7 +634,7 @@ fun MainScreen(
                 customPills.clear()
                 customPills.addAll(prefsManager.getPills())
                 showCreatePillDialog = false
-                Toast.makeText(context, "Custom refinement created", Toast.LENGTH_SHORT).show()
+                scope.launch { snackbarHostState.showSnackbar("Custom refinement created") }
             }
         )
     }
@@ -647,7 +654,7 @@ fun MainScreen(
                 customPills.addAll(prefsManager.getPills())
                 showEditPillDialog = false
                 pillToEdit = null
-                Toast.makeText(context, "Custom refinement updated", Toast.LENGTH_SHORT).show()
+                scope.launch { snackbarHostState.showSnackbar("Custom refinement updated") }
             },
             onDelete = {
                 prefsManager.deletePill(pillToEdit!!.id)
@@ -659,13 +666,14 @@ fun MainScreen(
                 }
                 showEditPillDialog = false
                 pillToEdit = null
-                Toast.makeText(context, "Custom refinement deleted", Toast.LENGTH_SHORT).show()
+                scope.launch { snackbarHostState.showSnackbar("Custom refinement deleted") }
             }
         )
     }
     
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(snackbarHostState) { data -> NeoSnackbar(data) } },
         bottomBar = {
             // Neo Bottom Bar
             Surface(
@@ -707,7 +715,7 @@ fun MainScreen(
                                 triggerInputShake = true
                                 HapticHelper(context).onError()
                             } else if (!prefsManager.hasApiKey()) {
-                                Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
+                                scope.launch { snackbarHostState.showSnackbar("API Key required. Please configure in Settings.") }
                                 onNavigateToSettings()
                             } else {
                                 isLoading = true
@@ -807,7 +815,8 @@ fun MainScreen(
                     isLoadingPreview = isLoadingPreview,
                     onExtractContent = onExtractContent,
                     onDismissPreview = onDismissPreview,
-                    isError = isInputError
+                    isError = isInputError,
+                    onShowSnackbar = { message -> scope.launch { snackbarHostState.showSnackbar(message) } }
                 )
             }
             
@@ -868,7 +877,7 @@ fun MainScreen(
                         {
                             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                             clipboard.setPrimaryClip(ClipData.newPlainText("Socurate Post", outputText))
-                            Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
+                            // Toast removed - NeoCopyButton provides visual feedback
                         }
                     }
                     val onShareClick = remember(outputText) {
@@ -919,7 +928,7 @@ fun MainScreen(
                             val allRefinements = refinementOptions.toList() + 
                                 customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
                             if (allRefinements.isEmpty()) {
-                                Toast.makeText(context, "Please select at least one refinement", Toast.LENGTH_SHORT).show()
+                                scope.launch { snackbarHostState.showSnackbar("Please select at least one refinement") }
                             } else {
                                 isLoading = true
                                 hasResult = false
@@ -952,10 +961,10 @@ fun MainScreen(
                             val text = clipboard.primaryClip?.getItemAt(0)?.text
                             if (text != null) {
                                 inputText = text.toString()
-                                Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
+                                scope.launch { snackbarHostState.showSnackbar("Content pasted") }
                             }
                         } else {
-                            Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
+                            scope.launch { snackbarHostState.showSnackbar("Clipboard is empty") }
                         }
                     }
                 )
@@ -986,7 +995,8 @@ fun InputCard(
     isLoadingPreview: Boolean,
     onExtractContent: (String) -> Unit,
     onDismissPreview: () -> Unit,
-    isError: Boolean = false
+    isError: Boolean = false,
+    onShowSnackbar: (String) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -1031,10 +1041,10 @@ fun InputCard(
                                     val text = clipboard.primaryClip?.getItemAt(0)?.text
                                     if (text != null) {
                                         onInputChange(text.toString())
-                                        Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
+                                        onShowSnackbar("Content pasted")
                                     }
                                 } else {
-                                    Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
+                                    onShowSnackbar("Clipboard is empty")
                                 }
                             })
                         }
@@ -1491,7 +1501,8 @@ fun RateLimitDialog(
 fun ProviderSelectorSheet(
     prefsManager: PreferencesManager,
     onProviderSelected: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onShowSnackbar: (String) -> Unit
 ) {
     val context = LocalContext.current
     val currentProvider = remember { prefsManager.getProvider() }
@@ -1603,11 +1614,7 @@ fun ProviderSelectorSheet(
                             onProviderSelected(selectedProvider)
                             onDismiss()
                         } else {
-                            Toast.makeText(
-                                context,
-                                "Please configure API key for this provider first",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            onShowSnackbar("Please configure API key for this provider first")
                         }
                     },
                     enabled = prefsManager.hasApiKeyForProvider(selectedProvider)
