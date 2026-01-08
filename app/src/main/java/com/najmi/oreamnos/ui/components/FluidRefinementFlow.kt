@@ -178,7 +178,9 @@ fun StaggeredEntranceItem(
 ) {
     val transition = updateTransition(targetState = visible, label = "entrance")
 
-    val alpha by transition.animateFloat(
+    // OPTIMIZATION: Use state objects instead of delegated properties to avoid immediate read
+    // and prevent recomposition of the entire StaggeredEntranceItem on every frame.
+    val alphaState = transition.animateFloat(
         transitionSpec = {
             tween(durationMillis = 300, delayMillis = index * 30)
         },
@@ -187,7 +189,7 @@ fun StaggeredEntranceItem(
         if (state) 1f else 0f
     }
 
-    val scale by transition.animateFloat(
+    val scaleState = transition.animateFloat(
         transitionSpec = {
             spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -200,7 +202,7 @@ fun StaggeredEntranceItem(
         if (state) 1f else 0.8f
     }
 
-    val translationY by transition.animateFloat(
+    val translationYState = transition.animateFloat(
         transitionSpec = {
              tween(durationMillis = 300, delayMillis = index * 30)
         },
@@ -212,10 +214,11 @@ fun StaggeredEntranceItem(
     androidx.compose.foundation.layout.Box(
         modifier = Modifier
             .graphicsLayer {
-                this.alpha = alpha
-                this.scaleX = scale
-                this.scaleY = scale
-                this.translationY = translationY
+                // Read state inside the lambda to defer read to the draw phase
+                this.alpha = alphaState.value
+                this.scaleX = scaleState.value
+                this.scaleY = scaleState.value
+                this.translationY = translationYState.value
             }
     ) {
         content()
