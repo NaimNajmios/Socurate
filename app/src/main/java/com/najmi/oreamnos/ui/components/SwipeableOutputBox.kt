@@ -1,9 +1,14 @@
 package com.najmi.oreamnos.ui.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
@@ -18,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,12 +32,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -41,16 +47,18 @@ import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.R
 import com.najmi.oreamnos.utils.HapticHelper
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.math.abs
+
+private enum class SwipeAction { COPY, SHARE }
 
 /**
  * Swipeable output box with gesture support and delightful micro-interactions:
- * - Swipe left to reveal Copy action
+ * - Swipe left to reveal Copy action (with Success Snap confirmation)
  * - Swipe right to reveal Share action
  * - Features haptic feedback, scaling animations, and threshold snapping
  * - Includes "Shimmy" entrance animation to teach gestures
  */
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SwipeableOutputBox(
     outputText: String,
@@ -69,6 +77,9 @@ fun SwipeableOutputBox(
     // Track user interaction to cancel the shimmy animation
     var isInteracted by remember { mutableStateOf(false) }
 
+    // Track confirmed action for visual feedback
+    var confirmedAction by remember { mutableStateOf<SwipeAction?>(null) }
+
     // "Shimmy" Entrance Animation: Teaches the user that the card is swipeable
     LaunchedEffect(Unit) {
         delay(600) // Wait for card entrance
@@ -81,8 +92,18 @@ fun SwipeableOutputBox(
         if (!isInteracted) offsetX = 0f
     }
 
+    // Handle Copy Confirmation Reset
+    LaunchedEffect(confirmedAction) {
+        if (confirmedAction == SwipeAction.COPY) {
+            delay(1000) // Hold success state for 1 second
+            offsetX = 0f
+            delay(300) // Wait for spring animation
+            confirmedAction = null
+            isPastThreshold = false
+        }
+    }
+
     // Animate offset back to 0 when released
-    // Changed to LowBouncy for a more rubber-band feel
     val animatedOffset by animateFloatAsState(
         targetValue = offsetX,
         animationSpec = spring(
@@ -109,13 +130,13 @@ fun SwipeableOutputBox(
             val isActive = offsetX > swipeThreshold
             val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "share_scale")
             val rotateState by animateFloatAsState(if (isActive) 15f else 0f, label = "share_rotate")
+            val bgScale by animateFloatAsState(if (isActive) 1f else 0f, label = "share_bg_scale")
             val iconColor by animateColorAsState(
                 if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                 label = "share_icon_color"
             )
-            val bgScale by animateFloatAsState(if (isActive) 1f else 0f, label = "share_bg_scale")
 
-            // Background Circle for visual pop
+            // Background Circle
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -149,14 +170,24 @@ fun SwipeableOutputBox(
                 .alpha(if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
             contentAlignment = Alignment.Center
         ) {
-            val isActive = offsetX < -swipeThreshold
+            val isActive = offsetX < -swipeThreshold || confirmedAction == SwipeAction.COPY
+            val isConfirmed = confirmedAction == SwipeAction.COPY
+
             val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
-            val rotateState by animateFloatAsState(if (isActive) -15f else 0f, label = "copy_rotate")
+            val rotateState by animateFloatAsState(if (isActive && !isConfirmed) -15f else 0f, label = "copy_rotate")
+
+            // Visual Confirmation: Green Background
+            val bgColor by animateColorAsState(
+                if (isConfirmed) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary,
+                label = "copy_bg_color"
+            )
+            val bgScale by animateFloatAsState(if (isActive) 1f else 0f, label = "copy_bg_scale")
+
+            // Icon Color: Dark when dragging, White when active/confirmed
             val iconColor by animateColorAsState(
                 if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                 label = "copy_icon_color"
             )
-             val bgScale by animateFloatAsState(if (isActive) 1f else 0f, label = "copy_bg_scale")
 
              // Background Circle for visual pop
             Box(
@@ -167,21 +198,39 @@ fun SwipeableOutputBox(
                         scaleY = bgScale
                     }
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
+                    .background(bgColor)
             )
 
-            Icon(
-                painter = painterResource(R.drawable.ic_copy),
-                contentDescription = "Copy",
-                tint = iconColor,
+            // Morph between Copy Icon and Checkmark
+            AnimatedContent(
+                targetState = isConfirmed,
+                transitionSpec = {
+                    scaleIn() with scaleOut()
+                },
                 modifier = Modifier
-                    .size(32.dp)
                     .graphicsLayer {
                         scaleX = scaleState
                         scaleY = scaleState
                         rotationZ = rotateState
-                    }
-            )
+                    },
+                label = "copy_icon_morph"
+            ) { confirmed ->
+                if (confirmed) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Copied!",
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(32.dp)
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_copy),
+                        contentDescription = "Copy",
+                        tint = iconColor,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
         }
 
         // --- FOREGROUND LAYER (Content) ---
@@ -197,6 +246,9 @@ fun SwipeableOutputBox(
                             isInteracted = true // Cancel shimmy on first touch
                         },
                         onHorizontalDrag = { change, dragAmount ->
+                            // Disable dragging if currently confirming an action
+                            if (confirmedAction != null) return@detectHorizontalDragGestures
+
                             change.consume()
                             isInteracted = true
                             // Add resistance as we drag further
@@ -213,14 +265,30 @@ fun SwipeableOutputBox(
                             }
                         },
                         onDragEnd = {
+                            // Prevent interfering if animation is running
+                            if (confirmedAction != null) return@detectHorizontalDragGestures
+
                             if (abs(offsetX) > swipeThreshold) {
-                                // Trigger action
-                                hapticHelper.onCopy() // Success haptic
-                                if (offsetX > 0) onShare() else onCopy()
+                                if (offsetX > 0) {
+                                    // SHARE: Standard trigger (System Sheet overlays)
+                                    hapticHelper.onCopy()
+                                    onShare()
+                                    offsetX = 0f
+                                    isPastThreshold = false
+                                } else {
+                                    // COPY: "Success Snap" Interaction
+                                    // Lock the offset and trigger visual confirmation
+                                    hapticHelper.onCopy()
+                                    confirmedAction = SwipeAction.COPY
+                                    // Snap to a nice visible position for the confirmation
+                                    offsetX = -swipeThreshold * 1.1f
+                                    onCopy()
+                                }
+                            } else {
+                                // Cancelled - Reset
+                                offsetX = 0f
+                                isPastThreshold = false
                             }
-                            // Reset
-                            offsetX = 0f
-                            isPastThreshold = false
                         }
                     )
                 }
