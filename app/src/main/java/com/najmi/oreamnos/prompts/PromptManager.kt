@@ -3,8 +3,10 @@ package com.najmi.oreamnos.prompts
 /**
  * Centralizes prompt engineering for content curation.
  * Extracted from GeminiService for reusability across different AI providers.
+ *
+ * OPTIMIZATION: Converted to object (singleton) to avoid object allocation on every API request.
  */
-class PromptManager {
+object PromptManager {
 
     /**
      * Builds the initial curation prompt based on tone and input text.
@@ -239,15 +241,13 @@ class PromptManager {
         return false
     }
 
-    private companion object {
-        val TACTICAL_KEYWORDS = arrayOf(
-            "formation", "tactical", "pressing", "possession", "xg", "expected goals",
-            "pass completion", "progressive passes", "defensive line", "build-up",
-            "counter-attack", "high press", "low block", "transition", "shape",
-            "midfielder", "forward", "defender", "fullback", "winger",
-            "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2", "3-4-3"
-        )
-    }
+    private val TACTICAL_KEYWORDS = arrayOf(
+        "formation", "tactical", "pressing", "possession", "xg", "expected goals",
+        "pass completion", "progressive passes", "defensive line", "build-up",
+        "counter-attack", "high press", "low block", "transition", "shape",
+        "midfielder", "forward", "defender", "fullback", "winger",
+        "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2", "3-4-3"
+    )
 
     /**
      * Detects if the input text contains bullet points or list markers.

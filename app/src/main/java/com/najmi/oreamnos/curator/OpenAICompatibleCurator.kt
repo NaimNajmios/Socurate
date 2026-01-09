@@ -44,8 +44,6 @@ class OpenAICompatibleCurator(
         private val BULLET_POINT_PATTERN: Pattern = Pattern.compile("(?m)^(\\s*)[-*>\u2022\u25e6\u25aa\u25ab\u2023\u2043](\\s+)")
     }
 
-    private val promptManager = PromptManager()
-
     // Token counts from last API call
     private var _lastPromptTokens = 0
     private var _lastCandidateTokens = 0
@@ -59,7 +57,7 @@ class OpenAICompatibleCurator(
     override fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
         val systemPrompt = "You are a professional social media content writer for a Malaysian football club. " +
                 "Write in Malaysian Malay (Bahasa Malaysia) only. Do not include hashtags. Do not include emojis."
-        val userPrompt = promptManager.buildInitialPrompt(tone, inputText, includeSource, keepStructure)
+        val userPrompt = PromptManager.buildInitialPrompt(tone, inputText, includeSource, keepStructure)
         val rawResult = callApi(systemPrompt, userPrompt)
         return cleanUpResponse(rawResult, includeSource)
     }
@@ -68,7 +66,7 @@ class OpenAICompatibleCurator(
     override fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String {
         val systemPrompt = "You are refining a Malaysian Malay social media post about football. " +
                 "Apply improvements while maintaining Bahasa Malaysia. Do not include hashtags. Do not include emojis."
-        val userPrompt = promptManager.buildRefinementPrompt(originalPost, refinements, includeSource)
+        val userPrompt = PromptManager.buildRefinementPrompt(originalPost, refinements, includeSource)
         val rawResult = callApi(systemPrompt, userPrompt)
         return cleanUpResponse(rawResult, includeSource)
     }
