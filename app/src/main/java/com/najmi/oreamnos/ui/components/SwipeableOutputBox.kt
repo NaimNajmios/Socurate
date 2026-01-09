@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -83,7 +84,7 @@ fun SwipeableOutputBox(
 
     // Animate offset back to 0 when released
     // Changed to LowBouncy for a more rubber-band feel
-    val animatedOffset by animateFloatAsState(
+    val animatedOffsetState = animateFloatAsState(
         targetValue = offsetX,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioLowBouncy,
@@ -103,10 +104,13 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(start = 24.dp)
-                .alpha(if (offsetX > 0) (offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
+                .graphicsLayer {
+                    val currentOffset = offsetX
+                    alpha = if (currentOffset > 0) (currentOffset / swipeThreshold).coerceIn(0f, 1f) else 0f
+                },
             contentAlignment = Alignment.Center
         ) {
-            val isActive = offsetX > swipeThreshold
+            val isActive by remember { derivedStateOf { offsetX > swipeThreshold } }
             val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "share_scale")
             val rotateState by animateFloatAsState(if (isActive) 15f else 0f, label = "share_rotate")
             val iconColor by animateColorAsState(
@@ -146,10 +150,13 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(end = 24.dp)
-                .alpha(if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
+                .graphicsLayer {
+                    val currentOffset = offsetX
+                    alpha = if (currentOffset < 0) (-currentOffset / swipeThreshold).coerceIn(0f, 1f) else 0f
+                },
             contentAlignment = Alignment.Center
         ) {
-            val isActive = offsetX < -swipeThreshold
+            val isActive by remember { derivedStateOf { offsetX < -swipeThreshold } }
             val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
             val rotateState by animateFloatAsState(if (isActive) -15f else 0f, label = "copy_rotate")
             val iconColor by animateColorAsState(
@@ -189,7 +196,7 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .fillMaxWidth()
                 .graphicsLayer {
-                    translationX = animatedOffset
+                    translationX = animatedOffsetState.value
                 }
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
@@ -252,7 +259,9 @@ fun SwipeableOutputBox(
             }
 
             // Fading Chevron Hints - Visible only during shimmy to teach direction
-            val shimmyVisible = !isInteracted && abs(animatedOffset) > 10f
+            val shimmyVisible by remember {
+                derivedStateOf { !isInteracted && abs(animatedOffsetState.value) > 10f }
+            }
             val hintAlpha by animateFloatAsState(if (shimmyVisible) 0.6f else 0f, label = "hint_alpha")
 
             if (hintAlpha > 0f) {
