@@ -43,6 +43,7 @@ A sleek, modern Android application that transforms global football news into po
 - **Stagger Entrance**: Cascading chip animations with delay
 - **Spring Physics**: Bouncy swipe gestures and card interactions
 - **Animated Checkmark**: Custom Canvas-drawn success animation
+- **Success Snap**: Satisfaction-locking animation for copy gestures
 - **Pulsing Loading**: Progress indicator with percentage display
 - **Haptic Feedback**: Tactile vibrations on key interactions
 
@@ -54,7 +55,7 @@ A sleek, modern Android application that transforms global football news into po
 - **Selection Container**: Copy portions of rendered text
 
 ### 🎯 Gesture Controls
-- **Swipe Left to Copy**: Quick copy action on output card
+- **Swipe Left to Copy**: Quick copy action with **Success Snap** confirmation
 - **Swipe Right to Share**: Quick share action on output card
 - **Long-Press Pills**: Edit or delete custom refinement commands
 - **Pull-to-Refresh**: Refresh usage statistics
@@ -264,6 +265,7 @@ The app uses a **Neo-Editorial** design language:
 | Spring Physics | `spring(dampingRatio = MediumBouncy)` |
 | Swipe Gestures | `pointerInput` + `detectHorizontalDragGestures` |
 | Color Transitions | `animateColorAsState` with 200ms tween |
+| Success Snap | `animateFloatAsState` with delayed reset logic |
 
 ## 🛠️ Technology Stack
 

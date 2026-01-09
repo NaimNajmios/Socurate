@@ -1,28 +1,25 @@
-## 2024-05-23 - Shimmy Entrance Animation
 
-**Context:** Swipeable Output Card (Swipe to Copy/Share)
-**Observation:** Users often missed the swipe functionality on the output card because the actions (Copy/Share) were hidden behind the content layer with no affordance.
-**Solution:** Implemented a "Shimmy" entrance animation that automatically slides the content layer back and forth (Right then Left) to peek the hidden actions. Added fading chevron hints during the animation to reinforce directionality.
-**Impact:** Drastically improves discoverability of the swipe gestures without permanent visual clutter.
+## 2025-05-24 - Success Snap Interaction
+
+**Context:** Swipeable Output Card (Copy Action)
+**Observation:** Users swiping to copy received haptic feedback but missed a clear visual confirmation, leading to uncertainty if the action succeeded. The card simply snapped back immediately.
+**Solution:** Implemented a "Success Snap" pattern where the card locks in the open position for 1000ms upon successful copy, morphing the icon into a checkmark before resetting. This provides a focused moment of confirmation.
+**Impact:** Eliminates ambiguity about the copy action's success and adds a delightful, polished feel to the gesture.
 
 **Code Pattern:**
 ```kotlin
-// Track interaction to cancel animation
-var isInteracted by remember { mutableStateOf(false) }
+// Success Snap Logic
+onDragEnd = {
+    if (isSwipeToCopy) {
+        onCopy()
+        isSuccess = true
+        offsetX = -snapOffset // Lock open
 
-// Shimmy Sequence
-LaunchedEffect(Unit) {
-    delay(600) // Wait for entrance
-    if (!isInteracted) offsetX = 50f // Reveal Left Action
-    delay(500)
-    if (!isInteracted) offsetX = 0f
-    delay(200)
-    if (!isInteracted) offsetX = -50f // Reveal Right Action
-    delay(500)
-    if (!isInteracted) offsetX = 0f
+        scope.launch {
+            delay(1000)
+            isSuccess = false
+            offsetX = 0f // Reset
+        }
+    }
 }
-
-// Hint Visibility
-val shimmyVisible = !isInteracted && abs(animatedOffset) > 10f
-val hintAlpha by animateFloatAsState(if (shimmyVisible) 0.6f else 0f)
 ```
