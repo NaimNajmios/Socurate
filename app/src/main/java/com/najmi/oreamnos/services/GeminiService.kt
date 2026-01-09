@@ -331,34 +331,28 @@ class GeminiService(
     private fun extractTextFromJson(root: JsonObject?): String? {
         if (root == null) return null
 
+        // Strategy 1: Structured Path - candidates[0].content.parts[0].text
+        try {
+            val structuredText = extractStructuredText(root)
+            if (!structuredText.isNullOrBlank()) return structuredText
+        } catch (e: Exception) {
+            Log.w(TAG, "Structured extraction failed, attempting fallback: ${e.message}")
+        }
+
+        // Strategy 2: Fallback Recursive Search
         return try {
-            // Try: candidates[0].content.parts[0].text
-            if (root.has("candidates")) {
-                val candidates = root.getAsJsonArray("candidates")
-                if (candidates.size() > 0) {
-                    val firstCandidate = candidates[0].asJsonObject
-                    if (firstCandidate.has("content")) {
-                        val content = firstCandidate.getAsJsonObject("content")
-                        if (content.has("parts")) {
-                            val parts = content.getAsJsonArray("parts")
-                            if (parts.size() > 0) {
-                                val firstPart = parts[0].asJsonObject
-                                if (firstPart.has("text")) {
-                                    val text = firstPart.get("text").asString
-                                    if (!text.isNullOrBlank()) return text
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             findFirstTextField(root)
         } catch (e: Exception) {
-            Log.e(TAG, "Error extracting text from JSON", e)
+            Log.e(TAG, "Fallback extraction failed", e)
             null
         }
     }
 
+    /**
+     * Recursive search for the first non-empty "text" field in the JSON structure.
+     * Exposed as package-private for testing via companion object helper if needed,
+     * but logic is simple enough to be covered by integration tests.
+     */
     private fun findFirstTextField(element: JsonElement?): String? {
         if (element == null || element.isJsonNull) return null
 
@@ -532,5 +526,42 @@ class GeminiService(
 
         // Clean up regex for delay parsing
         private val NUMERIC_CLEANUP_REGEX = Regex("[^0-9.]")
+
+        /**
+         * Pure extraction logic for structured Gemini response.
+         * Separated for testability without Android dependencies.
+         */
+        @JvmStatic
+        fun extractStructuredText(root: JsonObject): String? {
+            if (root.has("candidates")) {
+                val candidates = root.getAsJsonArray("candidates")
+                if (candidates.size() > 0) {
+                    val firstCandidate = candidates[0]
+                    if (firstCandidate.isJsonObject) {
+                        val candidateObj = firstCandidate.asJsonObject
+                        if (candidateObj.has("content")) {
+                            val contentElement = candidateObj.get("content")
+                            if (contentElement.isJsonObject) {
+                                val content = contentElement.asJsonObject
+                                if (content.has("parts")) {
+                                    val parts = content.getAsJsonArray("parts")
+                                    if (parts.size() > 0) {
+                                        val firstPart = parts[0]
+                                        if (firstPart.isJsonObject) {
+                                            val partObj = firstPart.asJsonObject
+                                            if (partObj.has("text")) {
+                                                val text = partObj.get("text").asString
+                                                if (!text.isNullOrBlank()) return text
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return null
+        }
     }
 }
