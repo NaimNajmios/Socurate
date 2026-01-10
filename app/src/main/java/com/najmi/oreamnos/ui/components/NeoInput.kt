@@ -6,6 +6,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -35,6 +36,30 @@ fun NeoInput(
     trailingIcon: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null
 ) {
+    // Memoize colors to avoid allocation on every recomposition (keystroke)
+    // Keying by specific theme colors ensures updates if theme changes
+    val focusedBorderColor = MaterialTheme.colorScheme.primary
+    val unfocusedBorderColor = MaterialTheme.colorScheme.outline
+    val focusedLabelColor = MaterialTheme.colorScheme.primary
+    val unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val cursorColor = MaterialTheme.colorScheme.primary
+
+    val colors = remember(
+        focusedBorderColor,
+        unfocusedBorderColor,
+        focusedLabelColor,
+        unfocusedLabelColor,
+        cursorColor
+    ) {
+        OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = focusedBorderColor,
+            unfocusedBorderColor = unfocusedBorderColor,
+            focusedLabelColor = focusedLabelColor,
+            unfocusedLabelColor = unfocusedLabelColor,
+            cursorColor = cursorColor
+        )
+    }
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -51,12 +76,6 @@ fun NeoInput(
         trailingIcon = trailingIcon,
         supportingText = supportingText,
         shape = NeoInputShape, // Sharp corners
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-            focusedLabelColor = MaterialTheme.colorScheme.primary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            cursorColor = MaterialTheme.colorScheme.primary
-        )
+        colors = colors
     )
 }
