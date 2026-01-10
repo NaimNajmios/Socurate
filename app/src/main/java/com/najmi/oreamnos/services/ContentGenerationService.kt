@@ -83,6 +83,7 @@ class ContentGenerationService : Service() {
                 return@execute
             }
 
+            var success = false
             val startTime = System.currentTimeMillis()
             try {
                 Log.i(TAG, "Starting content generation...")
@@ -119,6 +120,7 @@ class ContentGenerationService : Service() {
                 prefsManager.logInfo("API", "Request successful via $providerDisplay ($totalTokens tokens, ${durationMs}ms)")
 
                 Log.i(TAG, "Content generation successful")
+                success = true
                 broadcastSuccess(result, false)
 
             } catch (rle: RateLimitException) {
@@ -145,10 +147,12 @@ class ContentGenerationService : Service() {
                 broadcastError(e.message, false)
             } finally {
                 // Show completion notification and stop service
-                notificationHelper.showCompletedNotification(
-                    getString(R.string.notification_complete_title),
-                    getString(R.string.notification_complete_message)
-                )
+                if (success) {
+                    notificationHelper.showCompletedNotification(
+                        getString(R.string.notification_complete_title),
+                        getString(R.string.notification_complete_message)
+                    )
+                }
                 stopSelf(startId)
             }
         }
@@ -176,6 +180,7 @@ class ContentGenerationService : Service() {
                 return@execute
             }
 
+            var success = false
             val startTime = System.currentTimeMillis()
             try {
                 Log.i(TAG, "Starting content refinement with options: $refinements")
@@ -204,6 +209,7 @@ class ContentGenerationService : Service() {
                 prefsManager.logInfo("API", "Refinement successful via $providerDisplay ($totalTokens tokens, ${durationMs}ms)")
 
                 Log.i(TAG, "Content refinement successful")
+                success = true
                 broadcastSuccess(result, true)
 
             } catch (rle: RateLimitException) {
@@ -230,10 +236,12 @@ class ContentGenerationService : Service() {
                 broadcastError(e.message, true)
             } finally {
                 // Show completion notification and stop service
-                notificationHelper.showCompletedNotification(
-                    getString(R.string.notification_complete_title),
-                    getString(R.string.notification_complete_message)
-                )
+                if (success) {
+                    notificationHelper.showCompletedNotification(
+                        getString(R.string.notification_complete_title),
+                        getString(R.string.notification_complete_message)
+                    )
+                }
                 stopSelf(startId)
             }
         }
