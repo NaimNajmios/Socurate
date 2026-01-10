@@ -947,17 +947,8 @@ fun MainScreen(
             // Empty State
             AnimatedVisibility(visible = !hasResult && !isLoading && error == null && inputText.isBlank(), enter = fadeIn(), exit = fadeOut()) {
                 EmptyStateCard(
-                    onPaste = {
-                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        if (clipboard.hasPrimaryClip()) {
-                            val text = clipboard.primaryClip?.getItemAt(0)?.text
-                            if (text != null) {
-                                inputText = text.toString()
-                                Toast.makeText(context, "Content pasted", Toast.LENGTH_SHORT).show()
-                            }
-                        } else {
-                            Toast.makeText(context, "Clipboard is empty", Toast.LENGTH_SHORT).show()
-                        }
+                    onPaste = { text ->
+                        inputText = text
                     }
                 )
             }
