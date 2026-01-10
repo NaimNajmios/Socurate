@@ -29,8 +29,6 @@ class GeminiService(
     private val tone: String = "formal"
 ) : IContentCurator {
 
-    private val gson = Gson()
-
     // Last request usage metadata
     private var _lastPromptTokens: Int = 0
     private var _lastCandidateTokens: Int = 0
@@ -60,7 +58,8 @@ class GeminiService(
         if (inputText.isBlank()) throw Exception("Input text is required")
 
         // Build the prompt based on tone
-        val prompt = PromptManager().buildInitialPrompt(tone, inputText, includeSource, keepStructure)
+        // OPTIMIZATION: Use Singleton PromptManager to avoid allocation
+        val prompt = PromptManager.buildInitialPrompt(tone, inputText, includeSource, keepStructure)
 
         // Build request JSON
         val requestJson = buildRequestJson(prompt)
@@ -215,7 +214,8 @@ class GeminiService(
         Log.i(TAG, "[$requestId] Refinements: $refinements")
         Log.i(TAG, "[$requestId] Include source: $includeSource")
 
-        val prompt = PromptManager().buildRefinementPrompt(originalPost, refinements, includeSource)
+        // OPTIMIZATION: Use Singleton PromptManager to avoid allocation
+        val prompt = PromptManager.buildRefinementPrompt(originalPost, refinements, includeSource)
         val requestJson = buildRequestJson(prompt)
         val requestBodyString = gson.toJson(requestJson)
 
@@ -332,26 +332,20 @@ class GeminiService(
         if (root == null) return null
 
         return try {
-            // Try: candidates[0].content.parts[0].text
-            if (root.has("candidates")) {
-                val candidates = root.getAsJsonArray("candidates")
-                if (candidates.size() > 0) {
-                    val firstCandidate = candidates[0].asJsonObject
-                    if (firstCandidate.has("content")) {
-                        val content = firstCandidate.getAsJsonObject("content")
-                        if (content.has("parts")) {
-                            val parts = content.getAsJsonArray("parts")
-                            if (parts.size() > 0) {
-                                val firstPart = parts[0].asJsonObject
-                                if (firstPart.has("text")) {
-                                    val text = firstPart.get("text").asString
-                                    if (!text.isNullOrBlank()) return text
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            // OPTIMIZATION: Use safe direct access to avoid redundant has()/get() lookups
+            // Old approach: 4 has() checks + 4 get() calls = 8 lookups
+            // New approach: 4 direct get() calls with null checks = 4 lookups
+            val text = root.getAsJsonArray("candidates")
+                ?.takeIf { !it.isEmpty }
+                ?.get(0)?.asJsonObject
+                ?.getAsJsonObject("content")
+                ?.getAsJsonArray("parts")
+                ?.takeIf { !it.isEmpty }
+                ?.get(0)?.asJsonObject
+                ?.get("text")?.asString
+
+            if (!text.isNullOrBlank()) return text
+
             findFirstTextField(root)
         } catch (e: Exception) {
             Log.e(TAG, "Error extracting text from JSON", e)
@@ -532,5 +526,9 @@ class GeminiService(
 
         // Clean up regex for delay parsing
         private val NUMERIC_CLEANUP_REGEX = Regex("[^0-9.]")
+
+        // Shared Gson instance to avoid repeated allocation/setup on every request
+        // OPTIMIZATION: Moving Gson here makes it a singleton shared across all service instances
+        private val gson = Gson()
     }
 }
