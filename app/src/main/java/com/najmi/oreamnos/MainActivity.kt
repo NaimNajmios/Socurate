@@ -149,6 +149,7 @@ import com.najmi.oreamnos.ui.components.FluidRefinementFlow
 import com.najmi.oreamnos.ui.components.LinkPreviewSection
 import com.najmi.oreamnos.ui.components.PasteAction
 import com.najmi.oreamnos.ui.components.ClearAction
+import com.najmi.oreamnos.ui.components.SuccessOverlay
 import com.najmi.oreamnos.viewmodel.MainViewModel
 import androidx.compose.animation.animateContentSize
 
@@ -972,6 +973,9 @@ fun MainScreen(
                 onDismiss = { showReadingDialog = false }
             )
         }
+
+        // Success Animation Overlay
+        SuccessOverlay(visible = showSuccessAnimation)
     }
 }
 
