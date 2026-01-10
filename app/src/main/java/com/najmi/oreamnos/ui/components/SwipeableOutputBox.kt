@@ -1,9 +1,16 @@
 package com.najmi.oreamnos.ui.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
@@ -18,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -32,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -46,7 +55,7 @@ import kotlin.math.abs
 
 /**
  * Swipeable output box with gesture support and delightful micro-interactions:
- * - Swipe left to reveal Copy action
+ * - Swipe left to reveal Copy action (Success Snap with Checkmark)
  * - Swipe right to reveal Share action
  * - Features haptic feedback, scaling animations, and threshold snapping
  * - Includes "Shimmy" entrance animation to teach gestures
@@ -60,11 +69,15 @@ fun SwipeableOutputBox(
 ) {
     val context = LocalContext.current
     val hapticHelper = remember { HapticHelper(context) }
+    val scope = rememberCoroutineScope()
     var offsetX by remember { mutableFloatStateOf(0f) }
     val swipeThreshold = 150f
 
     // State to track if we've crossed the threshold to trigger haptics only once
     var isPastThreshold by remember { mutableStateOf(false) }
+
+    // State to track success animation (lock open)
+    var isSuccessState by remember { mutableStateOf(false) }
 
     // Track user interaction to cancel the shimmy animation
     var isInteracted by remember { mutableStateOf(false) }
@@ -149,11 +162,11 @@ fun SwipeableOutputBox(
                 .alpha(if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
             contentAlignment = Alignment.Center
         ) {
-            val isActive = offsetX < -swipeThreshold
+            val isActive = offsetX < -swipeThreshold || isSuccessState
             val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
-            val rotateState by animateFloatAsState(if (isActive) -15f else 0f, label = "copy_rotate")
+            val rotateState by animateFloatAsState(if (isActive && !isSuccessState) -15f else 0f, label = "copy_rotate")
             val iconColor by animateColorAsState(
-                if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                if (isSuccessState) Color(0xFF4CAF50) else if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                 label = "copy_icon_color"
             )
              val bgScale by animateFloatAsState(if (isActive) 1f else 0f, label = "copy_bg_scale")
@@ -167,21 +180,38 @@ fun SwipeableOutputBox(
                         scaleY = bgScale
                     }
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
+                    .background(if (isSuccessState) Color.White else MaterialTheme.colorScheme.primary)
             )
 
-            Icon(
-                painter = painterResource(R.drawable.ic_copy),
-                contentDescription = "Copy",
-                tint = iconColor,
-                modifier = Modifier
-                    .size(32.dp)
-                    .graphicsLayer {
-                        scaleX = scaleState
-                        scaleY = scaleState
-                        rotationZ = rotateState
-                    }
-            )
+            AnimatedContent(
+                targetState = isSuccessState,
+                transitionSpec = {
+                    (scaleIn(animationSpec = tween(300)) + fadeIn()) with (scaleOut() + fadeOut())
+                },
+                label = "copy_icon_morph"
+            ) { success ->
+                if (success) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Copied Success",
+                        tint = Color(0xFF4CAF50), // Success Green
+                        modifier = Modifier.size(32.dp)
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_copy),
+                        contentDescription = "Copy",
+                        tint = iconColor,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .graphicsLayer {
+                                scaleX = scaleState
+                                scaleY = scaleState
+                                rotationZ = rotateState
+                            }
+                    )
+                }
+            }
         }
 
         // --- FOREGROUND LAYER (Content) ---
@@ -195,8 +225,11 @@ fun SwipeableOutputBox(
                     detectHorizontalDragGestures(
                         onDragStart = {
                             isInteracted = true // Cancel shimmy on first touch
+                            // Do not allow drag if currently in success state lock
+                            if (isSuccessState) return@detectHorizontalDragGestures
                         },
                         onHorizontalDrag = { change, dragAmount ->
+                            if (isSuccessState) return@detectHorizontalDragGestures
                             change.consume()
                             isInteracted = true
                             // Add resistance as we drag further
@@ -213,14 +246,38 @@ fun SwipeableOutputBox(
                             }
                         },
                         onDragEnd = {
-                            if (abs(offsetX) > swipeThreshold) {
-                                // Trigger action
-                                hapticHelper.onCopy() // Success haptic
-                                if (offsetX > 0) onShare() else onCopy()
+                            if (isSuccessState) return@detectHorizontalDragGestures
+
+                            val isShare = offsetX > 0
+                            val thresholdMet = abs(offsetX) > swipeThreshold
+
+                            if (thresholdMet) {
+                                // Success Haptic
+                                hapticHelper.onCopy()
+
+                                if (isShare) {
+                                    // Share Action: Trigger and reset immediately
+                                    onShare()
+                                    offsetX = 0f
+                                    isPastThreshold = false
+                                } else {
+                                    // Copy Action: Trigger, Snap Open, and Wait
+                                    onCopy()
+                                    isSuccessState = true
+                                    offsetX = -swipeThreshold // Snap to open position
+
+                                    scope.launch {
+                                        delay(1000) // Hold "Success Snap"
+                                        offsetX = 0f
+                                        isSuccessState = false
+                                        isPastThreshold = false
+                                    }
+                                }
+                            } else {
+                                // Reset if threshold not met
+                                offsetX = 0f
+                                isPastThreshold = false
                             }
-                            // Reset
-                            offsetX = 0f
-                            isPastThreshold = false
                         }
                     )
                 }
