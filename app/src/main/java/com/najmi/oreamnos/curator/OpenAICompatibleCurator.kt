@@ -3,6 +3,9 @@ package com.najmi.oreamnos.curator
 import android.util.Log
 import com.najmi.oreamnos.exceptions.RateLimitException
 import com.najmi.oreamnos.prompts.PromptManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -54,7 +57,7 @@ class OpenAICompatibleCurator(
     override val lastTotalTokens: Int get() = _lastTotalTokens
 
     @Throws(Exception::class)
-    override fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
+    override suspend fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
         val systemPrompt = "You are a professional social media content writer for a Malaysian football club. " +
                 "Write in Malaysian Malay (Bahasa Malaysia) only. Do not include hashtags. Do not include emojis."
         val userPrompt = PromptManager.buildInitialPrompt(tone, inputText, includeSource, keepStructure)
@@ -63,7 +66,7 @@ class OpenAICompatibleCurator(
     }
 
     @Throws(Exception::class)
-    override fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String {
+    override suspend fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String {
         val systemPrompt = "You are refining a Malaysian Malay social media post about football. " +
                 "Apply improvements while maintaining Bahasa Malaysia. Do not include hashtags. Do not include emojis."
         val userPrompt = PromptManager.buildRefinementPrompt(originalPost, refinements, includeSource)
@@ -75,7 +78,7 @@ class OpenAICompatibleCurator(
      * Makes the API call with retry logic.
      */
     @Throws(Exception::class)
-    private fun callApi(systemPrompt: String, userPrompt: String): String {
+    private suspend fun callApi(systemPrompt: String, userPrompt: String): String {
         var retryCount = 0
         var delayMs = INITIAL_RETRY_DELAY_MS
         var lastException: Exception? = null
@@ -96,7 +99,7 @@ class OpenAICompatibleCurator(
                 }
 
                 // Exponential backoff
-                Thread.sleep(delayMs)
+                delay(delayMs)
                 delayMs *= 2
             }
         }
@@ -108,64 +111,66 @@ class OpenAICompatibleCurator(
      * Executes the HTTP request to the OpenAI-compatible API.
      */
     @Throws(Exception::class)
-    private fun executeRequest(systemPrompt: String, userPrompt: String): String {
-        val url = URL(baseUrl)
-        val conn = url.openConnection() as HttpURLConnection
+    private suspend fun executeRequest(systemPrompt: String, userPrompt: String): String {
+        return withContext(Dispatchers.IO) {
+            val url = URL(baseUrl)
+            val conn = url.openConnection() as HttpURLConnection
 
-        try {
-            conn.requestMethod = "POST"
-            conn.setRequestProperty("Content-Type", "application/json")
-            conn.setRequestProperty("Authorization", "Bearer $apiKey")
+            try {
+                conn.requestMethod = "POST"
+                conn.setRequestProperty("Content-Type", "application/json")
+                conn.setRequestProperty("Authorization", "Bearer $apiKey")
 
-            // OpenRouter requires additional headers
-            if (isOpenRouter) {
-                conn.setRequestProperty("HTTP-Referer", "https://github.com/socurate-app")
-                conn.setRequestProperty("X-Title", "Socurate Football Content Curator")
-            }
-
-            conn.doOutput = true
-            conn.connectTimeout = 30000
-            conn.readTimeout = 60000
-
-            // Build request body in OpenAI format
-            val requestBody = buildRequestBody(systemPrompt, userPrompt)
-
-            Log.d(TAG, "Sending request to: $baseUrl")
-            Log.d(TAG, "Model: $modelId")
-
-            // Write request
-            conn.outputStream.use { os ->
-                val input = requestBody.toString().toByteArray(StandardCharsets.UTF_8)
-                os.write(input)
-            }
-
-            val responseCode = conn.responseCode
-            Log.d(TAG, "Response code: $responseCode")
-
-            return if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Read response
-                val response = readStream(conn.inputStream)
-                parseResponse(response)
-            } else {
-                // Read error response safely (errorStream can be null)
-                val errorResponse = readStream(conn.errorStream)
-
-                Log.e(TAG, "API Error: $errorResponse")
-
-                // Check for rate limit (429)
-                if (responseCode == 429) {
-                    val providerName = if (isOpenRouter) "openrouter" else "groq"
-                    throw RateLimitException(
-                        "Rate limit exceeded for $providerName",
-                        0, // OpenAI-compatible APIs don't always provide retry delay
-                        providerName
-                    )
+                // OpenRouter requires additional headers
+                if (isOpenRouter) {
+                    conn.setRequestProperty("HTTP-Referer", "https://github.com/socurate-app")
+                    conn.setRequestProperty("X-Title", "Socurate Football Content Curator")
                 }
 
-                throw Exception("API error ($responseCode): ${parseErrorMessage(errorResponse.toString())}")
+                conn.doOutput = true
+                conn.connectTimeout = 30000
+                conn.readTimeout = 60000
+
+                // Build request body in OpenAI format
+                val requestBody = buildRequestBody(systemPrompt, userPrompt)
+
+                Log.d(TAG, "Sending request to: $baseUrl")
+                Log.d(TAG, "Model: $modelId")
+
+                // Write request
+                conn.outputStream.use { os ->
+                    val input = requestBody.toString().toByteArray(StandardCharsets.UTF_8)
+                    os.write(input)
+                }
+
+                val responseCode = conn.responseCode
+                Log.d(TAG, "Response code: $responseCode")
+
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // Read response
+                    val response = readStream(conn.inputStream)
+                    parseResponse(response)
+                } else {
+                    // Read error response safely (errorStream can be null)
+                    val errorResponse = readStream(conn.errorStream)
+
+                    Log.e(TAG, "API Error: $errorResponse")
+
+                    // Check for rate limit (429)
+                    if (responseCode == 429) {
+                        val providerName = if (isOpenRouter) "openrouter" else "groq"
+                        throw RateLimitException(
+                            "Rate limit exceeded for $providerName",
+                            0, // OpenAI-compatible APIs don't always provide retry delay
+                            providerName
+                        )
+                    }
+
+                    throw Exception("API error ($responseCode): ${parseErrorMessage(errorResponse.toString())}")
+                }
+            } finally {
+                conn.disconnect()
             }
-        } finally {
-            conn.disconnect()
         }
     }
 

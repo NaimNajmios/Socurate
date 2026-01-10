@@ -17,7 +17,7 @@ interface IContentCurator {
      * @throws Exception if curation fails
      */
     @Throws(Exception::class)
-    fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String
+    suspend fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String
 
     /**
      * Refines an existing post based on selected refinement options.
@@ -29,7 +29,7 @@ interface IContentCurator {
      * @throws Exception if refinement fails
      */
     @Throws(Exception::class)
-    fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String
+    suspend fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String
 
     /** Gets the last prompt token count from API response. */
     val lastPromptTokens: Int
