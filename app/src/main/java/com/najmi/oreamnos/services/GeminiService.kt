@@ -8,6 +8,9 @@ import com.google.gson.JsonObject
 import com.najmi.oreamnos.curator.IContentCurator
 import com.najmi.oreamnos.exceptions.RateLimitException
 import com.najmi.oreamnos.prompts.PromptManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -45,7 +48,7 @@ class GeminiService(
      * Implements retry logic with exponential backoff for transient errors.
      */
     @Throws(Exception::class)
-    override fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
+    override suspend fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
         val startTime = System.currentTimeMillis()
         val requestId = UUID.randomUUID().toString().substring(0, 8)
 
@@ -87,53 +90,55 @@ class GeminiService(
                 val connectionStart = System.currentTimeMillis()
 
                 // Use 'use' to guarantee closure of Response (fixes potential resource leak)
-                sharedClient.newCall(request).execute().use { response ->
-                    val connectionEnd = System.currentTimeMillis()
-                    val code = response.code
-                    Log.i(TAG, "[$requestId] Response code: $code (time: ${connectionEnd - connectionStart}ms) on attempt $attempt")
+                withContext(Dispatchers.IO) {
+                    sharedClient.newCall(request).execute().use { response ->
+                        val connectionEnd = System.currentTimeMillis()
+                        val code = response.code
+                        Log.i(TAG, "[$requestId] Response code: $code (time: ${connectionEnd - connectionStart}ms) on attempt $attempt")
 
-                    if (code >= 400) {
-                        val errorBody = response.body?.string() ?: ""
+                        if (code >= 400) {
+                            val errorBody = response.body?.string() ?: ""
 
-                        // Check if transient error (retry)
-                        if (code == 503 || code == 429 || code in 500..599) {
-                            val errorType = if (code == 429) "Rate limit (quota)" else "Server error"
-                            Log.w(TAG, "[$requestId] $errorType $code - will retry (attempt $attempt)")
+                            // Check if transient error (retry)
+                            if (code == 503 || code == 429 || code in 500..599) {
+                                val errorType = if (code == 429) "Rate limit (quota)" else "Server error"
+                                Log.w(TAG, "[$requestId] $errorType $code - will retry (attempt $attempt)")
 
-                            // For 429, parse retry delay from API response
-                            var apiSuggestedDelay: Long = 0
-                            if (code == 429) {
-                                apiSuggestedDelay = parseRetryDelay(errorBody, requestId)
-                                if (apiSuggestedDelay > 0) {
-                                    Log.i(TAG, "[$requestId] API requests wait of ${apiSuggestedDelay}ms")
-                                } else {
-                                    Log.w(TAG, "[$requestId] Could not parse retry delay, using default backoff")
+                                // For 429, parse retry delay from API response
+                                var apiSuggestedDelay: Long = 0
+                                if (code == 429) {
+                                    apiSuggestedDelay = parseRetryDelay(errorBody, requestId)
+                                    if (apiSuggestedDelay > 0) {
+                                        Log.i(TAG, "[$requestId] API requests wait of ${apiSuggestedDelay}ms")
+                                    } else {
+                                        Log.w(TAG, "[$requestId] Could not parse retry delay, using default backoff")
+                                    }
                                 }
-                            }
 
-                            lastException = RateLimitException(
-                                "Gemini ${errorType.lowercase()}: $code. $errorBody",
-                                apiSuggestedDelay,
-                                "gemini"
-                            )
-                        } else {
-                            // Permanent error
-                            Log.e(TAG, "[$requestId] Permanent error: $code - $errorBody")
-                            throw Exception("Gemini API error: $code. $errorBody")
-                        }
-                    } else {
-                        // Success: Stream parse JSON directly to avoid large String allocation
-                        try {
-                            responseJson = gson.fromJson(response.body?.charStream(), JsonObject::class.java)
-                            Log.d(TAG, "[$requestId] Response parsed successfully via stream")
-                        } catch (e: Exception) {
-                            Log.e(TAG, "[$requestId] Error parsing JSON stream", e)
-                            // If it's an IOException (network interruption during stream), rethrow to trigger retry
-                            if (e is IOException || (e.cause is IOException)) {
-                                throw if (e is IOException) e else (e.cause as IOException)
+                                lastException = RateLimitException(
+                                    "Gemini ${errorType.lowercase()}: $code. $errorBody",
+                                    apiSuggestedDelay,
+                                    "gemini"
+                                )
+                            } else {
+                                // Permanent error
+                                Log.e(TAG, "[$requestId] Permanent error: $code - $errorBody")
+                                throw Exception("Gemini API error: $code. $errorBody")
                             }
-                            // Otherwise it's a parse error (bad server response), stop retrying
-                            throw e
+                        } else {
+                            // Success: Stream parse JSON directly to avoid large String allocation
+                            try {
+                                responseJson = gson.fromJson(response.body?.charStream(), JsonObject::class.java)
+                                Log.d(TAG, "[$requestId] Response parsed successfully via stream")
+                            } catch (e: Exception) {
+                                Log.e(TAG, "[$requestId] Error parsing JSON stream", e)
+                                // If it's an IOException (network interruption during stream), rethrow to trigger retry
+                                if (e is IOException || (e.cause is IOException)) {
+                                    throw if (e is IOException) e else (e.cause as IOException)
+                                }
+                                // Otherwise it's a parse error (bad server response), stop retrying
+                                throw e
+                            }
                         }
                     }
                 }
@@ -156,7 +161,7 @@ class GeminiService(
             if (attempt < MAX_RETRIES) {
                 val delay = calculateRetryDelay(lastException, attempt, rnd, requestId)
                 Log.i(TAG, "[$requestId] Sleeping ${delay}ms before retry")
-                Thread.sleep(delay)
+                delay(delay)
             }
         }
 
@@ -207,7 +212,7 @@ class GeminiService(
      * Refines an existing post based on selected refinement options.
      */
     @Throws(Exception::class)
-    override fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String {
+    override suspend fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String {
         val startTime = System.currentTimeMillis()
         val requestId = UUID.randomUUID().toString().substring(0, 8)
 
@@ -228,20 +233,22 @@ class GeminiService(
                 .addHeader("Content-Type", "application/json")
                 .build()
 
-            sharedClient.newCall(request).execute().use { response ->
-                val code = response.code
+            withContext(Dispatchers.IO) {
+                sharedClient.newCall(request).execute().use { response ->
+                    val code = response.code
 
-                if (code >= 400) {
-                    val errorBody = response.body?.string() ?: ""
-                    throw Exception("Gemini API error: $code. $errorBody")
-                }
+                    if (code >= 400) {
+                        val errorBody = response.body?.string() ?: ""
+                        throw Exception("Gemini API error: $code. $errorBody")
+                    }
 
-                try {
-                    gson.fromJson(response.body?.charStream(), JsonObject::class.java)
-                } catch (e: Exception) {
-                    Log.e(TAG, "[$requestId] Error parsing JSON stream", e)
-                    if (e is IOException) throw e
-                    null // Return null on parse error to trigger fallback later
+                    try {
+                        gson.fromJson(response.body?.charStream(), JsonObject::class.java)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "[$requestId] Error parsing JSON stream", e)
+                        if (e is IOException) throw e
+                        null // Return null on parse error to trigger fallback later
+                    }
                 }
             }
         } catch (ioe: IOException) {
