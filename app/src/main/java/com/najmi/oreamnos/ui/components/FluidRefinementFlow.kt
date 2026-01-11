@@ -74,9 +74,11 @@ fun FluidRefinementFlow(
     // Combine all items to index them for staggering
     val totalItems = options.size + customPills.size + 1 // +1 for Add button
 
-    // OPTIMIZATION: Convert lists to Sets for O(1) lookup performance
-    val selectedOptionsSet = remember(selectedOptions) { selectedOptions.toSet() }
-    val selectedPillIdsSet = remember(selectedPillIds) { selectedPillIds.toSet() }
+    // Convert lists to Sets for O(1) lookup - cannot use remember here because
+    // mutableStateListOf's reference doesn't change when contents change,
+    // so remember's key wouldn't detect the update
+    val selectedOptionsSet = selectedOptions.toSet()
+    val selectedPillIdsSet = selectedPillIds.toSet()
 
     NeoCard(modifier = modifier.fillMaxWidth()) {
         Text("REFINE OUTPUT", style = MaterialTheme.typography.labelLarge)

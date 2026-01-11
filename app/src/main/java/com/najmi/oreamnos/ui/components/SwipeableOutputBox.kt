@@ -207,7 +207,7 @@ fun SwipeableOutputBox(
                             val currentlyPastThreshold = abs(offsetX) > swipeThreshold
                             if (currentlyPastThreshold != isPastThreshold) {
                                 if (currentlyPastThreshold) {
-                                    hapticHelper.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
+                                    hapticHelper.onGenerationStart() // Light tick feedback
                                 }
                                 isPastThreshold = currentlyPastThreshold
                             }

@@ -84,6 +84,13 @@ fun NeoChip(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
+    // Pressed state background overlay - more visible pressed feedback
+    val pressedOverlayAlpha by animateFloatAsState(
+        targetValue = if (isPressed) 0.15f else 0f,
+        animationSpec = tween(durationMillis = 50),
+        label = "pressed_overlay"
+    )
+
     // Selection Pop Animation
     // We want a distinct "pop" when selecting, separate from the press animation
     val selectionScale = remember { Animatable(1f) }
@@ -103,8 +110,9 @@ fun NeoChip(
         }
     }
 
+    // More noticeable press scale (0.92 instead of 0.95)
     val pressScale by animateFloatAsState(
-        targetValue = if (isPressed) 0.95f else 1f,
+        targetValue = if (isPressed) 0.92f else 1f,
         animationSpec = scaleSpec,
         label = "press_scale"
     )
@@ -113,6 +121,13 @@ fun NeoChip(
     val finalScale = pressScale * selectionScale.value
 
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+
+    // Calculate final background with pressed overlay
+    val finalBackgroundColor = if (isPressed && !selected) {
+        MaterialTheme.colorScheme.primary.copy(alpha = pressedOverlayAlpha)
+    } else {
+        animatedBackgroundColor
+    }
 
     Surface(
         modifier = modifier
@@ -136,8 +151,8 @@ fun NeoChip(
                 }
             ),
         shape = RoundedCornerShape(0.dp),
-        color = animatedBackgroundColor,
-        border = BorderStroke(2.dp, animatedBorderColor),
+        color = finalBackgroundColor,
+        border = BorderStroke(2.dp, if (isPressed) MaterialTheme.colorScheme.primary else animatedBorderColor),
         shadowElevation = 0.dp
     ) {
         Row(

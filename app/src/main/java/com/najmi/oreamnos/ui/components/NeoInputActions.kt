@@ -12,7 +12,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -109,7 +109,7 @@ fun ClearAction(
                 onClear()
                 isConfirming = false
             } else {
-                haptic.performHapticFeedback(HapticFeedbackType.ClockTick)
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 isConfirming = true
             }
         },
@@ -118,7 +118,7 @@ fun ClearAction(
         AnimatedContent(
             targetState = isConfirming,
             transitionSpec = {
-                (scaleIn() + fadeIn()) with (scaleOut() + fadeOut())
+                (scaleIn() + fadeIn()) togetherWith (scaleOut() + fadeOut())
             },
             label = "clear_icon_morph"
         ) { confirming ->

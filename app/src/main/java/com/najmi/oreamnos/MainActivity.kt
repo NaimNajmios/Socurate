@@ -33,6 +33,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -902,16 +903,18 @@ fun MainScreen(
                     )
                     
                     // Refinement Card
-                    val onToggleOption = remember {
+                    val onToggleOption: (String) -> Unit = remember {
                         { option: String ->
                             if (refinementOptions.contains(option)) refinementOptions.remove(option)
                             else refinementOptions.add(option)
+                            Unit
                         }
                     }
-                    val onTogglePill = remember {
+                    val onTogglePill: (String) -> Unit = remember {
                         { pillId: String ->
                             if (selectedPillIds.contains(pillId)) selectedPillIds.remove(pillId)
                             else selectedPillIds.add(pillId)
+                            Unit
                         }
                     }
                     val onRegenerateAction = remember(outputText) {
@@ -1018,7 +1021,7 @@ fun InputCard(
                     androidx.compose.animation.AnimatedContent(
                         targetState = inputText.isNotEmpty(),
                         transitionSpec = {
-                            (scaleIn() + fadeIn()) with (scaleOut() + fadeOut())
+                            (scaleIn() + fadeIn()) togetherWith (scaleOut() + fadeOut())
                         },
                         label = "input_action"
                     ) { hasText ->
@@ -1180,11 +1183,11 @@ fun OutputCard(
                 transitionSpec = {
                     if (targetState) {
                         // Entering Edit Mode: Subtle expansion feel
-                        (fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.98f)) with
+                        (fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.98f)) togetherWith
                         (fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.98f))
                     } else {
                         // Exiting Edit Mode: Subtle collapse feel
-                        (fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.98f)) with
+                        (fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.98f)) togetherWith
                         (fadeOut(animationSpec = tween(300)) + scaleOut(targetScale = 0.98f))
                     }
                 },

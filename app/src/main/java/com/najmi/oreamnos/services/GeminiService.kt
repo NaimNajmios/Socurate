@@ -165,11 +165,12 @@ class GeminiService(
             val totalTime = System.currentTimeMillis() - startTime
             Log.i(TAG, "[$requestId] API exhausted retries after ${totalTime}ms")
 
-            if (lastException != null) {
-                if (lastException is RateLimitException) {
-                    throw lastException
+            val finalException = lastException
+            if (finalException != null) {
+                if (finalException is RateLimitException) {
+                    throw finalException
                 }
-                throw Exception("Gemini API failed after retries: ${lastException.message}", lastException)
+                throw Exception("Gemini API failed after retries: ${finalException.message}", finalException)
             } else {
                 throw Exception("Gemini API returned no result after retries")
             }
