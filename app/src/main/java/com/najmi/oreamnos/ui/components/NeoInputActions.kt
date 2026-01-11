@@ -3,10 +3,10 @@ package com.najmi.oreamnos.ui.components
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
@@ -17,6 +17,8 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.with
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -24,7 +26,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
@@ -40,17 +41,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.najmi.oreamnos.R
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 /**
  * Animated Paste Action Icon.
- * Pulses gently to invite interaction when the input is empty.
+ * Features a delightful "wiggle" animation to invite interaction when the input is empty.
+ * Uses the custom Neo paste icon for better semantic clarity.
  */
 @Composable
 fun PasteAction(
@@ -58,30 +63,60 @@ fun PasteAction(
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
+    val rotation = remember { Animatable(0f) }
 
-    // Pulse animation
-    val infiniteTransition = rememberInfiniteTransition(label = "paste_pulse")
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000),
-            repeatMode = RepeatMode.Reverse
+    // Interaction state for proper press handling
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Press animation: Scale down when pressed
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.8f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
         ),
-        label = "paste_scale"
+        label = "paste_press_scale"
     )
+
+    // Wiggle animation loop: Gentle reminder to paste content
+    LaunchedEffect(isPressed) {
+        if (isPressed) {
+            // Stop wiggling immediately if pressed
+            rotation.snapTo(0f)
+        } else {
+            // Wait before starting the loop again
+            delay(4000)
+            while (isActive) {
+                // Wiggle sequence
+                rotation.animateTo(15f, spring(stiffness = Spring.StiffnessHigh))
+                rotation.animateTo(-15f, spring(stiffness = Spring.StiffnessHigh))
+                rotation.animateTo(0f, spring(stiffness = Spring.StiffnessMedium))
+                delay(4000) // Pause between wiggles
+            }
+        }
+    }
 
     IconButton(
         onClick = {
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             onPaste()
         },
-        modifier = modifier.scale(scale)
+        interactionSource = interactionSource,
+        modifier = modifier.graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        }
     ) {
         Icon(
-            imageVector = Icons.Default.Add, // Using Add as a "Add Content" metaphor
+            painter = painterResource(R.drawable.ic_paste),
             contentDescription = "Paste from clipboard",
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .size(24.dp)
+                .graphicsLayer {
+                    rotationZ = rotation.value
+                }
         )
     }
 }
