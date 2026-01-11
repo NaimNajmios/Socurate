@@ -15,12 +15,12 @@ class GeminiCurator(
     private val geminiService = GeminiService(apiKey, endpoint, tone)
 
     @Throws(Exception::class)
-    override fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
+    override suspend fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
         return geminiService.curatePost(inputText, includeSource, keepStructure) ?: ""
     }
 
     @Throws(Exception::class)
-    override fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String {
+    override suspend fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String {
         return geminiService.refinePost(originalPost, refinements, includeSource) ?: ""
     }
 

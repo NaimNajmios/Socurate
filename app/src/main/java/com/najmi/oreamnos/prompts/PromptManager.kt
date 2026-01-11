@@ -3,8 +3,10 @@ package com.najmi.oreamnos.prompts
 /**
  * Centralizes prompt engineering for content curation.
  * Extracted from GeminiService for reusability across different AI providers.
+ *
+ * OPTIMIZATION: Converted to object (singleton) to avoid object allocation on every API request.
  */
-class PromptManager {
+object PromptManager {
 
     /**
      * Builds the initial curation prompt based on tone and input text.
@@ -239,34 +241,100 @@ class PromptManager {
         return false
     }
 
-    private companion object {
-        val TACTICAL_KEYWORDS = arrayOf(
-            "formation", "tactical", "pressing", "possession", "xg", "expected goals",
-            "pass completion", "progressive passes", "defensive line", "build-up",
-            "counter-attack", "high press", "low block", "transition", "shape",
-            "midfielder", "forward", "defender", "fullback", "winger",
-            "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2", "3-4-3"
-        )
-    }
+    private val TACTICAL_KEYWORDS = arrayOf(
+        "formation", "tactical", "pressing", "possession", "xg", "expected goals",
+        "pass completion", "progressive passes", "defensive line", "build-up",
+        "counter-attack", "high press", "low block", "transition", "shape",
+        "midfielder", "forward", "defender", "fullback", "winger",
+        "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2", "3-4-3"
+    )
 
     /**
      * Detects if the input text contains bullet points or list markers.
+     *
+     * OPTIMIZATION: Uses a single-pass character scan to avoid allocating
+     * a List<String> with lines(), creating substring objects with trim(),
+     * and repeatedly compiling Regex patterns.
      */
     fun containsBulletPoints(text: String?): Boolean {
         if (text.isNullOrEmpty()) return false
-        
-        // Check for various bullet point and list markers
-        val lines = text.lines()
-        return lines.any { line ->
-            val trimmed = line.trim()
-            // Check for common bullet/list patterns
-            trimmed.startsWith("•") ||
-            trimmed.startsWith("- ") ||
-            trimmed.startsWith("* ") ||
-            trimmed.startsWith("· ") ||
-            trimmed.matches(Regex("^\\d+\\.\\s.*")) || // Numbered list: "1. item"
-            trimmed.matches(Regex("^\\d+\\)\\s.*")) || // Numbered list: "1) item"
-            trimmed.matches(Regex("^[a-z]\\)\\s.*"))   // Letter list: "a) item"
+
+        val len = text.length
+        var i = 0
+
+        while (i < len) {
+            // 1. Skip whitespace at start of line to find content
+            var contentStart = i
+            while (contentStart < len) {
+                val c = text[contentStart]
+                if (c != ' ' && c != '\t') break
+                contentStart++
+            }
+
+            // Check if we reached end of string
+            if (contentStart >= len) break
+
+            val firstChar = text[contentStart]
+
+            // If it's a newline, it's an empty line (or just whitespace), continue to next line
+            if (firstChar == '\n' || firstChar == '\r') {
+                // Logic below will advance 'i' to next line
+            } else {
+                // We are at the first non-whitespace character of a line
+
+                // Check simple markers: • (U+2022), · (U+00B7)
+                if (firstChar == '•' || firstChar == '·') return true
+
+                // Check 2-char markers: "- ", "* "
+                if (contentStart + 1 < len) {
+                    val secondChar = text[contentStart + 1]
+                    if ((firstChar == '-' || firstChar == '*') && secondChar == ' ') {
+                        return true
+                    }
+                }
+
+                // Check numbered lists: "1. ", "1) "
+                if (firstChar in '0'..'9') {
+                    var j = contentStart + 1
+                    while (j < len && text[j] in '0'..'9') {
+                        j++
+                    }
+                    if (j < len) {
+                        val afterDigits = text[j]
+                        // Must be followed by dot or closing paren, AND then a space
+                        if ((afterDigits == '.' || afterDigits == ')') &&
+                            (j + 1 < len && text[j + 1] == ' ')) {
+                            return true
+                        }
+                    }
+                }
+
+                // Check letter lists: "a) "
+                if (firstChar in 'a'..'z') {
+                    if (contentStart + 2 < len) {
+                        if (text[contentStart + 1] == ')' && text[contentStart + 2] == ' ') {
+                            return true
+                        }
+                    }
+                }
+            }
+
+            // 2. Skip to next line
+            while (i < len) {
+                val c = text[i]
+                if (c == '\n') {
+                    i++
+                    break
+                }
+                if (c == '\r') {
+                    i++
+                    if (i < len && text[i] == '\n') i++
+                    break
+                }
+                i++
+            }
         }
+
+        return false
     }
 }

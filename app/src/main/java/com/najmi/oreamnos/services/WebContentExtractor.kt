@@ -164,7 +164,8 @@ class WebContentExtractor {
         if (content == null) return ""
 
         var cleaned = content
-        cleaned = WHITESPACE_PATTERN.matcher(cleaned).replaceAll(" ")
+        // Use horizontal whitespace pattern to preserve newlines (defensive coding)
+        cleaned = HORIZONTAL_WHITESPACE_PATTERN.matcher(cleaned).replaceAll(" ")
         cleaned = NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n")
         cleaned = CLICK_HERE_PATTERN.matcher(cleaned).replaceAll("")
         cleaned = SHARE_THIS_PATTERN.matcher(cleaned).replaceAll("")
@@ -248,7 +249,7 @@ class WebContentExtractor {
             .build()
 
         // Pre-compiled regex patterns for better performance
-        private val WHITESPACE_PATTERN: Pattern = Pattern.compile("\\s+")
+        private val HORIZONTAL_WHITESPACE_PATTERN: Pattern = Pattern.compile("[ \\t]+")
         private val NEWLINES_PATTERN: Pattern = Pattern.compile("(?:\\n\\s*){3,}")
         private val CLICK_HERE_PATTERN: Pattern = Pattern.compile("(?i)\\bclick here\\b.*?\\bmore\\b")
         private val SHARE_THIS_PATTERN: Pattern = Pattern.compile("(?i)\\bshare this\\b.*?\\bfacebook\\b")

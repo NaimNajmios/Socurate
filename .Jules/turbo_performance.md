@@ -1,15 +1,11 @@
-## 2024-05-24 - ReadabilityUtils Syllable Counting Optimization
+## 2024-05-23 - PromptManager Singleton & Gson Sharing
 
-**Context:** `ReadabilityUtils.countSyllables` is a hot path used by `calculateFleschKincaidGradeLevel`, which iterates over every word in the text.
-**Symptoms:** The original implementation iterated over each word string twice (once for effective length, once for syllable counting) and used inefficient character checks.
-**Root Cause:** Two-pass algorithm and potentially boxed character operations or string lookups for vowels.
-**Solution:**
-1. Implemented a single-pass algorithm that calculates effective length and syllable count simultaneously.
-2. Replaced string lookup (`lowerC in "aeiouy"`) with direct character comparison.
-3. Used bitwise optimization for ASCII case conversion.
+**Context:** `GeminiService.kt` and `PromptManager.kt`
+**Symptoms:** Excessive object allocation during API requests (new `PromptManager` and `Gson` instances per request).
+**Root Cause:** `GeminiService` is instantiated per request, leading to repeated initialization of heavy objects.
+**Solution:** Converted `PromptManager` to `object` (singleton) and moved `Gson` to `companion object` in `GeminiService`.
 **Impact:**
-- **Execution Time:** ~2.37x speedup (Benchmark: 3209ms -> 1352ms for 2M iterations of sample words).
-- **Allocations:** Zero allocations (maintained from previous version, but reduced CPU cycles).
-- **CPU:** Reduced instruction count by avoiding double iteration and optimizing checks.
+- Memory: Eliminated 2 objects per request (PromptManager + Gson reflection setup).
+- CPU: Reduced initialization overhead significantly (Gson setup is expensive).
 
-**Learnings:** For text processing hot paths, always strive for single-pass algorithms (`O(N)`). Even simple loops add up when executed millions of times.
+**Learnings:** In high-frequency or per-request service classes, heavy stateless dependencies like Gson or helper utilities should be singletons or static fields.

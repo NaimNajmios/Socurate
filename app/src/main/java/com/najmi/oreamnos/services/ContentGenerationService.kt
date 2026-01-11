@@ -10,8 +10,12 @@ import com.najmi.oreamnos.curator.CuratorFactory
 import com.najmi.oreamnos.exceptions.RateLimitException
 import com.najmi.oreamnos.utils.NotificationHelper
 import com.najmi.oreamnos.utils.PreferencesManager
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Foreground Service for generating AI content in the background.
@@ -19,14 +23,13 @@ import java.util.concurrent.Executors
  */
 class ContentGenerationService : Service() {
 
-    private lateinit var executor: ExecutorService
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private lateinit var notificationHelper: NotificationHelper
     private lateinit var prefsManager: PreferencesManager
 
     override fun onCreate() {
         super.onCreate()
         Log.i(TAG, "Service created")
-        executor = Executors.newSingleThreadExecutor()
         notificationHelper = NotificationHelper(this)
         prefsManager = PreferencesManager(this)
     }
@@ -74,15 +77,15 @@ class ContentGenerationService : Service() {
         val includeSource = intent.getBooleanExtra(EXTRA_INCLUDE_SOURCE, false)
         val keepStructure = intent.getBooleanExtra(EXTRA_KEEP_STRUCTURE, false)
 
-        executor.execute {
-            // Validation moved inside executor to prevent race conditions with stopSelf
-            // This ensures validation failures don't kill the service while previous tasks are running
+        serviceScope.launch {
+            // Validation moved inside coroutine to prevent race conditions with stopSelf
             if (inputText.isNullOrEmpty()) {
                 broadcastError("Input text is required", false)
                 stopSelf(startId)
-                return@execute
+                return@launch
             }
 
+            var success = false
             val startTime = System.currentTimeMillis()
             try {
                 Log.i(TAG, "Starting content generation...")
@@ -91,8 +94,12 @@ class ContentGenerationService : Service() {
                 // Check if input is a URL
                 if (WebContentExtractor.isUrl(inputText)) {
                     Log.i(TAG, "Input is URL, extracting content...")
-                    val extractor = WebContentExtractor()
-                    content = extractor.extractContent(inputText)
+                    // Web content extraction is a blocking IO operation, so we explicitly run it on IO
+                    // even though we are already on IO, just to be explicit and safe.
+                    content = withContext(Dispatchers.IO) {
+                        val extractor = WebContentExtractor()
+                        extractor.extractContent(inputText)
+                    }
                 }
 
                 // Get provider name for logging
@@ -119,6 +126,7 @@ class ContentGenerationService : Service() {
                 prefsManager.logInfo("API", "Request successful via $providerDisplay ($totalTokens tokens, ${durationMs}ms)")
 
                 Log.i(TAG, "Content generation successful")
+                success = true
                 broadcastSuccess(result, false)
 
             } catch (rle: RateLimitException) {
@@ -145,10 +153,12 @@ class ContentGenerationService : Service() {
                 broadcastError(e.message, false)
             } finally {
                 // Show completion notification and stop service
-                notificationHelper.showCompletedNotification(
-                    getString(R.string.notification_complete_title),
-                    getString(R.string.notification_complete_message)
-                )
+                if (success) {
+                    notificationHelper.showCompletedNotification(
+                        getString(R.string.notification_complete_title),
+                        getString(R.string.notification_complete_message)
+                    )
+                }
                 stopSelf(startId)
             }
         }
@@ -162,20 +172,21 @@ class ContentGenerationService : Service() {
         val refinements = intent.getStringArrayListExtra(EXTRA_REFINEMENTS)
         val includeSource = intent.getBooleanExtra(EXTRA_INCLUDE_SOURCE, false)
 
-        executor.execute {
-            // Validation moved inside executor to prevent race conditions with stopSelf
+        serviceScope.launch {
+            // Validation moved inside coroutine to prevent race conditions with stopSelf
             if (originalPost.isNullOrEmpty()) {
                 broadcastError("Original post is required", true)
                 stopSelf(startId)
-                return@execute
+                return@launch
             }
 
             if (refinements.isNullOrEmpty()) {
                 broadcastError("At least one refinement option is required", true)
                 stopSelf(startId)
-                return@execute
+                return@launch
             }
 
+            var success = false
             val startTime = System.currentTimeMillis()
             try {
                 Log.i(TAG, "Starting content refinement with options: $refinements")
@@ -204,6 +215,7 @@ class ContentGenerationService : Service() {
                 prefsManager.logInfo("API", "Refinement successful via $providerDisplay ($totalTokens tokens, ${durationMs}ms)")
 
                 Log.i(TAG, "Content refinement successful")
+                success = true
                 broadcastSuccess(result, true)
 
             } catch (rle: RateLimitException) {
@@ -230,10 +242,12 @@ class ContentGenerationService : Service() {
                 broadcastError(e.message, true)
             } finally {
                 // Show completion notification and stop service
-                notificationHelper.showCompletedNotification(
-                    getString(R.string.notification_complete_title),
-                    getString(R.string.notification_complete_message)
-                )
+                if (success) {
+                    notificationHelper.showCompletedNotification(
+                        getString(R.string.notification_complete_title),
+                        getString(R.string.notification_complete_message)
+                    )
+                }
                 stopSelf(startId)
             }
         }
@@ -291,9 +305,7 @@ class ContentGenerationService : Service() {
 
     override fun onDestroy() {
         Log.i(TAG, "Service destroyed")
-        if (::executor.isInitialized) {
-            executor.shutdown()
-        }
+        serviceScope.cancel()
         super.onDestroy()
     }
 
