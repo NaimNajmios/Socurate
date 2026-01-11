@@ -210,12 +210,22 @@ object PromptManager {
 
     /**
      * Detects if the input text contains quotes.
+     *
+     * OPTIMIZATION: Uses a single-pass character scan to avoid multiple
+     * linear scans of the string (O(N) vs O(6*N)).
      */
     fun containsQuotes(text: String?): Boolean {
         if (text.isNullOrEmpty()) return false
-        // Check for various quote marks
-        return text.contains("\"") || text.contains("\u201C") || text.contains("\u201D") ||
-                text.contains("'") || text.contains("\u2018") || text.contains("\u2019")
+
+        // Single pass O(N) instead of 6 calls to contains()
+        for (i in 0 until text.length) {
+            val c = text[i]
+            if (c == '"' || c == '\u201C' || c == '\u201D' ||
+                c == '\'' || c == '\u2018' || c == '\u2019') {
+                return true
+            }
+        }
+        return false
     }
 
     /**
