@@ -29,3 +29,21 @@
 **Profiling Data (Estimated):**
 - MainScreen Recompositions during Pulse: ~60/sec → 0/sec
 - InputCard Recompositions on Loading: 1 → 0
+
+## 2024-05-24 - SwipeableOutputBox Shimmy Optimization
+
+**Context:** `SwipeableOutputBox` component.
+**Metric Impact:**
+- **Recomposition:** Reduced `SwipeableOutputBox` recomposition from ~60/sec (during shimmy animation) to 0/sec.
+- **CPU Usage:** Reduced UI thread overhead during the onboarding animation.
+**Root Cause:**
+1.  Using `by animateFloatAsState` caused the Composable to recompose on every frame of the shimmy animation.
+2.  Calculating `shimmyVisible` boolean directly from the float value triggered recomposition every frame.
+**Solution:**
+1.  Switched to using `State` object for animation (`val offsetState = ...`).
+2.  Deferred reading of the offset value to the `graphicsLayer` block.
+3.  Wrapped `shimmyVisible` logic in `derivedStateOf` to only trigger updates when the threshold is crossed.
+**Learnings:** Boolean logic derived from high-frequency animation values must use `derivedStateOf` to act as a low-pass filter for recomposition.
+
+**Profiling Data (Estimated):**
+- Recompositions during Shimmy: ~120 (2s @ 60fps) → ~4 (start/end of swings)

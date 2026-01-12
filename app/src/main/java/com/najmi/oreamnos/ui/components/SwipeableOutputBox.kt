@@ -83,7 +83,9 @@ fun SwipeableOutputBox(
 
     // Animate offset back to 0 when released
     // Changed to LowBouncy for a more rubber-band feel
-    val animatedOffset by animateFloatAsState(
+    // OPTIMIZATION: Use State object instead of delegated property to prevent
+    // recomposition of the entire parent on every animation frame.
+    val animatedOffsetState = animateFloatAsState(
         targetValue = offsetX,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioLowBouncy,
@@ -189,7 +191,8 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .fillMaxWidth()
                 .graphicsLayer {
-                    translationX = animatedOffset
+                    // Read state inside graphicsLayer to defer read to draw phase
+                    translationX = animatedOffsetState.value
                 }
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
@@ -252,7 +255,12 @@ fun SwipeableOutputBox(
             }
 
             // Fading Chevron Hints - Visible only during shimmy to teach direction
-            val shimmyVisible = !isInteracted && abs(animatedOffset) > 10f
+            // OPTIMIZATION: Use derivedStateOf to prevent recomposition until threshold is actually crossed
+            val shimmyVisible by remember {
+                androidx.compose.runtime.derivedStateOf {
+                    !isInteracted && abs(animatedOffsetState.value) > 10f
+                }
+            }
             val hintAlpha by animateFloatAsState(if (shimmyVisible) 0.6f else 0f, label = "hint_alpha")
 
             if (hintAlpha > 0f) {
