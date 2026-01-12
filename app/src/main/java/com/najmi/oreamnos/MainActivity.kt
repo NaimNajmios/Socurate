@@ -1054,8 +1054,23 @@ fun InputCard(
                         val wordCount = remember(inputText) { ReadabilityUtils.countWords(inputText) }
 
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            com.najmi.oreamnos.ui.components.AnimatedIntCounter(
+                                targetValue = charCount,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                             Text(
-                                text = "$charCount chars / $wordCount words",
+                                text = " chars / ",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            com.najmi.oreamnos.ui.components.AnimatedIntCounter(
+                                targetValue = wordCount,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = " words",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -1228,8 +1243,20 @@ fun OutputCard(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("WORDS: $wordCount", style = MaterialTheme.typography.labelMedium)
-                Text("GRADE: ${String.format("%.1f", gradeLevel)}", style = MaterialTheme.typography.labelMedium)
+                Row {
+                    Text("WORDS: ", style = MaterialTheme.typography.labelMedium)
+                    com.najmi.oreamnos.ui.components.AnimatedIntCounter(
+                        targetValue = wordCount,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+                Row {
+                    Text("GRADE: ", style = MaterialTheme.typography.labelMedium)
+                    com.najmi.oreamnos.ui.components.AnimatedFloatCounter(
+                        targetValue = gradeLevel,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
             }
             
             Spacer(Modifier.height(8.dp))
