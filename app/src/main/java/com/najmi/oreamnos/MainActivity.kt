@@ -144,6 +144,8 @@ import com.najmi.oreamnos.ui.components.NeoSwitch
 import com.najmi.oreamnos.ui.components.SwipeableOutputBox
 import com.najmi.oreamnos.ui.components.AnimatedCheckmark
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
+import com.najmi.oreamnos.ui.components.AnimatedIntCounter
+import com.najmi.oreamnos.ui.components.AnimatedFloatCounter
 import com.najmi.oreamnos.ui.components.EmptyStateCard
 import com.najmi.oreamnos.ui.components.FluidRefinementFlow
 import com.najmi.oreamnos.ui.components.LinkPreviewSection
@@ -1054,10 +1056,19 @@ fun InputCard(
                         val wordCount = remember(inputText) { ReadabilityUtils.countWords(inputText) }
 
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            Text(
-                                text = "$charCount chars / $wordCount words",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            AnimatedIntCounter(
+                                value = charCount,
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                ),
+                                suffix = " chars / "
+                            )
+                            AnimatedIntCounter(
+                                value = wordCount,
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                ),
+                                suffix = " words"
                             )
                         }
                     }
@@ -1228,8 +1239,16 @@ fun OutputCard(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("WORDS: $wordCount", style = MaterialTheme.typography.labelMedium)
-                Text("GRADE: ${String.format("%.1f", gradeLevel)}", style = MaterialTheme.typography.labelMedium)
+                AnimatedIntCounter(
+                    value = wordCount,
+                    style = MaterialTheme.typography.labelMedium,
+                    prefix = "WORDS: "
+                )
+                AnimatedFloatCounter(
+                    value = gradeLevel,
+                    style = MaterialTheme.typography.labelMedium,
+                    prefix = "GRADE: "
+                )
             }
             
             Spacer(Modifier.height(8.dp))
