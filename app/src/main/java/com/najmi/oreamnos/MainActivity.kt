@@ -589,12 +589,15 @@ fun MainScreen(
             onSwitchAndRetry = { newProvider ->
                 prefsManager.saveProvider(newProvider)
                 showRateLimitDialog = false
-                if (rateLimitInfo!!.isRefinement) {
-                    val allRefinements = refinementOptions.toList() + 
-                        customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
-                    onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
-                } else {
-                    onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                // Safe access: rateLimitInfo is mutable state and could technically change
+                rateLimitInfo?.let { info ->
+                    if (info.isRefinement) {
+                        val allRefinements = refinementOptions.toList() +
+                            customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
+                        onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
+                    } else {
+                        onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                    }
                 }
             },
             onDismiss = { showRateLimitDialog = false }
@@ -634,15 +637,18 @@ fun MainScreen(
     }
     
     // Pill edit dialog
-    if (showEditPillDialog && pillToEdit != null) {
+    // Safe access: Capture the current pillToEdit state
+    val currentPillToEdit = pillToEdit
+    if (showEditPillDialog && currentPillToEdit != null) {
         EditPillDialog(
-            pill = pillToEdit!!,
-            onDismiss = { 
+            pill = currentPillToEdit,
+            onDismiss = {
                 showEditPillDialog = false
                 pillToEdit = null
             },
             onSave = { name, command ->
-                val updatedPill = pillToEdit!!.copy(name = name, command = command)
+                // Defensive: Ensure we're editing the pill we started with
+                val updatedPill = currentPillToEdit.copy(name = name, command = command)
                 prefsManager.savePill(updatedPill)
                 customPills.clear()
                 customPills.addAll(prefsManager.getPills())
@@ -651,12 +657,12 @@ fun MainScreen(
                 Toast.makeText(context, "Custom refinement updated", Toast.LENGTH_SHORT).show()
             },
             onDelete = {
-                prefsManager.deletePill(pillToEdit!!.id)
+                prefsManager.deletePill(currentPillToEdit.id)
                 customPills.clear()
                 customPills.addAll(prefsManager.getPills())
                 // Deselect if it was selected
-                if (selectedPillIds.contains(pillToEdit!!.id)) {
-                    selectedPillIds.remove(pillToEdit!!.id)
+                if (selectedPillIds.contains(currentPillToEdit.id)) {
+                    selectedPillIds.remove(currentPillToEdit.id)
                 }
                 showEditPillDialog = false
                 pillToEdit = null

@@ -79,3 +79,37 @@ private val HORIZONTAL_WHITESPACE_PATTERN: Pattern = Pattern.compile("[ \\t]+")
 cleaned = HORIZONTAL_WHITESPACE_PATTERN.matcher(cleaned).replaceAll(" ") // Preserves \n
 cleaned = NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n") // Works correctly
 ```
+
+## 2024-05-24 - Null Safety Violations in State Management
+
+**Context:** `MainActivity.kt` uses Jetpack Compose state (`mutableStateOf`) for `rateLimitInfo` and `pillToEdit`. These states are nullable but were accessed using the non-null assertion operator (`!!`) inside asynchronous callbacks (`onSave`, `onSwitchAndRetry`).
+**Symptoms:** Potential `NullPointerException` crashes if the state changes (e.g., becomes null via `onDismiss`) before or during the execution of the callback, or if race conditions occur in the Compose lifecycle.
+**Root Cause:**
+Using `!!` on mutable state variables inside lambdas. The lambda captures the property reference, and when executed, it reads the *current* value. If that value has changed to null in the interim, `!!` causes a crash.
+
+**Code Example (Before):**
+```kotlin
+            onSave = { name, command ->
+                // CRASH RISK: pillToEdit might be null if dialog was just dismissed
+                val updatedPill = pillToEdit!!.copy(name = name, command = command)
+                // ...
+            }
+```
+
+**Fix Applied:**
+Captured the state value in a local immutable variable before using it in the conditional block (creating a stable snapshot for the scope), or used `?.let` for safe access.
+
+**Code Example (After):**
+```kotlin
+    val currentPillToEdit = pillToEdit
+    if (showEditPillDialog && currentPillToEdit != null) {
+        EditPillDialog(
+            pill = currentPillToEdit, // Pass stable local value
+            onSave = { name, command ->
+                // SAFE: accessing stable local capture or using safe call
+                val updatedPill = currentPillToEdit.copy(name = name, command = command)
+                // ...
+            }
+        )
+    }
+```
