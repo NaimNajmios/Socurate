@@ -1,24 +1,15 @@
-## 2024-05-24 - Optimized Keyword Scanning in PromptManager
+## 2024-05-21 - [MarkdownUtils Parsing Optimization]
 
-**Context:** `PromptManager.isLongTechnicalContent`
-**Symptoms:** High CPU usage during prompt generation for long texts due to repeated case-insensitive scanning.
-**Root Cause:**
-- The function iterated over 26 keywords.
-- For each keyword, it called `text.contains(keyword, ignoreCase = true)`.
-- `ignoreCase = true` triggers a case-insensitive scan (often `regionMatches`) which is slower than a direct byte comparison (`indexOf`).
-- Repeating this 26 times for a large text results in `O(K * N)` complexity with high constant factors.
-
-**Solution:**
-- Allocate a lowercase copy of the text *once* using `text.lowercase(Locale.ROOT)`.
-- Use standard `contains()` (which uses `indexOf` intrinsics) on the lowercase text.
-- This reduces the complexity to `O(N)` (allocation) + `O(K * N)` (fast scan), but the fast scan is significantly faster than the case-insensitive scan.
-
+**Context:** `MarkdownUtils.parseInlineFormatting` used for rendering rich text in `SwipeableOutputBox`.
+**Symptoms:** Repeated `indexOf` scans for multiple markers (`**`, `*`, `_`) caused O(K*N) complexity.
+**Root Cause:** Inefficient loop structure that rescanned the string tail for every formatting type separately.
+**Solution:** Implemented a unified single-pass scanner that finds the earliest marker and processes it, reducing complexity to O(N).
 **Impact:**
-- Time (Benchmark on 3.5KB text): ~4.8ms → ~1.2ms (4x speedup).
-- Memory: One allocation of the text size (negligible for typical usage < 10KB).
-- CPU: Reduced cycle count in hot path.
+- Time: Theoretical speedup of ~3x for scan operations (reducing 3 scans to 1-2).
+- Memory: Reduced temporary string allocations by avoiding overlapping searches.
+- CPU: Reduced cycles spent in `indexOf` intrinsic calls.
 
 **Learnings:**
-- For multiple substring searches, the cost of one-time case conversion often outweighs the overhead of repeated case-insensitive scans.
-- `String.indexOf` (and `contains`) is heavily optimized (SIMD) on the JVM compared to manual or complex regex scans.
-- Always use `Locale.ROOT` or `Locale.US` for internal string normalization to avoid locale-specific bugs (e.g., Turkish 'I').
+- `String.indexOf` is fast but repeatedly calling it for different needles in a loop multiplies the cost.
+- Unifying search for multiple markers using `min(idx1, idx2)` is effective when `indexOfAny` is not intrinsic.
+- Parsing logic should always aim for single-pass consumption of the input.

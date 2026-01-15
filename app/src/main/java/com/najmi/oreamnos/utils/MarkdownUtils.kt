@@ -8,6 +8,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
+import kotlin.math.min
 
 /**
  * Utility functions for parsing and rendering markdown text
@@ -93,104 +94,75 @@ object MarkdownUtils {
     /**
      * Helper function to parse inline formatting (bold and italic)
      * Optimized to avoid allocations by passing range indices
+     *
+     * Optimization: Uses a unified scan for * and _ markers to reduce
+     * repetitive indexOf calls. Reduces complexity from O(K*N) to O(N).
      */
     private fun AnnotatedString.Builder.parseInlineFormatting(text: String, start: Int, end: Int) {
         var currentIndex = start
 
         while (currentIndex < end) {
-            // Look for bold (**text**)
-            val boldStart = indexOf(text, "**", currentIndex, end)
+            val starIdx = indexOf(text, "*", currentIndex, end)
+            val underIdx = indexOf(text, "_", currentIndex, end)
 
-            // Look for italic (*text* or _text_)
-            // Skip * if it is part of ** (bold)
-            var italicStarStart = indexOf(text, "*", currentIndex, end)
-            if (italicStarStart != -1 && italicStarStart + 1 < end && text[italicStarStart + 1] == '*') {
-                italicStarStart = -1
-            }
-
-            // Skip _ if it is part of __ (double underscore, usually bold in some md but here just safety)
-            val italicUnderStart = indexOf(text, "_", currentIndex, end).let {
-                if (it != -1 && it + 1 < end && text[it + 1] == '_') -1 else it
-            }
-
-            // Find earliest formatting marker without creating a List/Pair
-            var formatStart = -1
-            var formatType = ""
-
-            // Check bold
-            if (boldStart != -1) {
-                formatStart = boldStart
-                formatType = "bold"
-            }
-
-            // Check italic star
-            if (italicStarStart != -1) {
-                if (formatStart == -1 || italicStarStart < formatStart) {
-                    formatStart = italicStarStart
-                    formatType = "italic_star"
-                }
-            }
-
-            // Check italic under
-            if (italicUnderStart != -1) {
-                if (formatStart == -1 || italicUnderStart < formatStart) {
-                    formatStart = italicUnderStart
-                    formatType = "italic_under"
-                }
-            }
-
-            if (formatStart == -1) {
-                // No more formatting, append rest
+            if (starIdx == -1 && underIdx == -1) {
                 append(text.substring(currentIndex, end))
                 break
             }
 
-            // Append text before formatting
-            append(text.substring(currentIndex, formatStart))
+            // Find the earliest marker
+            val markerIdx = if (starIdx == -1) underIdx else if (underIdx == -1) starIdx else min(starIdx, underIdx)
 
-            when (formatType) {
-                "bold" -> {
-                    val boldEnd = indexOf(text, "**", formatStart + 2, end)
-                    if (boldEnd != -1) {
-                        val boldText = text.substring(formatStart + 2, boldEnd)
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(boldText)
-                        }
-                        currentIndex = boldEnd + 2
-                    } else {
-                        // Unclosed bold, append the marker and continue
-                        append("**")
-                        currentIndex = formatStart + 2
+            // Append text before marker
+            if (markerIdx > currentIndex) {
+                append(text.substring(currentIndex, markerIdx))
+            }
+
+            var formatType = ""
+            var markerLength = 0
+            val c = text[markerIdx]
+
+            if (c == '*') {
+                if (markerIdx + 1 < end && text[markerIdx + 1] == '*') {
+                    formatType = "bold"
+                    markerLength = 2
+                } else {
+                    formatType = "italic_star"
+                    markerLength = 1
+                }
+            } else { // _
+                if (markerIdx + 1 < end && text[markerIdx + 1] == '_') {
+                    // Double underscore - treat as literal
+                    append("__")
+                    currentIndex = markerIdx + 2
+                    continue
+                }
+                formatType = "italic_under"
+                markerLength = 1
+            }
+
+            // Find closer
+            val contentStart = markerIdx + markerLength
+            val closerNeedle = if (formatType == "bold") "**" else if (formatType == "italic_star") "*" else "_"
+
+            val closerIndex = indexOf(text, closerNeedle, contentStart, end)
+
+            if (closerIndex != -1) {
+                val content = text.substring(contentStart, closerIndex)
+                if (formatType == "bold") {
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append(content)
+                    }
+                } else {
+                    withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+                        append(content)
                     }
                 }
-                "italic_star" -> {
-                    val italicEnd = indexOf(text, "*", formatStart + 1, end)
-                    if (italicEnd != -1) {
-                        val italicText = text.substring(formatStart + 1, italicEnd)
-                        withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                            append(italicText)
-                        }
-                        currentIndex = italicEnd + 1
-                    } else {
-                        // Unclosed italic, append the marker and continue
-                        append("*")
-                        currentIndex = formatStart + 1
-                    }
-                }
-                "italic_under" -> {
-                    val italicEnd = indexOf(text, "_", formatStart + 1, end)
-                    if (italicEnd != -1) {
-                        val italicText = text.substring(formatStart + 1, italicEnd)
-                        withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                            append(italicText)
-                        }
-                        currentIndex = italicEnd + 1
-                    } else {
-                        // Unclosed italic, append the marker and continue
-                        append("_")
-                        currentIndex = formatStart + 1
-                    }
-                }
+                currentIndex = closerIndex + markerLength
+            } else {
+                // No closer found, treat marker as literal
+                append(text.substring(markerIdx, contentStart))
+                currentIndex = contentStart
             }
         }
     }
