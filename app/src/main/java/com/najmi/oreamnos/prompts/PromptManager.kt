@@ -314,13 +314,17 @@ object PromptManager {
                 // Check numbered lists: "1. ", "1) "
                 if (firstChar in '0'..'9') {
                     var j = contentStart + 1
+                    var digitCount = 1
                     while (j < len && text[j] in '0'..'9') {
                         j++
+                        digitCount++
                     }
                     if (j < len) {
                         val afterDigits = text[j]
                         // Must be followed by dot or closing paren, AND then a space
-                        if ((afterDigits == '.' || afterDigits == ')') &&
+                        // DEFENSIVE: Limit to 3 digits to avoid detecting years (e.g. "2024. ") as list items
+                        if (digitCount <= 3 &&
+                            (afterDigits == '.' || afterDigits == ')') &&
                             (j + 1 < len && text[j + 1] == ' ')) {
                             return true
                         }
