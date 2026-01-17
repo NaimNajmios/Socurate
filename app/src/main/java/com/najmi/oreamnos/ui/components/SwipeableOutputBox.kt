@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -83,7 +83,7 @@ fun SwipeableOutputBox(
 
     // Animate offset back to 0 when released
     // Changed to LowBouncy for a more rubber-band feel
-    val animatedOffset by animateFloatAsState(
+    val animatedOffsetState = animateFloatAsState(
         targetValue = offsetX,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioLowBouncy,
@@ -103,25 +103,28 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(start = 24.dp)
-                .alpha(if (offsetX > 0) (offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
+                .graphicsLayer {
+                    alpha = if (offsetX > 0) (offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f
+                },
             contentAlignment = Alignment.Center
         ) {
-            val isActive = offsetX > swipeThreshold
-            val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "share_scale")
-            val rotateState by animateFloatAsState(if (isActive) 15f else 0f, label = "share_rotate")
+            val isActive by remember { derivedStateOf { offsetX > swipeThreshold } }
+            val scaleState = animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "share_scale")
+            val rotateState = animateFloatAsState(if (isActive) 15f else 0f, label = "share_rotate")
             val iconColor by animateColorAsState(
                 if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                 label = "share_icon_color"
             )
-            val bgScale by animateFloatAsState(if (isActive) 1f else 0f, label = "share_bg_scale")
+            val bgScaleState = animateFloatAsState(if (isActive) 1f else 0f, label = "share_bg_scale")
 
             // Background Circle for visual pop
             Box(
                 modifier = Modifier
                     .size(48.dp)
                     .graphicsLayer {
-                        scaleX = bgScale
-                        scaleY = bgScale
+                        val scale = bgScaleState.value
+                        scaleX = scale
+                        scaleY = scale
                     }
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)
@@ -134,9 +137,9 @@ fun SwipeableOutputBox(
                 modifier = Modifier
                     .size(32.dp)
                     .graphicsLayer {
-                        scaleX = scaleState
-                        scaleY = scaleState
-                        rotationZ = rotateState
+                        scaleX = scaleState.value
+                        scaleY = scaleState.value
+                        rotationZ = rotateState.value
                     }
             )
         }
@@ -146,25 +149,28 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(end = 24.dp)
-                .alpha(if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f),
+                .graphicsLayer {
+                    alpha = if (offsetX < 0) (-offsetX / swipeThreshold).coerceIn(0f, 1f) else 0f
+                },
             contentAlignment = Alignment.Center
         ) {
-            val isActive = offsetX < -swipeThreshold
-            val scaleState by animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
-            val rotateState by animateFloatAsState(if (isActive) -15f else 0f, label = "copy_rotate")
+            val isActive by remember { derivedStateOf { offsetX < -swipeThreshold } }
+            val scaleState = animateFloatAsState(if (isActive) 1.2f else 1.0f, label = "copy_scale")
+            val rotateState = animateFloatAsState(if (isActive) -15f else 0f, label = "copy_rotate")
             val iconColor by animateColorAsState(
                 if (isActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                 label = "copy_icon_color"
             )
-             val bgScale by animateFloatAsState(if (isActive) 1f else 0f, label = "copy_bg_scale")
+             val bgScaleState = animateFloatAsState(if (isActive) 1f else 0f, label = "copy_bg_scale")
 
              // Background Circle for visual pop
             Box(
                 modifier = Modifier
                     .size(48.dp)
                     .graphicsLayer {
-                        scaleX = bgScale
-                        scaleY = bgScale
+                        val scale = bgScaleState.value
+                        scaleX = scale
+                        scaleY = scale
                     }
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)
@@ -177,9 +183,9 @@ fun SwipeableOutputBox(
                 modifier = Modifier
                     .size(32.dp)
                     .graphicsLayer {
-                        scaleX = scaleState
-                        scaleY = scaleState
-                        rotationZ = rotateState
+                        scaleX = scaleState.value
+                        scaleY = scaleState.value
+                        rotationZ = rotateState.value
                     }
             )
         }
@@ -189,7 +195,7 @@ fun SwipeableOutputBox(
             modifier = Modifier
                 .fillMaxWidth()
                 .graphicsLayer {
-                    translationX = animatedOffset
+                    translationX = animatedOffsetState.value
                 }
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
@@ -252,10 +258,10 @@ fun SwipeableOutputBox(
             }
 
             // Fading Chevron Hints - Visible only during shimmy to teach direction
-            val shimmyVisible = !isInteracted && abs(animatedOffset) > 10f
-            val hintAlpha by animateFloatAsState(if (shimmyVisible) 0.6f else 0f, label = "hint_alpha")
+            val shimmyVisible by remember(animatedOffsetState) { derivedStateOf { !isInteracted && abs(animatedOffsetState.value) > 10f } }
+            val hintAlphaState = animateFloatAsState(if (shimmyVisible) 0.6f else 0f, label = "hint_alpha")
 
-            if (hintAlpha > 0f) {
+            if (hintAlphaState.value > 0f) {
                 // Left Hint (Pointing Right to indicate Swipe Right)
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -264,7 +270,7 @@ fun SwipeableOutputBox(
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp)
-                        .alpha(hintAlpha)
+                        .graphicsLayer { alpha = hintAlphaState.value }
                 )
 
                 // Right Hint (Pointing Left to indicate Swipe Left)
@@ -275,7 +281,7 @@ fun SwipeableOutputBox(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
-                        .alpha(hintAlpha)
+                        .graphicsLayer { alpha = hintAlphaState.value }
                 )
             }
         }
