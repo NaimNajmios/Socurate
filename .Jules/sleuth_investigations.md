@@ -119,3 +119,54 @@ Always use `let`, `run`, or local variable capture when working with nullable mu
                  retryDelayMs = info.retryDelayMs,
                  // ...
 ```
+
+## 2025-12-25 - [Integration/Robustness] JSON Extraction Logic Flaw
+
+**Context:** `GeminiService.extractTextFromJson` uses an optimized chain of Gson calls to extract text from a deep JSON structure.
+**Symptoms:** If the JSON structure is valid but slightly different from expected (e.g., "candidates" is not an array, or missing), the optimized path throws an exception (e.g., `ClassCastException`, `NullPointerException`), which is caught. However, the catch block swallows the error and returns `null`, causing the robust fallback `findFirstTextField` to be completely bypassed.
+**Root Cause:**
+The optimization logic was wrapped in a `try-catch` block that exited the function on error, rather than falling back.
+```kotlin
+    return try {
+        // ... optimized path ...
+        // ...
+        findFirstTextField(root) // Only reached if NO exception
+    } catch (e: Exception) {
+        Log.e(...)
+        null // Fallback bypassed!
+    }
+```
+**Fix Applied:**
+Isolate the optimized path in its own `try-catch` block. If it fails, log a warning and proceed to the fallback logic.
+
+**Prevention:**
+When implementing optimizations ("fast paths"), ensuring that failures in the optimization strictly fall through to the robust ("slow") path, rather than aborting the operation.
+
+**Tests Added:**
+`GeminiExtractionTest.kt` - Reproduces the issue by using a JSON structure that breaks the optimized path but contains valid text for the fallback.
+
+**Code Example (Before):**
+```kotlin
+        return try {
+            val text = root.getAsJsonArray("candidates") // ...
+            if (!text.isNullOrBlank()) return text
+            findFirstTextField(root)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error extracting text from JSON", e)
+            null
+        }
+```
+
+**Code Example (After):**
+```kotlin
+        val text = try {
+            root.getAsJsonArray("candidates") // ...
+        } catch (e: Exception) {
+            Log.w(TAG, "Optimized extraction failed...", e)
+            null
+        }
+
+        if (!text.isNullOrBlank()) return text
+
+        return findFirstTextField(root)
+```

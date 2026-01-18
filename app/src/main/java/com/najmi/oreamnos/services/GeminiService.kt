@@ -336,11 +336,11 @@ class GeminiService(
     private fun extractTextFromJson(root: JsonObject?): String? {
         if (root == null) return null
 
-        return try {
+        val text = try {
             // OPTIMIZATION: Use safe direct access to avoid redundant has()/get() lookups
             // Old approach: 4 has() checks + 4 get() calls = 8 lookups
             // New approach: 4 direct get() calls with null checks = 4 lookups
-            val text = root.getAsJsonArray("candidates")
+            root.getAsJsonArray("candidates")
                 ?.takeIf { !it.isEmpty }
                 ?.get(0)?.asJsonObject
                 ?.getAsJsonObject("content")
@@ -348,14 +348,14 @@ class GeminiService(
                 ?.takeIf { !it.isEmpty }
                 ?.get(0)?.asJsonObject
                 ?.get("text")?.asString
-
-            if (!text.isNullOrBlank()) return text
-
-            findFirstTextField(root)
         } catch (e: Exception) {
-            Log.e(TAG, "Error extracting text from JSON", e)
+            Log.w(TAG, "Optimized extraction failed, falling back to recursive search", e)
             null
         }
+
+        if (!text.isNullOrBlank()) return text
+
+        return findFirstTextField(root)
     }
 
     private fun findFirstTextField(element: JsonElement?): String? {
