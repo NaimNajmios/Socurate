@@ -510,7 +510,7 @@ class UsageStats {
     fun getAverageResponseTimeByProvider(): List<ProviderResponseTime> {
         val grouped = recentSessions
             .filter { it.success && it.durationMs > 0 && it.provider != null }
-            .groupBy { it.provider!! }
+            .groupBy { it.provider ?: "Unknown" }
         
         return grouped.map { (provider, sessions) ->
             val durations = sessions.map { it.durationMs }

@@ -312,7 +312,7 @@ fun LogDetailsDialog(
                 
                 if (!log.details.isNullOrEmpty()) {
                     Text(
-                        text = log.details!!,
+                        text = log.details.orEmpty(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
