@@ -119,3 +119,55 @@ Always use `let`, `run`, or local variable capture when working with nullable mu
                  retryDelayMs = info.retryDelayMs,
                  // ...
 ```
+
+## 2024-05-27 - Logic Error in JSON Extraction Fallback
+
+**Context:** `GeminiService.extractTextFromJson` handles parsing of JSON responses from the Gemini API. It implements an optimized path for standard structure and a fallback recursive search.
+**Symptoms:** If the API returns a JSON structure where the expected path for optimization (e.g., `candidates`) exists but is of an unexpected type (e.g., Object instead of Array), the extraction fails entirely returning `null`, even if valid text exists elsewhere in the JSON.
+**Root Cause:**
+The `try-catch` block encompassed both the optimized path and the fallback logic. If the optimized path threw an exception (e.g., `ClassCastException`), the catch block returned `null` immediately, skipping the fallback logic `findFirstTextField`.
+```kotlin
+    private fun extractTextFromJson(root: JsonObject?): String? {
+        // ...
+        return try {
+            // Optimized path ...
+            val text = root.getAsJsonArray("candidates")... // Throws here
+
+            findFirstTextField(root) // Unreachable on exception
+        } catch (e: Exception) {
+            null // Returns null, skipping fallback
+        }
+    }
+```
+**Fix Applied:**
+Restructured the method to wrap only the optimized path in a `try-catch`. If the optimized path fails, the exception is swallowed, and execution proceeds to the fallback `findFirstTextField`. Also moved the logic to `companion object` and made it `internal` to enable unit testing without Android dependencies.
+**Tests Added:** `GeminiExtractionTest.kt` - verifies that fallback is executed when the optimized path throws an exception due to structural mismatch.
+
+**Code Example (Before):**
+```kotlin
+    private fun extractTextFromJson(root: JsonObject?): String? {
+        return try {
+            val text = root.getAsJsonArray("candidates")... // Throws Exception
+            if (!text.isNullOrBlank()) return text
+            findFirstTextField(root)
+        } catch (e: Exception) {
+            null // Bug: Fallback skipped
+        }
+    }
+```
+
+**Code Example (After):**
+```kotlin
+    internal fun extractTextFromJson(root: JsonObject?): String? {
+        var text: String? = null
+        try {
+            text = root.getAsJsonArray("candidates")... // Exception caught here
+        } catch (e: Exception) {
+            // Ignore mismatch
+        }
+
+        if (!text.isNullOrBlank()) return text
+
+        return findFirstTextField(root) // Fallback executes
+    }
+```
