@@ -119,3 +119,43 @@ Always use `let`, `run`, or local variable capture when working with nullable mu
                  retryDelayMs = info.retryDelayMs,
                  // ...
 ```
+
+## 2024-05-25 - Fragile JSON Extraction Logic
+
+**Context:** `GeminiService.extractTextFromJson` attempts to extract text from a specific JSON path for performance, falling back to a recursive search (`findFirstTextField`) if the specific path yields no result.
+**Symptoms:** If the JSON structure changes slightly (e.g. `candidates` field is an object instead of an array), the optimized path throws an exception (e.g., `ClassCastException` or `IllegalStateException`). The existing `catch` block catches this exception but returns `null` immediately, effectively skipping the robust fallback logic. This causes the service to fail even if the text exists elsewhere in the JSON.
+**Root Cause:**
+The `try-catch` block around the optimized extraction path treats *any* exception as a total failure, returning `null`. The fallback `findFirstTextField` is only called if the optimized path completes successfully but returns `null`/blank.
+
+**Code Example (Before):**
+```kotlin
+        return try {
+            // Optimized path ...
+            val text = root.getAsJsonArray("candidates") // Throws if candidates is not array
+                // ...
+            if (!text.isNullOrBlank()) return text
+            findFirstTextField(root) // Unreachable if exception thrown above
+        } catch (e: Exception) {
+            Log.e(TAG, "Error extracting text from JSON", e)
+            null // Returns null, skipping fallback
+        }
+```
+
+**Fix Applied:**
+Modified the `try-catch` block to only wrap the optimized extraction path. If an exception occurs, it is swallowed (ignored), and execution proceeds to check if `text` was found. If not, it proceeds to the fallback `findFirstTextField`.
+Also refactored methods to `companion object` and `internal` visibility for better testability.
+
+**Code Example (After):**
+```kotlin
+        var text: String? = null
+        try {
+            // Optimized path ...
+            text = root.getAsJsonArray("candidates") // ...
+        } catch (e: Exception) {
+            // Ignore exception, proceed to fallback
+        }
+
+        if (!text.isNullOrBlank()) return text
+
+        return findFirstTextField(root) // Always reachable as fallback
+```
