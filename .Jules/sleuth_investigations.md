@@ -119,3 +119,45 @@ Always use `let`, `run`, or local variable capture when working with nullable mu
                  retryDelayMs = info.retryDelayMs,
                  // ...
 ```
+
+## 2024-05-24 - JSON Extraction Fallback Logic Error
+
+**Context:** `GeminiService.extractTextFromJson` attempts to parse a response using an optimized direct access path, falling back to a recursive search (`findFirstTextField`) if the text is not found.
+**Symptoms:** If the JSON structure differs slightly (e.g., `candidates` is an object instead of an array), the optimized path throws an exception (e.g., `ClassCastException`). This exception was caught by a general `catch` block that returned `null`, **skipping the fallback logic completely**.
+**Root Cause:**
+The `try-catch` block encompassed both the optimized path and the decision to call the fallback. An exception in the optimized path aborted the entire function.
+**Fix Applied:**
+Separated the `try-catch` scope. The optimized path is wrapped in its own `try-catch` that swallows exceptions (allowing execution to continue). The fallback logic is then executed if the optimized path failed or returned null. Additionally, moved the logic to `companion object` and made `internal` for better testability.
+
+**Code Example (Before):**
+```kotlin
+    try {
+        // Optimized path (throws if structure matches partially but types differ)
+        val text = root.getAsJsonArray("candidates")...
+        if (!text.isNullOrBlank()) return text
+
+        findFirstTextField(root) // Unreachable if optimized path throws!
+    } catch (e: Exception) {
+        Log.e(TAG, "Error...", e)
+        null
+    }
+```
+
+**Code Example (After):**
+```kotlin
+    // Try optimized path first
+    try {
+        val text = root.getAsJsonArray("candidates")...
+        if (!text.isNullOrBlank()) return text
+    } catch (e: Exception) {
+        Log.w(TAG, "Optimization failed, using fallback: ${e.message}")
+    }
+
+    // Fallback to recursive search
+    return try {
+        findFirstTextField(root)
+    } catch (e: Exception) {
+        Log.e(TAG, "Error...", e)
+        null
+    }
+```
