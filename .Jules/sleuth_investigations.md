@@ -119,3 +119,52 @@ Always use `let`, `run`, or local variable capture when working with nullable mu
                  retryDelayMs = info.retryDelayMs,
                  // ...
 ```
+
+## 2024-05-25 - Logic Error in Gemini Extraction Fallback
+
+**Context:** `GeminiService.extractTextFromJson` handles parsing the JSON response from the Gemini API. It attempts an optimized path (direct access to array indices) and falls back to a recursive search (`findFirstTextField`) if the structure is unexpected.
+**Symptoms:** If the JSON response structure changes (e.g., `candidates` is an object instead of an array), the extraction returns `null` instead of falling back to the recursive search, causing "Gagal mendapatkan hasil" errors even when valid text exists.
+**Root Cause:**
+The optimized path was inside a `try-catch` block that caught ALL exceptions and returned `null`.
+If the optimized path threw a `ClassCastException` (or any other exception), the catch block would handle it and return `null`, effectively skipping the `findFirstTextField` fallback which was located *after* the optimized block but *inside* the same try-catch scope (or reachable only if optimized block returned null, but exception jumped over it).
+Actually, the fallback was unreachable because the catch block returned null.
+
+**Code Example (Before):**
+```kotlin
+    private fun extractTextFromJson(root: JsonObject?): String? {
+        // ...
+        return try {
+            val text = root.getAsJsonArray("candidates") // throws exception if mismatch
+                // ...
+            if (!text.isNullOrBlank()) return text
+            findFirstTextField(root)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error extracting text from JSON", e)
+            null // Fallback skipped!
+        }
+    }
+```
+
+**Fix Applied:**
+Wrapped the optimized extraction path in its own `try-catch` block. If it fails, a warning is logged, and execution proceeds to the fallback mechanism. Also refactored methods to `internal` inside `companion object` for better testability.
+
+**Code Example (After):**
+```kotlin
+    internal fun extractTextFromJson(root: JsonObject?): String? {
+        // ...
+        try {
+            val text = root.getAsJsonArray("candidates")
+                // ...
+            if (!text.isNullOrBlank()) return text
+        } catch (e: Exception) {
+            Log.w(TAG, "Optimized extraction failed, falling back: ${e.message}")
+        }
+
+        // Fallback reachable
+        return try {
+            findFirstTextField(root)
+        } catch (e: Exception) {
+            // ...
+        }
+    }
+```
