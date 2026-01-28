@@ -119,3 +119,49 @@ Always use `let`, `run`, or local variable capture when working with nullable mu
                  retryDelayMs = info.retryDelayMs,
                  // ...
 ```
+
+## 2025-05-25 - Logic Error in Gemini Service Fallback
+
+**Context:** `GeminiService.extractTextFromJson` attempts to parse the AI response JSON.
+**Symptoms:** If the JSON structure deviates slightly (e.g., `candidates` field is present but not an array), the extraction fails completely, returning null, even if a valid text field exists elsewhere (which the fallback logic could find).
+**Root Cause:**
+An optimization block attempted to access specific JSON paths (`candidates[0].content...`) directly.
+However, `Gson`'s `getAsJsonArray` throws an exception if the element exists but is of the wrong type (e.g., `JsonNull` or `JsonObject`).
+This optimization was inside the same `try-catch` block as the fallback logic invocation.
+When the optimization threw an exception, control jumped to the `catch` block (logging an error and returning `null`), bypassing the fallback `findFirstTextField` call entirely.
+
+**Fix Applied:**
+Wrapped the optimization path in its own nested `try-catch` block. If the optimization fails, the exception is swallowed, allowing execution to proceed to the robust `findFirstTextField` fallback.
+
+**Prevention:**
+When implementing "fast path" optimizations, always isolate them so their failure does not prevent the "slow/robust path" from executing. Do not let exceptions from optional logic abort critical logic.
+
+**Code Example (Before):**
+```kotlin
+    return try {
+        // Optimization: Throws if structure is wrong
+        val text = root.getAsJsonArray("candidates")...get("text").asString
+        if (!text.isNullOrBlank()) return text
+
+        findFirstTextField(root) // SKIPPED on exception!
+    } catch (e: Exception) {
+        return null
+    }
+```
+
+**Code Example (After):**
+```kotlin
+    try {
+        try {
+             // Optimization
+             val text = root.getAsJsonArray("candidates")...get("text").asString
+             if (!text.isNullOrBlank()) return text
+        } catch (ignored: Exception) {
+             // Ignore optimization failure
+        }
+
+        return findFirstTextField(root) // Always executed if optimization fails
+    } catch (e: Exception) {
+        return null
+    }
+```

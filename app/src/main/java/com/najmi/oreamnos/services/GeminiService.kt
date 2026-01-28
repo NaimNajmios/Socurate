@@ -331,57 +331,6 @@ class GeminiService(
         return TRAILING_NEWLINES_PATTERN.matcher(cleaned).replaceAll("").trim()
     }
 
-
-
-    private fun extractTextFromJson(root: JsonObject?): String? {
-        if (root == null) return null
-
-        return try {
-            // OPTIMIZATION: Use safe direct access to avoid redundant has()/get() lookups
-            // Old approach: 4 has() checks + 4 get() calls = 8 lookups
-            // New approach: 4 direct get() calls with null checks = 4 lookups
-            val text = root.getAsJsonArray("candidates")
-                ?.takeIf { !it.isEmpty }
-                ?.get(0)?.asJsonObject
-                ?.getAsJsonObject("content")
-                ?.getAsJsonArray("parts")
-                ?.takeIf { !it.isEmpty }
-                ?.get(0)?.asJsonObject
-                ?.get("text")?.asString
-
-            if (!text.isNullOrBlank()) return text
-
-            findFirstTextField(root)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error extracting text from JSON", e)
-            null
-        }
-    }
-
-    private fun findFirstTextField(element: JsonElement?): String? {
-        if (element == null || element.isJsonNull) return null
-
-        if (element.isJsonObject) {
-            val obj = element.asJsonObject
-            for (key in obj.keySet()) {
-                if (key.equals("text", ignoreCase = true) && obj.get(key).isJsonPrimitive) {
-                    val text = obj.get(key).asString
-                    if (!text.isNullOrBlank()) return text
-                }
-                val deeper = findFirstTextField(obj.get(key))
-                if (!deeper.isNullOrBlank()) return deeper
-            }
-        } else if (element.isJsonArray) {
-            val arr = element.asJsonArray
-            for (item in arr) {
-                val deeper = findFirstTextField(item)
-                if (!deeper.isNullOrBlank()) return deeper
-            }
-        }
-
-        return null
-    }
-
     private fun cleanUpResponse(response: String?): String {
         if (response.isNullOrBlank()) return response ?: ""
 
@@ -478,6 +427,61 @@ class GeminiService(
     }
 
     companion object {
+        internal fun extractTextFromJson(root: JsonObject?): String? {
+            if (root == null) return null
+
+            try {
+                // OPTIMIZATION: Use safe direct access to avoid redundant has()/get() lookups
+                // Old approach: 4 has() checks + 4 get() calls = 8 lookups
+                // New approach: 4 direct get() calls with null checks = 4 lookups
+
+                // Wrap optimization in its own try-catch to ensure fallback is always attempted
+                try {
+                    val text = root.getAsJsonArray("candidates")
+                        ?.takeIf { !it.isEmpty }
+                        ?.get(0)?.asJsonObject
+                        ?.getAsJsonObject("content")
+                        ?.getAsJsonArray("parts")
+                        ?.takeIf { !it.isEmpty }
+                        ?.get(0)?.asJsonObject
+                        ?.get("text")?.asString
+
+                    if (!text.isNullOrBlank()) return text
+                } catch (ignored: Exception) {
+                    // Optimization failed (e.g. structure changed), ignore and use fallback
+                }
+
+                return findFirstTextField(root)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error extracting text from JSON", e)
+                null
+            }
+        }
+
+        internal fun findFirstTextField(element: JsonElement?): String? {
+            if (element == null || element.isJsonNull) return null
+
+            if (element.isJsonObject) {
+                val obj = element.asJsonObject
+                for (key in obj.keySet()) {
+                    if (key.equals("text", ignoreCase = true) && obj.get(key).isJsonPrimitive) {
+                        val text = obj.get(key).asString
+                        if (!text.isNullOrBlank()) return text
+                    }
+                    val deeper = findFirstTextField(obj.get(key))
+                    if (!deeper.isNullOrBlank()) return deeper
+                }
+            } else if (element.isJsonArray) {
+                val arr = element.asJsonArray
+                for (item in arr) {
+                    val deeper = findFirstTextField(item)
+                    if (!deeper.isNullOrBlank()) return deeper
+                }
+            }
+
+            return null
+        }
+
         private const val TAG = "GeminiService"
         private val JSON = "application/json; charset=utf-8".toMediaType()
 
