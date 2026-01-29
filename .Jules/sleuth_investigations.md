@@ -119,3 +119,55 @@ Always use `let`, `run`, or local variable capture when working with nullable mu
                  retryDelayMs = info.retryDelayMs,
                  // ...
 ```
+
+## 2024-05-24 - GeminiService JSON Extraction Logic Error
+
+**Context:** `GeminiService.extractTextFromJson` attempts to parse API responses using an optimized path (direct key access) before falling back to a recursive search.
+**Symptoms:** If the API response structure changes slightly (e.g. "candidates" is an object instead of an array), the optimized path throws an exception (e.g. `ClassCastException` or `IllegalStateException` via Gson). This exception was caught by a single try-catch block which then returned `null`, skipping the fallback logic entirely.
+**Root Cause:**
+The fallback logic `findFirstTextField(root)` was placed *inside* the same try-block as the optimized path.
+When the optimized path threw an exception, control jumped to the catch block, bypassing the fallback call.
+
+**Code Example (Before):**
+```kotlin
+    private fun extractTextFromJson(root: JsonObject?): String? {
+        // ...
+        return try {
+            // Optimized path (throws if structure mismatch)
+            val text = root.getAsJsonArray("candidates")...
+
+            if (!text.isNullOrBlank()) return text
+
+            findFirstTextField(root) // UNREACHABLE if optimized path throws
+        } catch (e: Exception) {
+            Log.e(TAG, "Error extracting text", e)
+            null
+        }
+    }
+```
+
+**Fix Applied:**
+Separated the optimized path into its own try-catch block. If it fails, the exception is swallowed (logged as warning), and execution explicitly proceeds to the fallback.
+Refactored methods to `companion object` and made them `internal` to enable unit testing.
+
+**Code Example (After):**
+```kotlin
+    internal fun extractTextFromJson(root: JsonObject?): String? {
+        // ...
+        try {
+            // Optimized path
+            val text = root.getAsJsonArray("candidates")...
+            if (!text.isNullOrBlank()) return text
+        } catch (e: Exception) {
+            Log.w(TAG, "Optimized extraction failed...", e)
+        }
+
+        // Fallback
+        return try {
+            findFirstTextField(root)
+        } catch (e: Exception) {
+            // ...
+        }
+    }
+```
+**Tests Added:** `app/src/test/java/com/najmi/oreamnos/services/GeminiExtractionLogicTest.kt` verifies that fallback works even when strict path fails.
