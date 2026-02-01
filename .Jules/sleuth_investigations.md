@@ -119,3 +119,39 @@ Always use `let`, `run`, or local variable capture when working with nullable mu
                  retryDelayMs = info.retryDelayMs,
                  // ...
 ```
+
+## 2024-05-27 - Usage Stats Race Condition
+
+**Context:** `PreferencesManager.kt` manages usage statistics (tokens, requests) stored in `SharedPreferences`.
+**Symptoms:** Inaccurate usage analytics (lost tokens/requests) when multiple operations occur concurrently (e.g., Service background tasks + UI updates). A simulation proved ~90% data loss under high concurrency.
+**Root Cause:**
+The "Read-Modify-Write" pattern on `UsageStats` was not synchronized across `PreferencesManager` instances.
+`PreferencesManager` is instantiated per-context (Activity, Service), so `synchronized(this)` is ineffective.
+Multiple threads/instances would read the same initial JSON state, modify it locally, and overwrite each other's changes when saving.
+**Fix Applied:**
+Introduced a `static` (companion object) lock `USAGE_STATS_LOCK`.
+Wrapped all `UsageStats` write operations (record success/failure, log, reset) in `synchronized(USAGE_STATS_LOCK)`.
+**Prevention:**
+When using `SharedPreferences` to store complex objects that require read-modify-write cycles, ensure synchronization uses a static lock or a singleton manager to prevent lost updates.
+
+**Code Example (Before):**
+```kotlin
+    fun recordApiSuccess(...) {
+        val stats = getUsageStats() // Read
+        stats.recordSuccess(...)    // Modify
+        saveUsageStats(stats)       // Write (Race condition!)
+    }
+```
+
+**Code Example (After):**
+```kotlin
+    private val USAGE_STATS_LOCK = Any() // In Companion Object
+
+    fun recordApiSuccess(...) {
+        synchronized(USAGE_STATS_LOCK) {
+            val stats = getUsageStats()
+            stats.recordSuccess(...)
+            saveUsageStats(stats)
+        }
+    }
+```
