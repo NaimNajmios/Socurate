@@ -328,9 +328,19 @@ class PreferencesManager(context: Context) {
         modelId: String? = null,
         modelName: String? = null
     ) {
-        val stats = getUsageStats()
-        stats.recordSuccess(promptTokens, candidateTokens, totalTokens, provider, modelId, modelName, durationMs)
-        saveUsageStats(stats)
+        synchronized(USAGE_STATS_LOCK) {
+            val stats = getUsageStats()
+            stats.recordSuccess(
+                promptTokens,
+                candidateTokens,
+                totalTokens,
+                provider,
+                modelId,
+                modelName,
+                durationMs
+            )
+            saveUsageStats(stats)
+        }
     }
 
     @JvmOverloads
@@ -341,39 +351,51 @@ class PreferencesManager(context: Context) {
         modelName: String? = null,
         error: String? = null
     ) {
-        val stats = getUsageStats()
-        stats.recordFailure(provider, modelId, modelName, error, durationMs)
-        saveUsageStats(stats)
+        synchronized(USAGE_STATS_LOCK) {
+            val stats = getUsageStats()
+            stats.recordFailure(provider, modelId, modelName, error, durationMs)
+            saveUsageStats(stats)
+        }
     }
 
     fun resetUsageStats() {
-        saveUsageStats(UsageStats())
+        synchronized(USAGE_STATS_LOCK) {
+            saveUsageStats(UsageStats())
+        }
     }
 
     // ==================== LOG METHODS ====================
 
     fun logInfo(tag: String, message: String) {
-        val stats = getUsageStats()
-        stats.logInfo(tag, message)
-        saveUsageStats(stats)
+        synchronized(USAGE_STATS_LOCK) {
+            val stats = getUsageStats()
+            stats.logInfo(tag, message)
+            saveUsageStats(stats)
+        }
     }
 
     fun logWarning(tag: String, message: String, details: String?) {
-        val stats = getUsageStats()
-        stats.logWarning(tag, message, details)
-        saveUsageStats(stats)
+        synchronized(USAGE_STATS_LOCK) {
+            val stats = getUsageStats()
+            stats.logWarning(tag, message, details)
+            saveUsageStats(stats)
+        }
     }
 
     fun logError(tag: String, message: String, details: String?) {
-        val stats = getUsageStats()
-        stats.logError(tag, message, details)
-        saveUsageStats(stats)
+        synchronized(USAGE_STATS_LOCK) {
+            val stats = getUsageStats()
+            stats.logError(tag, message, details)
+            saveUsageStats(stats)
+        }
     }
 
     fun clearLogs() {
-        val stats = getUsageStats()
-        stats.clearLogs()
-        saveUsageStats(stats)
+        synchronized(USAGE_STATS_LOCK) {
+            val stats = getUsageStats()
+            stats.clearLogs()
+            saveUsageStats(stats)
+        }
     }
 
     fun clearAll() {
@@ -381,6 +403,9 @@ class PreferencesManager(context: Context) {
     }
 
     companion object {
+        // Shared lock to prevent race conditions during read-modify-write operations on UsageStats
+        private val USAGE_STATS_LOCK = Any()
+
         private const val TAG = "PreferencesManager"
         private const val PREFS_FILE_NAME = "oreamnos_secure_prefs"
 
