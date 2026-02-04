@@ -119,3 +119,43 @@ Always use `let`, `run`, or local variable capture when working with nullable mu
                  retryDelayMs = info.retryDelayMs,
                  // ...
 ```
+
+## 2024-05-24 - Race Condition in Concurrent Service Requests
+
+**Context:** `ContentGenerationService` handles concurrent AI generation tasks using Kotlin Coroutines (`serviceScope.launch`).
+**Symptoms:** If multiple requests are sent to the service rapidly, a shorter/faster request (e.g., validation failure or short generation) finishing *before* a longer request can cause the service to stop prematurely, killing the longer-running job.
+**Root Cause:**
+The service relied on `stopSelf(startId)` called at the end of each coroutine.
+If Request 2 (startId=2) finishes before Request 1 (startId=1), it calls `stopSelf(2)`.
+Since `2` is the latest startId, the system stops the service.
+This kills the `CoroutineScope` and cancels Request 1.
+The standard `stopSelf(startId)` mechanism works for sequential processing but fails for parallel processing where job completion order is non-deterministic.
+
+**Fix Applied:**
+Introduced `ServiceConcurrencyTracker` (thread-safe counter) to track active jobs.
+Increment job count in `onStartCommand`.
+Decrement job count in `finally` block of every job.
+Only call `stopSelf(latestStartId)` when the active job count reaches zero.
+
+**Code Example (Before):**
+```kotlin
+    // Inside handleGenerate coroutine
+    try {
+        // ... work ...
+    } finally {
+        stopSelf(startId) // DANGEROUS: Might stop service while other jobs run
+    }
+```
+
+**Code Example (After):**
+```kotlin
+    // Inside handleGenerate coroutine
+    try {
+        // ... work ...
+    } finally {
+        val stopId = concurrencyTracker.onJobFinished()
+        if (stopId != null) {
+            stopSelf(stopId) // SAFE: Only stops when ALL jobs are done
+        }
+    }
+```
