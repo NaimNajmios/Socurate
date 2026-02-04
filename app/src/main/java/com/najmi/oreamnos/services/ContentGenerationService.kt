@@ -10,6 +10,7 @@ import com.najmi.oreamnos.curator.CuratorFactory
 import com.najmi.oreamnos.exceptions.RateLimitException
 import com.najmi.oreamnos.utils.NotificationHelper
 import com.najmi.oreamnos.utils.PreferencesManager
+import com.najmi.oreamnos.utils.ServiceConcurrencyTracker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,6 +25,7 @@ import kotlinx.coroutines.withContext
 class ContentGenerationService : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val concurrencyTracker = ServiceConcurrencyTracker()
     private lateinit var notificationHelper: NotificationHelper
     private lateinit var prefsManager: PreferencesManager
 
@@ -37,14 +39,17 @@ class ContentGenerationService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "Service started with action: ${intent?.action ?: "null"}")
 
+        // Track the new job
+        concurrencyTracker.onServiceStarted(startId)
+
         if (intent == null) {
-            stopSelf()
+            checkStop()
             return START_NOT_STICKY
         }
 
         val action = intent.action
         if (action == null) {
-            stopSelf()
+            checkStop()
             return START_NOT_STICKY
         }
 
@@ -62,7 +67,7 @@ class ContentGenerationService : Service() {
             ACTION_REFINE -> handleRefine(intent, startId)
             else -> {
                 Log.w(TAG, "Unknown action: $action")
-                stopSelf(startId)
+                checkStop()
             }
         }
 
@@ -78,88 +83,91 @@ class ContentGenerationService : Service() {
         val keepStructure = intent.getBooleanExtra(EXTRA_KEEP_STRUCTURE, false)
 
         serviceScope.launch {
-            // Validation moved inside coroutine to prevent race conditions with stopSelf
-            if (inputText.isNullOrEmpty()) {
-                broadcastError("Input text is required", false)
-                stopSelf(startId)
-                return@launch
-            }
-
-            var success = false
-            val startTime = System.currentTimeMillis()
             try {
-                Log.i(TAG, "Starting content generation...")
-                var content = inputText
+                // Validation moved inside coroutine to prevent race conditions with stopSelf
+                if (inputText.isNullOrEmpty()) {
+                    broadcastError("Input text is required", false)
+                    return@launch
+                }
 
-                // Check if input is a URL
-                if (WebContentExtractor.isUrl(inputText)) {
-                    Log.i(TAG, "Input is URL, extracting content...")
-                    // Web content extraction is a blocking IO operation, so we explicitly run it on IO
-                    // even though we are already on IO, just to be explicit and safe.
-                    content = withContext(Dispatchers.IO) {
-                        val extractor = WebContentExtractor()
-                        extractor.extractContent(inputText)
+                var success = false
+                val startTime = System.currentTimeMillis()
+                try {
+                    Log.i(TAG, "Starting content generation...")
+                    var content = inputText
+
+                    // Check if input is a URL
+                    if (WebContentExtractor.isUrl(inputText)) {
+                        Log.i(TAG, "Input is URL, extracting content...")
+                        // Web content extraction is a blocking IO operation, so we explicitly run it on IO
+                        // even though we are already on IO, just to be explicit and safe.
+                        content = withContext(Dispatchers.IO) {
+                            val extractor = WebContentExtractor()
+                            extractor.extractContent(inputText)
+                        }
+                    }
+
+                    // Get provider name for logging
+                    val provider = prefsManager.getProvider()
+                    val providerDisplay = CuratorFactory.getProviderDisplayName(provider)
+
+                    // Log the API request start
+                    prefsManager.logInfo("API", "Request started via $providerDisplay")
+
+                    // Generate post using curator abstraction
+                    val curator = CuratorFactory.create(this@ContentGenerationService)
+                    val result = curator.curatePost(content, includeSource, keepStructure)
+
+                    // Calculate duration
+                    val durationMs = System.currentTimeMillis() - startTime
+
+                    // Record token usage with duration
+                    val promptTokens = curator.lastPromptTokens
+                    val candidateTokens = curator.lastCandidateTokens
+                    val totalTokens = curator.lastTotalTokens
+                    prefsManager.recordApiSuccess(promptTokens, candidateTokens, totalTokens, durationMs)
+
+                    // Log success
+                    prefsManager.logInfo("API", "Request successful via $providerDisplay ($totalTokens tokens, ${durationMs}ms)")
+
+                    Log.i(TAG, "Content generation successful")
+                    success = true
+                    broadcastSuccess(result, false)
+
+                } catch (rle: RateLimitException) {
+                    Log.w(TAG, "Rate limit hit: ${rle.message}")
+                    val durationMs = System.currentTimeMillis() - startTime
+                    prefsManager.recordApiFailure(durationMs)
+
+                    // Log rate limit error
+                    val providerName = rle.providerName ?: "Unknown"
+                    val delayMs = rle.retryDelayMs
+                    val delayInfo = if (delayMs > 0) " (retry in ${delayMs / 1000}s)" else ""
+                    prefsManager.logWarning("API", "Rate limit hit on $providerName$delayInfo", rle.message)
+
+                    broadcastRateLimit(rle, false)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Content generation failed: ${e.message}", e)
+                    val durationMs = System.currentTimeMillis() - startTime
+                    prefsManager.recordApiFailure(durationMs)
+
+                    // Log error
+                    val errorMsg = e.message ?: "Unknown error"
+                    prefsManager.logError("API", "Request failed", errorMsg)
+
+                    broadcastError(e.message, false)
+                } finally {
+                    // Show completion notification
+                    if (success) {
+                        notificationHelper.showCompletedNotification(
+                            getString(R.string.notification_complete_title),
+                            getString(R.string.notification_complete_message)
+                        )
                     }
                 }
-
-                // Get provider name for logging
-                val provider = prefsManager.getProvider()
-                val providerDisplay = CuratorFactory.getProviderDisplayName(provider)
-
-                // Log the API request start
-                prefsManager.logInfo("API", "Request started via $providerDisplay")
-
-                // Generate post using curator abstraction
-                val curator = CuratorFactory.create(this@ContentGenerationService)
-                val result = curator.curatePost(content, includeSource, keepStructure)
-
-                // Calculate duration
-                val durationMs = System.currentTimeMillis() - startTime
-
-                // Record token usage with duration
-                val promptTokens = curator.lastPromptTokens
-                val candidateTokens = curator.lastCandidateTokens
-                val totalTokens = curator.lastTotalTokens
-                prefsManager.recordApiSuccess(promptTokens, candidateTokens, totalTokens, durationMs)
-
-                // Log success
-                prefsManager.logInfo("API", "Request successful via $providerDisplay ($totalTokens tokens, ${durationMs}ms)")
-
-                Log.i(TAG, "Content generation successful")
-                success = true
-                broadcastSuccess(result, false)
-
-            } catch (rle: RateLimitException) {
-                Log.w(TAG, "Rate limit hit: ${rle.message}")
-                val durationMs = System.currentTimeMillis() - startTime
-                prefsManager.recordApiFailure(durationMs)
-
-                // Log rate limit error
-                val providerName = rle.providerName ?: "Unknown"
-                val delayMs = rle.retryDelayMs
-                val delayInfo = if (delayMs > 0) " (retry in ${delayMs / 1000}s)" else ""
-                prefsManager.logWarning("API", "Rate limit hit on $providerName$delayInfo", rle.message)
-
-                broadcastRateLimit(rle, false)
-            } catch (e: Exception) {
-                Log.e(TAG, "Content generation failed: ${e.message}", e)
-                val durationMs = System.currentTimeMillis() - startTime
-                prefsManager.recordApiFailure(durationMs)
-
-                // Log error
-                val errorMsg = e.message ?: "Unknown error"
-                prefsManager.logError("API", "Request failed", errorMsg)
-
-                broadcastError(e.message, false)
             } finally {
-                // Show completion notification and stop service
-                if (success) {
-                    notificationHelper.showCompletedNotification(
-                        getString(R.string.notification_complete_title),
-                        getString(R.string.notification_complete_message)
-                    )
-                }
-                stopSelf(startId)
+                // Ensure we always check if we should stop the service
+                checkStop()
             }
         }
     }
@@ -173,82 +181,84 @@ class ContentGenerationService : Service() {
         val includeSource = intent.getBooleanExtra(EXTRA_INCLUDE_SOURCE, false)
 
         serviceScope.launch {
-            // Validation moved inside coroutine to prevent race conditions with stopSelf
-            if (originalPost.isNullOrEmpty()) {
-                broadcastError("Original post is required", true)
-                stopSelf(startId)
-                return@launch
-            }
-
-            if (refinements.isNullOrEmpty()) {
-                broadcastError("At least one refinement option is required", true)
-                stopSelf(startId)
-                return@launch
-            }
-
-            var success = false
-            val startTime = System.currentTimeMillis()
             try {
-                Log.i(TAG, "Starting content refinement with options: $refinements")
-
-                // Get provider name for logging
-                val provider = prefsManager.getProvider()
-                val providerDisplay = CuratorFactory.getProviderDisplayName(provider)
-
-                // Log the refinement request start
-                prefsManager.logInfo("API", "Refinement started via $providerDisplay ($refinements)")
-
-                // Refine post using curator abstraction
-                val curator = CuratorFactory.create(this@ContentGenerationService)
-                val result = curator.refinePost(originalPost, refinements, includeSource)
-
-                // Calculate duration
-                val durationMs = System.currentTimeMillis() - startTime
-
-                // Record token usage with duration
-                val promptTokens = curator.lastPromptTokens
-                val candidateTokens = curator.lastCandidateTokens
-                val totalTokens = curator.lastTotalTokens
-                prefsManager.recordApiSuccess(promptTokens, candidateTokens, totalTokens, durationMs)
-
-                // Log success
-                prefsManager.logInfo("API", "Refinement successful via $providerDisplay ($totalTokens tokens, ${durationMs}ms)")
-
-                Log.i(TAG, "Content refinement successful")
-                success = true
-                broadcastSuccess(result, true)
-
-            } catch (rle: RateLimitException) {
-                Log.w(TAG, "Rate limit hit during refinement: ${rle.message}")
-                val durationMs = System.currentTimeMillis() - startTime
-                prefsManager.recordApiFailure(durationMs)
-
-                // Log rate limit error
-                val providerName = rle.providerName ?: "Unknown"
-                val delayMs = rle.retryDelayMs
-                val delayInfo = if (delayMs > 0) " (retry in ${delayMs / 1000}s)" else ""
-                prefsManager.logWarning("API", "Rate limit during refinement on $providerName$delayInfo", rle.message)
-
-                broadcastRateLimit(rle, true)
-            } catch (e: Exception) {
-                Log.e(TAG, "Content refinement failed: ${e.message}", e)
-                val durationMs = System.currentTimeMillis() - startTime
-                prefsManager.recordApiFailure(durationMs)
-
-                // Log error
-                val errorMsg = e.message ?: "Unknown error"
-                prefsManager.logError("API", "Refinement failed", errorMsg)
-
-                broadcastError(e.message, true)
-            } finally {
-                // Show completion notification and stop service
-                if (success) {
-                    notificationHelper.showCompletedNotification(
-                        getString(R.string.notification_complete_title),
-                        getString(R.string.notification_complete_message)
-                    )
+                // Validation moved inside coroutine to prevent race conditions with stopSelf
+                if (originalPost.isNullOrEmpty()) {
+                    broadcastError("Original post is required", true)
+                    return@launch
                 }
-                stopSelf(startId)
+
+                if (refinements.isNullOrEmpty()) {
+                    broadcastError("At least one refinement option is required", true)
+                    return@launch
+                }
+
+                var success = false
+                val startTime = System.currentTimeMillis()
+                try {
+                    Log.i(TAG, "Starting content refinement with options: $refinements")
+
+                    // Get provider name for logging
+                    val provider = prefsManager.getProvider()
+                    val providerDisplay = CuratorFactory.getProviderDisplayName(provider)
+
+                    // Log the refinement request start
+                    prefsManager.logInfo("API", "Refinement started via $providerDisplay ($refinements)")
+
+                    // Refine post using curator abstraction
+                    val curator = CuratorFactory.create(this@ContentGenerationService)
+                    val result = curator.refinePost(originalPost, refinements, includeSource)
+
+                    // Calculate duration
+                    val durationMs = System.currentTimeMillis() - startTime
+
+                    // Record token usage with duration
+                    val promptTokens = curator.lastPromptTokens
+                    val candidateTokens = curator.lastCandidateTokens
+                    val totalTokens = curator.lastTotalTokens
+                    prefsManager.recordApiSuccess(promptTokens, candidateTokens, totalTokens, durationMs)
+
+                    // Log success
+                    prefsManager.logInfo("API", "Refinement successful via $providerDisplay ($totalTokens tokens, ${durationMs}ms)")
+
+                    Log.i(TAG, "Content refinement successful")
+                    success = true
+                    broadcastSuccess(result, true)
+
+                } catch (rle: RateLimitException) {
+                    Log.w(TAG, "Rate limit hit during refinement: ${rle.message}")
+                    val durationMs = System.currentTimeMillis() - startTime
+                    prefsManager.recordApiFailure(durationMs)
+
+                    // Log rate limit error
+                    val providerName = rle.providerName ?: "Unknown"
+                    val delayMs = rle.retryDelayMs
+                    val delayInfo = if (delayMs > 0) " (retry in ${delayMs / 1000}s)" else ""
+                    prefsManager.logWarning("API", "Rate limit during refinement on $providerName$delayInfo", rle.message)
+
+                    broadcastRateLimit(rle, true)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Content refinement failed: ${e.message}", e)
+                    val durationMs = System.currentTimeMillis() - startTime
+                    prefsManager.recordApiFailure(durationMs)
+
+                    // Log error
+                    val errorMsg = e.message ?: "Unknown error"
+                    prefsManager.logError("API", "Refinement failed", errorMsg)
+
+                    broadcastError(e.message, true)
+                } finally {
+                    // Show completion notification
+                    if (success) {
+                        notificationHelper.showCompletedNotification(
+                            getString(R.string.notification_complete_title),
+                            getString(R.string.notification_complete_message)
+                        )
+                    }
+                }
+            } finally {
+                // Ensure we always check if we should stop the service
+                checkStop()
             }
         }
     }
@@ -307,6 +317,13 @@ class ContentGenerationService : Service() {
         Log.i(TAG, "Service destroyed")
         serviceScope.cancel()
         super.onDestroy()
+    }
+
+    private fun checkStop() {
+        val stopId = concurrencyTracker.onJobFinished()
+        if (stopId != null) {
+            stopSelf(stopId)
+        }
     }
 
     companion object {
