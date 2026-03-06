@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.najmi.oreamnos"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="24"
+        android:targetSdkVersion="34" />
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Card export: read gallery images for backgrounds (API 33+) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <permission
+        android:name="com.najmi.oreamnos.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.najmi.oreamnos.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+
+    <application
+        android:allowBackup="true"
+        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+        android:extractNativeLibs="false"
+        android:icon="@mipmap/oreamnos_white"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Oreamnos"
+        android:usesCleartextTraffic="false" >
+
+        <!-- Main Activity -->
+        <activity
+            android:name="com.najmi.oreamnos.MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|keyboard"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Oreamnos" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Share Receiver Activity -->
+        <activity
+            android:name="com.najmi.oreamnos.ShareReceiverActivity"
+            android:exported="true"
+            android:label="@string/share_to_oreamnos"
+            android:theme="@style/Theme.Oreamnos.Transparent" >
+
+            <!-- Receive shared text from share sheet -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <!-- Receive selected text from floating text selection menu -->
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
+        <!-- Settings Activity -->
+        <activity
+            android:name="com.najmi.oreamnos.SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings"
+            android:parentActivityName="com.najmi.oreamnos.MainActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
+        <!-- Usage Activity -->
+        <activity
+            android:name="com.najmi.oreamnos.UsageActivity"
+            android:exported="false"
+            android:label="@string/nav_usage"
+            android:parentActivityName="com.najmi.oreamnos.MainActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
+        <!-- Hashtag Manager Activity -->
+        <activity
+            android:name="com.najmi.oreamnos.HashtagManagerActivity"
+            android:exported="false"
+            android:label="Hashtag Manager"
+            android:parentActivityName="com.najmi.oreamnos.SettingsActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
+        <!-- Log List Activity -->
+        <activity
+            android:name="com.najmi.oreamnos.LogListActivity"
+            android:exported="false"
+            android:label="@string/all_logs_title"
+            android:parentActivityName="com.najmi.oreamnos.UsageActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
+        <!-- Session List Activity -->
+        <activity
+            android:name="com.najmi.oreamnos.SessionListActivity"
+            android:exported="false"
+            android:label="@string/all_sessions_title"
+            android:parentActivityName="com.najmi.oreamnos.UsageActivity"
+            android:theme="@style/Theme.Oreamnos" />
+
+        <!-- Content Generation Foreground Service -->
+        <service
+            android:name="com.najmi.oreamnos.services.ContentGenerationService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <!-- Quick Settings Tile Service -->
+        <service
+            android:name="com.najmi.oreamnos.services.GenerateTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile"
+            android:label="@string/tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" >
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- FileProvider for sharing exported card images via share intent -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.najmi.oreamnos.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="com.najmi.oreamnos.androidx-startup"
+            android:exported="false" >
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+                android:value="androidx.startup" />
+        </provider>
+
+        <receiver
+            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+            android:directBootAware="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.DUMP" >
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

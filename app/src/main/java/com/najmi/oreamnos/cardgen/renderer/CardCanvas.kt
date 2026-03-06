@@ -101,68 +101,41 @@ fun MatchResultCanvas(
 
     CardBackground(
         config = config.copy(colorPair = gradientColors),
-        modifier = modifier.aspectRatio(1f) // Square by default; caller can override
+        modifier = modifier.aspectRatio(4f / 5f)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+                .padding(24.dp)
         ) {
-            // Header
-            Column {
-                Text(
-                    text = data.competition.uppercase(),
-                    color = CardTextMuted,
-                    style = MaterialTheme.typography.labelSmall,
-                    letterSpacing = 2.sp
-                )
-                Text(
-                    text = data.matchDate,
-                    color = CardTextSecondary,
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
-
-            // Score section
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Home team
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = data.homeTeam.uppercase(),
-                        color = CardTextPrimary,
-                        style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                // Score
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
-                ) {
+            // Top branding
+            Text(
+                text = "MATCH RESULT",
+                color = CardTextMuted,
+                style = MaterialTheme.typography.labelSmall,
+                letterSpacing = 3.sp
+            )
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // Center content - Large Score
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "${data.homeScore}",
-                        color = CardTextPrimary,
+                        color = Color(0xFFFFD100),
                         fontSize = 72.sp,
                         fontWeight = FontWeight.Black,
                         lineHeight = 72.sp
                     )
+                    Spacer(Modifier.width(16.dp))
                     Text(
-                        text = "VS",
-                        color = CardTextMuted,
-                        style = MaterialTheme.typography.labelSmall,
-                        letterSpacing = 3.sp
+                        text = data.homeTeam.uppercase(),
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black)
                     )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "${data.awayScore}",
                         color = CardTextPrimary,
@@ -170,82 +143,87 @@ fun MatchResultCanvas(
                         fontWeight = FontWeight.Black,
                         lineHeight = 72.sp
                     )
-                }
-
-                // Away team
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
-                ) {
+                    Spacer(Modifier.width(16.dp))
                     Text(
                         text = data.awayTeam.uppercase(),
-                        color = CardTextPrimary,
-                        style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        color = CardTextSecondary,
+                        style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black)
                     )
                 }
             }
-
-            // Key moment
-            if (data.keyMoment.isNotBlank() && data.keyMoment != "—") {
-                Text(
-                    text = "\"${data.keyMoment}\"",
-                    color = CardTextSecondary,
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+            
+            Spacer(modifier = Modifier.weight(0.5f))
+            
+            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 16.dp))
+            
+            // Bottom Section: Context (Left) and Stats (Right)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                // Context Info
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = data.competition.uppercase(),
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = data.matchDate.uppercase(),
+                        color = CardTextMuted,
+                        style = MaterialTheme.typography.labelSmall,
+                        letterSpacing = 1.sp
+                    )
+                    if (data.keyMoment.isNotBlank() && data.keyMoment != "—") {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = data.keyMoment,
+                            color = CardTextSecondary,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    CardFooter()
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                // Key Stats
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    val statNames = listOf("Poss", "Shots", "SOT")
+                    val homeVals = listOf("${data.homeStats.possession}%", "${data.homeStats.shots}", "${data.homeStats.shotsOnTarget}")
+                    val awayVals = listOf("${data.awayStats.possession}%", "${data.awayStats.shots}", "${data.awayStats.shotsOnTarget}")
+                    
+                    for (i in 0..2) {
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = homeVals[i],
+                                color = Color(0xFFFFD100), // Gold for Home
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Black,
+                                lineHeight = 24.sp
+                            )
+                            Text(
+                                text = awayVals[i],
+                                color = CardTextPrimary, // White for Away
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                lineHeight = 20.sp
+                            )
+                            Text(
+                                text = statNames[i].uppercase(),
+                                color = CardTextSecondary,
+                                style = MaterialTheme.typography.labelSmall,
+                                letterSpacing = 1.sp
+                            )
+                        }
+                    }
+                }
             }
-
-            Divider(color = CardBorder, thickness = 1.dp)
-
-            // Stats row: Home
-            StatRowSection(label = data.homeTeam, stats = data.homeStats)
-            // Stats row: Away
-            StatRowSection(label = data.awayTeam, stats = data.awayStats)
-
-            // Footer branding
-            CardFooter()
         }
-    }
-}
-
-@Composable
-private fun StatRowSection(label: String, stats: TeamStats) {
-    Column {
-        Text(
-            text = label.uppercase(),
-            color = CardTextMuted,
-            style = MaterialTheme.typography.labelSmall,
-            letterSpacing = 1.sp
-        )
-        Spacer(Modifier.height(4.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            StatCell(value = "${stats.possession}%", label = "Possession")
-            StatCell(value = "${stats.shots}", label = "Shots")
-            StatCell(value = "${stats.shotsOnTarget}", label = "On Target")
-        }
-    }
-}
-
-@Composable
-private fun StatCell(value: String, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = value,
-            color = CardTextPrimary,
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = label,
-            color = CardTextMuted,
-            style = MaterialTheme.typography.labelSmall
-        )
     }
 }
 
@@ -264,62 +242,82 @@ fun HeadlineQuoteCanvas(
 ) {
     CardBackground(
         config = config,
-        modifier = modifier.aspectRatio(1f)
+        modifier = modifier.aspectRatio(4f / 5f)
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp)
         ) {
-            // Decorative large quote mark via Canvas
-            Canvas(modifier = Modifier.size(80.dp)) {
-                drawQuoteMark(this, color = Color.White.copy(alpha = 0.15f))
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(Modifier.height(32.dp))
-
+            // Top branding
+            Text(
+                text = "HEADLINE",
+                color = CardTextMuted,
+                style = MaterialTheme.typography.labelSmall,
+                letterSpacing = 3.sp
+            )
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // The Quote
+            Row(modifier = Modifier.fillMaxWidth()) {
+                // Large quote mark graphic
+                Canvas(modifier = Modifier.size(32.dp)) {
+                    val w = size.width
+                    val h = size.height
+                    val stroke = Stroke(width = 4.dp.toPx())
+                    
+                    drawArc(
+                        color = Color(0xFFFFD100), // Gold accent
+                        startAngle = 180f, sweepAngle = 180f,
+                        useCenter = false,
+                        topLeft = Offset(0f, 0f),
+                        size = Size(w * 0.4f, h * 0.5f),
+                        style = stroke
+                    )
+                    drawArc(
+                        color = Color(0xFFFFD100),
+                        startAngle = 180f, sweepAngle = 180f,
+                        useCenter = false,
+                        topLeft = Offset(w * 0.5f, 0f),
+                        size = Size(w * 0.4f, h * 0.5f),
+                        style = stroke
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
                 Text(
-                    text = "\u201C${data.headline}\u201D",
+                    text = data.headline.uppercase(),
                     color = CardTextPrimary,
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Black,
                         lineHeight = 36.sp
-                    ),
-                    textAlign = TextAlign.Center
+                    )
                 )
-
+            }
+            
+            Spacer(modifier = Modifier.weight(0.5f))
+            
+            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 16.dp))
+            
+            // Bottom Section: Context (Left)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = data.source.uppercase(),
+                    color = CardTextPrimary,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
                 if (data.subtext.isNotBlank()) {
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = data.subtext,
                         color = CardTextSecondary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
-            }
-
-            // Source credit at bottom-right
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomEnd
-            ) {
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = data.source.uppercase(),
-                        color = CardTextMuted,
-                        style = MaterialTheme.typography.labelSmall,
-                        letterSpacing = 1.5.sp
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    CardFooter()
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+                CardFooter()
             }
         }
     }
@@ -371,105 +369,101 @@ fun PlayerSpotlightCanvas(
     config: CardConfig,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .aspectRatio(4f / 5f) // Portrait
-            .background(GradientBuilder.vertical(config.colorPair))
+    CardBackground(
+        config = config,
+        modifier = modifier.aspectRatio(4f / 5f) // Portrait
     ) {
-        // Gallery background image
-        if (config.backgroundBitmap != null) {
-            Image(
-                bitmap = config.backgroundBitmap.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
-
-        // Dark scrim for legibility
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(GradientBuilder.darkScrim)
-        )
-
-        // Rating badge: top-right
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
-        ) {
-            RatingBadge(rating = data.rating)
-        }
-
-        // Player info: bottom overlay
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .fillMaxSize()
+                .padding(24.dp)
         ) {
+            // Top branding
             Text(
-                text = data.position.uppercase(),
+                text = "PLAYER SPOTLIGHT",
                 color = CardTextMuted,
                 style = MaterialTheme.typography.labelSmall,
-                letterSpacing = 2.sp
+                letterSpacing = 3.sp
             )
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // The Player Name (Center Stage if no photo)
             Text(
-                text = data.playerName,
+                text = data.playerName.uppercase(),
                 color = CardTextPrimary,
-                style = MaterialTheme.typography.displaySmall.copy(
-                    fontWeight = FontWeight.Black
-                ),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = data.club.uppercase(),
-                color = CardTextSecondary,
-                style = MaterialTheme.typography.titleSmall
-            )
-
-            Divider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
-
-            // Stats row: goals and assists
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                StatCell(value = "${data.goals}", label = "Goals")
-                StatCell(value = "${data.assists}", label = "Assists")
-                Spacer(Modifier.width(1.dp)) // padding filler
-            }
-
-            if (data.keyQuote.isNotBlank() && data.keyQuote != "—") {
-                Text(
-                    text = "\u201C${data.keyQuote}\u201D",
-                    color = CardTextSecondary,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
+                style = MaterialTheme.typography.displayMedium.copy(
+                    fontWeight = FontWeight.Black,
+                    lineHeight = 48.sp
                 )
-            }
-
-            CardFooter()
-        }
-    }
-}
-
-@Composable
-private fun RatingBadge(rating: Float) {
-    Box(
-        modifier = Modifier
-            .background(
-                color = Color(0xFFFFD100),
-                shape = RoundedCornerShape(0.dp)
             )
-            .padding(horizontal = 10.dp, vertical = 6.dp)
-    ) {
-        Text(
-            text = String.format("%.1f", rating),
-            color = Color.Black,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black)
-        )
+            
+            Spacer(modifier = Modifier.weight(0.5f))
+            
+            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 16.dp))
+            
+            // Bottom Section: Context (Left) and Stats (Right)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                // Author/Context Info
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = data.club.uppercase(),
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = data.position.uppercase(),
+                        color = CardTextMuted,
+                        style = MaterialTheme.typography.labelSmall,
+                        letterSpacing = 1.sp
+                    )
+                    if (data.keyQuote.isNotBlank() && data.keyQuote != "—") {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "\u201C${data.keyQuote}\u201D",
+                            color = CardTextSecondary,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    CardFooter()
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                // 3 Key Stats
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    val stats = listOf(
+                        StatItem(label = "Gl", value = "${data.goals}", context = ""),
+                        StatItem(label = "Ast", value = "${data.assists}", context = ""),
+                        StatItem(label = "Rat", value = String.format("%.1f", data.rating), context = "")
+                    )
+                    stats.forEach { stat ->
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = stat.value,
+                                color = Color(0xFFFFD100), // Gold
+                                fontSize = 32.sp,
+                                fontWeight = FontWeight.Black,
+                                lineHeight = 32.sp
+                            )
+                            Text(
+                                text = stat.label.uppercase(),
+                                color = CardTextSecondary,
+                                style = MaterialTheme.typography.labelSmall,
+                                letterSpacing = 1.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -486,77 +480,72 @@ fun TopStatsCanvas(
     config: CardConfig,
     modifier: Modifier = Modifier
 ) {
-    // Accent colors alternating per row
-    val accents = listOf(
-        Color(0xFFFF4500), // International Orange
-        Color(0xFFFFD100), // Gold
-        Color(0xFF00C853)  // Sharp Green
-    )
-
     CardBackground(
         config = config,
-        modifier = modifier.aspectRatio(1f)
+        modifier = modifier.aspectRatio(4f / 5f)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+                .padding(24.dp)
         ) {
+            // Top branding
             Text(
                 text = "TOP STATS",
                 color = CardTextMuted,
                 style = MaterialTheme.typography.labelSmall,
                 letterSpacing = 3.sp
             )
-
-            Spacer(Modifier.height(8.dp))
-
-            data.stats.forEachIndexed { index, item ->
-                StatRowCard(
-                    item = item,
-                    accent = accents.getOrElse(index) { accents[0] }
-                )
-                if (index < data.stats.size - 1) {
-                    Divider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // Center Content: Huge graphic or just leave blank if there's a photo
+            
+            Spacer(modifier = Modifier.weight(0.5f))
+            
+            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 16.dp))
+            
+            // Bottom Section: Context (Left) and Stats (Right)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                // Context Info
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "MATCH STATS",
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    CardFooter()
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                // 3 Key Stats
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    data.stats.forEach { stat ->
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = stat.value,
+                                color = Color(0xFFFFD100), // Gold
+                                fontSize = 32.sp,
+                                fontWeight = FontWeight.Black,
+                                lineHeight = 32.sp
+                            )
+                            Text(
+                                text = stat.label.uppercase(),
+                                color = CardTextSecondary,
+                                style = MaterialTheme.typography.labelSmall,
+                                letterSpacing = 1.sp
+                            )
+                        }
+                    }
                 }
             }
-
-            Spacer(Modifier.weight(1f))
-            CardFooter()
         }
-    }
-}
-
-@Composable
-private fun StatRowCard(item: StatItem, accent: Color) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = item.label.uppercase(),
-                color = CardTextSecondary,
-                style = MaterialTheme.typography.labelMedium,
-                letterSpacing = 1.sp
-            )
-            if (item.context.isNotBlank()) {
-                Text(
-                    text = item.context,
-                    color = CardTextMuted,
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
-        }
-        Text(
-            text = item.value,
-            color = accent,
-            fontSize = 48.sp,
-            fontWeight = FontWeight.Black,
-            lineHeight = 48.sp
-        )
     }
 }
 
@@ -572,6 +561,132 @@ private fun CardFooter() {
         style = MaterialTheme.typography.labelSmall,
         letterSpacing = 3.sp
     )
+}
+
+// ──────────────────────────────────────────────────────────────
+// 5. NBA STYLE CANVAS
+// ──────────────────────────────────────────────────────────────
+
+/**
+ * NBA Style Quote card.
+ * Features a large, punchy quote taking center stage, with the author
+ * info on bottom-left and 3 key stats explicitly called out on bottom-right.
+ */
+@Composable
+fun NbaStyleCanvas(
+    data: CardData.NbaStyleQuote,
+    config: CardConfig,
+    modifier: Modifier = Modifier
+) {
+    CardBackground(
+        config = config,
+        modifier = modifier.aspectRatio(4f / 5f) // Portrait
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+        ) {
+            // Top branding
+            Text(
+                text = "PLAYER QUOTE",
+                color = CardTextMuted,
+                style = MaterialTheme.typography.labelSmall,
+                letterSpacing = 3.sp
+            )
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // The Quote
+            Row(modifier = Modifier.fillMaxWidth()) {
+                // Large quote mark graphic
+                Canvas(modifier = Modifier.size(32.dp)) {
+                    val w = size.width
+                    val h = size.height
+                    val stroke = Stroke(width = 4.dp.toPx())
+                    
+                    drawArc(
+                        color = Color(0xFFFFD100), // Gold accent
+                        startAngle = 180f, sweepAngle = 180f,
+                        useCenter = false,
+                        topLeft = Offset(0f, 0f),
+                        size = Size(w * 0.4f, h * 0.5f),
+                        style = stroke
+                    )
+                    drawArc(
+                        color = Color(0xFFFFD100),
+                        startAngle = 180f, sweepAngle = 180f,
+                        useCenter = false,
+                        topLeft = Offset(w * 0.5f, 0f),
+                        size = Size(w * 0.4f, h * 0.5f),
+                        style = stroke
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                Text(
+                    text = data.quote.uppercase(),
+                    color = CardTextPrimary,
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Black,
+                        lineHeight = 36.sp
+                    )
+                )
+            }
+            
+            Spacer(modifier = Modifier.weight(0.5f))
+            
+            Divider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 16.dp))
+            
+            // Bottom Section: Author (Left) and Stats (Right)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                // Author Info
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = data.authorName,
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = data.authorContext.uppercase(),
+                        color = CardTextMuted,
+                        style = MaterialTheme.typography.labelSmall,
+                        letterSpacing = 1.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    CardFooter()
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                // 3 Key Stats
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    data.stats.forEach { stat ->
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = stat.value,
+                                color = Color(0xFFFFD100), // Gold
+                                fontSize = 32.sp,
+                                fontWeight = FontWeight.Black,
+                                lineHeight = 32.sp
+                            )
+                            Text(
+                                text = stat.label.uppercase(),
+                                color = CardTextSecondary,
+                                style = MaterialTheme.typography.labelSmall,
+                                letterSpacing = 1.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -643,6 +758,26 @@ private fun PreviewTopStats() {
                     StatItem(label = "Possession", value = "67%", context = "JDT dominated the match"),
                     StatItem(label = "Shots", value = "24", context = "14 on target"),
                     StatItem(label = "Saves", value = "11", context = "Best goalkeeper of the match")
+                )
+            ),
+            config = CardConfig()
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "NBA Style Card")
+@Composable
+private fun PreviewNbaStyle() {
+    SocurateTheme {
+        NbaStyleCanvas(
+            data = CardData.NbaStyleQuote(
+                quote = "We controlled the game but failed to finish our chances.",
+                authorName = "Arif Aiman",
+                authorContext = "JDT Winger",
+                stats = listOf(
+                    StatItem(label = "Gl", value = "1", context = ""),
+                    StatItem(label = "As", value = "2", context = ""),
+                    StatItem(label = "Rat", value = "8.5", context = "")
                 )
             ),
             config = CardConfig()

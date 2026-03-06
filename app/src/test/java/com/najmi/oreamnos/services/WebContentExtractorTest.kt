@@ -35,22 +35,21 @@ class WebContentExtractorTest {
 
     @Test
     fun `test full cleanup logic simulation`() {
+        // App's cleanContent approach:
+        // 1. HORIZONTAL_WHITESPACE_PATTERN: Replace [ \t]+ with " "
+        // 2. NEWLINES_PATTERN: Replace (?:\n\s*){3,} with "\n\n"
+        // 3. trim()
         val content = "Paragraph 1.   \n\n   Paragraph 2.\n\n\nParagraph 3."
 
-        // 1. Replace horizontal whitespace
         var cleaned = HORIZONTAL_WHITESPACE_PATTERN.matcher(content).replaceAll(" ")
-
-        // 2. Reduce multiple newlines
         cleaned = NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n")
+        cleaned = cleaned.trim()
 
-        // We expect: "Paragraph 1. \n\n Paragraph 2.\n\nParagraph 3."
-        // Note: The spaces before/after newlines might remain as single spaces depending on exact regex match,
-        // but the key is that newlines exist.
-
+        // "Paragraph 1. \n\n Paragraph 2.\n\nParagraph 3."
         assertTrue("Output should contain newlines", cleaned.contains("\n"))
 
-        // Verify specifically that we have 3 paragraphs separated by newlines
-        val paragraphs = cleaned.split("\n+")
+        // When splitting by 2 or more newlines, we should get 3 paragraphs
+        val paragraphs = cleaned.split(Regex("\\n{2,}"))
         assertEquals("Should have 3 paragraphs", 3, paragraphs.size)
     }
 }

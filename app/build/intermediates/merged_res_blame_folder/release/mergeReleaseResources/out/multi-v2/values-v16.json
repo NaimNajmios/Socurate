@@ -1,0 +1,38 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.najmi.oreamnos.app-mergeReleaseResources-62:/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\789747e16abeb4d1ce2bf836353a844a\\transformed\\core-1.12.0\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\218776c5ea69f9e66b4cbc140bc1a1ee\\transformed\\appcompat-1.6.1\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "5",
+                        "endColumns": "12",
+                        "endOffsets": "223"
+                    },
+                    "to": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "121",
+                        "endLines": "6",
+                        "endColumns": "12",
+                        "endOffsets": "289"
+                    }
+                }
+            ]
+        }
+    ]
+}

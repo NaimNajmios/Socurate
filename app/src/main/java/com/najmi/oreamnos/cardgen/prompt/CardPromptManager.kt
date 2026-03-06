@@ -15,7 +15,7 @@ object CardPromptManager {
         "Your ONLY output must be a single valid JSON object. " +
         "Do NOT include any explanation, preamble, markdown, code fences, or text outside the JSON. " +
         "Start your response with { and end it with }. " +
-        "Use English for all extracted text values unless the source text includes proper nouns."
+        "CRITICAL RULE: Translate ALL extracted text values into Malaysian Malay (Bahasa Malaysia) EXCEPT for proper nouns like player names, club names, or tournament acronyms."
 
     fun buildPrompt(template: CardTemplate, articleText: String): String {
         val schema = when (template) {
@@ -23,6 +23,7 @@ object CardPromptManager {
             CardTemplate.PlayerSpotlight -> playerSpotlightSchema()
             CardTemplate.HeadlineQuote -> headlineQuoteSchema()
             CardTemplate.TopStats -> topStatsSchema()
+            CardTemplate.NbaStyleQuote -> nbaStyleQuoteSchema()
         }
         return "$schema\n\nARTICLE:\n$articleText\n\nRespond with ONLY the JSON object, starting with {"
     }
@@ -34,7 +35,7 @@ object CardPromptManager {
 
     private fun matchResultSchema(): String = """
         Extract match result data from the football article below.
-        Return ONLY a JSON object with this exact structure (fill in real values):
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia):
         {
           "homeTeam": "Team Name",
           "awayTeam": "Team Name",
@@ -44,42 +45,57 @@ object CardPromptManager {
           "matchDate": "DD Mon YYYY",
           "homeStats": { "possession": 50, "shots": 0, "shotsOnTarget": 0 },
           "awayStats": { "possession": 50, "shots": 0, "shotsOnTarget": 0 },
-          "keyMoment": "One sentence describing the key moment of the match (max 80 chars)"
+          "keyMoment": "Satu ayat menerangkan detik penting perlawanan (maks 80 aksara)"
         }
     """.trimIndent()
 
     private fun playerSpotlightSchema(): String = """
         Extract the standout player's data from the football article below.
-        Return ONLY a JSON object with this exact structure (fill in real values):
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia):
         {
           "playerName": "Full Name",
           "club": "Club Name",
-          "position": "Position",
+          "position": "Posisi Pemain (Bahasa Melayu)",
           "rating": 7.5,
           "goals": 0,
           "assists": 0,
-          "keyQuote": "One sentence describing the player's performance (max 100 chars)"
+          "keyQuote": "Satu ayat menerangkan prestasi pemain tersebut (maks 100 aksara)"
         }
     """.trimIndent()
 
     private fun headlineQuoteSchema(): String = """
         Extract the single most impactful headline or quote from the football article below.
-        Return ONLY a JSON object with this exact structure (fill in real values):
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia):
         {
-          "headline": "The main headline or quote (max 120 chars)",
-          "subtext": "A brief supporting context (max 60 chars)",
-          "source": "Publication or platform name"
+          "headline": "Tajuk utama atau petikan paling penting (maks 120 aksara)",
+          "subtext": "Satu perenggan sokongan ringkas (maks 60 aksara)",
+          "source": "Nama julukan sumber / majalah"
         }
     """.trimIndent()
 
     private fun topStatsSchema(): String = """
         Extract the 3 most interesting statistics from the football article below.
-        Return ONLY a JSON object with this exact structure (fill in real values):
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia):
         {
           "stats": [
-            { "label": "Stat name (max 30 chars)", "value": "Numeric value", "context": "Brief context (max 50 chars)" },
-            { "label": "Stat name (max 30 chars)", "value": "Numeric value", "context": "Brief context (max 50 chars)" },
-            { "label": "Stat name (max 30 chars)", "value": "Numeric value", "context": "Brief context (max 50 chars)" }
+            { "label": "Nama stat (maks 30 aksara)", "value": "Nilai nombor", "context": "Konteks ringkas (maks 50 aksara)" },
+            { "label": "Nama stat (maks 30 aksara)", "value": "Nilai nombor", "context": "Konteks ringkas (maks 50 aksara)" },
+            { "label": "Nama stat (maks 30 aksara)", "value": "Nilai nombor", "context": "Konteks ringkas (maks 50 aksara)" }
+          ]
+        }
+    """.trimIndent()
+
+    private fun nbaStyleQuoteSchema(): String = """
+        Extract a short, punchy quote from the football article below, along with the speaker's core stats.
+        Return ONLY a JSON object with this exact structure (fill in real values, write text in Bahasa Malaysia):
+        {
+          "quote": "Petikan kata-kata ringkas dan menarik (maks 100 aksara)",
+          "authorName": "Nama Pendek (cth. M. Salah)",
+          "authorContext": "Konteks pendek (cth. Penyerang Liverpool)",
+          "stats": [
+            { "label": "Nama stat ringkas", "value": "Nilai", "context": "" },
+            { "label": "Nama stat ringkas", "value": "Nilai", "context": "" },
+            { "label": "Nama stat ringkas", "value": "Nilai", "context": "" }
           ]
         }
     """.trimIndent()

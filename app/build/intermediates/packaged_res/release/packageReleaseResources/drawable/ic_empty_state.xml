@@ -1,0 +1,51 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Background circle -->
+    <path
+        android:fillColor="#1A6366F1"
+        android:pathData="M100,100m-80,0a80,80 0,1 1,160 0a80,80 0,1 1,-160 0" />
+    
+    <!-- Document icon -->
+    <path
+        android:fillColor="#6366F1"
+        android:pathData="M75,55 L115,55 L130,70 L130,145 L75,145 Z"
+        android:strokeWidth="2"
+        android:strokeColor="#6366F1" />
+    
+    <path
+        android:fillColor="#8B5CF6"
+        android:pathData="M115,55 L115,70 L130,70 Z" />
+    
+    <!-- Content lines -->
+    <path
+        android:strokeColor="#A5B4FC"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M85,85 L120,85" />
+    
+    <path
+        android:strokeColor="#C4B5FD"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M85,100 L115,100" />
+    
+    <path
+        android:strokeColor="#C4B5FD"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M85,115 L110,115" />
+    
+    <!-- Sparkle accents -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M145,45 L148,52 L155,55 L148,58 L145,65 L142,58 L135,55 L142,52 Z" />
+    
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M55,130 L57,135 L62,137 L57,139 L55,144 L53,139 L48,137 L53,135 Z" />
+    
+</vector>

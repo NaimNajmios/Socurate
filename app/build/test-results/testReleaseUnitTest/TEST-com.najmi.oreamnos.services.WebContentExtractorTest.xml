@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.najmi.oreamnos.services.WebContentExtractorTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-03-06T10:22:56" hostname="NAJMI" time="0.031">
+  <properties/>
+  <testcase name="test whitespace pattern preserves newlines" classname="com.najmi.oreamnos.services.WebContentExtractorTest" time="0.02"/>
+  <testcase name="test whitespace pattern collapses multiple spaces" classname="com.najmi.oreamnos.services.WebContentExtractorTest" time="0.001"/>
+  <testcase name="test full cleanup logic simulation" classname="com.najmi.oreamnos.services.WebContentExtractorTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -55,6 +55,17 @@ sealed class CardData {
     data class TopStats(
         val stats: List<StatItem>
     ) : CardData()
+
+    /**
+     * Data for the NBA Style Quote card.
+     * Contains a short punchy quote from a player, their name, and 3 key stats (like PTS, REB, AST for basketball, or G, A, Rating for football).
+     */
+    data class NbaStyleQuote(
+        val quote: String,
+        val authorName: String,
+        val authorContext: String,
+        val stats: List<StatItem>
+    ) : CardData()
 }
 
 /**

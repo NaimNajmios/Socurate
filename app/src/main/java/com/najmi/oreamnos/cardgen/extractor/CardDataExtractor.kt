@@ -130,6 +130,7 @@ class CardDataExtractor(private val context: Context) {
             CardTemplate.PlayerSpotlight -> parsePlayerSpotlight(obj)
             CardTemplate.HeadlineQuote -> parseHeadlineQuote(obj)
             CardTemplate.TopStats -> parseTopStats(obj)
+            CardTemplate.NbaStyleQuote -> parseNbaStyleQuote(obj)
         }
     }
 
@@ -244,6 +245,38 @@ class CardDataExtractor(private val context: Context) {
         }
 
         return CardData.TopStats(stats = items)
+    }
+
+    private fun parseNbaStyleQuote(obj: JsonObject): CardData.NbaStyleQuote {
+        val statsArray = try {
+            obj.getAsJsonArray("stats")
+        } catch (e: Exception) {
+            null
+        }
+
+        val items = mutableListOf<StatItem>()
+        if (statsArray != null) {
+            for (i in 0 until minOf(statsArray.size(), 3)) {
+                val item = statsArray[i]?.asJsonObject
+                items.add(
+                    StatItem(
+                        label = item.optString("label", "Stat ${i + 1}"),
+                        value = item.optString("value", ZERO_STR),
+                        context = item.optString("context", "")
+                    )
+                )
+            }
+        }
+        while (items.size < 3) {
+            items.add(StatItem(label = "Stat ${items.size + 1}", value = ZERO_STR, context = ""))
+        }
+
+        return CardData.NbaStyleQuote(
+            quote = obj.optString("quote", UNKNOWN),
+            authorName = obj.optString("authorName", UNKNOWN),
+            authorContext = obj.optString("authorContext", ""),
+            stats = items
+        )
     }
 
     private fun parseTeamStats(obj: JsonObject?): TeamStats {

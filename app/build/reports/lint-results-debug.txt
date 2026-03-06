@@ -1,0 +1,1666 @@
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\java\com\najmi\oreamnos\cardgen\renderer\CardCanvas.kt:445: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                        StatItem(label = "Rat", value = String.format("%.1f", data.rating), context = "")
+                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\java\com\najmi\oreamnos\MainActivity.kt:1278: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                Text("GRADE: ${String.format("%.1f", gradeLevel)}", style = MaterialTheme.typography.labelMedium)
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\java\com\najmi\oreamnos\SessionListActivity.kt:183: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                        String.format("%,d", session.totalTokens) 
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\java\com\najmi\oreamnos\ShareBottomSheetFragment.kt:420: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    Text("Grade: ${String.format("%.1f", gradeLevel)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "DefaultLocale":
+   Calling String#toLowerCase() or #toUpperCase() without specifying an
+   explicit locale is a common source of bugs. The reason for that is that
+   those methods will use the current locale on the user's device, and even
+   though the code appears to work correctly when you are developing the app,
+   it will fail in some locales. For example, in the Turkish locale, the
+   uppercase replacement for i is not I.
+
+   If you want the methods to just perform ASCII replacement, for example to
+   convert an enum name, call String#toUpperCase(Locale.ROOT) instead. If you
+   really want to use the current locale, call
+   String#toUpperCase(Locale.getDefault()) instead.
+
+   https://developer.android.com/reference/java/util/Locale.html#default_locale
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values-night\themes.xml:45: Error: android:windowLightNavigationBar requires API level 27 (current min is 26) [NewApi]
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">false</item>
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\themes.xml:45: Error: android:windowLightNavigationBar requires API level 27 (current min is 26) [NewApi]
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">false</item>
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:48: Error: android:lineHeight requires API level 28 (current min is 24) [NewApi]
+        <item name="android:lineHeight">24sp</item>
+              ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:54: Error: android:lineHeight requires API level 28 (current min is 24) [NewApi]
+        <item name="android:lineHeight">20sp</item>
+              ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:60: Error: android:lineHeight requires API level 28 (current min is 24) [NewApi]
+        <item name="android:lineHeight">16sp</item>
+              ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "NewApi":
+   This check scans through all the Android API calls in the application and
+   warns about any calls that are not available on all versions targeted by
+   this application (according to its minimum SDK attribute in the manifest).
+
+   If you really want to use this API and don't need to support older devices
+   just set the minSdkVersion in your build.gradle or AndroidManifest.xml
+   files.
+
+   If your code is deliberately accessing newer APIs, and you have ensured
+   (e.g. with conditional execution) that this code will only ever be called
+   on a supported platform, then you can annotate your class or method with
+   the @TargetApi annotation specifying the local minimum SDK to apply, such
+   as @TargetApi(11), such that this check considers 11 rather than your
+   manifest file's minimum SDK as the required API level.
+
+   If you are deliberately setting android: attributes in style definitions,
+   make sure you place this in a values-vNN folder in order to avoid running
+   into runtime conflicts on certain devices where manufacturers have added
+   custom attributes whose ids conflict with the new ones on later platforms.
+
+   Similarly, you can use tools:targetApi="11" in an XML file to indicate that
+   the element will only be inflated in an adequate context.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
+        targetSdk 34
+        ~~~~~~~~~~~~
+
+   Explanation for issues of type "OldTargetApi":
+   When your application runs on a version of Android that is more recent than
+   your targetSdkVersion specifies that it has been tested with, various
+   compatibility modes kick in. This ensures that your application continues
+   to work, but it may look out of place. For example, if the targetSdkVersion
+   is less than 14, your app may get an option button in the UI.
+
+   To fix this issue, set the targetSdkVersion to the highest available value.
+   Then test your app to make sure everything works correctly. You may want to
+   consult the compatibility notes to see what changes apply to each version
+   you are adding support for:
+   https://developer.android.com/reference/android/os/Build.VERSION_CODES.html
+   as well as follow this guide:
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.
+   html
+
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.html
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:92: Warning: Attribute tooltipText is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+                            android:tooltipText="@string/reset_all"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:190: Warning: Attribute tooltipText is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+                                android:tooltipText="@string/close_preview"
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\layout_empty_state.xml:50: Warning: Attribute lineHeight is only used in API level 28 and higher (current min is 24) [UnusedAttribute]
+            android:lineHeight="20sp"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedAttribute":
+   This check finds attributes set in XML files that were introduced in a
+   version newer than the oldest version targeted by your application (with
+   the minSdkVersion attribute).
+
+   This is not an error; the application will simply ignore the attribute.
+   However, if the attribute is important to the appearance or functionality
+   of your application, you should consider finding an alternative way to
+   achieve the same result with only available attributes, and then you can
+   optionally create a copy of the layout in a layout-vNN folder which will be
+   used on API NN or higher where you can take advantage of the newer
+   attribute.
+
+   Note: This check does not only apply to attributes. For example, some tags
+   can be unused too, such as the new <tag> element in layouts introduced in
+   API 21.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:25: Warning: Redundant label can be removed [RedundantLabel]
+            android:label="@string/app_name"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "RedundantLabel":
+   When an activity does not have a label attribute, it will use the one from
+   the application tag. Since the application has already specified the same
+   label, the label on this activity can be omitted.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:11: Warning: Your app is currently not handling Selected Photos Access introduced in Android 14+ [SelectedPhotoAccess]
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SelectedPhotoAccess":
+   Selected Photo Access is a new ability for users to share partial access to
+   their photo library when apps request access to their device storage on
+   Android 14+.
+
+   Instead of letting the system manage the selection lifecycle, we recommend
+   you adapt your app to handle partial access to the photo library.
+
+   https://developer.android.com/about/versions/14/changes/partial-photo-video-access
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:44: Warning: A newer version of androidx.appcompat:appcompat than 1.6.1 is available: 1.7.1 [GradleDependency]
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:45: Warning: A newer version of com.google.android.material:material than 1.11.0 is available: 1.13.0 [GradleDependency]
+    implementation 'com.google.android.material:material:1.11.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:46: Warning: A newer version of androidx.constraintlayout:constraintlayout than 2.1.4 is available: 2.2.1 [GradleDependency]
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:47: Warning: A newer version of androidx.core:core-ktx than 1.12.0 is available: 1.17.0 [GradleDependency]
+    implementation 'androidx.core:core-ktx:1.12.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:50: Warning: A newer version of androidx.lifecycle:lifecycle-viewmodel than 2.7.0 is available: 2.10.0 [GradleDependency]
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.7.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:51: Warning: A newer version of androidx.lifecycle:lifecycle-livedata than 2.7.0 is available: 2.10.0 [GradleDependency]
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.7.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:54: Warning: A newer version of androidx.security:security-crypto than 1.1.0-alpha06 is available: 1.1.0 [GradleDependency]
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:72: Warning: A newer version of androidx.compose:compose-bom than 2024.02.00 is available: 2026.02.01 [GradleDependency]
+    def composeBom = platform('androidx.compose:compose-bom:2024.02.00')
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:72: Warning: A newer version of androidx.compose:compose-bom than 2024.02.00 is available: 2026.02.01 [GradleDependency]
+    def composeBom = platform('androidx.compose:compose-bom:2024.02.00')
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:85: Warning: A newer version of androidx.activity:activity-compose than 1.8.2 is available: 1.12.4 [GradleDependency]
+    implementation 'androidx.activity:activity-compose:1.8.2'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:88: Warning: A newer version of androidx.lifecycle:lifecycle-viewmodel-compose than 2.7.0 is available: 2.10.0 [GradleDependency]
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:91: Warning: A newer version of androidx.navigation:navigation-compose than 2.7.7 is available: 2.9.7 [GradleDependency]
+    implementation 'androidx.navigation:navigation-compose:2.7.7'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:98: Warning: A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.3.0 [GradleDependency]
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:99: Warning: A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.7.0 [GradleDependency]
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\java\com\najmi\oreamnos\ui\components\NeoCopyButton.kt:48: Warning: Modifier parameter should be the first optional parameter [ModifierParameter from androidx.compose.ui]
+    modifier: Modifier = Modifier,
+    ~~~~~~~~
+
+   Explanation for issues of type "ModifierParameter":
+   The first (or only) Modifier parameter in a Composable function should
+   follow the following rules:
+   - Be named modifier
+   - Have a type of Modifier
+   - Either have no default value, or have a default value of Modifier
+   - If optional, be the first optional parameter in the parameter list
+
+   Vendor: Jetpack Compose
+   Identifier: androidx.compose.ui
+   Feedback: https://issuetracker.google.com/issues/new?component=612128
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\java\com\najmi\oreamnos\SettingsActivity.kt:204: Error: remember calls must not return Unit [RememberReturnType from androidx.compose.runtime]
+    remember(provider) {
+    ~~~~~~~~
+
+   Explanation for issues of type "RememberReturnType":
+   A call to remember that returns Unit is always an error. This typically
+   happens when using remember to mutate variables on an object. remember is
+   executed during the composition, which means that if the composition fails
+   or is happening on a separate thread, the mutated variables may not reflect
+   the true state of the composition. Instead, use SideEffect to make deferred
+   changes once the composition succeeds, or mutate MutableState backed
+   variables directly, as these will handle composition failure for you.
+
+   Vendor: Jetpack Compose
+   Identifier: androidx.compose.runtime
+   Feedback: https://issuetracker.google.com/issues/new?component=612128
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\fragment_share_bottom_sheet.xml:46: Error: Must use app:tint instead of android:tint [UseAppTint from androidx.appcompat]
+            android:tint="?attr/colorOnSurfaceVariant" />
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\fragment_share_bottom_sheet.xml:120: Error: Must use app:tint instead of android:tint [UseAppTint from androidx.appcompat]
+                            android:tint="?attr/colorOnSurfaceVariant" />
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UseAppTint":
+   ImageView or ImageButton uses android:tint instead of app:tint
+
+   Vendor: Android Open Source Project
+   Identifier: androidx.appcompat
+   Feedback: https://issuetracker.google.com/issues/new?component=460343
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:161: Warning: Use app:drawableStartCompat instead of android:drawableStart [UseCompatTextViewDrawableXml from androidx.appcompat]
+                    android:drawableStart="@drawable/ic_clear"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UseCompatTextViewDrawableXml":
+   TextView uses android: compound drawable attributes instead of app: ones
+
+   Vendor: Android Open Source Project
+   Identifier: androidx.appcompat
+   Feedback: https://issuetracker.google.com/issues/new?component=460343
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\java\com\najmi\oreamnos\services\GenerateTileService.kt:21: Warning: Unnecessary; SDK_INT is always >= 24 [ObsoleteSdkInt]
+@RequiresApi(api = Build.VERSION_CODES.N)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values-night\themes.xml:41: Warning: Unnecessary; SDK_INT is always >= 23 [ObsoleteSdkInt]
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+                                                  ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\themes.xml:41: Warning: Unnecessary; SDK_INT is always >= 23 [ObsoleteSdkInt]
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+                                                  ~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "ObsoleteSdkInt":
+   This check flags version checks that are not necessary, because the
+   minSdkVersion (or surrounding known API level) is already at least as high
+   as the version checked for.
+
+   Similarly, it also looks for resources in -vNN folders, such as values-v14
+   where the version qualifier is less than or equal to the minSdkVersion,
+   where the contents should be merged into the best folder.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:213: Warning: This tag and its children can be replaced by one <TextView/> and a compound drawable [UseCompoundDrawables]
+            <LinearLayout
+             ~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:122: Warning: This tag and its children can be replaced by one <TextView/> and a compound drawable [UseCompoundDrawables]
+                        <LinearLayout
+                         ~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:186: Warning: This tag and its children can be replaced by one <TextView/> and a compound drawable [UseCompoundDrawables]
+                        <LinearLayout
+                         ~~~~~~~~~~~~
+
+   Explanation for issues of type "UseCompoundDrawables":
+   A LinearLayout which contains an ImageView and a TextView can be more
+   efficiently handled as a compound drawable (a single TextView, using the
+   drawableTop, drawableLeft, drawableRight and/or drawableBottom attributes
+   to draw one or more images adjacent to the text).
+
+   If the two widgets are offset from each other with margins, this can be
+   replaced with a drawablePadding attribute.
+
+   There's a lint quickfix to perform this conversion in the Eclipse plugin.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_settings.xml:9: Warning: Very long vector path (905 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector. [VectorPath]
+        android:pathData="M19.14,12.94c0.04,-0.31 0.06,-0.63 0.06,-0.94c0,-0.31 -0.02,-0.63 -0.06,-0.94l2.03,-1.58c0.18,-0.14 0.23,-0.41 0.12,-0.61l-1.92,-3.32c-0.12,-0.22 -0.37,-0.29 -0.59,-0.22l-2.39,0.96c-0.5,-0.38 -1.03,-0.7 -1.62,-0.94L14.4,2.81c-0.04,-0.24 -0.24,-0.41 -0.48,-0.41h-3.84c-0.24,0 -0.43,0.17 -0.47,0.41L9.25,5.35C8.66,5.59 8.12,5.92 7.63,6.29L5.24,5.33c-0.22,-0.08 -0.47,0 -0.59,0.22L2.74,8.87C2.62,9.08 2.66,9.34 2.86,9.48l2.03,1.58C4.84,11.37 4.8,11.69 4.8,12s0.02,0.63 0.06,0.94l-2.03,1.58c-0.18,0.14 -0.23,0.41 -0.12,0.61l1.92,3.32c0.12,0.22 0.37,0.29 0.59,0.22l2.39,-0.96c0.5,0.38 1.03,0.7 1.62,0.94l0.36,2.54c0.05,0.24 0.24,0.41 0.48,0.41h3.84c0.24,0 0.44,-0.17 0.47,-0.41l0.36,-2.54c0.59,-0.24 1.13,-0.56 1.62,-0.94l2.39,0.96c0.22,0.08 0.47,0 0.59,-0.22l1.92,-3.32c0.12,-0.22 0.07,-0.47 -0.12,-0.61L19.14,12.94zM12,15.6c-1.98,0 -3.6,-1.62 -3.6,-3.6s1.62,-3.6 3.6,-3.6s3.6,1.62 3.6,3.6S13.98,15.6 12,15.6z"/>
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "VectorPath":
+   Using long vector paths is bad for performance. There are several ways to
+   make the pathData shorter:
+   * Using less precision
+   * Removing some minor details
+   * Using the Android Studio vector conversion tool
+   * Rasterizing the image (converting to PNG)
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\java\com\najmi\oreamnos\ui\components\ResponseTimeChart.kt:52: Information: Prefer mutableFloatStateOf instead of mutableStateOf [AutoboxingStateCreation from androidx.compose.runtime]
+    var animationProgress by remember { mutableStateOf(0f) }
+                                        ~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\java\com\najmi\oreamnos\ui\components\SuccessRateChart.kt:54: Information: Prefer mutableFloatStateOf instead of mutableStateOf [AutoboxingStateCreation from androidx.compose.runtime]
+    var animationProgress by remember { mutableStateOf(0f) }
+                                        ~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\java\com\najmi\oreamnos\ui\components\TokenUsageChart.kt:56: Information: Prefer mutableFloatStateOf instead of mutableStateOf [AutoboxingStateCreation from androidx.compose.runtime]
+    var animationProgress by remember { mutableStateOf(0f) }
+                                        ~~~~~~~~~~~~~~
+
+   Explanation for issues of type "AutoboxingStateCreation":
+   Calling mutableStateOf<T>() when T is either backed by a primitive type on
+   the JVM or is a value class results in a state implementation that requires
+   all state values to be boxed. This usually causes an additional allocation
+   for each state write, and adds some additional work to auto-unbox values
+   when reading the value of the state. Instead, prefer to use a specialized
+   primitive state implementation for Int, Long, Float, and Double when the
+   state does not need to track null values and does not override the default
+   SnapshotMutationPolicy. See mutableIntStateOf(), mutableLongStateOf(),
+   mutableFloatStateOf(), and mutableDoubleStateOf() for more information.
+
+   Vendor: Jetpack Compose
+   Identifier: androidx.compose.runtime
+   Feedback: https://issuetracker.google.com/issues/new?component=612128
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:479: Warning: Set android:baselineAligned="false" on this element for better performance [DisableBaselineAlignment]
+                    <LinearLayout
+                     ~~~~~~~~~~~~
+
+   Explanation for issues of type "DisableBaselineAlignment":
+   When a LinearLayout is used to distribute the space proportionally between
+   nested layouts, the baseline alignment property should be turned off to
+   make the layout computation faster.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:7: Warning: Possible overdraw: Root element paints background ?android:attr/colorBackground with a theme that also paints a background (inferred theme is @style/Theme_Oreamnos) [Overdraw]
+    android:background="?android:attr/colorBackground"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_log_list.xml:6: Warning: Possible overdraw: Root element paints background ?android:attr/colorBackground with a theme that also paints a background (inferred theme is @style/Theme.Oreamnos) [Overdraw]
+    android:background="?android:attr/colorBackground">
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:7: Warning: Possible overdraw: Root element paints background ?android:attr/colorBackground with a theme that also paints a background (inferred theme is @style/Theme_Oreamnos) [Overdraw]
+    android:background="?android:attr/colorBackground"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_session_list.xml:6: Warning: Possible overdraw: Root element paints background ?android:attr/colorBackground with a theme that also paints a background (inferred theme is @style/Theme.Oreamnos) [Overdraw]
+    android:background="?android:attr/colorBackground">
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:7: Warning: Possible overdraw: Root element paints background ?android:attr/colorBackground with a theme that also paints a background (inferred theme is @style/Theme_Oreamnos) [Overdraw]
+    android:background="?android:attr/colorBackground"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:7: Warning: Possible overdraw: Root element paints background ?android:attr/colorBackground with a theme that also paints a background (inferred theme is @style/Theme_Oreamnos) [Overdraw]
+    android:background="?android:attr/colorBackground"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\fragment_share_bottom_sheet.xml:7: Warning: Possible overdraw: Root element paints background ?attr/colorSurface with a theme that also paints a background (inferred theme is @style/Theme.Oreamnos) [Overdraw]
+    android:background="?attr/colorSurface"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "Overdraw":
+   If you set a background drawable on a root view, then you should use a
+   custom theme where the theme background is null. Otherwise, the theme
+   background will be painted first, only to have your custom background
+   completely cover it; this is called "overdraw".
+
+   NOTE: This detector relies on figuring out which layouts are associated
+   with which activities based on scanning the Java code, and it's currently
+   doing that using an inexact pattern matching algorithm. Therefore, it can
+   incorrectly conclude which activity the layout is associated with and then
+   wrongly complain that a background-theme is hidden.
+
+   If you want your custom background on multiple pages, then you should
+   consider making a custom theme with your custom background and just using
+   that theme instead of a root element background.
+
+   Of course it's possible that your custom drawable is translucent and you
+   want it to be mixed with the background. However, you will get better
+   performance if you pre-mix the background with your drawable and use that
+   resulting image or color as a custom theme background instead.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:2: Warning: The resource R.layout.activity_hashtag_manager appears to be unused [UnusedResources]
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_log_list.xml:2: Warning: The resource R.layout.activity_log_list appears to be unused [UnusedResources]
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:2: Warning: The resource R.layout.activity_main appears to be unused [UnusedResources]
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_session_list.xml:2: Warning: The resource R.layout.activity_session_list appears to be unused [UnusedResources]
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:2: Warning: The resource R.layout.activity_settings appears to be unused [UnusedResources]
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_share_receiver.xml:2: Warning: The resource R.layout.activity_share_receiver appears to be unused [UnusedResources]
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:2: Warning: The resource R.layout.activity_usage appears to be unused [UnusedResources]
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\bar_top_rounded.xml:2: Warning: The resource R.drawable.bar_top_rounded appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\bottom_sheet_handle.xml:2: Warning: The resource R.drawable.bottom_sheet_handle appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\anim\button_press.xml:2: Warning: The resource R.anim.button_press appears to be unused [UnusedResources]
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\anim\button_release.xml:2: Warning: The resource R.anim.button_release appears to be unused [UnusedResources]
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\color\chip_background_selector.xml:2: Warning: The resource R.color.chip_background_selector appears to be unused [UnusedResources]
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\anim\chip_stagger_item.xml:3: Warning: The resource R.anim.chip_stagger_item appears to be unused [UnusedResources]
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\color\chip_text_color_selector.xml:2: Warning: The resource R.color.chip_text_color_selector appears to be unused [UnusedResources]
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\circle_indicator.xml:2: Warning: The resource R.drawable.circle_indicator appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:7: Warning: The resource R.color.background_light appears to be unused [UnusedResources]
+    <color name="background_light">#0B1120</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:8: Warning: The resource R.color.surface_light appears to be unused [UnusedResources]
+    <color name="surface_light">#1E293B</color>
+           ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:11: Warning: The resource R.color.primary_light appears to be unused [UnusedResources]
+    <color name="primary_light">#3B82F6</color>
+           ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:12: Warning: The resource R.color.primary_variant_light appears to be unused [UnusedResources]
+    <color name="primary_variant_light">#60A5FA</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:13: Warning: The resource R.color.secondary_light appears to be unused [UnusedResources]
+    <color name="secondary_light">#60A5FA</color>
+           ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:14: Warning: The resource R.color.secondary_variant_light appears to be unused [UnusedResources]
+    <color name="secondary_variant_light">#93C5FD</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:17: Warning: The resource R.color.text_primary_light appears to be unused [UnusedResources]
+    <color name="text_primary_light">#FFFFFF</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:18: Warning: The resource R.color.text_secondary_light appears to be unused [UnusedResources]
+    <color name="text_secondary_light">#94A3B8</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:21: Warning: The resource R.color.outline_light appears to be unused [UnusedResources]
+    <color name="outline_light">#334155</color>
+           ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:22: Warning: The resource R.color.divider_light appears to be unused [UnusedResources]
+    <color name="divider_light">#1E293B</color>
+           ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:25: Warning: The resource R.color.error_light appears to be unused [UnusedResources]
+    <color name="error_light">#F87171</color>
+           ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:26: Warning: The resource R.color.on_error_light appears to be unused [UnusedResources]
+    <color name="on_error_light">#0B1120</color>
+           ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:29: Warning: The resource R.color.success appears to be unused [UnusedResources]
+    <color name="success">#4ADE80</color>
+           ~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:30: Warning: The resource R.color.on_success appears to be unused [UnusedResources]
+    <color name="on_success">#0B1120</color>
+           ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:62: Warning: The resource R.color.md_theme_light_inverseOnSurface appears to be unused [UnusedResources]
+    <color name="md_theme_light_inverseOnSurface">#0B1120</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:63: Warning: The resource R.color.md_theme_light_inverseSurface appears to be unused [UnusedResources]
+    <color name="md_theme_light_inverseSurface">#F1F5F9</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:64: Warning: The resource R.color.md_theme_light_inversePrimary appears to be unused [UnusedResources]
+    <color name="md_theme_light_inversePrimary">#1D4ED8</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:67: Warning: The resource R.color.skeleton_dark appears to be unused [UnusedResources]
+    <color name="skeleton_dark">#0F172A</color>
+           ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:68: Warning: The resource R.color.skeleton_light appears to be unused [UnusedResources]
+    <color name="skeleton_light">#1E293B</color>
+           ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:71: Warning: The resource R.color.glow_accent appears to be unused [UnusedResources]
+    <color name="glow_accent">#543B82F6</color>
+           ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\colors.xml:72: Warning: The resource R.color.glow_accent_transparent appears to be unused [UnusedResources]
+    <color name="glow_accent_transparent">#263B82F6</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\dark_card_bg.xml:2: Warning: The resource R.drawable.dark_card_bg appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\dialog_create_pill.xml:2: Warning: The resource R.layout.dialog_create_pill appears to be unused [UnusedResources]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\dialog_log_details.xml:2: Warning: The resource R.layout.dialog_log_details appears to be unused [UnusedResources]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\dimens.xml:4: Warning: The resource R.dimen.chip_stroke_width appears to be unused [UnusedResources]
+    <dimen name="chip_stroke_width">1dp</dimen>
+           ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\dimens.xml:7: Warning: The resource R.dimen.card_corner_radius appears to be unused [UnusedResources]
+    <dimen name="card_corner_radius">16dp</dimen>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\dimens.xml:10: Warning: The resource R.dimen.spacing_xs appears to be unused [UnusedResources]
+    <dimen name="spacing_xs">4dp</dimen>
+           ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\dimens.xml:11: Warning: The resource R.dimen.spacing_sm appears to be unused [UnusedResources]
+    <dimen name="spacing_sm">8dp</dimen>
+           ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\dimens.xml:12: Warning: The resource R.dimen.spacing_md appears to be unused [UnusedResources]
+    <dimen name="spacing_md">16dp</dimen>
+           ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\dimens.xml:13: Warning: The resource R.dimen.spacing_lg appears to be unused [UnusedResources]
+    <dimen name="spacing_lg">24dp</dimen>
+           ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\dimens.xml:14: Warning: The resource R.dimen.spacing_xl appears to be unused [UnusedResources]
+    <dimen name="spacing_xl">32dp</dimen>
+           ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\divider_horizontal.xml:2: Warning: The resource R.drawable.divider_horizontal appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\fab_gradient_blue.xml:3: Warning: The resource R.drawable.fab_gradient_blue appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\anim\fab_spring_press.xml:3: Warning: The resource R.anim.fab_spring_press appears to be unused [UnusedResources]
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\anim\fab_spring_release.xml:3: Warning: The resource R.anim.fab_spring_release appears to be unused [UnusedResources]
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\anim\fade_in.xml:2: Warning: The resource R.anim.fade_in appears to be unused [UnusedResources]
+<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\anim\fade_out.xml:2: Warning: The resource R.anim.fade_out appears to be unused [UnusedResources]
+<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\fragment_share_bottom_sheet.xml:2: Warning: The resource R.layout.fragment_share_bottom_sheet appears to be unused [UnusedResources]
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_add.xml:2: Warning: The resource R.drawable.ic_add appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_back.xml:1: Warning: The resource R.drawable.ic_back appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_chevron_right.xml:2: Warning: The resource R.drawable.ic_chevron_right appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_clear.xml:2: Warning: The resource R.drawable.ic_clear appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_document.xml:2: Warning: The resource R.drawable.ic_document appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_dropdown.xml:1: Warning: The resource R.drawable.ic_dropdown appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_generate.xml:1: Warning: The resource R.drawable.ic_generate appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_history.xml:1: Warning: The resource R.drawable.ic_history appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_paste.xml:1: Warning: The resource R.drawable.ic_paste appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_refresh.xml:1: Warning: The resource R.drawable.ic_refresh appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_settings.xml:1: Warning: The resource R.drawable.ic_settings appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_sparkle.xml:2: Warning: The resource R.drawable.ic_sparkle appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_stadium.xml:2: Warning: The resource R.drawable.ic_stadium appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_tag.xml:2: Warning: The resource R.drawable.ic_tag appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\ic_usage.xml:1: Warning: The resource R.drawable.ic_usage appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_log_entry.xml:2: Warning: The resource R.layout.item_log_entry appears to be unused [UnusedResources]
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_session_entry.xml:2: Warning: The resource R.layout.item_session_entry appears to be unused [UnusedResources]
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\layout_empty_state.xml:3: Warning: The resource R.layout.layout_empty_state appears to be unused [UnusedResources]
+<com.google.android.material.card.MaterialCardView
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\layout_shimmer_loading.xml:3: Warning: The resource R.layout.layout_shimmer_loading appears to be unused [UnusedResources]
+<com.facebook.shimmer.ShimmerFrameLayout
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\log_badge_debug.xml:2: Warning: The resource R.drawable.log_badge_debug appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\log_badge_error.xml:2: Warning: The resource R.drawable.log_badge_error appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\log_badge_info.xml:2: Warning: The resource R.drawable.log_badge_info appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\log_badge_warn.xml:2: Warning: The resource R.drawable.log_badge_warn appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\menu\menu_bottom_nav.xml:2: Warning: The resource R.menu.menu_bottom_nav appears to be unused [UnusedResources]
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\menu\menu_main.xml:2: Warning: The resource R.menu.menu_main appears to be unused [UnusedResources]
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\output_card_glow.xml:3: Warning: The resource R.drawable.output_card_glow appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\pill_button_dark.xml:2: Warning: The resource R.drawable.pill_button_dark appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\pill_button_green.xml:2: Warning: The resource R.drawable.pill_button_green appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\rounded_bg_surface.xml:2: Warning: The resource R.drawable.rounded_bg_surface appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\shimmer_placeholder.xml:2: Warning: The resource R.drawable.shimmer_placeholder appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\shimmer_placeholder_chip.xml:2: Warning: The resource R.drawable.shimmer_placeholder_chip appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\skeleton_item.xml:2: Warning: The resource R.drawable.skeleton_item appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\skeleton_item_dark.xml:3: Warning: The resource R.drawable.skeleton_item_dark appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\skeleton_item_light.xml:3: Warning: The resource R.drawable.skeleton_item_light appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\skeleton_shimmer.xml:2: Warning: The resource R.drawable.skeleton_shimmer appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\anim\slide_down_fade_out.xml:2: Warning: The resource R.anim.slide_down_fade_out appears to be unused [UnusedResources]
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\anim\slide_up.xml:2: Warning: The resource R.anim.slide_up appears to be unused [UnusedResources]
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\anim\slide_up_fade_in.xml:2: Warning: The resource R.anim.slide_up_fade_in appears to be unused [UnusedResources]
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:10: Warning: The resource R.string.input_hint appears to be unused [UnusedResources]
+    <string name="input_hint">Paste article text or URL here…</string>
+            ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:11: Warning: The resource R.string.generate_button appears to be unused [UnusedResources]
+    <string name="generate_button">Generate Post</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:12: Warning: The resource R.string.output_label appears to be unused [UnusedResources]
+    <string name="output_label">Generated Post</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:13: Warning: The resource R.string.output_placeholder appears to be unused [UnusedResources]
+    <string name="output_placeholder">Your Malaysian Malay post will appear here…</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:14: Warning: The resource R.string.copy_button appears to be unused [UnusedResources]
+    <string name="copy_button">Copy to Clipboard</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:15: Warning: The resource R.string.share_button appears to be unused [UnusedResources]
+    <string name="share_button">Share</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:16: Warning: The resource R.string.settings_button appears to be unused [UnusedResources]
+    <string name="settings_button">Settings</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:19: Warning: The resource R.string.processing appears to be unused [UnusedResources]
+    <string name="processing">Processing…</string>
+            ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:20: Warning: The resource R.string.extracting_content appears to be unused [UnusedResources]
+    <string name="extracting_content">Extracting content from URL…</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:21: Warning: The resource R.string.generating_post appears to be unused [UnusedResources]
+    <string name="generating_post">Generating post with AI…</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:22: Warning: The resource R.string.open_in_app appears to be unused [UnusedResources]
+    <string name="open_in_app">Open in Main App</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:23: Warning: The resource R.string.continue_in_app appears to be unused [UnusedResources]
+    <string name="continue_in_app">Continue in Main App</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:26: Warning: The resource R.string.api_key_label appears to be unused [UnusedResources]
+    <string name="api_key_label">Gemini API Key</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:27: Warning: The resource R.string.api_key_hint appears to be unused [UnusedResources]
+    <string name="api_key_hint">Enter your Google Gemini API key</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:28: Warning: The resource R.string.api_key_help appears to be unused [UnusedResources]
+    <string name="api_key_help">Get your API key from https://ai.google.dev</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:29: Warning: The resource R.string.tone_label appears to be unused [UnusedResources]
+    <string name="tone_label">Post Tone</string>
+            ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:30: Warning: The resource R.string.tone_formal appears to be unused [UnusedResources]
+    <string name="tone_formal">Formal (Professional)</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:31: Warning: The resource R.string.tone_casual appears to be unused [UnusedResources]
+    <string name="tone_casual">Casual (Fan Banter)</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:32: Warning: The resource R.string.test_connection appears to be unused [UnusedResources]
+    <string name="test_connection">Test Connection</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:33: Warning: The resource R.string.save_settings appears to be unused [UnusedResources]
+    <string name="save_settings">Save Settings</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:34: Warning: The resource R.string.advanced_settings appears to be unused [UnusedResources]
+    <string name="advanced_settings">ADVANCED SETTINGS</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:35: Warning: The resource R.string.api_endpoint_label appears to be unused [UnusedResources]
+    <string name="api_endpoint_label">API Endpoint</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:36: Warning: The resource R.string.api_endpoint_default appears to be unused [UnusedResources]
+    <string name="api_endpoint_default">https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:37: Warning: The resource R.string.reset_to_default appears to be unused [UnusedResources]
+    <string name="reset_to_default">Reset to Default</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:42: Warning: The resource R.string.api_key_saved appears to be unused [UnusedResources]
+    <string name="api_key_saved">API key saved securely</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:43: Warning: The resource R.string.settings_saved appears to be unused [UnusedResources]
+    <string name="settings_saved">Settings saved</string>
+            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:44: Warning: The resource R.string.connection_test_success appears to be unused [UnusedResources]
+    <string name="connection_test_success">Connection successful!</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:45: Warning: The resource R.string.connection_test_failed appears to be unused [UnusedResources]
+    <string name="connection_test_failed">Connection failed: %1$s</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:46: Warning: The resource R.string.input_required appears to be unused [UnusedResources]
+    <string name="input_required">Please enter some text or URL</string>
+            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:47: Warning: The resource R.string.processing_error appears to be unused [UnusedResources]
+    <string name="processing_error">Error: %1$s</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:48: Warning: The resource R.string.network_error appears to be unused [UnusedResources]
+    <string name="network_error">Network error. Please check your connection.</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:49: Warning: The resource R.string.invalid_url appears to be unused [UnusedResources]
+    <string name="invalid_url">Could not extract content from URL</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:50: Warning: The resource R.string.api_error appears to be unused [UnusedResources]
+    <string name="api_error">API error: %1$s</string>
+            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:53: Warning: The resource R.string.theme_label appears to be unused [UnusedResources]
+    <string name="theme_label">App Theme</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:54: Warning: The resource R.string.theme_system appears to be unused [UnusedResources]
+    <string name="theme_system">Follow System</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:55: Warning: The resource R.string.theme_light appears to be unused [UnusedResources]
+    <string name="theme_light">Always Light</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:56: Warning: The resource R.string.theme_dark appears to be unused [UnusedResources]
+    <string name="theme_dark">Always Dark</string>
+            ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:57: Warning: The resource R.string.theme_section appears to be unused [UnusedResources]
+    <string name="theme_section">APPEARANCE</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:60: Warning: The resource R.string.refine_section appears to be unused [UnusedResources]
+    <string name="refine_section">Refine Draft</string>
+            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:61: Warning: The resource R.string.refine_rephrase appears to be unused [UnusedResources]
+    <string name="refine_rephrase">Rephrase</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:62: Warning: The resource R.string.refine_recheck_flow appears to be unused [UnusedResources]
+    <string name="refine_recheck_flow">Recheck Flow</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:63: Warning: The resource R.string.refine_recheck_wording appears to be unused [UnusedResources]
+    <string name="refine_recheck_wording">Recheck Wording</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:64: Warning: The resource R.string.refine_formal appears to be unused [UnusedResources]
+    <string name="refine_formal">Formal</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:65: Warning: The resource R.string.refine_conversational appears to be unused [UnusedResources]
+    <string name="refine_conversational">Conversational</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:66: Warning: The resource R.string.refine_shorten_detailed appears to be unused [UnusedResources]
+    <string name="refine_shorten_detailed">Shorten But Detailed</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:67: Warning: The resource R.string.regenerate_button appears to be unused [UnusedResources]
+    <string name="regenerate_button">Regenerate</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:68: Warning: The resource R.string.generating_button appears to be unused [UnusedResources]
+    <string name="generating_button">Generating…</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:71: Warning: The resource R.string.source_citation appears to be unused [UnusedResources]
+    <string name="source_citation">Source Citation</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:72: Warning: The resource R.string.source_citation_desc appears to be unused [UnusedResources]
+    <string name="source_citation_desc">Automatically detect and cite the source</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:73: Warning: The resource R.string.include_source appears to be unused [UnusedResources]
+    <string name="include_source">Include Source</string>
+            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:74: Warning: The resource R.string.source_format appears to be unused [UnusedResources]
+    <string name="source_format">Sumber: [%1$s]</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:77: Warning: The resource R.string.error_title appears to be unused [UnusedResources]
+    <string name="error_title">Error</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:78: Warning: The resource R.string.success_title appears to be unused [UnusedResources]
+    <string name="success_title">Success</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:79: Warning: The resource R.string.warning_title appears to be unused [UnusedResources]
+    <string name="warning_title">Warning</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:82: Warning: The resource R.string.app_version appears to be unused [UnusedResources]
+    <string name="app_version">Version 1.0</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:83: Warning: The resource R.string.app_description appears to be unused [UnusedResources]
+    <string name="app_description">Football news curator for Malaysian Malay content</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:84: Warning: The resource R.string.powered_by appears to be unused [UnusedResources]
+    <string name="powered_by">Powered by Google Gemini</string>
+            ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:87: Warning: The resource R.string.hashtags_label appears to be unused [UnusedResources]
+    <string name="hashtags_label">Default Hashtags</string>
+            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:88: Warning: The resource R.string.hashtags_hint appears to be unused [UnusedResources]
+    <string name="hashtags_hint">e.g., #BolaSepak #Football #JDT</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:89: Warning: The resource R.string.hashtags_help appears to be unused [UnusedResources]
+    <string name="hashtags_help">Separate with spaces or commas</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:90: Warning: The resource R.string.enable_hashtags appears to be unused [UnusedResources]
+    <string name="enable_hashtags">Auto-append hashtags</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:91: Warning: The resource R.string.include_hashtags appears to be unused [UnusedResources]
+    <string name="include_hashtags">Include hashtags</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:92: Warning: The resource R.string.hashtags_section appears to be unused [UnusedResources]
+    <string name="hashtags_section">Hashtag Settings</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:93: Warning: The resource R.string.include_title appears to be unused [UnusedResources]
+    <string name="include_title">Include title</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:96: Warning: The resource R.string.edit_button appears to be unused [UnusedResources]
+    <string name="edit_button">Edit</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:97: Warning: The resource R.string.save_edit appears to be unused [UnusedResources]
+    <string name="save_edit">Save</string>
+            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:98: Warning: The resource R.string.cancel_edit appears to be unused [UnusedResources]
+    <string name="cancel_edit">Cancel</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:99: Warning: The resource R.string.restore_original appears to be unused [UnusedResources]
+    <string name="restore_original">Restore Original</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:100: Warning: The resource R.string.edited_indicator appears to be unused [UnusedResources]
+    <string name="edited_indicator">(Edited)</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:101: Warning: The resource R.string.original_post appears to be unused [UnusedResources]
+    <string name="original_post">Original Post</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:102: Warning: The resource R.string.generated_draft appears to be unused [UnusedResources]
+    <string name="generated_draft">Generated Draft</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:105: Warning: The resource R.string.clear_input appears to be unused [UnusedResources]
+    <string name="clear_input">Clear input</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:106: Warning: The resource R.string.input_cleared appears to be unused [UnusedResources]
+    <string name="input_cleared">Input cleared</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:107: Warning: The resource R.string.reset_all appears to be unused [UnusedResources]
+    <string name="reset_all">Reset all</string>
+            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:108: Warning: The resource R.string.all_reset appears to be unused [UnusedResources]
+    <string name="all_reset">Everything has been reset</string>
+            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:109: Warning: The resource R.string.paste_input appears to be unused [UnusedResources]
+    <string name="paste_input">Paste</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:110: Warning: The resource R.string.text_pasted appears to be unused [UnusedResources]
+    <string name="text_pasted">Text pasted</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:111: Warning: The resource R.string.close_preview appears to be unused [UnusedResources]
+    <string name="close_preview">Close preview</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:114: Warning: The resource R.string.placeholder_title appears to be unused [UnusedResources]
+    <string name="placeholder_title">Ready to curate. Paste a link to start.</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:115: Warning: The resource R.string.placeholder_subtitle appears to be unused [UnusedResources]
+    <string name="placeholder_subtitle">Share from your browser or paste a URL</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:118: Warning: The resource R.string.error_state_title appears to be unused [UnusedResources]
+    <string name="error_state_title">Something went wrong</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:119: Warning: The resource R.string.error_state_network appears to be unused [UnusedResources]
+    <string name="error_state_network">We lost the connection</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:120: Warning: The resource R.string.error_state_api appears to be unused [UnusedResources]
+    <string name="error_state_api">There was an API error</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:121: Warning: The resource R.string.try_again_button appears to be unused [UnusedResources]
+    <string name="try_again_button">Try Again</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:124: Warning: The resource R.string.content_description_settings_icon appears to be unused [UnusedResources]
+    <string name="content_description_settings_icon">Settings</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:125: Warning: The resource R.string.content_description_copy_icon appears to be unused [UnusedResources]
+    <string name="content_description_copy_icon">Copy to clipboard</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:126: Warning: The resource R.string.content_description_share_icon appears to be unused [UnusedResources]
+    <string name="content_description_share_icon">Share</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:127: Warning: The resource R.string.website_icon appears to be unused [UnusedResources]
+    <string name="website_icon">Website Icon</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:139: Warning: The resource R.string.model_label appears to be unused [UnusedResources]
+    <string name="model_label">AI Model</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:140: Warning: The resource R.string.model_2_5_flash_lite appears to be unused [UnusedResources]
+    <string name="model_2_5_flash_lite">Gemini 2.5 Flash Lite</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:141: Warning: The resource R.string.model_2_5_flash appears to be unused [UnusedResources]
+    <string name="model_2_5_flash">Gemini 2.5 Flash</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:142: Warning: The resource R.string.model_2_5_pro appears to be unused [UnusedResources]
+    <string name="model_2_5_pro">Gemini 2.5 Pro</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:143: Warning: The resource R.string.model_2_0_flash appears to be unused [UnusedResources]
+    <string name="model_2_0_flash">Gemini 2.0 Flash</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:146: Warning: The resource R.string.provider_section appears to be unused [UnusedResources]
+    <string name="provider_section">AI PROVIDER</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:147: Warning: The resource R.string.provider_label appears to be unused [UnusedResources]
+    <string name="provider_label">AI Provider</string>
+            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:148: Warning: The resource R.string.provider_gemini appears to be unused [UnusedResources]
+    <string name="provider_gemini">Gemini (Google)</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:149: Warning: The resource R.string.provider_groq appears to be unused [UnusedResources]
+    <string name="provider_groq">Groq (Llama 3.3)</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:150: Warning: The resource R.string.provider_openrouter appears to be unused [UnusedResources]
+    <string name="provider_openrouter">OpenRouter (Free Models)</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:151: Warning: The resource R.string.groq_api_key_label appears to be unused [UnusedResources]
+    <string name="groq_api_key_label">Groq API Key</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:152: Warning: The resource R.string.groq_api_key_hint appears to be unused [UnusedResources]
+    <string name="groq_api_key_hint">Enter your Groq API key</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:153: Warning: The resource R.string.openrouter_api_key_label appears to be unused [UnusedResources]
+    <string name="openrouter_api_key_label">OpenRouter API Key</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:154: Warning: The resource R.string.openrouter_api_key_hint appears to be unused [UnusedResources]
+    <string name="openrouter_api_key_hint">Enter your OpenRouter API key</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:155: Warning: The resource R.string.provider_help_groq appears to be unused [UnusedResources]
+    <string name="provider_help_groq">Get your key at console.groq.com</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:156: Warning: The resource R.string.provider_help_openrouter appears to be unused [UnusedResources]
+    <string name="provider_help_openrouter">Get your key at openrouter.ai</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:157: Warning: The resource R.string.cerebras_api_key_label appears to be unused [UnusedResources]
+    <string name="cerebras_api_key_label">Cerebras API Key</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:158: Warning: The resource R.string.cerebras_api_key_hint appears to be unused [UnusedResources]
+    <string name="cerebras_api_key_hint">Enter your Cerebras API key</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:159: Warning: The resource R.string.provider_help_cerebras appears to be unused [UnusedResources]
+    <string name="provider_help_cerebras">Get your key at cloud.cerebras.ai</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:160: Warning: The resource R.string.provider_cerebras appears to be unused [UnusedResources]
+    <string name="provider_cerebras">Cerebras (Fast Inference)</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:163: Warning: The resource R.string.progress_extracting appears to be unused [UnusedResources]
+    <string name="progress_extracting">Extracting content…</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:164: Warning: The resource R.string.progress_generating appears to be unused [UnusedResources]
+    <string name="progress_generating">Generating with AI…</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:165: Warning: The resource R.string.generate_background appears to be unused [UnusedResources]
+    <string name="generate_background">Generate in background</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:166: Warning: The resource R.string.tap_to_expand appears to be unused [UnusedResources]
+    <string name="tap_to_expand">Tap to expand</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:167: Warning: The resource R.string.tap_to_collapse appears to be unused [UnusedResources]
+    <string name="tap_to_collapse">Tap to collapse</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:168: Warning: The resource R.string.tone_quick_toggle appears to be unused [UnusedResources]
+    <string name="tone_quick_toggle">Tone</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:169: Warning: The resource R.string.chip_formal appears to be unused [UnusedResources]
+    <string name="chip_formal">Formal</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:170: Warning: The resource R.string.chip_casual appears to be unused [UnusedResources]
+    <string name="chip_casual">Casual</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:171: Warning: The resource R.string.notification_action_copy appears to be unused [UnusedResources]
+    <string name="notification_action_copy">Copy</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:172: Warning: The resource R.string.notification_action_open appears to be unused [UnusedResources]
+    <string name="notification_action_open">Open</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:173: Warning: The resource R.string.content_copied_notification appears to be unused [UnusedResources]
+    <string name="content_copied_notification">Content copied!</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:176: Warning: The resource R.string.add_custom_pill appears to be unused [UnusedResources]
+    <string name="add_custom_pill">+ Add Custom</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:177: Warning: The resource R.string.create_custom_pill appears to be unused [UnusedResources]
+    <string name="create_custom_pill">Create Custom Refinement</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:178: Warning: The resource R.string.edit_custom_pill appears to be unused [UnusedResources]
+    <string name="edit_custom_pill">Edit Custom Refinement</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:179: Warning: The resource R.string.pill_name_hint appears to be unused [UnusedResources]
+    <string name="pill_name_hint">Name (e.g., Punchy)</string>
+            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:180: Warning: The resource R.string.pill_command_hint appears to be unused [UnusedResources]
+    <string name="pill_command_hint">Command (e.g., Make it punchy and engaging)</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:181: Warning: The resource R.string.pill_saved appears to be unused [UnusedResources]
+    <string name="pill_saved">Custom refinement saved</string>
+            ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:182: Warning: The resource R.string.pill_deleted appears to be unused [UnusedResources]
+    <string name="pill_deleted">Delete Custom Refinement</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:183: Warning: The resource R.string.delete_pill_confirm appears to be unused [UnusedResources]
+    <string name="delete_pill_confirm">Delete this custom refinement?</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:186: Warning: The resource R.string.total_tokens appears to be unused [UnusedResources]
+    <string name="total_tokens">Total Tokens Used</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:187: Warning: The resource R.string.total_tokens_label appears to be unused [UnusedResources]
+    <string name="total_tokens_label">tokens used</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:188: Warning: The resource R.string.token_breakdown appears to be unused [UnusedResources]
+    <string name="token_breakdown">Token Breakdown</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:189: Warning: The resource R.string.prompt_tokens appears to be unused [UnusedResources]
+    <string name="prompt_tokens">Prompt Tokens</string>
+            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:190: Warning: The resource R.string.response_tokens appears to be unused [UnusedResources]
+    <string name="response_tokens">Response Tokens</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:191: Warning: The resource R.string.api_requests appears to be unused [UnusedResources]
+    <string name="api_requests">API Requests</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:192: Warning: The resource R.string.successful_requests appears to be unused [UnusedResources]
+    <string name="successful_requests">Successful</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:193: Warning: The resource R.string.failed_requests appears to be unused [UnusedResources]
+    <string name="failed_requests">Failed</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:194: Warning: The resource R.string.reset_stats appears to be unused [UnusedResources]
+    <string name="reset_stats">Reset Statistics</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:195: Warning: The resource R.string.stats_reset appears to be unused [UnusedResources]
+    <string name="stats_reset">Usage statistics reset</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:196: Warning: The resource R.string.success_rate appears to be unused [UnusedResources]
+    <string name="success_rate">success rate</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:197: Warning: The resource R.string.today appears to be unused [UnusedResources]
+    <string name="today">Today</string>
+            ~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:198: Warning: The resource R.string.this_week appears to be unused [UnusedResources]
+    <string name="this_week">This Week</string>
+            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:199: Warning: The resource R.string.this_month appears to be unused [UnusedResources]
+    <string name="this_month">This Month</string>
+            ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:200: Warning: The resource R.string.all_time appears to be unused [UnusedResources]
+    <string name="all_time">All Time</string>
+            ~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:201: Warning: The resource R.string.no_recent_activity appears to be unused [UnusedResources]
+    <string name="no_recent_activity">No recent activity yet</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:202: Warning: The resource R.string.no_logs appears to be unused [UnusedResources]
+    <string name="no_logs">No logs recorded</string>
+            ~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:205: Warning: The resource R.string.view_all appears to be unused [UnusedResources]
+    <string name="view_all">View All</string>
+            ~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:206: Warning: The resource R.string.clear_logs appears to be unused [UnusedResources]
+    <string name="clear_logs">Clear Logs</string>
+            ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:207: Warning: The resource R.string.logs_cleared appears to be unused [UnusedResources]
+    <string name="logs_cleared">Logs cleared</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:210: Warning: The resource R.string.clipboard_url_detected appears to be unused [UnusedResources]
+    <string name="clipboard_url_detected">Football URL Detected</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:211: Warning: The resource R.string.clipboard_url_message appears to be unused [UnusedResources]
+    <string name="clipboard_url_message">Generate a post from the copied URL?</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:212: Warning: The resource R.string.clipboard_generate appears to be unused [UnusedResources]
+    <string name="clipboard_generate">Generate</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:213: Warning: The resource R.string.clipboard_dismiss appears to be unused [UnusedResources]
+    <string name="clipboard_dismiss">Dismiss</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:221: Warning: The resource R.string.nav_generate appears to be unused [UnusedResources]
+    <string name="nav_generate">Generate</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:223: Warning: The resource R.string.nav_settings appears to be unused [UnusedResources]
+    <string name="nav_settings">Settings</string>
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:226: Warning: The resource R.string.empty_state_title appears to be unused [UnusedResources]
+    <string name="empty_state_title">Ready to Create</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:227: Warning: The resource R.string.empty_state_message appears to be unused [UnusedResources]
+    <string name="empty_state_message">Paste a URL or enter text to generate a curated social media post</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:228: Warning: The resource R.string.empty_history_title appears to be unused [UnusedResources]
+    <string name="empty_history_title">No History Yet</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:229: Warning: The resource R.string.empty_history_message appears to be unused [UnusedResources]
+    <string name="empty_history_message">Your generated posts will appear here</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:232: Warning: The resource R.string.rate_limit_title appears to be unused [UnusedResources]
+    <string name="rate_limit_title">Traffic Overload</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:233: Warning: The resource R.string.switch_and_retry appears to be unused [UnusedResources]
+    <string name="switch_and_retry">Switch &amp; Retry</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:234: Warning: The resource R.string.wait_button appears to be unused [UnusedResources]
+    <string name="wait_button">Wait</string>
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\strings.xml:235: Warning: The resource R.string.go_to_settings appears to be unused [UnusedResources]
+    <string name="go_to_settings">Go to Settings</string>
+            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\themes.xml:82: Warning: The resource R.style.ShapeAppearance_Oreamnos_Pill appears to be unused [UnusedResources]
+    <style name="ShapeAppearance.Oreamnos.Pill" parent="">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\token_bar_background.xml:2: Warning: The resource R.drawable.token_bar_background appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\token_bar_prompt.xml:2: Warning: The resource R.drawable.token_bar_prompt appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\drawable\token_bar_response.xml:2: Warning: The resource R.drawable.token_bar_response appears to be unused [UnusedResources]
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+^
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:7: Warning: The resource R.style.TextAppearance_Socurate_DisplayLarge appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:14: Warning: The resource R.style.TextAppearance_Socurate_HeadlineLarge appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:21: Warning: The resource R.style.TextAppearance_Socurate_HeadlineMedium appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:27: Warning: The resource R.style.TextAppearance_Socurate_TitleLarge appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:34: Warning: The resource R.style.TextAppearance_Socurate_TitleMedium appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:40: Warning: The resource R.style.TextAppearance_Socurate_TitleSmall appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:46: Warning: The resource R.style.TextAppearance_Socurate_BodyLarge appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:52: Warning: The resource R.style.TextAppearance_Socurate_BodyMedium appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:58: Warning: The resource R.style.TextAppearance_Socurate_BodySmall appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.BodySmall" parent="TextAppearance.Material3.BodySmall">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:64: Warning: The resource R.style.TextAppearance_Socurate_LabelLarge appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:71: Warning: The resource R.style.TextAppearance_Socurate_LabelMedium appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\values\type.xml:76: Warning: The resource R.style.TextAppearance_Socurate_LabelSmall appears to be unused [UnusedResources]
+    <style name="TextAppearance.Socurate.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedResources":
+   Unused resources make applications larger and slow down builds.
+
+
+   The unused resource check can ignore tests. If you want to include
+   resources that are only referenced from tests, consider packaging them in a
+   test source set instead.
+
+   You can include test sources in the unused resource check by setting the
+   system property lint.unused-resources.include-tests =true, and to exclude
+   them (usually for performance reasons), use
+   lint.unused-resources.exclude-tests =true.
+   ,
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:795: Warning: activity_main.xml has more than 80 views, bad for performance [TooManyViews]
+                        <com.google.android.material.chip.Chip
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:741: Warning: activity_settings.xml has more than 80 views, bad for performance [TooManyViews]
+                <LinearLayout
+                 ~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:628: Warning: activity_usage.xml has more than 80 views, bad for performance [TooManyViews]
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                         ~~~~~~~~
+
+   Explanation for issues of type "TooManyViews":
+   Using too many views in a single layout is bad for performance. Consider
+   using compound drawables or other tricks for reducing the number of views
+   in this layout.
+
+   The maximum view count defaults to 80 but can be configured with the
+   environment variable ANDROID_LINT_MAX_VIEW_COUNT.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:309: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                            android:textSize="10sp"
+                            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:357: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                            android:textSize="10sp"
+                            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:404: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                            android:textSize="10sp"
+                            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:621: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                            android:text="MON" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:623: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                            android:text="TUE" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:625: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                            android:text="WED" android:textColor="?attr/colorOnSurface" android:textSize="10sp" android:textStyle="bold" android:gravity="center" />
+                                                                                        ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:627: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                            android:text="THU" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:629: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                            android:text="FRI" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:631: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                            android:text="SAT" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:633: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                            android:text="SUN" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1210: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                    android:textSize="10sp" />
+                    ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_log_entry.xml:32: Warning: Avoid using sizes smaller than 11sp: 9sp [SmallSp]
+            android:textSize="9sp"
+            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_log_entry.xml:70: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+                    android:textSize="10sp" />
+                    ~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SmallSp":
+   Avoid using sizes smaller than 11sp.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:50: Information: Add suffix -ktx to enable the Kotlin extensions for this library [KtxExtensionAvailable]
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.7.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build.gradle:51: Information: Add suffix -ktx to enable the Kotlin extensions for this library [KtxExtensionAvailable]
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.7.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "KtxExtensionAvailable":
+   Android KTX extensions augment some libraries with support for modern
+   Kotlin language features like extension functions, extension properties,
+   lambdas, named parameters, coroutines, and more.
+
+   In Kotlin projects, use the KTX version of a library by replacing the
+   dependency in your build.gradle file. For example, you can replace
+   androidx.fragment:fragment with androidx.fragment:fragment-ktx.
+
+   https://developer.android.com/kotlin/ktx
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:236: Warning: Missing accessibility label: provide either a view with an android:labelFor that references this view or provide an android:hint [LabelFor]
+                        <AutoCompleteTextView
+                         ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:429: Warning: Missing accessibility label: provide either a view with an android:labelFor that references this view or provide an android:hint [LabelFor]
+                        <AutoCompleteTextView
+                         ~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "LabelFor":
+   Editable text fields should provide an android:hint or, provided your
+   minSdkVersion is at least 17, they may be referenced by a view with a
+   android:labelFor attribute.
+
+   When using android:labelFor, be sure to provide an android:text or an
+   android:contentDescription.
+
+   If your view is labeled but by a label in a different layout which includes
+   this one, just suppress this warning from lint.
+
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:33: Warning: Hardcoded string "Save", should use @string resource [HardcodedText]
+                android:text="Save"
+                ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:62: Warning: Hardcoded string "Manage the default tags appended to your Socurate posts.", should use @string resource [HardcodedText]
+                android:text="Manage the default tags appended to your Socurate posts."
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:98: Warning: Hardcoded string "Auto-append", should use @string resource [HardcodedText]
+                            android:contentDescription="Auto-append" />
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:112: Warning: Hardcoded string "Auto-append", should use @string resource [HardcodedText]
+                            android:text="Auto-append"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:120: Warning: Hardcoded string "Add tags to generated posts", should use @string resource [HardcodedText]
+                            android:text="Add tags to generated posts"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:148: Warning: Hardcoded string "GLOBAL HASHTAGS", should use @string resource [HardcodedText]
+                    android:text="GLOBAL HASHTAGS"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:158: Warning: Hardcoded string "Clear", should use @string resource [HardcodedText]
+                    android:text="Clear"
+                    ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:190: Warning: Hardcoded string "Enter hashtags (e.g. #BolaSepak #LigaSuper)...", should use @string resource [HardcodedText]
+                        android:hint="Enter hashtags (e.g. #BolaSepak #LigaSuper)..."
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:204: Warning: Hardcoded string "0 / 30", should use @string resource [HardcodedText]
+                        android:text="0 / 30"
+                        ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:225: Warning: Hardcoded string "Info", should use @string resource [HardcodedText]
+                    android:contentDescription="Info" />
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:230: Warning: Hardcoded string "Separate with spaces or commas.", should use @string resource [HardcodedText]
+                    android:text="Separate with spaces or commas."
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:241: Warning: Hardcoded string "ACTIVE PREVIEW", should use @string resource [HardcodedText]
+                android:text="ACTIVE PREVIEW"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:262: Warning: Hardcoded string "# BolaSepak", should use @string resource [HardcodedText]
+                    android:text="# BolaSepak"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:274: Warning: Hardcoded string "# HarimauMalaya", should use @string resource [HardcodedText]
+                    android:text="# HarimauMalaya"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:286: Warning: Hardcoded string "# EPL", should use @string resource [HardcodedText]
+                    android:text="# EPL"
+                    ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:298: Warning: Hardcoded string "# Socurate", should use @string resource [HardcodedText]
+                    android:text="# Socurate"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:312: Warning: Hardcoded string "Add Tag", should use @string resource [HardcodedText]
+                    android:text="Add Tag"
+                    ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_hashtag_manager.xml:327: Warning: Hardcoded string "All changes are saved locally to your device.", should use @string resource [HardcodedText]
+                android:text="All changes are saved locally to your device."
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:74: Warning: Hardcoded string "Input", should use @string resource [HardcodedText]
+                            android:text="Input"
+                            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:166: Warning: Hardcoded string "Page Title", should use @string resource [HardcodedText]
+                                    android:text="Page Title"
+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:175: Warning: Hardcoded string "example.com", should use @string resource [HardcodedText]
+                                    android:text="example.com"
+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:203: Warning: Hardcoded string "Keep existing structure", should use @string resource [HardcodedText]
+                        android:text="Keep existing structure"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:574: Warning: Hardcoded string "Grade: 0.0", should use @string resource [HardcodedText]
+                            android:text="Grade: 0.0"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_main.xml:583: Warning: Hardcoded string "0 words", should use @string resource [HardcodedText]
+                            android:text="0 words"
+                            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:44: Warning: Hardcoded string "QUICK ACCESS", should use @string resource [HardcodedText]
+                android:text="QUICK ACCESS"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:84: Warning: Hardcoded string "Hashtag Manager", should use @string resource [HardcodedText]
+                            android:contentDescription="Hashtag Manager" />
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:96: Warning: Hardcoded string "Hashtag Manager", should use @string resource [HardcodedText]
+                                android:text="Hashtag Manager"
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:103: Warning: Hardcoded string "Manage default tags for posts", should use @string resource [HardcodedText]
+                                android:text="Manage default tags for posts"
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:114: Warning: Hardcoded string "4 Active", should use @string resource [HardcodedText]
+                            android:text="4 Active"
+                            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:129: Warning: Hardcoded string "Navigate", should use @string resource [HardcodedText]
+                            android:contentDescription="Navigate" />
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:149: Warning: Hardcoded string "Usage Statistics", should use @string resource [HardcodedText]
+                            android:contentDescription="Usage Statistics" />
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:161: Warning: Hardcoded string "Usage Statistics", should use @string resource [HardcodedText]
+                                android:text="Usage Statistics"
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:168: Warning: Hardcoded string "View token usage and API health", should use @string resource [HardcodedText]
+                                android:text="View token usage and API health"
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:180: Warning: Hardcoded string "Navigate", should use @string resource [HardcodedText]
+                            android:contentDescription="Navigate" />
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:587: Warning: Hardcoded string "POST CUSTOMIZATION", should use @string resource [HardcodedText]
+                android:text="POST CUSTOMIZATION"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:635: Warning: Hardcoded string "Formal", should use @string resource [HardcodedText]
+                                android:text="Formal"
+                                ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:646: Warning: Hardcoded string "Casual", should use @string resource [HardcodedText]
+                                android:text="Casual"
+                                ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:708: Warning: Hardcoded string "#BolaSepak #Football", should use @string resource [HardcodedText]
+                                android:text="#BolaSepak #Football"
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:724: Warning: Hardcoded string "GENERAL", should use @string resource [HardcodedText]
+                android:text="GENERAL"
+                ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_settings.xml:766: Warning: Hardcoded string "App Version 1.0.0", should use @string resource [HardcodedText]
+                        android:text="App Version 1.0.0"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_share_receiver.xml:72: Warning: Hardcoded string "Input", should use @string resource [HardcodedText]
+                            android:text="Input"
+                            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_share_receiver.xml:99: Warning: Hardcoded string "0 characters", should use @string resource [HardcodedText]
+                        android:text="0 characters"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_share_receiver.xml:448: Warning: Hardcoded string "0 words", should use @string resource [HardcodedText]
+                        android:text="0 words"
+                        ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:63: Warning: Hardcoded string "24H", should use @string resource [HardcodedText]
+                        android:text="24H"
+                        ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:75: Warning: Hardcoded string "7D", should use @string resource [HardcodedText]
+                        android:text="7D"
+                        ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:86: Warning: Hardcoded string "30D", should use @string resource [HardcodedText]
+                        android:text="30D"
+                        ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:134: Warning: Hardcoded string "Total Tokens", should use @string resource [HardcodedText]
+                                android:contentDescription="Total Tokens" />
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:150: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                            android:text="0"
+                            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:160: Warning: Hardcoded string "↗ +12% vs last week", should use @string resource [HardcodedText]
+                            android:text="↗ +12% vs last week"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:198: Warning: Hardcoded string "Estimated Cost", should use @string resource [HardcodedText]
+                                android:contentDescription="Estimated Cost" />
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:203: Warning: Hardcoded string "Est. Cost", should use @string resource [HardcodedText]
+                                android:text="Est. Cost"
+                                ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:214: Warning: Hardcoded string "$0.00", should use @string resource [HardcodedText]
+                            android:text="$0.00"
+                            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:224: Warning: Hardcoded string "Reset in 30 days", should use @string resource [HardcodedText]
+                            android:text="Reset in 30 days"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:241: Warning: Hardcoded string "100%", should use @string resource [HardcodedText]
+                android:text="100%" />
+                ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:248: Warning: Hardcoded string "0 requests", should use @string resource [HardcodedText]
+                android:text="0 requests" />
+                ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:254: Warning: Hardcoded string "USAGE BY TIME", should use @string resource [HardcodedText]
+                android:text="USAGE BY TIME"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:291: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                            android:text="0"
+                            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:307: Warning: Hardcoded string "0 req", should use @string resource [HardcodedText]
+                            android:text="0 req"
+                            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:339: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                            android:text="0"
+                            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:355: Warning: Hardcoded string "0 req", should use @string resource [HardcodedText]
+                            android:text="0 req"
+                            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:386: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                            android:text="0"
+                            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:402: Warning: Hardcoded string "0 req", should use @string resource [HardcodedText]
+                            android:text="0 req"
+                            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:442: Warning: Hardcoded string "Token Distribution", should use @string resource [HardcodedText]
+                            android:text="Token Distribution"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:456: Warning: Hardcoded string "Response", should use @string resource [HardcodedText]
+                            android:text="Response"
+                            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:471: Warning: Hardcoded string "Prompt", should use @string resource [HardcodedText]
+                            android:text="Prompt"
+                            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:621: Warning: Hardcoded string "MON", should use @string resource [HardcodedText]
+                            android:text="MON" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:623: Warning: Hardcoded string "TUE", should use @string resource [HardcodedText]
+                            android:text="TUE" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:625: Warning: Hardcoded string "WED", should use @string resource [HardcodedText]
+                            android:text="WED" android:textColor="?attr/colorOnSurface" android:textSize="10sp" android:textStyle="bold" android:gravity="center" />
+                            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:627: Warning: Hardcoded string "THU", should use @string resource [HardcodedText]
+                            android:text="THU" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:629: Warning: Hardcoded string "FRI", should use @string resource [HardcodedText]
+                            android:text="FRI" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:631: Warning: Hardcoded string "SAT", should use @string resource [HardcodedText]
+                            android:text="SAT" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:633: Warning: Hardcoded string "SUN", should use @string resource [HardcodedText]
+                            android:text="SUN" android:textColor="?attr/colorOnSurfaceVariant" android:textSize="10sp" android:gravity="center" />
+                            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:641: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                        <TextView android:id="@+id/promptTokensValue" android:layout_width="0dp" android:layout_height="0dp" android:text="0" />
+                                                                                                                             ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:642: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                        <TextView android:id="@+id/responseTokensValue" android:layout_width="0dp" android:layout_height="0dp" android:text="0" />
+                                                                                                                               ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:653: Warning: Hardcoded string "BY PROVIDER", should use @string resource [HardcodedText]
+                android:text="BY PROVIDER"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:694: Warning: Hardcoded string "Gemini", should use @string resource [HardcodedText]
+                            android:text="Gemini"
+                            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:714: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                            android:text="0"
+                            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:739: Warning: Hardcoded string "Groq", should use @string resource [HardcodedText]
+                            android:text="Groq"
+                            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:759: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                            android:text="0"
+                            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:784: Warning: Hardcoded string "OpenRouter", should use @string resource [HardcodedText]
+                            android:text="OpenRouter"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:804: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                            android:text="0"
+                            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:845: Warning: Hardcoded string "API Health", should use @string resource [HardcodedText]
+                            android:text="API Health"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:855: Warning: Hardcoded string "● Operational", should use @string resource [HardcodedText]
+                            android:text="● Operational"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:890: Warning: Hardcoded string "Successful", should use @string resource [HardcodedText]
+                            android:text="Successful"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:898: Warning: Hardcoded string "4,281", should use @string resource [HardcodedText]
+                            android:text="4,281"
+                            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:916: Warning: Hardcoded string "Failed", should use @string resource [HardcodedText]
+                            android:text="Failed"
+                            ~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:924: Warning: Hardcoded string "34", should use @string resource [HardcodedText]
+                            android:text="34"
+                            ~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:966: Warning: Hardcoded string "Avg. Response Time", should use @string resource [HardcodedText]
+                            android:text="Avg. Response Time"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:974: Warning: Hardcoded string "1.2s", should use @string resource [HardcodedText]
+                            android:text="1.2s"
+                            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:993: Warning: Hardcoded string "Last Request", should use @string resource [HardcodedText]
+                            android:text="Last Request"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1001: Warning: Hardcoded string "14:02 PM", should use @string resource [HardcodedText]
+                            android:text="14:02 PM"
+                            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1020: Warning: Hardcoded string "Active Model", should use @string resource [HardcodedText]
+                            android:text="Active Model"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1028: Warning: Hardcoded string "● Gemini 1.5 Pro", should use @string resource [HardcodedText]
+                            android:text="● Gemini 1.5 Pro"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1042: Warning: Hardcoded string "RECENT ACTIVITY", should use @string resource [HardcodedText]
+                android:text="RECENT ACTIVITY"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1090: Warning: Hardcoded string "Show More", should use @string resource [HardcodedText]
+                        android:text="Show More"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1128: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                            android:text="0"
+                            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1167: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                            android:text="0"
+                            ~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1198: Warning: Hardcoded string "LOGS", should use @string resource [HardcodedText]
+                    android:text="LOGS"
+                    ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1208: Warning: Hardcoded string "0 entries", should use @string resource [HardcodedText]
+                    android:text="0 entries"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\activity_usage.xml:1255: Warning: Hardcoded string "Show More", should use @string resource [HardcodedText]
+                        android:text="Show More"
+                        ~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\dialog_log_details.xml:25: Warning: Hardcoded string "INFO", should use @string resource [HardcodedText]
+            android:text="INFO"
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\dialog_log_details.xml:36: Warning: Hardcoded string "Tag", should use @string resource [HardcodedText]
+            android:text="Tag"
+            ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\dialog_log_details.xml:44: Warning: Hardcoded string "12:00:00", should use @string resource [HardcodedText]
+            android:text="12:00:00"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\dialog_log_details.xml:61: Warning: Hardcoded string "Message", should use @string resource [HardcodedText]
+        android:text="Message"
+        ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\dialog_log_details.xml:71: Warning: Hardcoded string "Log message goes here", should use @string resource [HardcodedText]
+        android:text="Log message goes here"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\dialog_log_details.xml:81: Warning: Hardcoded string "Details", should use @string resource [HardcodedText]
+        android:text="Details"
+        ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\dialog_log_details.xml:101: Warning: Hardcoded string "Stack trace or details...", should use @string resource [HardcodedText]
+            android:text="Stack trace or details..."
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\dialog_log_details.xml:112: Warning: Hardcoded string "Copy Log Details", should use @string resource [HardcodedText]
+        android:text="Copy Log Details"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\fragment_share_bottom_sheet.xml:94: Warning: Hardcoded string "Input", should use @string resource [HardcodedText]
+                            android:text="Input"
+                            ~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\fragment_share_bottom_sheet.xml:108: Warning: Hardcoded string "0 characters", should use @string resource [HardcodedText]
+                            android:text="0 characters"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\fragment_share_bottom_sheet.xml:537: Warning: Hardcoded string "Grade: 0.0", should use @string resource [HardcodedText]
+                            android:text="Grade: 0.0"
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\fragment_share_bottom_sheet.xml:546: Warning: Hardcoded string "0 words", should use @string resource [HardcodedText]
+                            android:text="0 words"
+                            ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_log_entry.xml:30: Warning: Hardcoded string "INFO", should use @string resource [HardcodedText]
+            android:text="INFO"
+            ~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_log_entry.xml:57: Warning: Hardcoded string "API", should use @string resource [HardcodedText]
+                    android:text="API"
+                    ~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_log_entry.xml:68: Warning: Hardcoded string "10:30:00", should use @string resource [HardcodedText]
+                    android:text="10:30:00"
+                    ~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_log_entry.xml:79: Warning: Hardcoded string "Request completed successfully", should use @string resource [HardcodedText]
+                android:text="Request completed successfully"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_session_entry.xml:45: Warning: Hardcoded string "Gemini • Gemini 2.0 Flash", should use @string resource [HardcodedText]
+                android:text="Gemini • Gemini 2.0 Flash"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_session_entry.xml:57: Warning: Hardcoded string "Dec 13, 10:30", should use @string resource [HardcodedText]
+                android:text="Dec 13, 10:30"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\res\layout\item_session_entry.xml:69: Warning: Hardcoded string "1,234", should use @string resource [HardcodedText]
+            android:text="1,234"
+            ~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "HardcodedText":
+   Hardcoding text attributes directly in layout files is bad for several
+   reasons:
+
+   * When creating configuration variations (for example for landscape or
+   portrait) you have to repeat the actual text (and keep it up to date when
+   making changes)
+
+   * The application cannot be translated to other languages by just adding
+   new translations for existing string resources.
+
+   There are quickfixes to automatically extract this hardcoded string into a
+   resource lookup.
+
+8 errors, 446 warnings
