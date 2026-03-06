@@ -563,7 +563,7 @@ fun NavigationRow(
     }
 }
 
-private fun testConnection(provider: String, apiKey: String, modelId: String, tone: String): String {
+private suspend fun testConnection(provider: String, apiKey: String, modelId: String, tone: String): String {
     return when (provider) {
         PreferencesManager.PROVIDER_GROQ -> {
             val curator = OpenAICompatibleCurator(apiKey, "https://api.groq.com/openai/v1/chat/completions", modelId, tone, false)

@@ -152,7 +152,15 @@ import com.najmi.oreamnos.ui.components.PasteAction
 import com.najmi.oreamnos.ui.components.ClearAction
 import com.najmi.oreamnos.ui.components.SuccessOverlay
 import com.najmi.oreamnos.viewmodel.MainViewModel
+import com.najmi.oreamnos.viewmodel.AppViewModel
 import androidx.compose.animation.animateContentSize
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.najmi.oreamnos.cardgen.ui.CardGeneratorScreen
 
 // File-level regex patterns for use in composables
 private val SOURCE_CITATION_PATTERN = Regex("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$")
@@ -171,6 +179,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var prefsManager: PreferencesManager
     private lateinit var viewModel: MainViewModel
+    private lateinit var appViewModel: AppViewModel
     
     // State for broadcast receiver results
     private val generationResult = mutableStateOf<GenerationResult?>(null)
@@ -224,6 +233,7 @@ class MainActivity : ComponentActivity() {
         
         prefsManager = PreferencesManager(this)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
         
         // Initialize theme
         currentTheme.value = prefsManager.getTheme()
@@ -240,19 +250,63 @@ class MainActivity : ComponentActivity() {
             val themeValue by currentTheme
 
             SocurateTheme(themeMode = themeValue) {
-                MainScreen(
-                    prefsManager = prefsManager,
-                    generationResult = generationResult.value,
-                    onClearResult = { generationResult.value = null },
-                    onNavigateToSettings = { startActivity(Intent(this, SettingsActivity::class.java)) },
-                    onNavigateToUsage = { startActivity(Intent(this, UsageActivity::class.java)) },
-                    onGenerate = { input, includeSource, keepStructure -> startGeneration(input, includeSource, keepStructure) },
-                    onRefine = { originalPost, refinements, includeSource -> startRefinement(originalPost, refinements, includeSource) },
-                    initialSharedText = sharedText,
-                    initialTitle = intentTitle,
-                    initialBody = intentBody,
-                    initialSource = intentSource
-                )
+                val navController = rememberNavController()
+                Scaffold(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    bottomBar = {
+                        val navBackStackEntry by navController.currentBackStackEntryAsState()
+                        val currentRoute = navBackStackEntry?.destination?.route
+                        NavigationBar(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            tonalElevation = 0.dp
+                        ) {
+                            NavigationBarItem(
+                                selected = currentRoute == "generate",
+                                onClick = { navController.navigate("generate") { launchSingleTop = true; popUpTo("generate") } },
+                                icon = { Icon(Icons.Default.PlayArrow, contentDescription = null) },
+                                label = { Text("JANA", style = MaterialTheme.typography.labelSmall) }
+                            )
+                            NavigationBarItem(
+                                selected = currentRoute == "card",
+                                onClick = { navController.navigate("card") { launchSingleTop = true } },
+                                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                                label = { Text("KAD", style = MaterialTheme.typography.labelSmall) }
+                            )
+                        }
+                    }
+                ) { innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = "generate",
+                        modifier = Modifier.padding(innerPadding)
+                    ) {
+                        composable("generate") {
+                            MainScreen(
+                                prefsManager = prefsManager,
+                                generationResult = generationResult.value,
+                                onClearResult = { generationResult.value = null },
+                                onNavigateToSettings = { startActivity(Intent(this@MainActivity, SettingsActivity::class.java)) },
+                                onNavigateToUsage = { startActivity(Intent(this@MainActivity, UsageActivity::class.java)) },
+                                onGenerate = { input, includeSource, keepStructure -> startGeneration(input, includeSource, keepStructure) },
+                                onRefine = { originalPost, refinements, includeSource -> startRefinement(originalPost, refinements, includeSource) },
+                                initialSharedText = sharedText,
+                                initialTitle = intentTitle,
+                                initialBody = intentBody,
+                                initialSource = intentSource,
+                                onCreateCard = { text ->
+                                    appViewModel.pipeText(text)
+                                    navController.navigate("card") { launchSingleTop = true }
+                                }
+                            )
+                        }
+                        composable("card") {
+                            CardGeneratorScreen(
+                                appViewModel = appViewModel,
+                                onNavigateUp = { navController.popBackStack() }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -328,7 +382,8 @@ fun MainScreen(
     initialSharedText: String? = null,
     initialTitle: String? = null,
     initialBody: String? = null,
-    initialSource: String? = null
+    initialSource: String? = null,
+    onCreateCard: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -668,75 +723,21 @@ fun MainScreen(
     
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = {
-            // Neo Bottom Bar
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    // Pulse animation for Generate button when input changes
-                    val infiniteTransition = rememberInfiniteTransition(label = "generatePulse")
-                    val pulseScale = infiniteTransition.animateFloat(
-                        initialValue = 1f,
-                        targetValue = if (inputHasChanged) 1.05f else 1f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(600, easing = LinearEasing),
-                            repeatMode = RepeatMode.Reverse
-                        ),
-                        label = "pulse_scale"
-                    )
-                    val pulseAlpha = infiniteTransition.animateFloat(
-                        initialValue = 1f,
-                        targetValue = if (inputHasChanged) 0.85f else 1f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(600, easing = LinearEasing),
-                            repeatMode = RepeatMode.Reverse
-                        ),
-                        label = "pulse_alpha"
-                    )
-                    
-                    NeoButton(
-                        onClick = {
-                            inputHasChanged = false // Stop pulsing when clicked
-                            if (inputText.isBlank()) {
-                                isInputError = true
-                                triggerInputShake = true
-                                HapticHelper(context).onError()
-                            } else if (!prefsManager.hasApiKey()) {
-                                Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
-                                onNavigateToSettings()
-                            } else {
-                                isLoading = true
-                                error = null
-                                onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
-                            }
-                        },
-                        text = "GENERATE",
-                        isLoading = isLoading,
-                        modifier = Modifier
-                            .weight(1f)
-                            .graphicsLayer {
-                                val currentScale = if (inputHasChanged) pulseScale.value else 1f
-                                scaleX = currentScale
-                                scaleY = currentScale
-                                alpha = if (inputHasChanged) pulseAlpha.value else 1f
-                            }
-                    )
-                    Spacer(Modifier.width(8.dp))
+        topBar = {
+            TopAppBar(
+                title = { Text("SOCURATE", style = MaterialTheme.typography.displaySmall) },
+                actions = {
                     TextButton(onClick = onNavigateToUsage) {
-                        Text("USAGE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
+                        Text("USAGE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold))
                     }
                     TextButton(onClick = onNavigateToSettings) {
-                        Text("SETTINGS", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
+                        Text("SETTINGS", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold))
                     }
-                }
-            }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+            )
         }
     ) { paddingValues ->
         Column(
@@ -744,17 +745,29 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Neo Header
-            Text(
-                text = "SOCURATE",
-                style = MaterialTheme.typography.displayMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(bottom = 8.dp)
+            // Generate button in body
+            val infiniteTransition = rememberInfiniteTransition(label = "generatePulse")
+            val pulseScale = infiniteTransition.animateFloat(
+                initialValue = 1f,
+                targetValue = if (inputHasChanged) 1.05f else 1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(600, easing = LinearEasing),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "pulse_scale"
             )
-
+            val pulseAlpha = infiniteTransition.animateFloat(
+                initialValue = 1f,
+                targetValue = if (inputHasChanged) 0.85f else 1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(600, easing = LinearEasing),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "pulse_alpha"
+            )
             // Input Card
             val inputShakeOffset = animateFloatAsState(
                 targetValue = if (triggerInputShake) 1f else 0f,
@@ -767,6 +780,34 @@ fun MainScreen(
                     tween(0)
                 },
                 label = "inputShake"
+            )
+            // Generate button — now lives in the scrollable body, not the bottom bar
+            NeoButton(
+                onClick = {
+                    inputHasChanged = false
+                    if (inputText.isBlank()) {
+                        isInputError = true
+                        triggerInputShake = true
+                        HapticHelper(context).onError()
+                    } else if (!prefsManager.hasApiKey()) {
+                        Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
+                        onNavigateToSettings()
+                    } else {
+                        isLoading = true
+                        error = null
+                        onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                    }
+                },
+                text = "GENERATE",
+                isLoading = isLoading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        val currentScale = if (inputHasChanged) pulseScale.value else 1f
+                        scaleX = currentScale
+                        scaleY = currentScale
+                        alpha = if (inputHasChanged) pulseAlpha.value else 1f
+                    }
             )
 
             val onInputChange = remember {
@@ -900,6 +941,7 @@ fun MainScreen(
                         onCopyClick = onCopyClick,
                         onShareClick = onShareClick,
                         onExpandClick = onExpandClick,
+                        onCreateCard = onCreateCard,
                         textSize = textSizeState.intValue
                     )
                     
@@ -1140,6 +1182,7 @@ fun OutputCard(
     onCopyClick: () -> Unit,
     onShareClick: () -> Unit,
     onExpandClick: () -> Unit,
+    onCreateCard: (String) -> Unit = {},
     textSize: Int
 ) {
     NeoCard(
@@ -1250,6 +1293,12 @@ fun OutputCard(
                 )
                 NeoButton(onClick = onShareClick, modifier = Modifier.weight(1f), text = "Share")
             }
+            // Create Card shortcut — appears after a successful generation
+            NeoOutlinedButton(
+                text = "BUAT KAD 🎮",
+                onClick = { onCreateCard(outputText) },
+                modifier = Modifier.fillMaxWidth()
+            )
     }
 }
 

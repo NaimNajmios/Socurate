@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.najmi.oreamnos.app-mergeDebugResources-59:/values-ko/values-ko.xml",
+            "outputFile": "com.najmi.oreamnos.app-mergeDebugResources-65:/values-ko/values-ko.xml",
             "map": [
                 {
                     "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\218776c5ea69f9e66b4cbc140bc1a1ee\\transformed\\appcompat-1.6.1\\res\\values-ko\\values-ko.xml",

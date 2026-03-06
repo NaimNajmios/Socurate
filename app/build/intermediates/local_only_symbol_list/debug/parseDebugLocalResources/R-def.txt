@@ -506,3 +506,4 @@ style Theme.Oreamnos
 style Theme.Oreamnos.BottomSheet
 style Theme.Oreamnos.Transparent
 style Widget.Oreamnos.BottomSheet
+xml file_paths
