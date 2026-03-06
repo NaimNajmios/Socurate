@@ -24,11 +24,11 @@ enum class ExportSize(
     val label: String
 ) {
     /** 1080 × 1080 px — Instagram feed / Facebook post. */
-    SQUARE(1080, 1080, "Segiempat (1:1)"),
+    SQUARE(1080, 1080, "Square (1:1)"),
     /** 1080 × 1350 px — Instagram feed portrait. */
-    PORTRAIT(1080, 1350, "Potret (4:5)"),
+    PORTRAIT(1080, 1350, "Portrait (4:5)"),
     /** 1080 × 1920 px — Instagram / Facebook Stories. */
-    STORY(1080, 1920, "Stori (9:16)")
+    STORY(1080, 1920, "Story (9:16)")
 }
 
 /**

@@ -5,6 +5,8 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.google.gson.stream.JsonReader
+import java.io.StringReader
 import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.model.CardTemplate
 import com.najmi.oreamnos.cardgen.model.StatItem
@@ -53,12 +55,8 @@ class CardDataExtractor(private val context: Context) {
             // because IContentCurator.curatePost() doesn't expose a separate system param.
             val fullPrompt = "${CardPromptManager.systemPrompt()}\n\n${CardPromptManager.buildPrompt(template, articleText)}"
 
-            // curatePost with no source / no structure keeps the response as raw JSON
-            val rawResponse = curator.curatePost(
-                inputText = fullPrompt,
-                includeSource = false,
-                keepStructure = true
-            )
+            // generateRaw() bypasses the Malay social-media prompt injections in curatePost
+            val rawResponse = curator.generateRaw(prompt = fullPrompt)
 
             Log.d(TAG, "Raw AI response for $template:\n$rawResponse")
 
@@ -71,32 +69,61 @@ class CardDataExtractor(private val context: Context) {
             throw e
         } catch (e: Exception) {
             Log.e(TAG, "Failed to extract card data for $template", e)
-            Result.failure(Exception("Tidak dapat mengekstrak data kad: ${e.message}", e))
+            Result.failure(Exception("Could not extract card data: ${e.message}", e))
         }
     }
 
     /**
      * Strips markdown code fences from the AI response.
+     *
+     * Strategy:
+     * 1. If a ```json ... ``` or ``` ... ``` fence is found, extract its content.
+     * 2. Otherwise, extract the first complete  { … }  block by bracket-matching.
+     *    This handles AI responses that prepend prose ("Sure, here is the JSON:").
+     * 3. If neither strategy finds valid JSON, return the trimmed raw string.
+     *
      * Exposed as internal for unit testing.
      */
     internal fun stripFences(raw: String): String {
-        val match = FENCE_PATTERN.find(raw.trim())
-        return if (match != null) match.groupValues[1].trim() else raw.trim()
+        val trimmed = raw.trim()
+
+        // 1. Try code fence extraction
+        val fenceMatch = FENCE_PATTERN.find(trimmed)
+        if (fenceMatch != null) return fenceMatch.groupValues[1].trim()
+
+        // 2. Find first '{' and match to its closing '}'
+        val startIdx = trimmed.indexOf('{')
+        if (startIdx >= 0) {
+            var depth = 0
+            var endIdx = -1
+            for (i in startIdx..trimmed.lastIndex) {
+                when (trimmed[i]) {
+                    '{' -> depth++
+                    '}' -> {
+                        depth--
+                        if (depth == 0) { endIdx = i; break }
+                    }
+                }
+            }
+            if (endIdx > startIdx) return trimmed.substring(startIdx, endIdx + 1)
+        }
+
+        return trimmed
     }
 
     /**
      * Parses a clean JSON string into the appropriate [CardData] subclass.
+     * Uses a lenient [JsonReader] so minor AI quirks (trailing commas, etc.) don't throw.
+     * If the parsed element is not a JsonObject (e.g. AI returned a string or array),
+     * falls back to bracket-scanning the raw string for the first { ... } block.
      * Missing fields are replaced with safe placeholder values.
      * Exposed as internal for unit testing.
      *
-     * @throws Exception if the JSON is structurally malformed (not parseable at all).
+     * @throws Exception if no JSON object can be found at all.
      */
     internal fun parseJson(template: CardTemplate, json: String): CardData {
-        val obj: JsonObject = try {
-            JsonParser.parseString(json).asJsonObject
-        } catch (e: Exception) {
-            throw Exception("JSON tidak sah: ${e.message}")
-        }
+        val obj: JsonObject = parseToObject(json)
+            ?: throw Exception("The AI response did not contain a JSON object. Try again.")
 
         return when (template) {
             CardTemplate.MatchResult -> parseMatchResult(obj)
@@ -104,6 +131,53 @@ class CardDataExtractor(private val context: Context) {
             CardTemplate.HeadlineQuote -> parseHeadlineQuote(obj)
             CardTemplate.TopStats -> parseTopStats(obj)
         }
+    }
+
+    /**
+     * Attempts to parse [json] into a [JsonObject].
+     *
+     * 1. Direct lenient parse — if the result is already a JsonObject, return it.
+     * 2. If the result is a non-object (string/array), scan [json] for the first
+     *    balanced { ... } block and retry parsing that substring.
+     * 3. Return null if no object can be extracted.
+     */
+    private fun parseToObject(json: String): JsonObject? {
+        // Attempt 1: direct lenient parse
+        val element = try {
+            val reader = JsonReader(StringReader(json)).also { it.isLenient = true }
+            JsonParser.parseReader(reader)
+        } catch (e: Exception) {
+            Log.w(TAG, "Lenient parse failed, trying bracket scan: ${e.message}")
+            null
+        }
+
+        if (element != null && element.isJsonObject) return element.asJsonObject
+
+        // Attempt 2: bracket-scan the raw string for a {...} block
+        val startIdx = json.indexOf('{')
+        if (startIdx >= 0) {
+            var depth = 0
+            var endIdx = -1
+            for (i in startIdx..json.lastIndex) {
+                when (json[i]) {
+                    '{' -> depth++
+                    '}' -> { depth--; if (depth == 0) { endIdx = i; break } }
+                }
+            }
+            if (endIdx > startIdx) {
+                val candidate = json.substring(startIdx, endIdx + 1)
+                return try {
+                    val reader = JsonReader(StringReader(candidate)).also { it.isLenient = true }
+                    val parsed = JsonParser.parseReader(reader)
+                    if (parsed.isJsonObject) parsed.asJsonObject else null
+                } catch (e: Exception) {
+                    Log.w(TAG, "Bracket-scan parse also failed: ${e.message}")
+                    null
+                }
+            }
+        }
+
+        return null
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -157,7 +231,7 @@ class CardDataExtractor(private val context: Context) {
                 val item = statsArray[i]?.asJsonObject
                 items.add(
                     StatItem(
-                        label = item.optString("label", "Statistik ${i + 1}"),
+                        label = item.optString("label", "Stat ${i + 1}"),
                         value = item.optString("value", ZERO_STR),
                         context = item.optString("context", "")
                     )
@@ -166,7 +240,7 @@ class CardDataExtractor(private val context: Context) {
         }
         // Pad to exactly 3 items if AI returned fewer
         while (items.size < 3) {
-            items.add(StatItem(label = "Statistik ${items.size + 1}", value = ZERO_STR, context = ""))
+            items.add(StatItem(label = "Stat ${items.size + 1}", value = ZERO_STR, context = ""))
         }
 
         return CardData.TopStats(stats = items)

@@ -76,7 +76,7 @@ fun BackgroundPickerSheet(
             else -> 0
         }
     ) }
-    val tabs = listOf("Gradien", "Galeri", "Pratetap")
+    val tabs = listOf("Gradient", "Gallery", "Preset")
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -89,7 +89,7 @@ fun BackgroundPickerSheet(
                 .padding(bottom = 24.dp)
         ) {
             Text(
-                text = "LATAR BELAKANG",
+                text = "BACKGROUND",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
@@ -135,7 +135,7 @@ private fun GradientTab(
 ) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
-            text = "Pilih warna kelab",
+            text = "Pick a club colour gradient",
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(bottom = 12.dp)
@@ -255,7 +255,7 @@ private fun GalleryTab(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Kebenaran galeri diperlukan.\nPilih lagi selepas memberi kebenaran.",
+                text = "Gallery permission required.\nGrant permission and try again.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
@@ -364,7 +364,7 @@ private fun PresetTab(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Latar belakang pratetap",
+                            text = "Preset background",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )

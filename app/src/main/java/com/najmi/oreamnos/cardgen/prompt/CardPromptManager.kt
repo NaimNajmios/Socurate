@@ -6,24 +6,17 @@ import com.najmi.oreamnos.cardgen.model.CardTemplate
  * Builds AI prompts for each card template type.
  *
  * Each prompt instructs the AI to return ONLY a JSON object — no markdown fences,
- * no explanation. The [CardDataExtractor] is responsible for stripping any
- * fence characters that sneak through and parsing the result.
+ * no explanation. The [CardDataExtractor] strips stray fences and parses the result.
  */
 object CardPromptManager {
 
-    /**
-     * Returns the system instruction common to all card extraction prompts.
-     * Keeps the AI focused on pure JSON output.
-     */
     fun systemPrompt(): String =
-        "You are a football data extractor. Your ONLY task is to extract structured data " +
-        "from the article and return it as a valid JSON object. " +
-        "Return NOTHING else — no markdown, no code fences, no explanation, no preamble. " +
-        "If a field cannot be determined from the article, use a sensible placeholder string."
+        "You are a structured data extractor for football (soccer) articles. " +
+        "Your ONLY output must be a single valid JSON object. " +
+        "Do NOT include any explanation, preamble, markdown, code fences, or text outside the JSON. " +
+        "Start your response with { and end it with }. " +
+        "Use English for all extracted text values unless the source text includes proper nouns."
 
-    /**
-     * Returns the full extraction prompt for the given [template] and [articleText].
-     */
     fun buildPrompt(template: CardTemplate, articleText: String): String {
         val schema = when (template) {
             CardTemplate.MatchResult -> matchResultSchema()
@@ -31,67 +24,62 @@ object CardPromptManager {
             CardTemplate.HeadlineQuote -> headlineQuoteSchema()
             CardTemplate.TopStats -> topStatsSchema()
         }
-        return "$schema\n\nARTICLE TEXT:\n$articleText"
+        return "$schema\n\nARTICLE:\n$articleText\n\nRespond with ONLY the JSON object, starting with {"
     }
 
     // ──────────────────────────────────────────────────────────────
-    // Schema prompts
+    // Schema prompts — no "Bahasa Melayu" instruction, ends with
+    // a forcing anchor so the model begins its reply with {
     // ──────────────────────────────────────────────────────────────
 
     private fun matchResultSchema(): String = """
-        Extract match result data from this football article and return ONLY this JSON structure:
+        Extract match result data from the football article below.
+        Return ONLY a JSON object with this exact structure (fill in real values):
         {
-          "homeTeam": "string",
-          "awayTeam": "string",
+          "homeTeam": "Team Name",
+          "awayTeam": "Team Name",
           "homeScore": 0,
           "awayScore": 0,
-          "competition": "string",
-          "matchDate": "string",
-          "homeStats": {
-            "possession": 50,
-            "shots": 0,
-            "shotsOnTarget": 0
-          },
-          "awayStats": {
-            "possession": 50,
-            "shots": 0,
-            "shotsOnTarget": 0
-          },
-          "keyMoment": "string max 80 chars in Bahasa Melayu"
+          "competition": "Competition Name",
+          "matchDate": "DD Mon YYYY",
+          "homeStats": { "possession": 50, "shots": 0, "shotsOnTarget": 0 },
+          "awayStats": { "possession": 50, "shots": 0, "shotsOnTarget": 0 },
+          "keyMoment": "One sentence describing the key moment of the match (max 80 chars)"
         }
     """.trimIndent()
 
     private fun playerSpotlightSchema(): String = """
-        Extract player highlight data from this football article and return ONLY this JSON structure:
+        Extract the standout player's data from the football article below.
+        Return ONLY a JSON object with this exact structure (fill in real values):
         {
-          "playerName": "string",
-          "club": "string",
-          "position": "string",
+          "playerName": "Full Name",
+          "club": "Club Name",
+          "position": "Position",
           "rating": 7.5,
           "goals": 0,
           "assists": 0,
-          "keyQuote": "string max 100 chars in Bahasa Melayu describing the performance"
+          "keyQuote": "One sentence describing the player's performance (max 100 chars)"
         }
     """.trimIndent()
 
     private fun headlineQuoteSchema(): String = """
-        Extract the single most impactful headline or quote from this football article
-        and return ONLY this JSON structure:
+        Extract the single most impactful headline or quote from the football article below.
+        Return ONLY a JSON object with this exact structure (fill in real values):
         {
-          "headline": "string max 120 chars in Bahasa Melayu",
-          "subtext": "string max 60 chars in Bahasa Melayu",
-          "source": "string — publication or platform name"
+          "headline": "The main headline or quote (max 120 chars)",
+          "subtext": "A brief supporting context (max 60 chars)",
+          "source": "Publication or platform name"
         }
     """.trimIndent()
 
     private fun topStatsSchema(): String = """
-        Extract the 3 most interesting statistics from this football article
-        and return ONLY this JSON structure:
+        Extract the 3 most interesting statistics from the football article below.
+        Return ONLY a JSON object with this exact structure (fill in real values):
         {
           "stats": [
-            { "label": "string max 30 chars in Bahasa Melayu", "value": "string max 10 chars", "context": "string max 50 chars in Bahasa Melayu" },
-            { "label": "string max 30 chars in Bahasa Melayu", "value": "string max 10 chars", "context": "string max 50 chars in Bahasa Melayu" },
-            { "label": "string max 30 chars in Bahasa Melayu", "value": "string max 10 chars", "context": "string max 50 chars in Bahasa Melayu" }
+            { "label": "Stat name (max 30 chars)", "value": "Numeric value", "context": "Brief context (max 50 chars)" },
+            { "label": "Stat name (max 30 chars)", "value": "Numeric value", "context": "Brief context (max 50 chars)" },
+            { "label": "Stat name (max 30 chars)", "value": "Numeric value", "context": "Brief context (max 50 chars)" }
           ]
         }
     """.trimIndent()

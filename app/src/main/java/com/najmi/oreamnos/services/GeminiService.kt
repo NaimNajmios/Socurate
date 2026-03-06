@@ -209,6 +209,110 @@ class GeminiService(
     }
 
     /**
+     * Sends [prompt] to Gemini exactly as-is. Used for extracting structured JSON
+     * data without the Malay social-media framing from [PromptManager].
+     */
+    @Throws(Exception::class)
+    override suspend fun generateRaw(prompt: String): String {
+        val startTime = System.currentTimeMillis()
+        val requestId = UUID.randomUUID().toString().substring(0, 8)
+
+        Log.i(TAG, "=== GEMINI RAW CALL START [$requestId] ===")
+
+        if (apiKey.isBlank()) throw Exception("Invalid or missing Gemini API key")
+        if (endpoint.isBlank()) throw Exception("Invalid Gemini API endpoint")
+        if (prompt.isBlank()) throw Exception("Prompt is required")
+
+        val requestJson = buildRequestJson(prompt)
+        val requestBodyString = gson.toJson(requestJson)
+
+        var responseJson: JsonObject? = null
+        var lastException: Exception? = null
+        val rnd = Random()
+
+        for (attempt in 1..MAX_RETRIES) {
+            try {
+                val urlWithKey = "$endpoint?key=$apiKey"
+                val body = requestBodyString.toRequestBody(JSON)
+                val request = Request.Builder()
+                    .url(urlWithKey)
+                    .post(body)
+                    .addHeader("Content-Type", "application/json")
+                    .build()
+
+                withContext(Dispatchers.IO) {
+                    sharedClient.newCall(request).execute().use { response ->
+                        val code = response.code
+
+                        if (code >= 400) {
+                            val errorBody = response.body?.string() ?: ""
+                            if (code == 503 || code == 429 || code in 500..599) {
+                                val errorType = if (code == 429) "Rate limit (quota)" else "Server error"
+                                var apiSuggestedDelay: Long = 0
+                                if (code == 429) {
+                                    apiSuggestedDelay = parseRetryDelay(errorBody, requestId)
+                                }
+                                lastException = RateLimitException(
+                                    "Gemini ${errorType.lowercase()}: $code. $errorBody",
+                                    apiSuggestedDelay,
+                                    "gemini"
+                                )
+                            } else {
+                                throw Exception("Gemini API error: $code. $errorBody")
+                            }
+                        } else {
+                            try {
+                                responseJson = gson.fromJson(response.body?.charStream(), JsonObject::class.java)
+                            } catch (e: Exception) {
+                                if (e is IOException || (e.cause is IOException)) {
+                                    throw if (e is IOException) e else (e.cause as IOException)
+                                }
+                                throw e
+                            }
+                        }
+                    }
+                }
+
+                if (responseJson != null) {
+                    lastException = null
+                    break
+                }
+            } catch (ioe: IOException) {
+                lastException = ioe
+            } catch (e: Exception) {
+                lastException = e
+                if (e !is IOException) throw e
+            }
+
+            if (attempt < MAX_RETRIES) {
+                delay(calculateRetryDelay(lastException, attempt, rnd, requestId))
+            }
+        }
+
+        if (responseJson == null) {
+            val finalException = lastException
+            if (finalException != null) {
+                if (finalException is RateLimitException) throw finalException
+                throw Exception("Gemini API failed after retries: ${finalException.message}", finalException)
+            } else {
+                throw Exception("Gemini API returned no result after retries")
+            }
+        }
+
+        return try {
+            val root = responseJson
+            val extractedText = extractTextFromJson(root) ?: ""
+            extractUsageMetadata(root!!)
+
+            Log.i(TAG, "=== GEMINI RAW CALL END [$requestId] ===")
+            extractedText
+        } catch (e: Exception) {
+            Log.e(TAG, "[$requestId] Error parsing raw response", e)
+            ""
+        }
+    }
+
+    /**
      * Refines an existing post based on selected refinement options.
      */
     @Throws(Exception::class)

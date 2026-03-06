@@ -117,7 +117,7 @@ fun CardGeneratorScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "KAD",
+                        text = "CARD",
                         style = MaterialTheme.typography.displaySmall
                     )
                 },
@@ -164,18 +164,18 @@ fun CardGeneratorScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     NeoOutlinedButton(
-                        text = "Latar Belakang",
+                        text = "Background",
                         onClick = { showBackgroundSheet = true },
                         modifier = Modifier.weight(1f)
                     )
                     NeoButton(
-                        text = "Eksport",
+                        text = "Export",
                         onClick = {
                             if (extractionState is ExtractionState.Success) {
                                 showExportSheet = true
                             } else {
                                 scope.launch {
-                                    snackbarHostState.showSnackbar("Jana kandungan kad dahulu")
+                                    snackbarHostState.showSnackbar("Generate card data first")
                                 }
                             }
                         },
@@ -187,7 +187,7 @@ fun CardGeneratorScreen(
             // ── 4. Text input (direct paste) ───────────────────────
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
-                    text = "TEKS ARTIKEL",
+                    text = "ARTICLE TEXT",
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                     style = MaterialTheme.typography.labelSmall,
                     letterSpacing = androidx.compose.ui.unit.TextUnit(
@@ -203,7 +203,7 @@ fun CardGeneratorScreen(
                         .height(140.dp),
                     placeholder = {
                         Text(
-                            text = "Tampal artikel bola sepak di sini...",
+                            text = "Paste a football article here...",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                         )
@@ -213,7 +213,7 @@ fun CardGeneratorScreen(
                 )
                 Spacer(Modifier.height(8.dp))
                 NeoButton(
-                    text = "Jana Data Kad",
+                    text = "Extract Card Data",
                     onClick = { cardViewModel.extractCardData(context) },
                     isLoading = extractionState is ExtractionState.Loading,
                     enabled = inputText.isNotBlank() && extractionState !is ExtractionState.Loading,
@@ -260,7 +260,7 @@ fun CardGeneratorScreen(
                             val uri = BitmapExporter.saveToGallery(bitmap, context)
                             cardViewModel.setExportState(ExportState.Saved(uri))
                         } catch (e: Exception) {
-                            cardViewModel.setExportState(ExportState.Error(e.message ?: "Gagal menyimpan"))
+                            cardViewModel.setExportState(ExportState.Error(e.message ?: "Failed to save"))
                         }
                     }
                 }
@@ -280,7 +280,7 @@ fun CardGeneratorScreen(
                             BitmapExporter.shareImage(bitmap, context)
                             cardViewModel.setExportState(ExportState.Shared)
                         } catch (e: Exception) {
-                            cardViewModel.setExportState(ExportState.Error(e.message ?: "Gagal berkongsi"))
+                            cardViewModel.setExportState(ExportState.Error(e.message ?: "Failed to share"))
                         }
                     }
                 }

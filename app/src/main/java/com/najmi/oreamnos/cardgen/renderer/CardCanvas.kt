@@ -225,9 +225,9 @@ private fun StatRowSection(label: String, stats: TeamStats) {
         )
         Spacer(Modifier.height(4.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            StatCell(value = "${stats.possession}%", label = "Milikan")
-            StatCell(value = "${stats.shots}", label = "Tendangan")
-            StatCell(value = "${stats.shotsOnTarget}", label = "Tepat")
+            StatCell(value = "${stats.possession}%", label = "Possession")
+            StatCell(value = "${stats.shots}", label = "Shots")
+            StatCell(value = "${stats.shotsOnTarget}", label = "On Target")
         }
     }
 }
@@ -435,8 +435,8 @@ fun PlayerSpotlightCanvas(
 
             // Stats row: goals and assists
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                StatCell(value = "${data.goals}", label = "Gol")
-                StatCell(value = "${data.assists}", label = "Aist")
+                StatCell(value = "${data.goals}", label = "Goals")
+                StatCell(value = "${data.assists}", label = "Assists")
                 Spacer(Modifier.width(1.dp)) // padding filler
             }
 
@@ -504,7 +504,7 @@ fun TopStatsCanvas(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "STATISTIK TERBAIK",
+                text = "TOP STATS",
                 color = CardTextMuted,
                 style = MaterialTheme.typography.labelSmall,
                 letterSpacing = 3.sp
@@ -640,9 +640,9 @@ private fun PreviewTopStats() {
         TopStatsCanvas(
             data = CardData.TopStats(
                 stats = listOf(
-                    StatItem(label = "Milikan Bola", value = "67%", context = "JDT menguasai permainan"),
-                    StatItem(label = "Tendangan", value = "24", context = "14 tepat sasaran"),
-                    StatItem(label = "Simpanan", value = "11", context = "Kiper terbaik perlawanan")
+                    StatItem(label = "Possession", value = "67%", context = "JDT dominated the match"),
+                    StatItem(label = "Shots", value = "24", context = "14 on target"),
+                    StatItem(label = "Saves", value = "11", context = "Best goalkeeper of the match")
                 )
             ),
             config = CardConfig()

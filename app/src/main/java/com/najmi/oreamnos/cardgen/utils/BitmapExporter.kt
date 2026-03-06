@@ -117,7 +117,7 @@ object BitmapExporter {
 
         withContext(Dispatchers.Main) {
             context.startActivity(
-                Intent.createChooser(shareIntent, "Kongsi Kad Socurate")
+                Intent.createChooser(shareIntent, "Share Socurate Card")
                     .also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
             )
         }

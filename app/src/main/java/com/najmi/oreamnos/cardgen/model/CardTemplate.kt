@@ -10,26 +10,26 @@ sealed class CardTemplate(
 ) {
     /** Match result card: score, teams, possession, shots stats. */
     object MatchResult : CardTemplate(
-        displayName = "Keputusan",
-        description = "Skor & Statistik Perlawanan"
+        displayName = "Result",
+        description = "Match Score & Stats"
     )
 
     /** Player spotlight card: player name, rating, goals, assists. */
     object PlayerSpotlight : CardTemplate(
-        displayName = "Pemain",
-        description = "Sorotan Prestasi Pemain"
+        displayName = "Player",
+        description = "Player Performance Spotlight"
     )
 
     /** Headline / quote card: key quote or headline from article. */
     object HeadlineQuote : CardTemplate(
-        displayName = "Tajuk",
-        description = "Petikan atau Tajuk Utama"
+        displayName = "Headline",
+        description = "Key Quote or Headline"
     )
 
     /** Top 3 stats card: the three most interesting statistics. */
     object TopStats : CardTemplate(
-        displayName = "Statistik",
-        description = "3 Statistik Terbaik"
+        displayName = "Stats",
+        description = "Top 3 Statistics"
     )
 
     companion object {

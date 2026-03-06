@@ -9,34 +9,29 @@ interface IContentCurator {
 
     /**
      * Curates the input text into a social media post.
-     *
-     * @param inputText     The text to curate
-     * @param includeSource Whether to include source citation
-     * @param keepStructure Whether to preserve original formatting/structure
-     * @return The curated post
-     * @throws Exception if curation fails
      */
     @Throws(Exception::class)
     suspend fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String
 
     /**
-     * Refines an existing post based on selected refinement options.
+     * Sends [prompt] to the AI provider exactly as-is, with no additional system
+     * prompt or post-processing. Used by [CardDataExtractor] to get raw JSON output
+     * without the Malay social-media framing that [curatePost] applies.
      *
-     * @param originalPost  The post to refine
-     * @param refinements   List of refinement options (e.g., "rephrase", "formal")
-     * @param includeSource Whether to include source citation
-     * @return The refined post
-     * @throws Exception if refinement fails
+     * Implementations SHOULD override this. The default falls back to [curatePost]
+     * for providers that have not yet implemented it.
+     */
+    @Throws(Exception::class)
+    suspend fun generateRaw(prompt: String): String =
+        curatePost(inputText = prompt, includeSource = false, keepStructure = true)
+
+    /**
+     * Refines an existing post based on selected refinement options.
      */
     @Throws(Exception::class)
     suspend fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String
 
-    /** Gets the last prompt token count from API response. */
     val lastPromptTokens: Int
-
-    /** Gets the last candidate (response) token count from API response. */
     val lastCandidateTokens: Int
-
-    /** Gets the last total token count from API response. */
     val lastTotalTokens: Int
 }

@@ -75,6 +75,17 @@ class OpenAICompatibleCurator(
     }
 
     /**
+     * Sends [prompt] to the OpenAI-compatible API exactly as-is. Used for extracting structured JSON
+     * data without the Malay social-media framing from [PromptManager].
+     */
+    @Throws(Exception::class)
+    override suspend fun generateRaw(prompt: String): String {
+        // We still need to pass a system prompt in the OpenAI format,
+        // but it should be empty so we don't interfere with the user prompt.
+        return callApi(systemPrompt = "", userPrompt = prompt)
+    }
+
+    /**
      * Makes the API call with retry logic.
      */
     @Throws(Exception::class)

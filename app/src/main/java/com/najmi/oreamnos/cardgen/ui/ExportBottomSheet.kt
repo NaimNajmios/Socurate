@@ -58,12 +58,12 @@ fun ExportBottomSheet(
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             Text(
-                text = "EKSPORT KAD",
+                text = "EXPORT CARD",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
-                text = "Pilih saiz dan simpan atau kongsi",
+                text = "Choose size, then save or share",
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 style = MaterialTheme.typography.bodySmall
             )
@@ -72,7 +72,7 @@ fun ExportBottomSheet(
 
             // Size chips
             Text(
-                text = "SAIZ",
+                text = "SIZE",
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 style = MaterialTheme.typography.labelSmall,
                 letterSpacing = androidx.compose.ui.unit.TextUnit(2f, androidx.compose.ui.unit.TextUnitType.Sp)
@@ -113,12 +113,12 @@ fun ExportBottomSheet(
                                 )
                             }
                             NeoButton(
-                                text = "Simpan ke Galeri",
+                                text = "Save to Gallery",
                                 onClick = onSaveToGallery,
                                 modifier = Modifier.fillMaxWidth()
                             )
                             NeoOutlinedButton(
-                                text = "Kongsi",
+                                text = "Share",
                                 onClick = onShare,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -126,7 +126,7 @@ fun ExportBottomSheet(
                     }
                     is ExportState.Exporting -> {
                         NeoButton(
-                            text = "Menyimpan...",
+                            text = "Saving...",
                             onClick = {},
                             isLoading = true,
                             enabled = false,
@@ -144,7 +144,7 @@ fun ExportBottomSheet(
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                text = if (state is ExportState.Saved) "Tersimpan!" else "Dikongsi!",
+                                text = if (state is ExportState.Saved) "Saved!" else "Shared!",
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )

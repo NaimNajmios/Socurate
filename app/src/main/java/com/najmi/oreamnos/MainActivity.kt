@@ -264,13 +264,13 @@ class MainActivity : ComponentActivity() {
                                 selected = currentRoute == "generate",
                                 onClick = { navController.navigate("generate") { launchSingleTop = true; popUpTo("generate") } },
                                 icon = { Icon(Icons.Default.PlayArrow, contentDescription = null) },
-                                label = { Text("JANA", style = MaterialTheme.typography.labelSmall) }
+                                label = { Text("GENERATE", style = MaterialTheme.typography.labelSmall) }
                             )
                             NavigationBarItem(
                                 selected = currentRoute == "card",
                                 onClick = { navController.navigate("card") { launchSingleTop = true } },
                                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                                label = { Text("KAD", style = MaterialTheme.typography.labelSmall) }
+                                label = { Text("CARD", style = MaterialTheme.typography.labelSmall) }
                             )
                         }
                     }
@@ -1295,7 +1295,7 @@ fun OutputCard(
             }
             // Create Card shortcut — appears after a successful generation
             NeoOutlinedButton(
-                text = "BUAT KAD 🎮",
+                text = "CREATE CARD",
                 onClick = { onCreateCard(outputText) },
                 modifier = Modifier.fillMaxWidth()
             )
