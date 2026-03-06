@@ -6,6 +6,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -51,12 +52,14 @@ fun NeoInput(
         trailingIcon = trailingIcon,
         supportingText = supportingText,
         shape = NeoInputShape, // Sharp corners
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-            focusedLabelColor = MaterialTheme.colorScheme.primary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            cursorColor = MaterialTheme.colorScheme.primary
-        )
+        colors = remember(MaterialTheme.colorScheme) {
+            OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                cursorColor = MaterialTheme.colorScheme.primary
+            )
+        }
     )
 }

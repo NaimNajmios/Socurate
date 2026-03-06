@@ -79,3 +79,43 @@ private val HORIZONTAL_WHITESPACE_PATTERN: Pattern = Pattern.compile("[ \\t]+")
 cleaned = HORIZONTAL_WHITESPACE_PATTERN.matcher(cleaned).replaceAll(" ") // Preserves \n
 cleaned = NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n") // Works correctly
 ```
+
+## 2024-05-21 - Null Safety Violation in MainActivity
+
+**Context:** `MainActivity.kt` uses `!!` operator on mutable state variables `rateLimitInfo` and `pillToEdit` inside Composable functions.
+
+**Symptoms:** Potential `NullPointerException` if `rateLimitInfo` or `pillToEdit` are set to null (e.g., by another event or concurrent modification) between the time they are checked and the time they are accessed inside a lambda (e.g., `onSwitchAndRetry` or `onSave`).
+
+**Root Cause:**
+Usage of `!!` on mutable properties.
+```kotlin
+    if (showRateLimitDialog && rateLimitInfo != null) {
+        RateLimitDialog(
+            // ...
+            onSwitchAndRetry = { newProvider ->
+                // ...
+                if (rateLimitInfo!!.isRefinement) { // Unsafe! rateLimitInfo could be null here if dialog was concurrently dismissed or state changed.
+```
+
+**Fix Applied:**
+Capture the non-null value using `let` or a local variable before passing it to the dialog or usage.
+
+**Prevention:**
+Always use `let`, `run`, or local variable capture when working with nullable mutable state properties in Compose, especially when passing them to callbacks or lambdas that might execute later.
+
+**Code Example (Before):**
+```kotlin
+    if (showRateLimitDialog && rateLimitInfo != null) {
+        RateLimitDialog(
+             retryDelayMs = rateLimitInfo!!.retryDelayMs,
+             // ...
+```
+
+**Code Example (After):**
+```kotlin
+    if (showRateLimitDialog) {
+        rateLimitInfo?.let { info ->
+            RateLimitDialog(
+                 retryDelayMs = info.retryDelayMs,
+                 // ...
+```

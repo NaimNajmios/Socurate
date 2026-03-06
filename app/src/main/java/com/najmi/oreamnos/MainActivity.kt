@@ -636,25 +636,27 @@ fun MainScreen(
     }
     
     // Rate limit dialog
-    if (showRateLimitDialog && rateLimitInfo != null) {
-        RateLimitDialog(
-            currentProvider = rateLimitInfo!!.rateLimitProvider ?: "",
-            retryDelayMs = rateLimitInfo!!.retryDelayMs,
-            isRefinement = rateLimitInfo!!.isRefinement,
-            prefsManager = prefsManager,
-            onSwitchAndRetry = { newProvider ->
-                prefsManager.saveProvider(newProvider)
-                showRateLimitDialog = false
-                if (rateLimitInfo!!.isRefinement) {
-                    val allRefinements = refinementOptions.toList() + 
-                        customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
-                    onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
-                } else {
-                    onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
-                }
-            },
-            onDismiss = { showRateLimitDialog = false }
-        )
+    if (showRateLimitDialog) {
+        rateLimitInfo?.let { info ->
+            RateLimitDialog(
+                currentProvider = info.rateLimitProvider ?: "",
+                retryDelayMs = info.retryDelayMs,
+                isRefinement = info.isRefinement,
+                prefsManager = prefsManager,
+                onSwitchAndRetry = { newProvider ->
+                    prefsManager.saveProvider(newProvider)
+                    showRateLimitDialog = false
+                    if (info.isRefinement) {
+                        val allRefinements = refinementOptions.toList() +
+                                customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
+                        onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
+                    } else {
+                        onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                    }
+                },
+                onDismiss = { showRateLimitDialog = false }
+            )
+        }
     }
     
     // Provider selector sheet
@@ -690,35 +692,37 @@ fun MainScreen(
     }
     
     // Pill edit dialog
-    if (showEditPillDialog && pillToEdit != null) {
-        EditPillDialog(
-            pill = pillToEdit!!,
-            onDismiss = { 
-                showEditPillDialog = false
-                pillToEdit = null
-            },
-            onSave = { name, command ->
-                val updatedPill = pillToEdit!!.copy(name = name, command = command)
-                prefsManager.savePill(updatedPill)
-                customPills.clear()
-                customPills.addAll(prefsManager.getPills())
-                showEditPillDialog = false
-                pillToEdit = null
-                Toast.makeText(context, "Custom refinement updated", Toast.LENGTH_SHORT).show()
-            },
-            onDelete = {
-                prefsManager.deletePill(pillToEdit!!.id)
-                customPills.clear()
-                customPills.addAll(prefsManager.getPills())
-                // Deselect if it was selected
-                if (selectedPillIds.contains(pillToEdit!!.id)) {
-                    selectedPillIds.remove(pillToEdit!!.id)
+    if (showEditPillDialog) {
+        pillToEdit?.let { pill ->
+            EditPillDialog(
+                pill = pill,
+                onDismiss = {
+                    showEditPillDialog = false
+                    pillToEdit = null
+                },
+                onSave = { name, command ->
+                    val updatedPill = pill.copy(name = name, command = command)
+                    prefsManager.savePill(updatedPill)
+                    customPills.clear()
+                    customPills.addAll(prefsManager.getPills())
+                    showEditPillDialog = false
+                    pillToEdit = null
+                    Toast.makeText(context, "Custom refinement updated", Toast.LENGTH_SHORT).show()
+                },
+                onDelete = {
+                    prefsManager.deletePill(pill.id)
+                    customPills.clear()
+                    customPills.addAll(prefsManager.getPills())
+                    // Deselect if it was selected
+                    if (selectedPillIds.contains(pill.id)) {
+                        selectedPillIds.remove(pill.id)
+                    }
+                    showEditPillDialog = false
+                    pillToEdit = null
+                    Toast.makeText(context, "Custom refinement deleted", Toast.LENGTH_SHORT).show()
                 }
-                showEditPillDialog = false
-                pillToEdit = null
-                Toast.makeText(context, "Custom refinement deleted", Toast.LENGTH_SHORT).show()
-            }
-        )
+            )
+        }
     }
     
     Scaffold(

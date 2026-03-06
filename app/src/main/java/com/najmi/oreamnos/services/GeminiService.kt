@@ -195,7 +195,7 @@ class GeminiService(
                 }
             }
 
-            extractUsageMetadata(root!!)
+            extractUsageMetadata(root)
 
             val totalTime = System.currentTimeMillis() - startTime
             Log.i(TAG, "[$requestId] Success! Output: ${curatedText.length} chars (total time: ${totalTime}ms)")
@@ -374,9 +374,7 @@ class GeminiService(
             }
 
             // Extract token usage for stats tracking
-            if (root != null) {
-                extractUsageMetadata(root)
-            }
+            extractUsageMetadata(root)
 
             val totalTime = System.currentTimeMillis() - startTime
             Log.i(TAG, "[$requestId] Refinement success! (time: ${totalTime}ms)")
@@ -560,7 +558,9 @@ class GeminiService(
         }
     }
 
-    private fun extractUsageMetadata(root: JsonObject) {
+    private fun extractUsageMetadata(root: JsonObject?) {
+        if (root == null) return
+
         try {
             if (root.has("usageMetadata")) {
                 val usage = root.getAsJsonObject("usageMetadata")
