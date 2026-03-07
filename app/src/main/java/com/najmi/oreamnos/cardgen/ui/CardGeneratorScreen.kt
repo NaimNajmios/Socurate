@@ -19,15 +19,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -48,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -62,6 +66,11 @@ import com.najmi.oreamnos.cardgen.viewmodel.ExtractionState
 import com.najmi.oreamnos.ui.components.NeoButton
 import com.najmi.oreamnos.ui.components.NeoOutlinedButton
 import com.najmi.oreamnos.viewmodel.AppViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.Icon
 import kotlinx.coroutines.launch
 
 /**
@@ -94,6 +103,7 @@ fun CardGeneratorScreen(
     // Sheet visibility
     var showBackgroundSheet by remember { mutableStateOf(false) }
     var showExportSheet by remember { mutableStateOf(false) }
+    var showDataSheet by remember { mutableStateOf(false) }
     var selectedExportSize by remember { mutableStateOf(ExportSize.SQUARE) }
 
     // Consume piped text from AppViewModel (from the Generate screen)
@@ -134,10 +144,53 @@ fun CardGeneratorScreen(
                         style = MaterialTheme.typography.displaySmall
                     )
                 },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if (extractionState is ExtractionState.Success) {
+                                showExportSheet = true
+                            } else {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Generate card data first")
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Export"
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 )
             )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 8.dp
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    NeoOutlinedButton(
+                        text = "Data",
+                        onClick = { showDataSheet = true },
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    NeoOutlinedButton(
+                        text = "Design",
+                        onClick = { showBackgroundSheet = true },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
         }
     ) { paddingValues ->
         Column(
@@ -163,85 +216,12 @@ fun CardGeneratorScreen(
                 cardConfig = cardConfig,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
-
-            // ── 3. Action bar ──────────────────────────────────────
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    NeoOutlinedButton(
-                        text = "Background",
-                        onClick = { showBackgroundSheet = true },
-                        modifier = Modifier.weight(1f)
-                    )
-                    NeoButton(
-                        text = "Export",
-                        onClick = {
-                            if (extractionState is ExtractionState.Success) {
-                                showExportSheet = true
-                            } else {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Generate card data first")
-                                }
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-
-            // ── 4. Layout & Font Size Controls ───────────────────────
-            LayoutFontSizeSection(
+            // ── 3. Layout Options ──────────────────────────────────
+            LayoutOptionsSection(
                 cardConfig = cardConfig,
-                onConfigUpdate = { newConfig ->
-                    cardViewModel.updateConfig(newConfig)
-                },
+                onConfigUpdate = { cardViewModel.updateConfig(it) },
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
-
-            // ── 5. Text input (direct paste) ───────────────────────
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Text(
-                    text = "ARTICLE TEXT",
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                    style = MaterialTheme.typography.labelSmall,
-                    letterSpacing = androidx.compose.ui.unit.TextUnit(
-                        2f, androidx.compose.ui.unit.TextUnitType.Sp
-                    )
-                )
-                Spacer(Modifier.height(4.dp))
-                OutlinedTextField(
-                    value = inputText,
-                    onValueChange = { cardViewModel.updateInputText(it) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp),
-                    placeholder = {
-                        Text(
-                            text = "Paste a football article here...",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                        )
-                    },
-                    maxLines = 6,
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(0.dp)
-                )
-                Spacer(Modifier.height(8.dp))
-                NeoButton(
-                    text = "Extract Card Data",
-                    onClick = { cardViewModel.extractCardData(context) },
-                    isLoading = extractionState is ExtractionState.Loading,
-                    enabled = inputText.isNotBlank() && extractionState !is ExtractionState.Loading,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
 
             Spacer(Modifier.height(24.dp))
         }
@@ -250,7 +230,7 @@ fun CardGeneratorScreen(
     // ── Sheets ─────────────────────────────────────────────────
 
     if (showBackgroundSheet) {
-        BackgroundPickerSheet(
+        DesignBottomSheet(
             currentConfig = cardConfig,
             onConfigUpdate = { newConfig ->
                 cardViewModel.updateConfig(newConfig)
@@ -259,6 +239,16 @@ fun CardGeneratorScreen(
                 }
             },
             onDismiss = { showBackgroundSheet = false }
+        )
+    }
+
+    if (showDataSheet) {
+        DataEditorSheet(
+            inputText = inputText,
+            onInputTextChange = { cardViewModel.updateInputText(it) },
+            isExtracting = extractionState is ExtractionState.Loading,
+            onExtractClick = { cardViewModel.extractCardData(context) },
+            onDismiss = { showDataSheet = false }
         )
     }
 
@@ -315,167 +305,82 @@ fun CardGeneratorScreen(
     }
 }
 
-// ──────────────────────────────────────────────────────────────
-// Layout & Font Size Section
-// ──────────────────────────────────────────────────────────────
-
 @Composable
-private fun LayoutFontSizeSection(
+private fun LayoutOptionsSection(
     cardConfig: CardConfig,
     onConfigUpdate: (CardConfig) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-        modifier = modifier.fillMaxWidth()
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Layout Mode Section
-            Text(
-                text = "LAYOUT",
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-            
-            // Layout options row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                ImagePosition.entries.take(3).forEach { position ->
-                    LayoutChip(
-                        position = position,
-                        isSelected = cardConfig.imagePosition == position,
-                        onClick = { onConfigUpdate(cardConfig.copy(imagePosition = position)) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                ImagePosition.entries.drop(3).forEach { position ->
-                    LayoutChip(
-                        position = position,
-                        isSelected = cardConfig.imagePosition == position,
-                        onClick = { onConfigUpdate(cardConfig.copy(imagePosition = position)) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
+        // Font Size Slider
+        Text(
+            text = "FONT SIZE",
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+        Slider(
+            value = cardConfig.fontSizeMultiplier,
+            onValueChange = { onConfigUpdate(cardConfig.copy(fontSizeMultiplier = it)) },
+            valueRange = 0.5f..2f,
+            modifier = Modifier.fillMaxWidth()
+        )
 
-            // Image preview if selected
-            if (cardConfig.backgroundBitmap != null) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+        // Image Position
+        Text(
+            text = "DESIGN LAYOUT",
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+        // A simple row of options using a LazyRow (horizontal scroll)
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(ImagePosition.entries.toList()) { position ->
+                val isSelected = cardConfig.imagePosition == position
+                Surface(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(48.dp)
+                        .clickable { onConfigUpdate(cardConfig.copy(imagePosition = position)) },
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(
+                        width = if (isSelected) 2.dp else 1.dp,
+                        color = if (isSelected) MaterialTheme.colorScheme.primary 
+                               else MaterialTheme.colorScheme.outline
+                    ),
+                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) 
+                           else MaterialTheme.colorScheme.surface
                 ) {
-                    // Thumbnail preview
-                    AsyncImage(
-                        model = cardConfig.backgroundBitmap,
-                        contentDescription = "Background preview",
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(RoundedCornerShape(0.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                    
-                    Column(modifier = Modifier.weight(1f)) {
-                        // Opacity slider
+                    Box(contentAlignment = Alignment.Center) {
                         Text(
-                            text = "Opacity: ${(cardConfig.imageOpacity * 100).toInt()}%",
+                            text = position.displayName,
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
-                        Slider(
-                            value = cardConfig.imageOpacity,
-                            onValueChange = { onConfigUpdate(cardConfig.copy(imageOpacity = it)) },
-                            valueRange = 0.1f..1f,
-                            modifier = Modifier.fillMaxWidth()
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isSelected) MaterialTheme.colorScheme.primary 
+                                   else MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
             }
-
-            // Font Size Section
+        }
+        
+        // Image Opacity
+        if (cardConfig.backgroundBitmap != null || cardConfig.imagePosition == ImagePosition.MINIMAL) {
             Text(
-                text = "FONT SIZE",
+                text = "IMAGE OPACITY: ${(cardConfig.imageOpacity * 100).toInt()}%",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "A",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                )
-                Slider(
-                    value = cardConfig.fontSizeMultiplier,
-                    onValueChange = { onConfigUpdate(cardConfig.copy(fontSizeMultiplier = it)) },
-                    valueRange = 0.6f..1.4f,
-                    steps = 7,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 8.dp)
-                )
-                Text(
-                    text = "A",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                )
-            }
-            Text(
-                text = "${(cardConfig.fontSizeMultiplier * 100).toInt()}%",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-        }
-    }
-}
-
-@Composable
-private fun LayoutChip(
-    position: ImagePosition,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier
-            .height(48.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(0.dp),
-        border = BorderStroke(
-            width = if (isSelected) 2.dp else 1.dp,
-            color = if (isSelected) MaterialTheme.colorScheme.primary 
-                   else MaterialTheme.colorScheme.outline
-        ),
-        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) 
-               else MaterialTheme.colorScheme.surface
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = position.displayName,
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                color = if (isSelected) MaterialTheme.colorScheme.primary 
-                       else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            Slider(
+                value = cardConfig.imageOpacity,
+                onValueChange = { onConfigUpdate(cardConfig.copy(imageOpacity = it)) },
+                valueRange = 0.1f..1f,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
