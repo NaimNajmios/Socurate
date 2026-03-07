@@ -26,11 +26,16 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -54,12 +59,14 @@ import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.najmi.oreamnos.cardgen.model.BackgroundType
 import com.najmi.oreamnos.cardgen.model.CardConfig
+import com.najmi.oreamnos.cardgen.model.ImagePosition
 import com.najmi.oreamnos.cardgen.model.PresetBackground
 import com.najmi.oreamnos.cardgen.utils.ColorExtractor
+import com.najmi.oreamnos.cardgen.utils.GradientBuilder
 
 /**
  * Bottom sheet for selecting the card background.
- * Three tabs: Gradient | Gallery | Preset.
+ * Four tabs: Gradient | Gallery | Preset | Layout.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +83,8 @@ fun BackgroundPickerSheet(
             else -> 0
         }
     ) }
-    val tabs = listOf("Gradient", "Gallery", "Preset")
+    // Add "Layout" tab - total 4 tabs now
+    val tabs = listOf("Gradient", "Gallery", "Preset", "Layout")
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -119,6 +127,7 @@ fun BackgroundPickerSheet(
                 0 -> GradientTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
                 1 -> GalleryTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
                 2 -> PresetTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
+                3 -> LayoutTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
             }
         }
     }
@@ -379,4 +388,372 @@ private fun PresetTab(
             }
         }
     }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Tab 4: Layout (Image Position)
+// ──────────────────────────────────────────────────────────────
+
+@Composable
+private fun LayoutTab(
+    currentConfig: CardConfig,
+    onConfigUpdate: (CardConfig) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Section: Image Position
+        Text(
+            text = "IMAGE POSITION",
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+
+        // Grid of layout options (2 columns)
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ImagePosition.entries.take(2).forEach { position ->
+                    LayoutOptionCard(
+                        position = position,
+                        isSelected = currentConfig.imagePosition == position,
+                        onClick = {
+                            onConfigUpdate(currentConfig.copy(imagePosition = position))
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ImagePosition.entries.drop(2).take(2).forEach { position ->
+                    LayoutOptionCard(
+                        position = position,
+                        isSelected = currentConfig.imagePosition == position,
+                        onClick = {
+                            onConfigUpdate(currentConfig.copy(imagePosition = position))
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ImagePosition.entries.drop(4).forEach { position ->
+                    LayoutOptionCard(
+                        position = position,
+                        isSelected = currentConfig.imagePosition == position,
+                        onClick = {
+                            onConfigUpdate(currentConfig.copy(imagePosition = position))
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+
+        // Section: Image Opacity
+        if (currentConfig.backgroundBitmap != null || currentConfig.imagePosition == ImagePosition.MINIMAL) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "IMAGE OPACITY: ${(currentConfig.imageOpacity * 100).toInt()}%",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
+            Slider(
+                value = currentConfig.imageOpacity,
+                onValueChange = { onConfigUpdate(currentConfig.copy(imageOpacity = it)) },
+                valueRange = 0.1f..1f,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Section: Scrim Overlay
+        if (currentConfig.backgroundBitmap != null && 
+            currentConfig.imagePosition != ImagePosition.SPLIT_LEFT &&
+            currentConfig.imagePosition != ImagePosition.SPLIT_RIGHT) {
+            
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "SHOW OVERLAY",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                    Text(
+                        text = "Darkens image for text readability",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                }
+                Switch(
+                    checked = currentConfig.showScrim,
+                    onCheckedChange = { onConfigUpdate(currentConfig.copy(showScrim = it)) }
+                )
+            }
+
+            // Scrim intensity slider
+            if (currentConfig.showScrim) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "OVERLAY INTENSITY",
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+                
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    contentPadding = PaddingValues(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.height(100.dp)
+                ) {
+                    items(GradientBuilder.ScrimType.entries.toList()) { scrimType ->
+                        val isSelected = currentConfig.scrimType == scrimType
+                        val label = when (scrimType) {
+                            GradientBuilder.ScrimType.DARK -> "Dark"
+                            GradientBuilder.ScrimType.LIGHT -> "Light"
+                            GradientBuilder.ScrimType.MINIMAL -> "Min"
+                            GradientBuilder.ScrimType.NONE -> "None"
+                            GradientBuilder.ScrimType.HORIZONTAL -> "H"
+                            GradientBuilder.ScrimType.REVERSE_HORIZONTAL -> "R"
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(32.dp)
+                                .clickable {
+                                    onConfigUpdate(currentConfig.copy(scrimType = scrimType))
+                                },
+                            shape = RoundedCornerShape(0.dp),
+                            border = BorderStroke(
+                                width = if (isSelected) 2.dp else 1.dp,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary 
+                                       else MaterialTheme.colorScheme.outline
+                            ),
+                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer 
+                                   else Color.Transparent
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Info text
+        if (currentConfig.backgroundBitmap == null && currentConfig.imagePosition != ImagePosition.BACKGROUND) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "💡 Tip: Select an image from the Gallery tab to use image-based layouts",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun LayoutOptionCard(
+    position: ImagePosition,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .height(72.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(0.dp),
+        border = BorderStroke(
+            width = if (isSelected) 2.dp else 1.dp,
+            color = if (isSelected) MaterialTheme.colorScheme.primary 
+                   else MaterialTheme.colorScheme.outline
+        ),
+        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) 
+               else MaterialTheme.colorScheme.surface
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            // Mini preview of layout
+            when (position) {
+                ImagePosition.BACKGROUND -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                                    )
+                                )
+                            )
+                    ) {
+                        // Text preview
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(4.dp)
+                        ) {
+                            Text(
+                                text = "Aa",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+                ImagePosition.SPLIT_LEFT -> {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Box(
+                            modifier = Modifier
+                                .weight(0.55f)
+                                .height(48.dp)
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                        )
+                        Box(
+                            modifier = Modifier
+                                .weight(0.45f)
+                                .height(48.dp)
+                                .background(Color.Black.copy(alpha = 0.5f))
+                        ) {
+                            Text(
+                                text = "Aa",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
+                }
+                ImagePosition.SPLIT_RIGHT -> {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Box(
+                            modifier = Modifier
+                                .weight(0.45f)
+                                .height(48.dp)
+                                .background(Color.Black.copy(alpha = 0.5f))
+                        ) {
+                            Text(
+                                text = "Aa",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .weight(0.55f)
+                                .height(48.dp)
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                        )
+                    }
+                }
+                ImagePosition.OVERLAY_TOP -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth()
+                                .height(20.dp)
+                                .background(Color.Black.copy(alpha = 0.6f))
+                        )
+                    }
+                }
+                ImagePosition.CUTOUT -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        // Cutout preview - center circle
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .align(Alignment.Center)
+                                .background(MaterialTheme.colorScheme.primary)
+                        )
+                        Text(
+                            text = "Aa",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            modifier = Modifier.align(Alignment.BottomEnd)
+                        )
+                    }
+                }
+                ImagePosition.MINIMAL -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(
+                                        MaterialTheme.colorScheme.surface,
+                                        MaterialTheme.colorScheme.surface
+                                    )
+                                )
+                            )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                        )
+                        Text(
+                            text = "Aa",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(4.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
+    // Label below the preview
+    Text(
+        text = position.displayName,
+        style = MaterialTheme.typography.labelSmall,
+        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+        color = if (isSelected) MaterialTheme.colorScheme.primary 
+               else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+        modifier = Modifier.padding(top = 4.dp)
+    )
 }

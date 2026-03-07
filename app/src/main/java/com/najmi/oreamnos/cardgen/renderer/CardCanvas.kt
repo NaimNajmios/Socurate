@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
+import com.najmi.oreamnos.cardgen.model.ImagePosition
 import com.najmi.oreamnos.cardgen.model.StatItem
 import com.najmi.oreamnos.cardgen.model.TeamStats
 import com.najmi.oreamnos.cardgen.utils.ColorExtractor
@@ -57,30 +60,237 @@ private val CardTextSecondary = Color.White.copy(alpha = 0.75f)
 private val CardTextMuted = Color.White.copy(alpha = 0.55f)
 
 /**
- * Applies the background (gradient or gallery image + scrim) from [config].
+ * Applies the background based on [config]'s imagePosition setting.
+ * Handles gradient backgrounds, gallery images, and various layout modes.
  */
 @Composable
-private fun CardBackground(config: CardConfig, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Box(
-        modifier = modifier
-            .background(GradientBuilder.vertical(config.colorPair))
-    ) {
-        // Gallery bitmap overlay with scrim
-        if (config.backgroundBitmap != null) {
-            Image(
-                bitmap = config.backgroundBitmap.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-            // Dark scrim for text legibility
+private fun CardBackground(
+    config: CardConfig,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    when (config.imagePosition) {
+        ImagePosition.BACKGROUND -> {
+            // Original: Full background with scrim
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(GradientBuilder.darkScrim)
-            )
+                modifier = modifier
+                    .background(GradientBuilder.vertical(config.colorPair))
+            ) {
+                if (config.backgroundBitmap != null) {
+                    Image(
+                        bitmap = config.backgroundBitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        alpha = config.imageOpacity
+                    )
+                    if (config.showScrim) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(GradientBuilder.getScrim(config.scrimType))
+                        )
+                    }
+                }
+                content()
+            }
         }
-        content()
+
+        ImagePosition.SPLIT_LEFT -> {
+            // Image on left (60%), text on right - NBA quote card style
+            Box(modifier = modifier) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    // Left side - Image
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(0.55f)
+                    ) {
+                        if (config.backgroundBitmap != null) {
+                            Image(
+                                bitmap = config.backgroundBitmap.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                alpha = config.imageOpacity
+                            )
+                            // Horizontal scrim darkening from left to right
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(GradientBuilder.horizontalScrim)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(GradientBuilder.vertical(config.colorPair))
+                            )
+                        }
+                    }
+                    // Right side - Text content with gradient
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth()
+                            .background(
+                                Brush.horizontalGradient(
+                                    listOf(
+                                        Color.Black.copy(alpha = 0.7f),
+                                        Color.Black.copy(alpha = 0.9f)
+                                    )
+                                )
+                            )
+                    ) {
+                        content()
+                    }
+                }
+            }
+        }
+
+        ImagePosition.SPLIT_RIGHT -> {
+            // Image on right (60%), text on left - match highlights style
+            Box(modifier = modifier) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    // Left side - Text content with gradient
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(0.45f)
+                            .background(
+                                Brush.horizontalGradient(
+                                    listOf(
+                                        Color.Black.copy(alpha = 0.9f),
+                                        Color.Black.copy(alpha = 0.7f)
+                                    )
+                                )
+                            )
+                    ) {
+                        content()
+                    }
+                    // Right side - Image
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth()
+                    ) {
+                        if (config.backgroundBitmap != null) {
+                            Image(
+                                bitmap = config.backgroundBitmap.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                                alpha = config.imageOpacity
+                            )
+                            // Reverse horizontal scrim
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(GradientBuilder.reverseHorizontalScrim)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(GradientBuilder.vertical(config.colorPair))
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        ImagePosition.OVERLAY_TOP -> {
+            // Full-bleed image with text at bottom - player spotlight style
+            Box(modifier = modifier.fillMaxSize()) {
+                // Full image background
+                if (config.backgroundBitmap != null) {
+                    Image(
+                        bitmap = config.backgroundBitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        alpha = config.imageOpacity
+                    )
+                    if (config.showScrim) {
+                        // Bottom-heavy scrim for text legibility
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(GradientBuilder.lightScrim)
+                        )
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(GradientBuilder.vertical(config.colorPair))
+                    )
+                }
+                content()
+            }
+        }
+
+        ImagePosition.CUTOUT -> {
+            // Cutout mode - player image with transparent background, text beside/overlay
+            Box(
+                modifier = modifier
+                    .background(GradientBuilder.vertical(config.colorPair))
+            ) {
+                // Background image if present (will show through transparent areas)
+                if (config.backgroundBitmap != null) {
+                    Image(
+                        bitmap = config.backgroundBitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        alpha = 0.3f
+                    )
+                }
+                
+                // Cutout bitmap overlay (transparent PNG of player)
+                if (config.cutoutBitmap != null) {
+                    Image(
+                        bitmap = config.cutoutBitmap.asImageBitmap(),
+                        contentDescription = "Player cutout",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentScale = ContentScale.Fit,
+                        alpha = config.imageOpacity
+                    )
+                }
+                
+                content()
+            }
+        }
+
+        ImagePosition.MINIMAL -> {
+            // Subtle background, prominent text
+            Box(
+                modifier = modifier
+                    .background(GradientBuilder.vertical(config.colorPair))
+            ) {
+                if (config.backgroundBitmap != null) {
+                    Image(
+                        bitmap = config.backgroundBitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer { alpha = 0.25f },
+                        contentScale = ContentScale.Crop
+                    )
+                    if (config.showScrim) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(GradientBuilder.minimalScrim)
+                        )
+                    }
+                }
+                content()
+            }
+        }
     }
 }
 

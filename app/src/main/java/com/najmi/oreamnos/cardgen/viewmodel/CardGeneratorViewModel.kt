@@ -151,9 +151,54 @@ class CardGeneratorViewModel : ViewModel() {
 
     /**
      * Sets the background bitmap chosen from the gallery.
+     * Automatically updates the CardConfig with the new bitmap and switches to GALLERY background type.
      */
     fun setBackgroundBitmap(bitmap: Bitmap?) {
         _backgroundBitmap.value = bitmap
+        // Also update the card config reflect the new to bitmap
+        if (bitmap != null) {
+            _cardConfig.value = _cardConfig.value.copy(
+                backgroundBitmap = bitmap,
+                backgroundType = com.najmi.oreamnos.cardgen.model.BackgroundType.GALLERY,
+                presetBackground = null
+            )
+        } else {
+            _cardConfig.value = _cardConfig.value.copy(
+                backgroundBitmap = null,
+                backgroundType = com.najmi.oreamnos.cardgen.model.BackgroundType.GRADIENT
+            )
+        }
+    }
+
+    /**
+     * Updates the image position/layout mode in the CardConfig.
+     */
+    fun setImagePosition(position: com.najmi.oreamnos.cardgen.model.ImagePosition) {
+        _cardConfig.value = _cardConfig.value.copy(imagePosition = position)
+    }
+
+    /**
+     * Updates the image opacity in the CardConfig.
+     */
+    fun setImageOpacity(opacity: Float) {
+        _cardConfig.value = _cardConfig.value.copy(imageOpacity = opacity.coerceIn(0.1f, 1f))
+    }
+
+    /**
+     * Updates the scrim settings in the CardConfig.
+     */
+    fun setScrimSettings(showScrim: Boolean, scrimType: com.najmi.oreamnos.cardgen.utils.GradientBuilder.ScrimType) {
+        _cardConfig.value = _cardConfig.value.copy(
+            showScrim = showScrim,
+            scrimType = scrimType
+        )
+    }
+
+    /**
+     * Updates the cutout bitmap for CUTOUT mode (transparent PNG overlay).
+     */
+    fun setCutoutBitmap(bitmap: Bitmap?) {
+        _cardConfig.value = _cardConfig.value.copy(cutoutBitmap = bitmap)
     }
 
     /**
