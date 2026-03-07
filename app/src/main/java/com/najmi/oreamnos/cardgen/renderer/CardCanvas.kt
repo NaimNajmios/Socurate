@@ -38,6 +38,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.model.ImagePosition
@@ -58,6 +61,16 @@ private val CardBorder = Color.White.copy(alpha = 0.15f)
 private val CardTextPrimary = Color.White
 private val CardTextSecondary = Color.White.copy(alpha = 0.75f)
 private val CardTextMuted = Color.White.copy(alpha = 0.55f)
+
+/**
+ * Returns scaled sp value based on multiplier.
+ */
+private fun Int.scaleSp(multiplier: Float): TextUnit = (this * multiplier).sp
+
+/**
+ * Returns scaled sp value from a TextUnit based on multiplier.
+ */
+private fun TextUnit.scaleSp(multiplier: Float): TextUnit = (this.value * multiplier).sp
 
 /**
  * Applies the background based on [config]'s imagePosition setting.
@@ -315,6 +328,7 @@ fun MatchResultCanvas(
     modifier: Modifier = Modifier
 ) {
     val gradientColors = ColorExtractor.getMatchColors(data.homeTeam, data.awayTeam)
+    val scale = config.fontSizeMultiplier
 
     CardBackground(
         config = config.copy(colorPair = gradientColors),
@@ -341,30 +355,36 @@ fun MatchResultCanvas(
                     Text(
                         text = "${data.homeScore}",
                         color = Color(0xFFFFD100),
-                        fontSize = 56.sp,
+                        fontSize = 56.sp.scaleSp(scale),
                         fontWeight = FontWeight.Black,
-                        lineHeight = 56.sp
+                        lineHeight = 56.sp.scaleSp(scale)
                     )
                     Spacer(Modifier.width(16.dp))
                     Text(
                         text = data.homeTeam.uppercase(),
                         color = CardTextPrimary,
-                        style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black)
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale)
+                        )
                     )
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "${data.awayScore}",
                         color = CardTextPrimary,
-                        fontSize = 56.sp,
+                        fontSize = 56.sp.scaleSp(scale),
                         fontWeight = FontWeight.Black,
-                        lineHeight = 56.sp
+                        lineHeight = 56.sp.scaleSp(scale)
                     )
                     Spacer(Modifier.width(16.dp))
                     Text(
                         text = data.awayTeam.uppercase(),
                         color = CardTextSecondary,
-                        style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black)
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale)
+                        )
                     )
                 }
             }
@@ -384,7 +404,10 @@ fun MatchResultCanvas(
                     Text(
                         text = data.competition.uppercase(),
                         color = CardTextPrimary,
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize.scaleSp(scale)
+                        )
                     )
                     Text(
                         text = data.matchDate.uppercase(),
@@ -397,7 +420,9 @@ fun MatchResultCanvas(
                         Text(
                             text = data.keyMoment,
                             color = CardTextSecondary,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
+                            ),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -419,16 +444,16 @@ fun MatchResultCanvas(
                             Text(
                                 text = homeVals[i],
                                 color = Color(0xFFFFD100), // Gold for Home
-                                fontSize = 22.sp,
+                                fontSize = 22.sp.scaleSp(scale),
                                 fontWeight = FontWeight.Black,
-                                lineHeight = 22.sp
+                                lineHeight = 22.sp.scaleSp(scale)
                             )
                             Text(
                                 text = awayVals[i],
                                 color = CardTextPrimary, // White for Away
-                                fontSize = 18.sp,
+                                fontSize = 18.sp.scaleSp(scale),
                                 fontWeight = FontWeight.Bold,
-                                lineHeight = 18.sp
+                                lineHeight = 18.sp.scaleSp(scale)
                             )
                             Text(
                                 text = statNames[i].uppercase(),
@@ -447,7 +472,7 @@ fun MatchResultCanvas(
 // ──────────────────────────────────────────────────────────────
 // 2. HEADLINE / QUOTE CANVAS
 // ──────────────────────────────────────────────────────────────
-
+    
 /**
  * Headline / Quote card with a Canvas-drawn decorative opening quotation mark.
  */

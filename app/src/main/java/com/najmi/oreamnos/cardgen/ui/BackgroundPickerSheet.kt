@@ -66,7 +66,7 @@ import com.najmi.oreamnos.cardgen.utils.GradientBuilder
 
 /**
  * Bottom sheet for selecting the card background.
- * Four tabs: Gradient | Gallery | Preset | Layout.
+ * Three tabs: Gradient | Gallery | Preset.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,8 +83,7 @@ fun BackgroundPickerSheet(
             else -> 0
         }
     ) }
-    // Add "Layout" tab - total 4 tabs now
-    val tabs = listOf("Gradient", "Gallery", "Preset", "Layout")
+    val tabs = listOf("Gradient", "Gallery", "Preset")
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -126,12 +125,12 @@ fun BackgroundPickerSheet(
             when (selectedTab) {
                 0 -> GradientTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
                 1 -> GalleryTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
-                2 -> PresetTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
-                3 -> LayoutTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
+            2 -> PresetTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
             }
         }
     }
 }
+
 
 // ──────────────────────────────────────────────────────────────
 // Tab 1: Gradient
