@@ -1,115 +1,127 @@
 package com.najmi.oreamnos.cardgen.renderer
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
+import com.najmi.oreamnos.cardgen.utils.ColorExtractor
 
 @Composable
 fun DetailedScoreboardCanvas(
     data: CardData.DetailedScoreboard,
     config: CardConfig
 ) {
-    CardBackground(config = config) {
-        Box(
+    val scale = config.fontSizeMultiplier
+    val gradientColors = ColorExtractor.getMatchColors(data.homeTeam, data.awayTeam)
+
+    CardBackground(
+        config = config.copy(colorPair = gradientColors),
+        modifier = Modifier.aspectRatio(1f)
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
-            contentAlignment = Alignment.Center
+                .padding(20.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.7f))
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Match Status
-                Text(
-                    text = data.matchStatus.uppercase(),
-                    color = Color.Yellow,
-                    fontSize = 16.sp * config.fontSizeMultiplier,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Score Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            // Top branding
+            Text(
+                text = "MATCH RESULT",
+                color = CardTextMuted,
+                style = MaterialTheme.typography.labelSmall,
+                letterSpacing = 3.sp
+            )
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // Center content - Large Score
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "${data.homeScore}",
+                        color = Color(0xFFFFD100),
+                        fontSize = 56.sp.scaleSp(scale),
+                        fontWeight = FontWeight.Black,
+                        lineHeight = 56.sp.scaleSp(scale)
+                    )
+                    Spacer(Modifier.width(16.dp))
                     Text(
                         text = data.homeTeam.uppercase(),
-                        color = Color.White,
-                        fontSize = 28.sp * config.fontSizeMultiplier,
-                        fontWeight = FontWeight.Black,
-                        textAlign = TextAlign.Start,
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    Text(
-                        text = "${data.homeScore} - ${data.awayScore}",
-                        color = Color.White,
-                        fontSize = 48.sp * config.fontSizeMultiplier,
-                        fontWeight = FontWeight.Black,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                    
-                    Text(
-                        text = data.awayTeam.uppercase(),
-                        color = Color.White,
-                        fontSize = 28.sp * config.fontSizeMultiplier,
-                        fontWeight = FontWeight.Black,
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.weight(1f)
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale)
+                        )
                     )
                 }
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Goalscorers Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = data.homeScorers,
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 14.sp * config.fontSizeMultiplier,
-                        textAlign = TextAlign.Start,
-                        modifier = Modifier.weight(1f)
+                        text = "${data.awayScore}",
+                        color = CardTextPrimary,
+                        fontSize = 56.sp.scaleSp(scale),
+                        fontWeight = FontWeight.Black,
+                        lineHeight = 56.sp.scaleSp(scale)
                     )
-                    
-                    Spacer(modifier = Modifier.padding(horizontal = 24.dp))
-                    
+                    Spacer(Modifier.width(16.dp))
                     Text(
-                        text = data.awayScorers,
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 14.sp * config.fontSizeMultiplier,
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.weight(1f)
+                        text = data.awayTeam.uppercase(),
+                        color = CardTextSecondary,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale)
+                        )
                     )
+                }
+            }
+            
+            HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
+            
+            // Bottom Section
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                // Context Info (Goalscorers)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = data.matchStatus.uppercase(),
+                        color = Color(0xFFFFD100), // Gold
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize.scaleSp(scale)
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    if (data.homeScorers.isNotBlank() && data.homeScorers != "—") {
+                        Text(
+                            text = "${data.homeTeam}:\n${data.homeScorers}",
+                            color = CardTextPrimary,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
+                            )
+                        )
+                    }
+                    if (data.awayScorers.isNotBlank() && data.awayScorers != "—") {
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "${data.awayTeam}:\n${data.awayScorers}",
+                            color = CardTextSecondary,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    CardFooter()
                 }
             }
         }

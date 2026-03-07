@@ -1,20 +1,15 @@
 package com.najmi.oreamnos.cardgen.renderer
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.cardgen.model.CardConfig
@@ -25,49 +20,72 @@ fun BreakingNewsCanvas(
     data: CardData.BreakingNews,
     config: CardConfig
 ) {
-    CardBackground(config = config) {
-        Box(
+    val scale = config.fontSizeMultiplier
+
+    CardBackground(
+        config = config,
+        modifier = Modifier.aspectRatio(1f)
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
-            contentAlignment = Alignment.Center
+                .padding(20.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Red.copy(alpha = 0.85f))
-                    .padding(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Eyebrow Label
-                Text(
-                    text = data.label.uppercase(),
-                    color = Color.White,
-                    fontSize = 16.sp * config.fontSizeMultiplier,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Main Headline
-                Text(
-                    text = data.headline.uppercase(),
-                    color = Color.Yellow,
-                    fontSize = 36.sp * config.fontSizeMultiplier,
+            // Top branding
+            Text(
+                text = "BREAKING NEWS",
+                color = CardTextMuted,
+                style = MaterialTheme.typography.labelSmall,
+                letterSpacing = 3.sp
+            )
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // Middle Content
+            Text(
+                text = data.headline.uppercase(),
+                color = CardTextPrimary,
+                style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Black,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 40.sp * config.fontSizeMultiplier
-                )
-                
-                if (data.subtext.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(24.dp))
+                    fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale),
+                    lineHeight = 38.sp.scaleSp(scale)
+                ),
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
+            
+            // Bottom Section
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                // Context Info
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = data.subtext,
-                        color = Color.White,
-                        fontSize = 18.sp * config.fontSizeMultiplier,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 24.sp * config.fontSizeMultiplier
+                        text = data.label.uppercase(),
+                        color = Color(0xFFFF4B4B), // Bold red for breaking news
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize.scaleSp(scale)
+                        )
                     )
+                    if (data.subtext.isNotBlank() && data.subtext != "—") {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = data.subtext,
+                            color = CardTextSecondary,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
+                            ),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    CardFooter()
                 }
             }
         }

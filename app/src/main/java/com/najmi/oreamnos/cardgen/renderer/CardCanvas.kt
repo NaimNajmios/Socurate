@@ -804,7 +804,7 @@ fun TopStatsCanvas(
 // ──────────────────────────────────────────────────────────────
 
 @Composable
-private fun CardFooter() {
+internal fun CardFooter() {
     Text(
         text = "SOCURATE",
         color = CardTextMuted,

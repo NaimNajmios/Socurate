@@ -1,20 +1,14 @@
 package com.najmi.oreamnos.cardgen.renderer
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,63 +20,88 @@ fun TransferNewsCanvas(
     data: CardData.TransferNews,
     config: CardConfig
 ) {
-    CardBackground(config = config) {
-        Box(
+    val scale = config.fontSizeMultiplier
+
+    CardBackground(
+        config = config,
+        modifier = Modifier.aspectRatio(1f)
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
-            contentAlignment = Alignment.BottomStart
+                .padding(20.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.6f))
-                    .padding(24.dp)
-            ) {
-                // Large action text block (e.g., AGREEMENT REACHED)
-                Text(
-                    text = data.action.uppercase(),
-                    color = Color.Yellow,
-                    fontSize = 32.sp * config.fontSizeMultiplier,
+            // Top branding
+            Text(
+                text = "TRANSFER NEWS",
+                color = CardTextMuted,
+                style = MaterialTheme.typography.labelSmall,
+                letterSpacing = 3.sp
+            )
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // Middle Content
+            Text(
+                text = data.action.uppercase(),
+                color = Color(0xFFFFD100), // Gold
+                fontSize = 24.sp.scaleSp(scale),
+                fontWeight = FontWeight.Black,
+                letterSpacing = 1.sp
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = data.playerName.uppercase(),
+                color = CardTextPrimary,
+                style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Black,
-                    lineHeight = 36.sp * config.fontSizeMultiplier
+                    fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale),
+                    lineHeight = 36.sp.scaleSp(scale)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Player Name
-                Text(
-                    text = data.playerName.uppercase(),
-                    color = Color.White,
-                    fontSize = 24.sp * config.fontSizeMultiplier,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Transfer Details
-                Text(
-                    text = "${data.fromTeam} ➔ ${data.toTeam}",
-                    color = Color.White.copy(alpha = 0.9f),
-                    fontSize = 18.sp * config.fontSizeMultiplier,
-                    fontWeight = FontWeight.SemiBold
-                )
-                
-                Text(
-                    text = "FEE / CONTRACT: ${data.fee}",
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 14.sp * config.fontSizeMultiplier,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
+            )
 
-                if (data.quote.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
+            
+            // Bottom Section
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                // Context Info
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "\"${data.quote}\"",
-                        color = Color.White,
-                        fontSize = 16.sp * config.fontSizeMultiplier,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
+                        text = "${data.fromTeam} ➔ ${data.toTeam}".uppercase(),
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize.scaleSp(scale)
+                        )
                     )
+                    Text(
+                        text = "FEE / TERM: ${data.fee}".uppercase(),
+                        color = CardTextMuted,
+                        style = MaterialTheme.typography.labelSmall,
+                        letterSpacing = 1.sp
+                    )
+                    
+                    if (data.quote.isNotBlank() && data.quote != "—") {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "\"${data.quote}\"",
+                            color = CardTextSecondary,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale),
+                                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                            ),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    CardFooter()
                 }
             }
         }
