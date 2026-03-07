@@ -21,6 +21,9 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -82,7 +85,11 @@ private fun CardBackground(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    when (config.imagePosition) {
+    val density = LocalDensity.current
+    CompositionLocalProvider(
+        LocalDensity provides Density(density = density.density, fontScale = density.fontScale * config.fontSizeMultiplier)
+    ) {
+        when (config.imagePosition) {
         ImagePosition.BACKGROUND -> {
             // Original: Full background with scrim
             Box(
@@ -304,6 +311,7 @@ private fun CardBackground(
                 content()
             }
         }
+    }
     }
 }
 
