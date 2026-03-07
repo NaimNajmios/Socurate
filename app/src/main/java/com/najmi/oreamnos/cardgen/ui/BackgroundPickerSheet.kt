@@ -229,9 +229,15 @@ private fun GalleryTab(
             val uris = mutableListOf<Uri>()
             val projection = arrayOf(MediaStore.Images.Media._ID)
             val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+
+            // Use Bundle query to safely limit results (LIMIT in sortOrder crashes on API 30+)
+            val queryArgs = android.os.Bundle().apply {
+                putString(android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER, sortOrder)
+                putInt(android.content.ContentResolver.QUERY_ARG_LIMIT, 30)
+            }
             val cursor: Cursor? = context.contentResolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection, null, null, "$sortOrder LIMIT 30"
+                projection, queryArgs, null
             )
             cursor?.use {
                 val idColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)

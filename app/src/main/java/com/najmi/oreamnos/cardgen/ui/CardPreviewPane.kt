@@ -99,8 +99,5 @@ private fun CardPlaceholder(template: CardTemplate) {
     }
 }
 
-/** Aspect ratio for the card preview based on the selected template's natural format. */
-private fun aspectForTemplate(template: CardTemplate): Float = when (template) {
-    CardTemplate.PlayerSpotlight, CardTemplate.NbaStyleQuote -> 4f / 5f  // Portrait
-    else -> 1f                                 // Square
-}
+/** Aspect ratio for the card preview — all templates use compact square format. */
+private fun aspectForTemplate(template: CardTemplate): Float = 1f

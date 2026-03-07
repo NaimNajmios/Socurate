@@ -67,6 +67,13 @@ private fun CardBackground(config: CardConfig, modifier: Modifier = Modifier, co
     ) {
         // Gallery bitmap overlay with scrim
         if (config.backgroundBitmap != null) {
+            Image(
+                bitmap = config.backgroundBitmap.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            // Dark scrim for text legibility
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -101,12 +108,12 @@ fun MatchResultCanvas(
 
     CardBackground(
         config = config.copy(colorPair = gradientColors),
-        modifier = modifier.aspectRatio(4f / 5f)
+        modifier = modifier.aspectRatio(1f)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(20.dp)
         ) {
             // Top branding
             Text(
@@ -116,7 +123,7 @@ fun MatchResultCanvas(
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.6f))
             
             // Center content - Large Score
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -124,9 +131,9 @@ fun MatchResultCanvas(
                     Text(
                         text = "${data.homeScore}",
                         color = Color(0xFFFFD100),
-                        fontSize = 72.sp,
+                        fontSize = 56.sp,
                         fontWeight = FontWeight.Black,
-                        lineHeight = 72.sp
+                        lineHeight = 56.sp
                     )
                     Spacer(Modifier.width(16.dp))
                     Text(
@@ -139,9 +146,9 @@ fun MatchResultCanvas(
                     Text(
                         text = "${data.awayScore}",
                         color = CardTextPrimary,
-                        fontSize = 72.sp,
+                        fontSize = 56.sp,
                         fontWeight = FontWeight.Black,
-                        lineHeight = 72.sp
+                        lineHeight = 56.sp
                     )
                     Spacer(Modifier.width(16.dp))
                     Text(
@@ -152,9 +159,9 @@ fun MatchResultCanvas(
                 }
             }
             
-            Spacer(modifier = Modifier.weight(0.5f))
+            Spacer(modifier = Modifier.weight(0.3f))
             
-            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 16.dp))
+            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
             
             // Bottom Section: Context (Left) and Stats (Right)
             Row(
@@ -185,7 +192,7 @@ fun MatchResultCanvas(
                             overflow = TextOverflow.Ellipsis
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     CardFooter()
                 }
                 
@@ -202,16 +209,16 @@ fun MatchResultCanvas(
                             Text(
                                 text = homeVals[i],
                                 color = Color(0xFFFFD100), // Gold for Home
-                                fontSize = 24.sp,
+                                fontSize = 22.sp,
                                 fontWeight = FontWeight.Black,
-                                lineHeight = 24.sp
+                                lineHeight = 22.sp
                             )
                             Text(
                                 text = awayVals[i],
                                 color = CardTextPrimary, // White for Away
-                                fontSize = 20.sp,
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                lineHeight = 20.sp
+                                lineHeight = 18.sp
                             )
                             Text(
                                 text = statNames[i].uppercase(),
@@ -242,12 +249,12 @@ fun HeadlineQuoteCanvas(
 ) {
     CardBackground(
         config = config,
-        modifier = modifier.aspectRatio(4f / 5f)
+        modifier = modifier.aspectRatio(1f)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(20.dp)
         ) {
             // Top branding
             Text(
@@ -257,7 +264,7 @@ fun HeadlineQuoteCanvas(
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.6f))
             
             // The Quote
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -297,9 +304,9 @@ fun HeadlineQuoteCanvas(
                 )
             }
             
-            Spacer(modifier = Modifier.weight(0.5f))
+            Spacer(modifier = Modifier.weight(0.3f))
             
-            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 16.dp))
+            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
             
             // Bottom Section: Context (Left)
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -371,12 +378,12 @@ fun PlayerSpotlightCanvas(
 ) {
     CardBackground(
         config = config,
-        modifier = modifier.aspectRatio(4f / 5f) // Portrait
+        modifier = modifier.aspectRatio(1f) // Square compact
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(20.dp)
         ) {
             // Top branding
             Text(
@@ -386,21 +393,21 @@ fun PlayerSpotlightCanvas(
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.6f))
             
             // The Player Name (Center Stage if no photo)
             Text(
                 text = data.playerName.uppercase(),
                 color = CardTextPrimary,
-                style = MaterialTheme.typography.displayMedium.copy(
+                style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Black,
-                    lineHeight = 48.sp
+                    lineHeight = 40.sp
                 )
             )
             
-            Spacer(modifier = Modifier.weight(0.5f))
+            Spacer(modifier = Modifier.weight(0.3f))
             
-            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 16.dp))
+            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
             
             // Bottom Section: Context (Left) and Stats (Right)
             Row(
@@ -431,7 +438,7 @@ fun PlayerSpotlightCanvas(
                             overflow = TextOverflow.Ellipsis
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     CardFooter()
                 }
                 
@@ -449,9 +456,9 @@ fun PlayerSpotlightCanvas(
                             Text(
                                 text = stat.value,
                                 color = Color(0xFFFFD100), // Gold
-                                fontSize = 32.sp,
+                                fontSize = 28.sp,
                                 fontWeight = FontWeight.Black,
-                                lineHeight = 32.sp
+                                lineHeight = 28.sp
                             )
                             Text(
                                 text = stat.label.uppercase(),
@@ -482,12 +489,12 @@ fun TopStatsCanvas(
 ) {
     CardBackground(
         config = config,
-        modifier = modifier.aspectRatio(4f / 5f)
+        modifier = modifier.aspectRatio(1f)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(20.dp)
         ) {
             // Top branding
             Text(
@@ -497,13 +504,13 @@ fun TopStatsCanvas(
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.6f))
             
             // Center Content: Huge graphic or just leave blank if there's a photo
             
-            Spacer(modifier = Modifier.weight(0.5f))
+            Spacer(modifier = Modifier.weight(0.3f))
             
-            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 16.dp))
+            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
             
             // Bottom Section: Context (Left) and Stats (Right)
             Row(
@@ -531,9 +538,9 @@ fun TopStatsCanvas(
                             Text(
                                 text = stat.value,
                                 color = Color(0xFFFFD100), // Gold
-                                fontSize = 32.sp,
+                                fontSize = 28.sp,
                                 fontWeight = FontWeight.Black,
-                                lineHeight = 32.sp
+                                lineHeight = 28.sp
                             )
                             Text(
                                 text = stat.label.uppercase(),
@@ -580,12 +587,12 @@ fun NbaStyleCanvas(
 ) {
     CardBackground(
         config = config,
-        modifier = modifier.aspectRatio(4f / 5f) // Portrait
+        modifier = modifier.aspectRatio(1f) // Square compact
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(20.dp)
         ) {
             // Top branding
             Text(
@@ -595,7 +602,7 @@ fun NbaStyleCanvas(
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.6f))
             
             // The Quote
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -635,9 +642,9 @@ fun NbaStyleCanvas(
                 )
             }
             
-            Spacer(modifier = Modifier.weight(0.5f))
+            Spacer(modifier = Modifier.weight(0.3f))
             
-            Divider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 16.dp))
+            Divider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
             
             // Bottom Section: Author (Left) and Stats (Right)
             Row(
@@ -671,9 +678,9 @@ fun NbaStyleCanvas(
                             Text(
                                 text = stat.value,
                                 color = Color(0xFFFFD100), // Gold
-                                fontSize = 32.sp,
+                                fontSize = 28.sp,
                                 fontWeight = FontWeight.Black,
-                                lineHeight = 32.sp
+                                lineHeight = 28.sp
                             )
                             Text(
                                 text = stat.label.uppercase(),
