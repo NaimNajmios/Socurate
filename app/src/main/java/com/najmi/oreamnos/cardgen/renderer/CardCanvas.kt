@@ -123,7 +123,7 @@ fun MatchResultCanvas(
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(0.6f))
+            Spacer(modifier = Modifier.weight(1f))
             
             // Center content - Large Score
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -159,7 +159,7 @@ fun MatchResultCanvas(
                 }
             }
             
-            Spacer(modifier = Modifier.weight(0.3f))
+            // Bottom spacer removed to anchor content
             
             androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
             
@@ -264,7 +264,7 @@ fun HeadlineQuoteCanvas(
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(0.6f))
+            Spacer(modifier = Modifier.weight(1f))
             
             // The Quote
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -304,7 +304,7 @@ fun HeadlineQuoteCanvas(
                 )
             }
             
-            Spacer(modifier = Modifier.weight(0.3f))
+            // Bottom spacer removed to anchor content
             
             androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
             
@@ -393,7 +393,7 @@ fun PlayerSpotlightCanvas(
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(0.6f))
+            Spacer(modifier = Modifier.weight(1f))
             
             // The Player Name (Center Stage if no photo)
             Text(
@@ -405,7 +405,7 @@ fun PlayerSpotlightCanvas(
                 )
             )
             
-            Spacer(modifier = Modifier.weight(0.3f))
+            // Bottom spacer removed to anchor content
             
             androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
             
@@ -504,11 +504,11 @@ fun TopStatsCanvas(
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(0.6f))
+            Spacer(modifier = Modifier.weight(1f))
             
             // Center Content: Huge graphic or just leave blank if there's a photo
             
-            Spacer(modifier = Modifier.weight(0.3f))
+            // Bottom spacer removed to anchor content
             
             androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
             
@@ -602,7 +602,7 @@ fun NbaStyleCanvas(
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(0.6f))
+            Spacer(modifier = Modifier.weight(1f))
             
             // The Quote
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -642,7 +642,7 @@ fun NbaStyleCanvas(
                 )
             }
             
-            Spacer(modifier = Modifier.weight(0.3f))
+            // Bottom spacer removed to anchor content
             
             Divider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
             

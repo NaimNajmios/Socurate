@@ -35,10 +35,9 @@ object GradientBuilder {
      */
     val darkScrim: Brush =
         Brush.verticalGradient(
-            listOf(
-                Color.Black.copy(alpha = 0.1f),
-                Color.Black.copy(alpha = 0.45f),
-                Color.Black.copy(alpha = 0.65f)
-            )
+            0.0f to Color.Transparent,
+            0.45f to Color.Transparent,
+            0.65f to Color.Black.copy(alpha = 0.5f),
+            1.0f to Color.Black.copy(alpha = 0.95f)
         )
 }
