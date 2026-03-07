@@ -16,6 +16,12 @@ import com.najmi.oreamnos.cardgen.renderer.HeadlineQuoteCanvas
 import com.najmi.oreamnos.cardgen.renderer.MatchResultCanvas
 import com.najmi.oreamnos.cardgen.renderer.PlayerSpotlightCanvas
 import com.najmi.oreamnos.cardgen.renderer.TopStatsCanvas
+import com.najmi.oreamnos.cardgen.renderer.BreakingNewsCanvas
+import com.najmi.oreamnos.cardgen.renderer.DetailedScoreboardCanvas
+import com.najmi.oreamnos.cardgen.renderer.MatchPreviewCanvas
+import com.najmi.oreamnos.cardgen.renderer.OnThisDayCanvas
+import com.najmi.oreamnos.cardgen.renderer.StartingXICanvas
+import com.najmi.oreamnos.cardgen.renderer.TransferNewsCanvas
 import com.najmi.oreamnos.cardgen.viewmodel.ExtractionState
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
 
@@ -74,6 +80,12 @@ fun CardCanvas(
         is CardData.HeadlineQuote -> HeadlineQuoteCanvas(data = cardData, config = cardConfig, modifier = modifier)
         is CardData.PlayerSpotlight -> PlayerSpotlightCanvas(data = cardData, config = cardConfig, modifier = modifier)
         is CardData.TopStats -> TopStatsCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.TransferNews -> TransferNewsCanvas(data = cardData, config = cardConfig)
+        is CardData.BreakingNews -> BreakingNewsCanvas(data = cardData, config = cardConfig)
+        is CardData.MatchPreview -> MatchPreviewCanvas(data = cardData, config = cardConfig)
+        is CardData.DetailedScoreboard -> DetailedScoreboardCanvas(data = cardData, config = cardConfig)
+        is CardData.OnThisDay -> OnThisDayCanvas(data = cardData, config = cardConfig)
+        is CardData.StartingXI -> StartingXICanvas(data = cardData, config = cardConfig)
     }
 }
 

@@ -58,29 +58,29 @@ import com.najmi.oreamnos.ui.theme.SocurateTheme
 // ──────────────────────────────────────────────────────────────
 
 /** Standard 2dp border color used on all cards. */
-private val CardBorder = Color.White.copy(alpha = 0.15f)
+internal val CardBorder = Color.White.copy(alpha = 0.15f)
 
 /** Text colors for card overlays. */
-private val CardTextPrimary = Color.White
-private val CardTextSecondary = Color.White.copy(alpha = 0.75f)
-private val CardTextMuted = Color.White.copy(alpha = 0.55f)
+internal val CardTextPrimary = Color.White
+internal val CardTextSecondary = Color.White.copy(alpha = 0.75f)
+internal val CardTextMuted = Color.White.copy(alpha = 0.55f)
 
 /**
  * Returns scaled sp value based on multiplier.
  */
-private fun Int.scaleSp(multiplier: Float): TextUnit = (this * multiplier).sp
+internal fun Int.scaleSp(multiplier: Float): TextUnit = (this * multiplier).sp
 
 /**
  * Returns scaled sp value from a TextUnit based on multiplier.
  */
-private fun TextUnit.scaleSp(multiplier: Float): TextUnit = (this.value * multiplier).sp
+internal fun TextUnit.scaleSp(multiplier: Float): TextUnit = (this.value * multiplier).sp
 
 /**
  * Applies the background based on [config]'s imagePosition setting.
  * Handles gradient backgrounds, gallery images, and various layout modes.
  */
 @Composable
-private fun CardBackground(
+internal fun CardBackground(
     config: CardConfig,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit

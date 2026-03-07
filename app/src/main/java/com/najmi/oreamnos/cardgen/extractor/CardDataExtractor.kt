@@ -5,10 +5,12 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.google.gson.JsonSyntaxException
 import com.google.gson.stream.JsonReader
 import java.io.StringReader
 import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.model.CardTemplate
+import com.najmi.oreamnos.cardgen.model.LineupPlayer
 import com.najmi.oreamnos.cardgen.model.StatItem
 import com.najmi.oreamnos.cardgen.model.TeamStats
 import com.najmi.oreamnos.cardgen.prompt.CardPromptManager
@@ -130,6 +132,12 @@ class CardDataExtractor(private val context: Context) {
             CardTemplate.PlayerSpotlight -> parsePlayerSpotlight(obj)
             CardTemplate.HeadlineQuote -> parseHeadlineQuote(obj)
             CardTemplate.TopStats -> parseTopStats(obj)
+            CardTemplate.TransferNews -> parseTransferNews(obj)
+            CardTemplate.BreakingNews -> parseBreakingNews(obj)
+            CardTemplate.MatchPreview -> parseMatchPreview(obj)
+            CardTemplate.DetailedScoreboard -> parseDetailedScoreboard(obj)
+            CardTemplate.OnThisDay -> parseOnThisDay(obj)
+            CardTemplate.StartingXI -> parseStartingXI(obj)
         }
     }
 
@@ -244,6 +252,110 @@ class CardDataExtractor(private val context: Context) {
         }
 
         return CardData.TopStats(stats = items)
+    }
+
+    private fun parseTransferNews(obj: JsonObject): CardData.TransferNews {
+        return CardData.TransferNews(
+            playerName = obj.optString("playerName", UNKNOWN),
+            action = obj.optString("action", UNKNOWN),
+            fromTeam = obj.optString("fromTeam", UNKNOWN),
+            toTeam = obj.optString("toTeam", UNKNOWN),
+            fee = obj.optString("fee", UNKNOWN),
+            quote = obj.optString("quote", UNKNOWN)
+        )
+    }
+
+    private fun parseBreakingNews(obj: JsonObject): CardData.BreakingNews {
+        return CardData.BreakingNews(
+            label = obj.optString("label", "🚨 BREAKING"),
+            headline = obj.optString("headline", UNKNOWN),
+            subtext = obj.optString("subtext", "")
+        )
+    }
+
+    private fun parseMatchPreview(obj: JsonObject): CardData.MatchPreview {
+        return CardData.MatchPreview(
+            competition = obj.optString("competition", UNKNOWN),
+            homeTeam = obj.optString("homeTeam", UNKNOWN),
+            awayTeam = obj.optString("awayTeam", UNKNOWN),
+            matchTime = obj.optString("matchTime", UNKNOWN),
+            stadium = obj.optString("stadium", UNKNOWN)
+        )
+    }
+
+    private fun parseDetailedScoreboard(obj: JsonObject): CardData.DetailedScoreboard {
+        return CardData.DetailedScoreboard(
+            homeTeam = obj.optString("homeTeam", UNKNOWN),
+            awayTeam = obj.optString("awayTeam", UNKNOWN),
+            homeScore = obj.optInt("homeScore", 0),
+            awayScore = obj.optInt("awayScore", 0),
+            homeScorers = obj.optString("homeScorers", ""),
+            awayScorers = obj.optString("awayScorers", ""),
+            matchStatus = obj.optString("matchStatus", UNKNOWN)
+        )
+    }
+
+    private fun parseOnThisDay(obj: JsonObject): CardData.OnThisDay {
+        val statsArray = try { obj.getAsJsonArray("keyStats") } catch (e: Exception) { null }
+        val items = mutableListOf<StatItem>()
+        if (statsArray != null) {
+            for (i in 0 until statsArray.size()) {
+                val item = statsArray[i]?.asJsonObject
+                if (item != null) {
+                    items.add(
+                        StatItem(
+                            label = item.optString("label", "Stat ${i + 1}"),
+                            value = item.optString("value", ZERO_STR),
+                            context = item.optString("context", "")
+                        )
+                    )
+                }
+            }
+        }
+        return CardData.OnThisDay(
+            dateLabel = obj.optString("dateLabel", "ON THIS DAY"),
+            headline = obj.optString("headline", UNKNOWN),
+            keyStats = items
+        )
+    }
+
+    private fun parseStartingXI(obj: JsonObject): CardData.StartingXI {
+        val startersArray = try { obj.getAsJsonArray("starters") } catch (e: Exception) { null }
+        val subsArray = try { obj.getAsJsonArray("subs") } catch (e: Exception) { null }
+
+        val starters = mutableListOf<LineupPlayer>()
+        if (startersArray != null) {
+            for (i in 0 until startersArray.size()) {
+                val item = startersArray[i]?.asJsonObject
+                if (item != null) {
+                    starters.add(LineupPlayer(
+                        number = item.optString("number", ""),
+                        name = item.optString("name", UNKNOWN)
+                    ))
+                }
+            }
+        }
+
+        val subs = mutableListOf<LineupPlayer>()
+        if (subsArray != null) {
+            for (i in 0 until subsArray.size()) {
+                val item = subsArray[i]?.asJsonObject
+                if (item != null) {
+                    subs.add(LineupPlayer(
+                        number = item.optString("number", ""),
+                        name = item.optString("name", UNKNOWN)
+                    ))
+                }
+            }
+        }
+
+        return CardData.StartingXI(
+            teamName = obj.optString("teamName", UNKNOWN),
+            formation = obj.optString("formation", ""),
+            starters = starters,
+            subs = subs,
+            manager = obj.optString("manager", "")
+        )
     }
 
     private fun parseTeamStats(obj: JsonObject?): TeamStats {

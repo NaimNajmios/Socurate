@@ -32,10 +32,49 @@ sealed class CardTemplate(
         description = "Top 3 Statistics"
     )
 
+    /** Transfer news card: player signings, loans, rumors. */
+    object TransferNews : CardTemplate(
+        displayName = "Transfer",
+        description = "Transfers & Rumors"
+    )
+
+    /** Breaking news card: major announcements and flash news. */
+    object BreakingNews : CardTemplate(
+        displayName = "Breaking",
+        description = "Urgent / Breaking News"
+    )
+
+    /** Match preview card: upcoming fixture details. */
+    object MatchPreview : CardTemplate(
+        displayName = "Preview",
+        description = "Upcoming Fixture"
+    )
+
+    /** Detailed scoreboard card: scores with goalscorers. */
+    object DetailedScoreboard : CardTemplate(
+        displayName = "Full Time",
+        description = "Detailed Scoreboard"
+    )
+
+    /** Historical card: on this day anniversaries. */
+    object OnThisDay : CardTemplate(
+        displayName = "History",
+        description = "On This Day Anniversary"
+    )
+
+    /** Lineup card: starting XI and substitutes. */
+    object StartingXI : CardTemplate(
+        displayName = "Lineup",
+        description = "Starting XI / Pitch"
+    )
+
     companion object {
         /** All templates in display order. Lazy to avoid class init order NPE. */
         val all: List<CardTemplate> by lazy {
-            listOf(MatchResult, PlayerSpotlight, HeadlineQuote, TopStats)
+            listOf(
+                MatchResult, PlayerSpotlight, HeadlineQuote, TopStats,
+                TransferNews, BreakingNews, MatchPreview, DetailedScoreboard, OnThisDay, StartingXI
+            )
         }
     }
 }

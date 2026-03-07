@@ -55,7 +55,76 @@ sealed class CardData {
     data class TopStats(
         val stats: List<StatItem>
     ) : CardData()
+
+    /**
+     * Data for the Transfer News / Here We Go card.
+     */
+    data class TransferNews(
+        val playerName: String,
+        val action: String, // e.g. "SIGNED", "LOANED", "AGREEMENT REACHED"
+        val fromTeam: String,
+        val toTeam: String,
+        val fee: String,
+        val quote: String
+    ) : CardData()
+
+    /**
+     * Data for the Breaking News / Flash card.
+     */
+    data class BreakingNews(
+        val label: String, // e.g. "🚨 BREAKING", "OFFICIAL"
+        val headline: String,
+        val subtext: String
+    ) : CardData()
+
+    /**
+     * Data for the Upcoming Match Preview card.
+     */
+    data class MatchPreview(
+        val competition: String,
+        val homeTeam: String,
+        val awayTeam: String,
+        val matchTime: String,
+        val stadium: String
+    ) : CardData()
+
+    /**
+     * Data for the Detailed Scoreboard / Full-Time card.
+     */
+    data class DetailedScoreboard(
+        val homeTeam: String,
+        val awayTeam: String,
+        val homeScore: Int,
+        val awayScore: Int,
+        val homeScorers: String, // Comma separated list of scorers & minutes
+        val awayScorers: String,
+        val matchStatus: String // e.g. "FULL TIME", "AET"
+    ) : CardData()
+
+    /**
+     * Data for the On This Day / Historical card.
+     */
+    data class OnThisDay(
+        val dateLabel: String,
+        val headline: String,
+        val keyStats: List<StatItem>
+    ) : CardData()
+
+    /**
+     * Data for the Starting XI / Lineup card.
+     */
+    data class StartingXI(
+        val teamName: String,
+        val formation: String,
+        val starters: List<LineupPlayer>,
+        val subs: List<LineupPlayer>,
+        val manager: String
+    ) : CardData()
 }
+
+/**
+ * A single stat row used in [CardData.MatchResult] and [CardData.TopStats].
+ */
 
 /**
  * A single stat row used in [CardData.MatchResult] and [CardData.TopStats].
@@ -73,4 +142,12 @@ data class StatItem(
     val label: String,
     val value: String,
     val context: String
+)
+
+/**
+ * A single player entry for the StartingXI card.
+ */
+data class LineupPlayer(
+    val number: String,
+    val name: String
 )
