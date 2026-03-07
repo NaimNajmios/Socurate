@@ -16,7 +16,6 @@ import com.najmi.oreamnos.cardgen.renderer.HeadlineQuoteCanvas
 import com.najmi.oreamnos.cardgen.renderer.MatchResultCanvas
 import com.najmi.oreamnos.cardgen.renderer.PlayerSpotlightCanvas
 import com.najmi.oreamnos.cardgen.renderer.TopStatsCanvas
-import com.najmi.oreamnos.cardgen.renderer.NbaStyleCanvas
 import com.najmi.oreamnos.cardgen.viewmodel.ExtractionState
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
 
@@ -75,7 +74,6 @@ fun CardCanvas(
         is CardData.HeadlineQuote -> HeadlineQuoteCanvas(data = cardData, config = cardConfig, modifier = modifier)
         is CardData.PlayerSpotlight -> PlayerSpotlightCanvas(data = cardData, config = cardConfig, modifier = modifier)
         is CardData.TopStats -> TopStatsCanvas(data = cardData, config = cardConfig, modifier = modifier)
-        is CardData.NbaStyleQuote -> NbaStyleCanvas(data = cardData, config = cardConfig, modifier = modifier)
     }
 }
 

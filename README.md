@@ -4,6 +4,12 @@ A sleek, modern Android application that transforms global football news into po
 
 ## ✨ What's New
 
+### 🖼️ Automated Sports Card Generator
+- **Premium Graphics**: Generate 1:1 square sports cards resembling premium NBA coverage and sports media.
+- **Multiple Templates**: Built-in templates for Match Result, Player Spotlight, Headline Quote, and Top Stats.
+- **Dynamic Backgrounds**: Custom GradientBuilder and an interactive background picker UI for versatile styling.
+- **Integrated Export**: Dedicated export bottom sheet to directly save or share generated cards.
+
 ### 🔄 Multi-Provider AI Support
 - **Gemini (Google)**: Default provider with multiple model options
 - **Groq (Llama 3.3)**: Fast inference alternative
@@ -85,6 +91,7 @@ A sleek, modern Android application that transforms global football news into po
 - **AI-Powered Curation**: Professional Malaysian Malay posts
 - **Smart Context Detection**: Adapts to quotes, tactical analysis, different content types
 - **URL Extraction**: Automatically extracts content from shared URLs
+- **Instant Sports Cards**: Turn any generated news into a visually stunning, shareable 1:1 layout card with a single tap.
 
 ### Customization & Productivity
 - **Dual Tone Modes**: Formal (professional) or Casual (fan banter)
@@ -169,6 +176,14 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 6. Adjust display options using toggle chips
 7. Copy or share the generated post
 
+### Generating Sports Cards
+
+1. Generate text content using direct input or share intent
+2. Tap the "Generate Card" button on the output card
+3. Choose a template (Match Result, Spotlight, Quote, Top Stats)
+4. Customize the background color and design
+5. Save or directly share the 1:1 image to supported platforms
+
 ### Post Refinement Workflow
 
 1. After generation, the refinement card appears
@@ -192,6 +207,12 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 
 ```
 com.najmi.oreamnos/
+├── cardgen/                    # Sports Card Generator Features
+│   ├── extractor/             # Parsing AI output to structural data
+│   ├── model/                 # Card configuration & templates
+│   ├── prompt/                # Card-specific AI prompts
+│   ├── renderer/              # Custom Canvas rendering (1:1 format)
+│   └── ui/                    # Generator UI & background picker
 ├── curator/                    # AI Provider Abstraction
 │   ├── IContentCurator.kt     # Content curator interface
 │   ├── CuratorFactory.kt      # Factory for creating curators

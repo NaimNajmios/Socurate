@@ -23,7 +23,6 @@ object CardPromptManager {
             CardTemplate.PlayerSpotlight -> playerSpotlightSchema()
             CardTemplate.HeadlineQuote -> headlineQuoteSchema()
             CardTemplate.TopStats -> topStatsSchema()
-            CardTemplate.NbaStyleQuote -> nbaStyleQuoteSchema()
         }
         return "$schema\n\nARTICLE:\n$articleText\n\nRespond with ONLY the JSON object, starting with {"
     }
@@ -81,21 +80,6 @@ object CardPromptManager {
             { "label": "Nama stat (maks 30 aksara)", "value": "Nilai nombor", "context": "Konteks ringkas (maks 50 aksara)" },
             { "label": "Nama stat (maks 30 aksara)", "value": "Nilai nombor", "context": "Konteks ringkas (maks 50 aksara)" },
             { "label": "Nama stat (maks 30 aksara)", "value": "Nilai nombor", "context": "Konteks ringkas (maks 50 aksara)" }
-          ]
-        }
-    """.trimIndent()
-
-    private fun nbaStyleQuoteSchema(): String = """
-        Extract a short, punchy quote from the football article below, along with the speaker's core stats.
-        Return ONLY a JSON object with this exact structure (fill in real values, write text in Bahasa Malaysia):
-        {
-          "quote": "Petikan kata-kata ringkas dan menarik (maks 100 aksara)",
-          "authorName": "Nama Pendek (cth. M. Salah)",
-          "authorContext": "Konteks pendek (cth. Penyerang Liverpool)",
-          "stats": [
-            { "label": "Nama stat ringkas", "value": "Nilai", "context": "" },
-            { "label": "Nama stat ringkas", "value": "Nilai", "context": "" },
-            { "label": "Nama stat ringkas", "value": "Nilai", "context": "" }
           ]
         }
     """.trimIndent()

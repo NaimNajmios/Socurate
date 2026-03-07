@@ -91,5 +91,7 @@ data class CardConfig(
     /** Scrim intensity type - controls how much the image is darkened for text legibility */
     val scrimType: GradientBuilder.ScrimType = GradientBuilder.ScrimType.DARK,
     /** For CUTOUT mode - secondary bitmap for player cutout (transparent PNG) */
-    val cutoutBitmap: Bitmap? = null
+    val cutoutBitmap: Bitmap? = null,
+    /** Font size multiplier (1.0 = default, 0.8 = smaller, 1.2 = larger) */
+    val fontSizeMultiplier: Float = 1.0f
 )

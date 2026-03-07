@@ -3,6 +3,8 @@ package com.najmi.oreamnos.cardgen.ui
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,12 +14,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -29,18 +35,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.ExportSize
+import com.najmi.oreamnos.cardgen.model.ImagePosition
 import com.najmi.oreamnos.cardgen.renderer.CardRenderer
 import com.najmi.oreamnos.cardgen.utils.BitmapExporter
 import com.najmi.oreamnos.cardgen.viewmodel.CardGeneratorViewModel
@@ -184,7 +197,16 @@ fun CardGeneratorScreen(
                 }
             }
 
-            // ── 4. Text input (direct paste) ───────────────────────
+            // ── 4. Layout & Font Size Controls ───────────────────────
+            LayoutFontSizeSection(
+                cardConfig = cardConfig,
+                onConfigUpdate = { newConfig ->
+                    cardViewModel.updateConfig(newConfig)
+                },
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            // ── 5. Text input (direct paste) ───────────────────────
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
                     text = "ARTICLE TEXT",
@@ -290,5 +312,171 @@ fun CardGeneratorScreen(
                 cardViewModel.resetExportState()
             }
         )
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Layout & Font Size Section
+// ──────────────────────────────────────────────────────────────
+
+@Composable
+private fun LayoutFontSizeSection(
+    cardConfig: CardConfig,
+    onConfigUpdate: (CardConfig) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Layout Mode Section
+            Text(
+                text = "LAYOUT",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
+            
+            // Layout options row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ImagePosition.entries.take(3).forEach { position ->
+                    LayoutChip(
+                        position = position,
+                        isSelected = cardConfig.imagePosition == position,
+                        onClick = { onConfigUpdate(cardConfig.copy(imagePosition = position)) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ImagePosition.entries.drop(3).forEach { position ->
+                    LayoutChip(
+                        position = position,
+                        isSelected = cardConfig.imagePosition == position,
+                        onClick = { onConfigUpdate(cardConfig.copy(imagePosition = position)) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            // Image preview if selected
+            if (cardConfig.backgroundBitmap != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Thumbnail preview
+                    AsyncImage(
+                        model = cardConfig.backgroundBitmap,
+                        contentDescription = "Background preview",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(0.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    
+                    Column(modifier = Modifier.weight(1f)) {
+                        // Opacity slider
+                        Text(
+                            text = "Opacity: ${(cardConfig.imageOpacity * 100).toInt()}%",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                        Slider(
+                            value = cardConfig.imageOpacity,
+                            onValueChange = { onConfigUpdate(cardConfig.copy(imageOpacity = it)) },
+                            valueRange = 0.1f..1f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+            // Font Size Section
+            Text(
+                text = "FONT SIZE",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "A",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
+                Slider(
+                    value = cardConfig.fontSizeMultiplier,
+                    onValueChange = { onConfigUpdate(cardConfig.copy(fontSizeMultiplier = it)) },
+                    valueRange = 0.6f..1.4f,
+                    steps = 7,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp)
+                )
+                Text(
+                    text = "A",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
+            }
+            Text(
+                text = "${(cardConfig.fontSizeMultiplier * 100).toInt()}%",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
+    }
+}
+
+@Composable
+private fun LayoutChip(
+    position: ImagePosition,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .height(48.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(0.dp),
+        border = BorderStroke(
+            width = if (isSelected) 2.dp else 1.dp,
+            color = if (isSelected) MaterialTheme.colorScheme.primary 
+                   else MaterialTheme.colorScheme.outline
+        ),
+        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) 
+               else MaterialTheme.colorScheme.surface
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = position.displayName,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                color = if (isSelected) MaterialTheme.colorScheme.primary 
+                       else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
+        }
     }
 }

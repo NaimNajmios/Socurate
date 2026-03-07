@@ -32,16 +32,10 @@ sealed class CardTemplate(
         description = "Top 3 Statistics"
     )
 
-    /** NBA style card: A short, punchy quote with key player stats attached. */
-    object NbaStyleQuote : CardTemplate(
-        displayName = "NBA Style",
-        description = "Short Quote & Core Stats"
-    )
-
     companion object {
         /** All templates in display order. Lazy to avoid class init order NPE. */
         val all: List<CardTemplate> by lazy {
-            listOf(MatchResult, PlayerSpotlight, HeadlineQuote, TopStats, NbaStyleQuote)
+            listOf(MatchResult, PlayerSpotlight, HeadlineQuote, TopStats)
         }
     }
 }
