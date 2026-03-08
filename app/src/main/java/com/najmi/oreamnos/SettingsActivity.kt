@@ -81,48 +81,44 @@ class SettingsActivity : ComponentActivity() {
         
         // Gemini models
         val GEMINI_MODEL_NAMES = arrayOf(
-            "Gemini 2.5 Flash Lite", "Gemini 2.5 Flash", "Gemini 2.0 Flash",
-            "Gemini 2.0 Flash Lite", "Gemini 1.5 Flash", "Gemini 1.5 Flash-8B"
+            "Gemini 3.1 Pro", "Gemini 3 Flash", "Gemini 3.1 Flash Lite",
+            "Gemini 2.5 Pro", "Gemini 2.5 Flash", "Gemini 2.5 Flash Lite"
         )
         val GEMINI_MODEL_ENDPOINTS = arrayOf(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent",
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent"
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent"
         )
         
         // Groq models
         val GROQ_MODEL_NAMES = arrayOf(
-            "Llama 3.3 70B Versatile", "Llama 3.1 8B Instant", "Llama 3 70B",
-            "Llama 3 8B", "Gemma 2 9B", "Mixtral 8x7B"
+            "DeepSeek R1 Distill Llama 70B", "Llama 3.3 70B Versatile", "Llama 3.1 8B Instant",
+            "Qwen QwQ 32B", "GPT OSS 120B"
         )
         val GROQ_MODEL_IDS = arrayOf(
-            "llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama3-70b-8192",
-            "llama3-8b-8192", "gemma2-9b-it", "mixtral-8x7b-32768"
+            "deepseek-r1-distill-llama-70b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant",
+            "qwen-qwq-32b", "openai/gpt-oss-120b"
         )
         
         // OpenRouter models
         val OPENROUTER_MODEL_NAMES = arrayOf(
-            "Llama 3.3 70B Instruct", "Llama 3.1 8B Instruct", "Llama 3.1 405B Instruct",
-            "Llama 3.2 3B Instruct", "Google Gemma 2 9B", "Mistral 7B Instruct",
-            "Qwen 2.5 7B Instruct", "NVIDIA Nemotron 70B", "HuggingFace Zephyr 7B"
+            "DeepSeek R1 Zero", "DeepSeek V3 Base", "Llama 4 Maverick",
+            "Gemini 2.5 Pro Exp", "GPT OSS 120B", "Llama 3.3 70B Instruct"
         )
         val OPENROUTER_MODEL_IDS = arrayOf(
-            "meta-llama/llama-3.3-70b-instruct:free", "meta-llama/llama-3.1-8b-instruct:free",
-            "meta-llama/llama-3.1-405b-instruct:free", "meta-llama/llama-3.2-3b-instruct:free",
-            "google/gemma-2-9b-it:free", "mistralai/mistral-7b-instruct:free",
-            "qwen/qwen-2.5-7b-instruct:free", "nvidia/llama-3.1-nemotron-70b-instruct:free",
-            "huggingfaceh4/zephyr-7b-beta:free"
+            "deepseek/deepseek-r1-zero:free", "deepseek/deepseek-v3-base:free", "meta-llama/llama-4-maverick:free",
+            "google/gemini-2.5-pro-exp-03-25:free", "openai/gpt-oss-120b:free", "meta-llama/llama-3.3-70b-instruct:free"
         )
         
         // Cerebras models
         val CEREBRAS_MODEL_NAMES = arrayOf(
-            "Llama 3.3 70B", "Llama 3.1 8B", "Qwen 3 32B", "GPT-OSS 120B", "Z.ai GLM 4.6"
+            "GPT-5.3 Codex Spark", "Llama 3.3 70B", "Llama 3.1 8B", "Z.ai GLM 4.7"
         )
         val CEREBRAS_MODEL_IDS = arrayOf(
-            "llama-3.3-70b", "llama3.1-8b", "qwen-3-32b", "gpt-oss-120b", "zai-glm-4.6"
+            "gpt-5.3-codex-spark", "llama-3.3-70b", "llama3.1-8b", "zai-glm-4.7"
         )
         
         val PROVIDER_NAMES = arrayOf("Gemini", "Groq", "OpenRouter", "Cerebras")

@@ -4365,10 +4365,10 @@ int string material_timepicker_minute 0x7f1000e2
 int string material_timepicker_pm 0x7f1000e3
 int string material_timepicker_select_time 0x7f1000e4
 int string material_timepicker_text_input_mode_description 0x7f1000e5
-int string model_2_0_flash 0x7f1000e6
-int string model_2_5_flash 0x7f1000e7
-int string model_2_5_flash_lite 0x7f1000e8
-int string model_2_5_pro 0x7f1000e9
+int string model_2_5_flash_lite 0x7f1000e6
+int string model_3_1_flash_lite 0x7f1000e7
+int string model_3_1_pro 0x7f1000e8
+int string model_3_flash 0x7f1000e9
 int string model_label 0x7f1000ea
 int string mtrl_badge_numberless_content_description 0x7f1000eb
 int string mtrl_checkbox_button_icon_path_checked 0x7f1000ec

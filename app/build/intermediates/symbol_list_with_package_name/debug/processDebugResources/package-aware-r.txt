@@ -4366,10 +4366,10 @@ string material_timepicker_minute
 string material_timepicker_pm
 string material_timepicker_select_time
 string material_timepicker_text_input_mode_description
-string model_2_0_flash
-string model_2_5_flash
 string model_2_5_flash_lite
-string model_2_5_pro
+string model_3_1_flash_lite
+string model_3_1_pro
+string model_3_flash
 string model_label
 string mtrl_badge_numberless_content_description
 string mtrl_checkbox_button_icon_path_checked
