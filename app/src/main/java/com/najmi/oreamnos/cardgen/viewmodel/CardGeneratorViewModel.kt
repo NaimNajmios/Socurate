@@ -53,7 +53,7 @@ class CardGeneratorViewModel : ViewModel() {
 
     // ── Template selection ─────────────────────────────────────
 
-    private val _selectedTemplate = MutableStateFlow<CardTemplate>(CardTemplate.MatchResult)
+    private val _selectedTemplate = MutableStateFlow<CardTemplate>(CardTemplate.DetailedScoreboard)
     val selectedTemplate: StateFlow<CardTemplate> = _selectedTemplate.asStateFlow()
 
     // ── AI extraction state ────────────────────────────────────

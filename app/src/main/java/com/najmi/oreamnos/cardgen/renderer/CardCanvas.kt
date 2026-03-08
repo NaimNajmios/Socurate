@@ -48,7 +48,6 @@ import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.model.ImagePosition
 import com.najmi.oreamnos.cardgen.model.StatItem
-import com.najmi.oreamnos.cardgen.model.TeamStats
 import com.najmi.oreamnos.cardgen.utils.ColorExtractor
 import com.najmi.oreamnos.cardgen.utils.GradientBuilder
 import com.najmi.oreamnos.ui.theme.SocurateTheme
@@ -312,172 +311,6 @@ internal fun CardBackground(
             }
         }
     }
-    }
-}
-
-// ──────────────────────────────────────────────────────────────
-// 1. MATCH RESULT CANVAS
-// ──────────────────────────────────────────────────────────────
-
-/**
- * Match Result card composable.
- *
- * Layout:
- * - Competition name + date (top)
- * - Two-column team section with score in center
- * - Horizontal divider
- * - 3-column stat row per team (possession, shots, shots on target)
- * - Branding footer
- */
-@Composable
-fun MatchResultCanvas(
-    data: CardData.MatchResult,
-    config: CardConfig,
-    modifier: Modifier = Modifier
-) {
-    val gradientColors = ColorExtractor.getMatchColors(data.homeTeam, data.awayTeam)
-    val scale = config.fontSizeMultiplier
-
-    CardBackground(
-        config = config.copy(colorPair = gradientColors),
-        modifier = modifier.aspectRatio(1f)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp)
-        ) {
-            // Top branding
-            Text(
-                text = "MATCH RESULT",
-                color = CardTextMuted,
-                style = MaterialTheme.typography.labelSmall,
-                letterSpacing = 3.sp
-            )
-            
-            Spacer(modifier = Modifier.weight(1f))
-            
-            // Center content - Large Score
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${data.homeScore}",
-                        color = Color(0xFFFFD100),
-                        fontSize = 56.sp.scaleSp(scale),
-                        fontWeight = FontWeight.Black,
-                        lineHeight = 56.sp.scaleSp(scale)
-                    )
-                    Spacer(Modifier.width(16.dp))
-                    Text(
-                        text = data.homeTeam.uppercase(),
-                        color = CardTextPrimary,
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Black,
-                            fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale)
-                        )
-                    )
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${data.awayScore}",
-                        color = CardTextPrimary,
-                        fontSize = 56.sp.scaleSp(scale),
-                        fontWeight = FontWeight.Black,
-                        lineHeight = 56.sp.scaleSp(scale)
-                    )
-                    Spacer(Modifier.width(16.dp))
-                    Text(
-                        text = data.awayTeam.uppercase(),
-                        color = CardTextSecondary,
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Black,
-                            fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale)
-                        )
-                    )
-                }
-            }
-            
-            // Bottom spacer removed to anchor content
-            
-            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
-            
-            // Bottom Section: Context (Left) and Stats (Right)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                // Context Info
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = data.competition.uppercase(),
-                        color = CardTextPrimary,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = MaterialTheme.typography.titleLarge.fontSize.scaleSp(scale)
-                        )
-                    )
-                    if (data.matchDate.isNotBlank()) {
-                        Text(
-                            text = data.matchDate.uppercase(),
-                            color = CardTextMuted,
-                            style = MaterialTheme.typography.labelSmall,
-                            letterSpacing = 1.sp
-                        )
-                    }
-                    if (data.keyMoment.isNotBlank() && data.keyMoment != "—") {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = data.keyMoment,
-                            color = CardTextSecondary,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
-                            ),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    CardFooter()
-                }
-                
-                Spacer(modifier = Modifier.width(16.dp))
-                
-                // Key Stats
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    val statNames = listOf("Poss", "Shots", "SOT")
-                    val homeVals = listOf("${data.homeStats.possession}%", "${data.homeStats.shots}", "${data.homeStats.shotsOnTarget}")
-                    val awayVals = listOf("${data.awayStats.possession}%", "${data.awayStats.shots}", "${data.awayStats.shotsOnTarget}")
-                    
-                    for (i in 0..2) {
-                        if (homeVals[i] != "0%" && awayVals[i] != "0%" && homeVals[i] != "0" && awayVals[i] != "0") {
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(
-                                    text = homeVals[i],
-                                    color = Color(0xFFFFD100), // Gold for Home
-                                    fontSize = 22.sp.scaleSp(scale),
-                                    fontWeight = FontWeight.Black,
-                                    lineHeight = 22.sp.scaleSp(scale)
-                                )
-                                Text(
-                                    text = awayVals[i],
-                                    color = CardTextPrimary, // White for Away
-                                    fontSize = 18.sp.scaleSp(scale),
-                                    fontWeight = FontWeight.Bold,
-                                    lineHeight = 18.sp.scaleSp(scale)
-                                )
-                                Text(
-                                    text = statNames[i].uppercase(),
-                                    color = CardTextSecondary,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    letterSpacing = 1.sp
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -825,27 +658,6 @@ internal fun CardFooter() {
 // ──────────────────────────────────────────────────────────────
 // @Preview functions
 // ──────────────────────────────────────────────────────────────
-
-@Preview(showBackground = true, name = "Match Result Card")
-@Composable
-private fun PreviewMatchResult() {
-    SocurateTheme {
-        MatchResultCanvas(
-            data = CardData.MatchResult(
-                homeTeam = "JDT",
-                awayTeam = "Selangor",
-                homeScore = 3,
-                awayScore = 1,
-                competition = "Liga Super",
-                matchDate = "5 Mac 2026",
-                homeStats = TeamStats(possession = 58, shots = 14, shotsOnTarget = 8),
-                awayStats = TeamStats(possession = 42, shots = 9, shotsOnTarget = 3),
-                keyMoment = "JDT dominasi babak pertama dengan tiga gol tanpa balas"
-            ),
-            config = CardConfig()
-        )
-    }
-}
 
 @Preview(showBackground = true, name = "Headline Quote Card")
 @Composable

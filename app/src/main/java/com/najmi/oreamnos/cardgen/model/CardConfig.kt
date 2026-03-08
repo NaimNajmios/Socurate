@@ -73,7 +73,7 @@ enum class PresetBackground(val resourceName: String) {
  * Drives both the live preview and the final bitmap export.
  */
 data class CardConfig(
-    val template: CardTemplate = CardTemplate.MatchResult,
+    val template: CardTemplate = CardTemplate.DetailedScoreboard,
     val backgroundType: BackgroundType = BackgroundType.GRADIENT,
     /** Start and end colors for the gradient background. */
     val colorPair: Pair<Color, Color> = Pair(Color(0xFF1A237E), Color(0xFF0D47A1)),

@@ -12,7 +12,7 @@ import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.model.CardTemplate
 import com.najmi.oreamnos.cardgen.model.LineupPlayer
 import com.najmi.oreamnos.cardgen.model.StatItem
-import com.najmi.oreamnos.cardgen.model.TeamStats
+
 import com.najmi.oreamnos.cardgen.prompt.CardPromptManager
 import com.najmi.oreamnos.curator.CuratorFactory
 
@@ -128,7 +128,7 @@ class CardDataExtractor(private val context: Context) {
             ?: throw Exception("The AI response did not contain a JSON object. Try again.")
 
         return when (template) {
-            CardTemplate.MatchResult -> parseMatchResult(obj)
+
             CardTemplate.PlayerSpotlight -> parsePlayerSpotlight(obj)
             CardTemplate.HeadlineQuote -> parseHeadlineQuote(obj)
             CardTemplate.TopStats -> parseTopStats(obj)
@@ -191,20 +191,6 @@ class CardDataExtractor(private val context: Context) {
     // ──────────────────────────────────────────────────────────────
     // Per-template parsers
     // ──────────────────────────────────────────────────────────────
-
-    private fun parseMatchResult(obj: JsonObject): CardData.MatchResult {
-        return CardData.MatchResult(
-            homeTeam = obj.optString("homeTeam", UNKNOWN),
-            awayTeam = obj.optString("awayTeam", UNKNOWN),
-            homeScore = obj.optInt("homeScore", 0),
-            awayScore = obj.optInt("awayScore", 0),
-            competition = obj.optString("competition", UNKNOWN),
-            matchDate = obj.optString("matchDate", UNKNOWN),
-            homeStats = parseTeamStats(obj.optObject("homeStats")),
-            awayStats = parseTeamStats(obj.optObject("awayStats")),
-            keyMoment = obj.optString("keyMoment", UNKNOWN)
-        )
-    }
 
     private fun parsePlayerSpotlight(obj: JsonObject): CardData.PlayerSpotlight {
         return CardData.PlayerSpotlight(
@@ -355,15 +341,6 @@ class CardDataExtractor(private val context: Context) {
             starters = starters,
             subs = subs,
             manager = obj.optString("manager", "")
-        )
-    }
-
-    private fun parseTeamStats(obj: JsonObject?): TeamStats {
-        if (obj == null) return TeamStats(possession = 50, shots = 0, shotsOnTarget = 0)
-        return TeamStats(
-            possession = obj.optInt("possession", 50),
-            shots = obj.optInt("shots", 0),
-            shotsOnTarget = obj.optInt("shotsOnTarget", 0)
         )
     }
 

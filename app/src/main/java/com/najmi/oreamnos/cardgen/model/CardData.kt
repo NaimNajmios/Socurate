@@ -9,22 +9,6 @@ package com.najmi.oreamnos.cardgen.model
 sealed class CardData {
 
     /**
-     * Data for the Match Result card.
-     * Contains team names, score, key stats, and a Malay key moment summary.
-     */
-    data class MatchResult(
-        val homeTeam: String,
-        val awayTeam: String,
-        val homeScore: Int,
-        val awayScore: Int,
-        val competition: String,
-        val matchDate: String,
-        val homeStats: TeamStats,
-        val awayStats: TeamStats,
-        val keyMoment: String
-    ) : CardData()
-
-    /**
      * Data for the Player Spotlight card.
      * Contains player performance metrics and a Malay description.
      */
@@ -121,19 +105,6 @@ sealed class CardData {
         val manager: String
     ) : CardData()
 }
-
-/**
- * A single stat row used in [CardData.MatchResult] and [CardData.TopStats].
- */
-
-/**
- * A single stat row used in [CardData.MatchResult] and [CardData.TopStats].
- */
-data class TeamStats(
-    val possession: Int,
-    val shots: Int,
-    val shotsOnTarget: Int
-)
 
 /**
  * A single stat row for the Top 3 Stats card.

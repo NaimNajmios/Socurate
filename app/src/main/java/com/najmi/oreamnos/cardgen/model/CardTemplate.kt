@@ -8,12 +8,6 @@ sealed class CardTemplate(
     val displayName: String,
     val description: String
 ) {
-    /** Match result card: score, teams, possession, shots stats. */
-    object MatchResult : CardTemplate(
-        displayName = "Result",
-        description = "Match Score & Stats"
-    )
-
     /** Player spotlight card: player name, rating, goals, assists. */
     object PlayerSpotlight : CardTemplate(
         displayName = "Player",
@@ -72,7 +66,7 @@ sealed class CardTemplate(
         /** All templates in display order. Lazy to avoid class init order NPE. */
         val all: List<CardTemplate> by lazy {
             listOf(
-                MatchResult, PlayerSpotlight, HeadlineQuote, TopStats,
+                PlayerSpotlight, HeadlineQuote, TopStats,
                 TransferNews, BreakingNews, MatchPreview, DetailedScoreboard, OnThisDay, StartingXI
             )
         }

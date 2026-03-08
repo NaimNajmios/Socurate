@@ -13,7 +13,7 @@ import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.model.CardTemplate
 import com.najmi.oreamnos.cardgen.model.ExportSize
 import com.najmi.oreamnos.cardgen.renderer.HeadlineQuoteCanvas
-import com.najmi.oreamnos.cardgen.renderer.MatchResultCanvas
+
 import com.najmi.oreamnos.cardgen.renderer.PlayerSpotlightCanvas
 import com.najmi.oreamnos.cardgen.renderer.TopStatsCanvas
 import com.najmi.oreamnos.cardgen.renderer.BreakingNewsCanvas
@@ -76,7 +76,7 @@ fun CardCanvas(
     modifier: Modifier = Modifier
 ) {
     when (cardData) {
-        is CardData.MatchResult -> MatchResultCanvas(data = cardData, config = cardConfig, modifier = modifier)
+
         is CardData.HeadlineQuote -> HeadlineQuoteCanvas(data = cardData, config = cardConfig, modifier = modifier)
         is CardData.PlayerSpotlight -> PlayerSpotlightCanvas(data = cardData, config = cardConfig, modifier = modifier)
         is CardData.TopStats -> TopStatsCanvas(data = cardData, config = cardConfig, modifier = modifier)

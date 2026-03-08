@@ -20,7 +20,7 @@ object CardPromptManager {
 
     fun buildPrompt(template: CardTemplate, articleText: String): String {
         val schema = when (template) {
-            CardTemplate.MatchResult -> matchResultSchema()
+
             CardTemplate.PlayerSpotlight -> playerSpotlightSchema()
             CardTemplate.HeadlineQuote -> headlineQuoteSchema()
             CardTemplate.TopStats -> topStatsSchema()
@@ -38,22 +38,6 @@ object CardPromptManager {
     // Schema prompts — no "Bahasa Melayu" instruction, ends with
     // a forcing anchor so the model begins its reply with {
     // ──────────────────────────────────────────────────────────────
-
-    private fun matchResultSchema(): String = """
-        Extract match result data from the football article below.
-        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia):
-        {
-          "homeTeam": "Team Name",
-          "awayTeam": "Team Name",
-          "homeScore": 0,
-          "awayScore": 0,
-          "competition": "Competition Name",
-          "matchDate": "DD Mon YYYY",
-          "homeStats": { "possession": 50, "shots": 0, "shotsOnTarget": 0 },
-          "awayStats": { "possession": 50, "shots": 0, "shotsOnTarget": 0 },
-          "keyMoment": "Satu ayat menerangkan detik penting perlawanan (maks 80 aksara)"
-        }
-    """.trimIndent()
 
     private fun playerSpotlightSchema(): String = """
         Extract the standout player's data from the football article below.
