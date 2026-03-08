@@ -61,6 +61,11 @@ class CardGeneratorViewModel : ViewModel() {
     private val _extractionState = MutableStateFlow<ExtractionState>(ExtractionState.Idle)
     val extractionState: StateFlow<ExtractionState> = _extractionState.asStateFlow()
 
+    // ── Dynamic Editable Data (For DataEditorSheet) ────────────
+
+    private val _mutableCardData = MutableStateFlow<CardData?>(null)
+    val mutableCardData: StateFlow<CardData?> = _mutableCardData.asStateFlow()
+
     // ── Card config (background, colors, size) ─────────────────
 
     private val _cardConfig = MutableStateFlow(CardConfig())
@@ -130,7 +135,9 @@ class CardGeneratorViewModel : ViewModel() {
                 val extractor = CardDataExtractor(context)
                 val result = extractor.extract(_selectedTemplate.value, text, isRefresh)
                 _extractionState.value = if (result.isSuccess) {
-                    ExtractionState.Success(result.getOrThrow())
+                    val data = result.getOrThrow()
+                    _mutableCardData.value = data // Cache for live editing
+                    ExtractionState.Success(data)
                 } else {
                     ExtractionState.Error(result.exceptionOrNull()?.message ?: "Gagal mengekstrak data")
                 }
@@ -228,5 +235,21 @@ class CardGeneratorViewModel : ViewModel() {
      */
     fun resetExtractionState() {
         _extractionState.value = ExtractionState.Idle
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Inline Data Editing Functions
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * Updates the actively cached [CardData]. 
+     * Applies the lambda modification and re-emits to update the canvas.
+     */
+    fun updateCardData(updater: (CardData) -> CardData) {
+        val currentData = _mutableCardData.value ?: return
+        val updatedData = updater(currentData)
+        _mutableCardData.value = updatedData
+        // Re-emit into the primary pipeline so CardPreviewPane recomposes 
+        _extractionState.value = ExtractionState.Success(updatedData)
     }
 }

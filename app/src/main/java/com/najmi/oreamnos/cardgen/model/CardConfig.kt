@@ -93,5 +93,13 @@ data class CardConfig(
     /** For CUTOUT mode - secondary bitmap for player cutout (transparent PNG) */
     val cutoutBitmap: Bitmap? = null,
     /** Font size multiplier (1.0 = default, 0.8 = smaller, 1.2 = larger) */
-    val fontSizeMultiplier: Float = 1.0f
+    val fontSizeMultiplier: Float = 1.0f,
+    /** Master opacity for the dark scrim (0.0 to 1.0, default 0.6) */
+    val overlayOpacity: Float = 0.6f,
+    /** Optional explicit font family choice (overriding default AppTypography) */
+    val primaryFontFamilyName: String? = null,
+    /** Optional accent color to override default text colorations */
+    val accentColor: Color? = null,
+    /** Stores X,Y offsets for draggable components (key = component ID, value = (x,y)) */
+    val elementOffsets: Map<String, Pair<Float, Float>> = emptyMap()
 )

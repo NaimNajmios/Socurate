@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalDensity
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -86,9 +88,38 @@ internal fun CardBackground(
     content: @Composable () -> Unit
 ) {
     val density = LocalDensity.current
-    CompositionLocalProvider(
-        LocalDensity provides Density(density = density.density, fontScale = density.fontScale * config.fontSizeMultiplier)
-    ) {
+
+    // Determine custom font family if selected, otherwise fallback to Theme default
+    val customFontFamily = when(config.primaryFontFamilyName) {
+        "Serif" -> FontFamily.Serif
+        "Monospace" -> FontFamily.Monospace
+        else -> null
+    }
+
+    // Apply scaling and optionally override the font family
+    val baseTypography = MaterialTheme.typography
+    val scaledTypography = Typography(
+        displayLarge = baseTypography.displayLarge.copy(fontSize = baseTypography.displayLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.displayLarge.fontFamily),
+        displayMedium = baseTypography.displayMedium.copy(fontSize = baseTypography.displayMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.displayMedium.fontFamily),
+        displaySmall = baseTypography.displaySmall.copy(fontSize = baseTypography.displaySmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.displaySmall.fontFamily),
+        headlineLarge = baseTypography.headlineLarge.copy(fontSize = baseTypography.headlineLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.headlineLarge.fontFamily),
+        headlineMedium = baseTypography.headlineMedium.copy(fontSize = baseTypography.headlineMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.headlineMedium.fontFamily),
+        headlineSmall = baseTypography.headlineSmall.copy(fontSize = baseTypography.headlineSmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.headlineSmall.fontFamily),
+        titleLarge = baseTypography.titleLarge.copy(fontSize = baseTypography.titleLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.titleLarge.fontFamily),
+        titleMedium = baseTypography.titleMedium.copy(fontSize = baseTypography.titleMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.titleMedium.fontFamily),
+        titleSmall = baseTypography.titleSmall.copy(fontSize = baseTypography.titleSmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.titleSmall.fontFamily),
+        bodyLarge = baseTypography.bodyLarge.copy(fontSize = baseTypography.bodyLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.bodyLarge.fontFamily),
+        bodyMedium = baseTypography.bodyMedium.copy(fontSize = baseTypography.bodyMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.bodyMedium.fontFamily),
+        bodySmall = baseTypography.bodySmall.copy(fontSize = baseTypography.bodySmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.bodySmall.fontFamily),
+        labelLarge = baseTypography.labelLarge.copy(fontSize = baseTypography.labelLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.labelLarge.fontFamily),
+        labelMedium = baseTypography.labelMedium.copy(fontSize = baseTypography.labelMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.labelMedium.fontFamily),
+        labelSmall = baseTypography.labelSmall.copy(fontSize = baseTypography.labelSmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.labelSmall.fontFamily)
+    )
+
+    MaterialTheme(typography = scaledTypography) {
+        CompositionLocalProvider(
+            LocalDensity provides Density(density = density.density, fontScale = density.fontScale * config.fontSizeMultiplier)
+        ) {
         when (config.imagePosition) {
         ImagePosition.BACKGROUND -> {
             // Original: Full background with scrim
@@ -108,7 +139,7 @@ internal fun CardBackground(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(GradientBuilder.getScrim(config.scrimType))
+                                .background(GradientBuilder.getScrim(config.scrimType, config.overlayOpacity))
                         )
                     }
                 }
@@ -138,7 +169,7 @@ internal fun CardBackground(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(GradientBuilder.horizontalScrim)
+                                    .background(GradientBuilder.horizontalScrim(config.overlayOpacity))
                             )
                         } else {
                             Box(
@@ -206,7 +237,7 @@ internal fun CardBackground(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(GradientBuilder.reverseHorizontalScrim)
+                                    .background(GradientBuilder.reverseHorizontalScrim(config.overlayOpacity))
                             )
                         } else {
                             Box(
@@ -237,7 +268,7 @@ internal fun CardBackground(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(GradientBuilder.lightScrim)
+                                .background(GradientBuilder.lightScrim(config.overlayOpacity))
                         )
                     }
                 } else {
@@ -304,7 +335,7 @@ internal fun CardBackground(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(GradientBuilder.minimalScrim)
+                                .background(GradientBuilder.minimalScrim(config.overlayOpacity))
                         )
                     }
                 }
@@ -312,6 +343,7 @@ internal fun CardBackground(
             }
         }
     }
+        }
     }
 }
 

@@ -127,6 +127,9 @@ fun DesignBottomSheet(
                 1 -> GalleryTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
                 2 -> PresetTab(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
             }
+            
+            Spacer(Modifier.height(24.dp))
+            GlobalDesignControls(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
         }
     }
 }
@@ -389,3 +392,85 @@ private fun PresetTab(
     }
 }
 
+// ──────────────────────────────────────────────────────────────
+// Global Design Controls (Opacity & Typography)
+// ──────────────────────────────────────────────────────────────
+
+@Composable
+private fun GlobalDesignControls(
+    currentConfig: CardConfig,
+    onConfigUpdate: (CardConfig) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        // Overlay Opacity
+        Text(
+            text = "OVERLAY OPACITY",
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "${(currentConfig.overlayOpacity * 100).toInt()}%",
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.width(40.dp)
+            )
+            Slider(
+                value = currentConfig.overlayOpacity,
+                onValueChange = { onConfigUpdate(currentConfig.copy(overlayOpacity = it)) },
+                valueRange = 0f..1f,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Typography Selector
+        Text(
+            text = "TYPOGRAPHY",
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            val fonts = listOf(null to "Default", "Serif" to "Classic", "Monospace" to "Type")
+            fonts.forEach { (fontName, label) ->
+                val isSelected = currentConfig.primaryFontFamilyName == fontName
+                Surface(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onConfigUpdate(currentConfig.copy(primaryFontFamilyName = fontName)) },
+                    shape = RoundedCornerShape(4.dp),
+                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                    )
+                ) {
+                    Text(
+                        text = label,
+                        modifier = Modifier.padding(vertical = 12.dp),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            fontFamily = when(fontName) {
+                                "Serif" -> androidx.compose.ui.text.font.FontFamily.Serif
+                                "Monospace" -> androidx.compose.ui.text.font.FontFamily.Monospace
+                                else -> androidx.compose.ui.text.font.FontFamily.Default
+                            }
+                        ),
+                        color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}

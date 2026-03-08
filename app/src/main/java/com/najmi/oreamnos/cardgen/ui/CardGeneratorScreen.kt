@@ -257,9 +257,13 @@ fun CardGeneratorScreen(
     }
 
     if (showDataSheet) {
+        val mutableCardData by cardViewModel.mutableCardData.collectAsState()
+        
         DataEditorSheet(
             inputText = inputText,
             onInputTextChange = { cardViewModel.updateInputText(it) },
+            cardData = mutableCardData,
+            onCardDataChange = { updater -> cardViewModel.updateCardData(updater) },
             isExtracting = extractionState is ExtractionState.Loading,
             onExtractClick = { cardViewModel.extractCardData(context) },
             onDismiss = { showDataSheet = false }
