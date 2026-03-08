@@ -50,6 +50,7 @@ import com.najmi.oreamnos.cardgen.model.ImagePosition
 import com.najmi.oreamnos.cardgen.model.StatItem
 import com.najmi.oreamnos.cardgen.utils.ColorExtractor
 import com.najmi.oreamnos.cardgen.utils.GradientBuilder
+import com.najmi.oreamnos.ui.components.AutoSizeText
 import com.najmi.oreamnos.ui.theme.SocurateTheme
 
 // ──────────────────────────────────────────────────────────────
@@ -374,13 +375,15 @@ fun HeadlineQuoteCanvas(
                 
                 Spacer(modifier = Modifier.width(16.dp))
                 
-                Text(
+                AutoSizeText(
                     text = data.headline.uppercase(),
                     color = CardTextPrimary,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Black,
                         lineHeight = 36.sp
-                    )
+                    ),
+                    maxLines = 4,
+                    modifier = Modifier.weight(1f)
                 )
             }
             
@@ -478,13 +481,15 @@ fun PlayerSpotlightCanvas(
             Spacer(modifier = Modifier.weight(1f))
             
             // The Player Name (Center Stage if no photo)
-            Text(
+            AutoSizeText(
                 text = data.playerName.uppercase(),
                 color = CardTextPrimary,
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Black,
                     lineHeight = 40.sp
-                )
+                ),
+                maxLines = 1,
+                modifier = Modifier.fillMaxWidth()
             )
             
             // Bottom spacer removed to anchor content

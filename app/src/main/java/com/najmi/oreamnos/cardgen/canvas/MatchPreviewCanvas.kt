@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
+import com.najmi.oreamnos.ui.components.AutoSizeText
 
 @Composable
 fun MatchPreviewCanvas(
@@ -47,7 +48,7 @@ fun MatchPreviewCanvas(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
+                AutoSizeText(
                     text = data.homeTeam.uppercase(),
                     color = CardTextPrimary,
                     style = MaterialTheme.typography.headlineLarge.copy(
@@ -56,6 +57,7 @@ fun MatchPreviewCanvas(
                         lineHeight = 36.sp.scaleSp(scale),
                         textAlign = TextAlign.Start
                     ),
+                    maxLines = 2,
                     modifier = Modifier.weight(1f)
                 )
                 
@@ -67,7 +69,7 @@ fun MatchPreviewCanvas(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 
-                Text(
+                AutoSizeText(
                     text = data.awayTeam.uppercase(),
                     color = CardTextSecondary,
                     style = MaterialTheme.typography.headlineLarge.copy(
@@ -76,6 +78,7 @@ fun MatchPreviewCanvas(
                         lineHeight = 36.sp.scaleSp(scale),
                         textAlign = TextAlign.End
                     ),
+                    maxLines = 2,
                     modifier = Modifier.weight(1f)
                 )
             }

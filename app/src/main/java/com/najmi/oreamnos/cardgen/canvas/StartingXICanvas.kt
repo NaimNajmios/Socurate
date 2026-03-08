@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
+import com.najmi.oreamnos.ui.components.AutoSizeText
 
 @Composable
 fun StartingXICanvas(
@@ -42,14 +43,16 @@ fun StartingXICanvas(
             Spacer(modifier = Modifier.weight(0.2f))
             
             // Middle Content - Team & Formation
-            Text(
+            AutoSizeText(
                 text = "${data.teamName} • ${data.formation}".uppercase(),
                 color = Color(0xFFFFD100), // Gold
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Black,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize.scaleSp(scale),
                     letterSpacing = 1.sp
-                )
+                ),
+                maxLines = 1,
+                modifier = Modifier.fillMaxWidth()
             )
             
             Spacer(modifier = Modifier.height(8.dp))

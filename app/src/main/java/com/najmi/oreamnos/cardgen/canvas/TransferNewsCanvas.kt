@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
+import com.najmi.oreamnos.ui.components.AutoSizeText
 
 @Composable
 fun TransferNewsCanvas(
@@ -52,14 +53,16 @@ fun TransferNewsCanvas(
             
             Spacer(modifier = Modifier.height(4.dp))
             
-            Text(
+            AutoSizeText(
                 text = data.playerName.uppercase(),
                 color = CardTextPrimary,
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Black,
                     fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale),
                     lineHeight = 36.sp.scaleSp(scale)
-                )
+                ),
+                maxLines = 2,
+                modifier = Modifier.fillMaxWidth()
             )
 
             HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))

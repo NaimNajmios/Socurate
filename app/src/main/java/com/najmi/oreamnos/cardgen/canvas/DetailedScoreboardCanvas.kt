@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.utils.ColorExtractor
+import com.najmi.oreamnos.ui.components.AutoSizeText
 
 @Composable
 fun DetailedScoreboardCanvas(
@@ -53,13 +54,15 @@ fun DetailedScoreboardCanvas(
                         lineHeight = 56.sp.scaleSp(scale)
                     )
                     Spacer(Modifier.width(16.dp))
-                    Text(
+                    AutoSizeText(
                         text = data.homeTeam.uppercase(),
                         color = CardTextPrimary,
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Black,
                             fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale)
-                        )
+                        ),
+                        maxLines = 2,
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -71,13 +74,15 @@ fun DetailedScoreboardCanvas(
                         lineHeight = 56.sp.scaleSp(scale)
                     )
                     Spacer(Modifier.width(16.dp))
-                    Text(
+                    AutoSizeText(
                         text = data.awayTeam.uppercase(),
                         color = CardTextSecondary,
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Black,
                             fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale)
-                        )
+                        ),
+                        maxLines = 2,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
