@@ -49,7 +49,7 @@ object PromptManager {
         ).append(toneDesc).append(" social media post written in Malaysian Malay (Bahasa Malaysia).\n\n")
 
         prompt.append("STRICT REQUIREMENTS:\n")
-            .append("1. Write ONLY in Bahasa Malaysia (Malaysian Malay) - do not include any English text in your output\n")
+            .append("1. Write in Bahasa Malaysia (Malaysian Malay), BUT ALWAYS use accepted English football terms instead of making up stiff direct translations. Do NOT translate: 'Clean Sheet', 'Offside', 'Hat-trick', 'Tackle', 'Assist', 'Playmaker', 'Derby', 'Comeback', 'Winger', 'Striker', 'Midfielder', 'Defender', 'Full-back', 'Center-back', 'Goalkeeper', 'Free-kick', 'Penalty', 'Corner Kicks', 'VAR', 'Counter-attack', 'Pressing', 'Cross', 'Header', 'Nutmeg', 'Dribble', 'Volley', 'Bicycle Kick', 'Man of the Match', 'Golden Boot', 'Pitch', 'Box-to-box', 'Sweeper', 'Target Man', 'False Nine', 'High Press', 'Through Ball', 'Overhead Kick'.\n")
             .append("2. ").append(toneInstruction).append("\n")
 
         if (keepStructure) {
@@ -189,7 +189,7 @@ object PromptManager {
         prompt.append("\nORIGINAL POST:\n---\n")
         prompt.append(originalPost)
         prompt.append("\n---\n\n")
-        prompt.append("Provide ONLY the refined Bahasa Malaysia post. ")
+        prompt.append("Provide ONLY the refined Bahasa Malaysia post, BUT ALWAYS use natural English football terminology where appropriate (e.g., 'Offside', 'Clean Sheet', 'Hat-trick'). ")
         prompt.append("Maintain the same length and structure. ")
         prompt.append("If there are bullet points, use • character only. ")
         prompt.append("Do NOT include any hashtags or explanations. ")
