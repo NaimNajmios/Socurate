@@ -32,6 +32,9 @@ class MainViewModel : ViewModel() {
     // User-edited content (if different from original)
     var userEditedContent: String = ""
 
+    // Auto-generate flag triggered by Share intent
+    var autoGenerateFlag: Boolean = false
+
     /**
      * Gets the current state value (non-observable).
      */

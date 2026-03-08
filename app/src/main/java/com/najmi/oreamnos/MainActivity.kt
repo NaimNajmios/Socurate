@@ -246,6 +246,17 @@ class MainActivity : ComponentActivity() {
         
         // Get incoming intent data
         val sharedText = intent?.getStringExtra("shared_text")
+        val routeToCard = intent?.getBooleanExtra("ROUTE_TO_CARD", false) ?: false
+        val autoGenerate = intent?.getBooleanExtra("AUTO_GENERATE", false) ?: false
+        
+        // If routing to card directly, pre-seed the shared view model
+        if (routeToCard && !sharedText.isNullOrEmpty()) {
+            appViewModel.syncGeneratedText(sharedText)
+        } else if (!sharedText.isNullOrEmpty()) {
+            viewModel.currentInputText = sharedText
+            viewModel.autoGenerateFlag = autoGenerate
+        }
+        
         val generatedContent = intent?.getStringExtra("generated_content")
         val intentTitle = intent?.getStringExtra("generated_title")
         val intentBody = intent?.getStringExtra("generated_body")
@@ -298,11 +309,12 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = "generate",
+                        startDestination = if (routeToCard) "card" else "generate",
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("generate") {
                             MainScreen(
+                                viewModel = viewModel,
                                 prefsManager = prefsManager,
                                 generationResult = generationResult.value,
                                 onClearResult = { generationResult.value = null },
@@ -344,6 +356,25 @@ class MainActivity : ComponentActivity() {
         if (currentTheme.value != savedTheme) {
             currentTheme.value = savedTheme
             applyTheme(savedTheme)
+        }
+    }
+    
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        
+        val sharedText = intent.getStringExtra("shared_text")
+        val routeToCard = intent.getBooleanExtra("ROUTE_TO_CARD", false)
+        val autoGenerate = intent.getBooleanExtra("AUTO_GENERATE", false)
+        
+        if (!sharedText.isNullOrEmpty()) {
+            if (routeToCard) {
+                appViewModel.syncGeneratedText(sharedText)
+            } else {
+                // If routing to generate, push it to MainViewModel
+                viewModel.currentInputText = sharedText
+                viewModel.autoGenerateFlag = autoGenerate
+            }
         }
     }
     
@@ -393,6 +424,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(
+    viewModel: MainViewModel,
     prefsManager: PreferencesManager,
     generationResult: MainActivity.GenerationResult?,
     onClearResult: () -> Unit,
@@ -470,6 +502,32 @@ fun MainScreen(
     LaunchedEffect(Unit) {
         customPills.clear()
         customPills.addAll(prefsManager.getPills())
+    }
+    
+    // React to new Intent data injected from activity on warm/cold boot via ViewModel
+    LaunchedEffect(viewModel.currentInputText, viewModel.autoGenerateFlag) {
+        if (viewModel.currentInputText.isNotEmpty()) {
+            inputText = viewModel.currentInputText
+            
+            if (viewModel.autoGenerateFlag) {
+                if (prefsManager.hasApiKey()) {
+                    onGenerate(inputText, includeSource, keepStructure)
+                } else {
+                    Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
+                }
+                viewModel.autoGenerateFlag = false
+            }
+            
+            // Clear the view model text after consumption so it doesn't repeatedly override user edits
+            viewModel.currentInputText = ""
+        }
+    }
+    
+    // Legacy cold boot initial text population
+    LaunchedEffect(initialSharedText) {
+        if (!initialSharedText.isNullOrEmpty() && inputText.isEmpty()) {
+            inputText = initialSharedText
+        }
     }
     
     // Detect URL and fetch metadata

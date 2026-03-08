@@ -31,25 +31,53 @@
             </intent-filter>
         </activity>
 
-        <!-- Share Receiver Activity -->
+        <!-- Invisible Share Intent Router -->
         <activity
-            android:name=".ShareReceiverActivity"
+            android:name=".ShareRouterActivity"
             android:exported="true"
-            android:label="@string/share_to_oreamnos"
-            android:theme="@style/Theme.Oreamnos.Transparent">
-            <!-- Receive shared text from share sheet -->
+            android:theme="@style/Theme.Oreamnos.Transparent" />
+
+        <!-- Share Alias: Generate Post -->
+        <activity-alias
+            android:name=".ShareToGenerateAlias"
+            android:targetActivity=".ShareRouterActivity"
+            android:exported="true"
+            android:label="Generate Post"
+            android:icon="@drawable/ic_tile">
+            <!-- Receive shared text from OS share sheet -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
-            <!-- Receive selected text from floating text selection menu -->
+            <!-- Receive text from popup selection context menu -->
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
-        </activity>
+        </activity-alias>
+
+        <!-- Share Alias: Create Card Graphic -->
+        <activity-alias
+            android:name=".ShareToCardAlias"
+            android:targetActivity=".ShareRouterActivity"
+            android:exported="true"
+            android:label="Create Card Graphic"
+            android:icon="@drawable/ic_tile">
+            <!-- Receive shared text from OS share sheet -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <!-- Receive text from popup selection context menu -->
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity-alias>
 
         <!-- Settings Activity -->
         <activity
