@@ -49,13 +49,13 @@ class CardDataExtractor(private val context: Context) {
      *         Rate limit [com.najmi.oreamnos.exceptions.RateLimitException] is re-thrown
      *         so the existing rate limit dialog handles it.
      */
-    suspend fun extract(template: CardTemplate, articleText: String): Result<CardData> {
+    suspend fun extract(template: CardTemplate, articleText: String, isRefresh: Boolean = false): Result<CardData> {
         return try {
             val curator = CuratorFactory.create(context)
 
             // Build the combined prompt — system instruction is baked into the user message
             // because IContentCurator.curatePost() doesn't expose a separate system param.
-            val fullPrompt = "${CardPromptManager.systemPrompt()}\n\n${CardPromptManager.buildPrompt(template, articleText)}"
+            val fullPrompt = "${CardPromptManager.systemPrompt()}\n\n${CardPromptManager.buildPrompt(template, articleText, isRefresh)}"
 
             // generateRaw() bypasses the Malay social-media prompt injections in curatePost
             val rawResponse = curator.generateRaw(prompt = fullPrompt)

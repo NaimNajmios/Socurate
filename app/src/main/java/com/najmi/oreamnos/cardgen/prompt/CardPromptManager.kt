@@ -19,7 +19,7 @@ object CardPromptManager {
         "CRITICAL RULE 2: Use common English football terminology naturally mixed within the Bahasa Malaysia context to avoid stiff or weird translation (e.g., use words like 'Clean Sheet', 'Offside', 'Hat-trick', 'Tackle', 'Assist', 'Playmaker', 'Derby', 'Derby', 'Comeback'). " +
         "CRITICAL RULE 3: If a specific piece of information (e.g., stats, dates, fees) is NOT explicitly mentioned in the text, you MUST return an empty string \"\" or 0 for numeric fields. Do NOT guess, infer, or provide placeholders like 'N/A', '-', or '—'."
 
-    fun buildPrompt(template: CardTemplate, articleText: String): String {
+    fun buildPrompt(template: CardTemplate, articleText: String, isRefresh: Boolean = false): String {
         val schema = when (template) {
 
             CardTemplate.PlayerSpotlight -> playerSpotlightSchema()
@@ -32,7 +32,12 @@ object CardPromptManager {
             CardTemplate.OnThisDay -> onThisDaySchema()
             CardTemplate.StartingXI -> startingXISchema()
         }
-        return "$schema\n\nARTICLE:\n$articleText\n\nRespond with ONLY the JSON object, starting with {"
+        
+        val cacheBuster = if (isRefresh) {
+            "\n\n[SYSTEM NOTE: This is a REFRESH instruction. The user was unhappy with the previous extraction. Please generate slightly different wording, alter phrasing creatively, and ensure you catch any fields you missed previously. Timestamp: ${System.currentTimeMillis()}]"
+        } else ""
+
+        return "$schema\n\nARTICLE:\n$articleText$cacheBuster\n\nRespond with ONLY the JSON object, starting with {"
     }
 
     // ──────────────────────────────────────────────────────────────

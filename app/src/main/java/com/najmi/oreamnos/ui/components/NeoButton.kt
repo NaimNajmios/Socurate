@@ -11,7 +11,14 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -111,9 +118,11 @@ fun NeoButton(
     }
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun NeoOutlinedButton(
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     text: String,
@@ -129,28 +138,39 @@ fun NeoOutlinedButton(
         label = "buttonScale"
     )
 
-    OutlinedButton(
-        onClick = {
-            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-            onClick()
-        },
-        // OPTIMIZATION: Use graphicsLayer to avoid recomposition during animation
-        modifier = modifier.graphicsLayer {
-            scaleX = scaleState.value
-            scaleY = scaleState.value
-        },
-        enabled = enabled,
-        shape = RoundedCornerShape(0.dp),
-        border = BorderStroke(2.dp, contentColor),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = contentColor
-        ),
-        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
-        interactionSource = interactionSource
+    Box(
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = scaleState.value
+                scaleY = scaleState.value
+            }
+            .border(
+                border = BorderStroke(2.dp, if (enabled) contentColor else contentColor.copy(alpha = 0.5f)),
+                shape = RoundedCornerShape(0.dp)
+            )
+            .background(Color.Transparent, RoundedCornerShape(0.dp))
+            .combinedClickable(
+                interactionSource = interactionSource,
+                indication = LocalIndication.current,
+                enabled = enabled,
+                onClick = {
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                    onClick()
+                },
+                onLongClick = {
+                    if (onLongClick != null) {
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                        onLongClick()
+                    }
+                }
+            )
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = text.uppercase(),
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+            color = if (enabled) contentColor else contentColor.copy(alpha = 0.5f)
         )
     }
 }

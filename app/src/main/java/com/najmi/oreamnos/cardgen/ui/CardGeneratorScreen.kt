@@ -189,6 +189,12 @@ fun CardGeneratorScreen(
                     NeoOutlinedButton(
                         text = "Data",
                         onClick = { showDataSheet = true },
+                        onLongClick = {
+                            cardViewModel.extractCardData(context, isRefresh = true)
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Mengemas kini data kad...")
+                            }
+                        },
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(Modifier.width(8.dp))

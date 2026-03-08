@@ -113,15 +113,22 @@ class CardGeneratorViewModel : ViewModel() {
      * Triggers AI extraction for the currently selected template.
      * Rate limit exceptions are caught and surfaced as [ExtractionState.Error].
      */
-    fun extractCardData(context: Context) {
+    fun extractCardData(context: Context, isRefresh: Boolean = false) {
         val text = _inputText.value
         if (text.isBlank()) return
 
         viewModelScope.launch {
+            // Drop to Idle briefly to break StateFlow conflation if data returns identical
+            if (isRefresh) {
+                _extractionState.value = ExtractionState.Idle
+                kotlinx.coroutines.delay(50)
+            }
+            
             _extractionState.value = ExtractionState.Loading
+            kotlinx.coroutines.delay(100)
             try {
                 val extractor = CardDataExtractor(context)
-                val result = extractor.extract(_selectedTemplate.value, text)
+                val result = extractor.extract(_selectedTemplate.value, text, isRefresh)
                 _extractionState.value = if (result.isSuccess) {
                     ExtractionState.Success(result.getOrThrow())
                 } else {
