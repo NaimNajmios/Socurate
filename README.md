@@ -1,13 +1,15 @@
-# Socurate (Oreamnos Android Edition)
+# Oreamnos Android
 
 A sleek, modern Android application that transforms global football news into polished Malaysian Malay social media posts using AI. Built with **Jetpack Compose** and **Kotlin** featuring a premium design system and sophisticated animations.
 
 ## ✨ What's New
 
-### 🖼️ Automated Sports Card Generator
+### 🖼️ Automated Sports Card Generator (with Design Studio)
 - **Premium Graphics**: Generate 1:1 square sports cards resembling premium NBA coverage and sports media.
 - **Multiple Templates**: Built-in templates for Match Result, Player Spotlight, Headline Quote, and Top Stats.
-- **Dynamic Backgrounds**: Custom GradientBuilder and an interactive background picker UI for versatile styling.
+- **Inline Editing**: Dynamically edit the extracted AI fields right in the app to perfect the copy before rendering.
+- **Dynamic Backgrounds & Opacity**: Custom GradientBuilder and an interactive background picker UI for versatile styling. Adjust overlay opacity via a granular slider.
+- **Typography Controls**: Instantly swap between Default, Classic Serif, and Typewriter Monospace fonts across all components.
 - **Integrated Export**: Dedicated export bottom sheet to directly save or share generated cards.
 
 ### 🔄 Multi-Provider AI Support
@@ -158,7 +160,7 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 
 1. Open a football article in any browser
 2. Tap the "Share" button
-3. Select "Socurate" from the share menu
+3. Select "Oreamnos" from the share menu
 4. A **bottom sheet** slides up showing your shared content
 5. **Tone Quick Toggle**: Choose Formal or Casual
 6. Watch the **animated progress** as content is generated
@@ -168,7 +170,7 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 
 ### Method 2: Direct Input
 
-1. Open the Socurate app
+1. Open the Oreamnos app
 2. Paste article text or URL into the input field
 3. Tap the "Generate Post" FAB button
 4. Watch the loading animation with percentage

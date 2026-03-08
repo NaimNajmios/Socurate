@@ -816,7 +816,7 @@ fun MainScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("SOCURATE", style = MaterialTheme.typography.displaySmall) },
+                title = { Text("OREAMNOS", style = MaterialTheme.typography.displaySmall) },
                 actions = {
                     TextButton(onClick = onNavigateToUsage) {
                         Text("USAGE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold))

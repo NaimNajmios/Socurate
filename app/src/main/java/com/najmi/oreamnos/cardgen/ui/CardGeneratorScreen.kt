@@ -148,7 +148,7 @@ fun CardGeneratorScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "CARD",
+                        text = "OREAMNOS",
                         style = MaterialTheme.typography.displaySmall
                     )
                 },
