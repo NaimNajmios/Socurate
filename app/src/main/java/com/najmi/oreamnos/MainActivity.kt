@@ -101,6 +101,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -160,7 +161,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.najmi.oreamnos.cardgen.ui.CardGeneratorScreen
+import com.najmi.oreamnos.cardgen.viewmodel.CardGeneratorViewModel
 
 // File-level regex patterns for use in composables
 private val SOURCE_CITATION_PATTERN = Regex("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$")
@@ -180,6 +183,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var prefsManager: PreferencesManager
     private lateinit var viewModel: MainViewModel
     private lateinit var appViewModel: AppViewModel
+    private lateinit var cardViewModel: CardGeneratorViewModel
     
     // State for broadcast receiver results
     private val generationResult = mutableStateOf<GenerationResult?>(null)
@@ -234,6 +238,7 @@ class MainActivity : ComponentActivity() {
         prefsManager = PreferencesManager(this)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
+        cardViewModel = ViewModelProvider(this)[CardGeneratorViewModel::class.java]
         
         // Initialize theme
         currentTheme.value = prefsManager.getTheme()
@@ -262,13 +267,29 @@ class MainActivity : ComponentActivity() {
                         ) {
                             NavigationBarItem(
                                 selected = currentRoute == "generate",
-                                onClick = { navController.navigate("generate") { launchSingleTop = true; popUpTo("generate") } },
+                                onClick = {
+                                    navController.navigate("generate") {
+                                        popUpTo("generate") {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                },
                                 icon = { Icon(Icons.Default.PlayArrow, contentDescription = null) },
                                 label = { Text("GENERATE", style = MaterialTheme.typography.labelSmall) }
                             )
                             NavigationBarItem(
                                 selected = currentRoute == "card",
-                                onClick = { navController.navigate("card") { launchSingleTop = true } },
+                                onClick = {
+                                    navController.navigate("card") {
+                                        popUpTo("generate") {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                },
                                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
                                 label = { Text("CARD", style = MaterialTheme.typography.labelSmall) }
                             )
@@ -293,8 +314,7 @@ class MainActivity : ComponentActivity() {
                                 initialTitle = intentTitle,
                                 initialBody = intentBody,
                                 initialSource = intentSource,
-                                onCreateCard = { text ->
-                                    appViewModel.pipeText(text)
+                                onCreateCard = {
                                     navController.navigate("card") { launchSingleTop = true }
                                 }
                             )
@@ -302,6 +322,7 @@ class MainActivity : ComponentActivity() {
                         composable("card") {
                             CardGeneratorScreen(
                                 appViewModel = appViewModel,
+                                cardViewModel = cardViewModel,
                                 onNavigateUp = { navController.popBackStack() }
                             )
                         }
@@ -383,27 +404,27 @@ fun MainScreen(
     initialTitle: String? = null,
     initialBody: String? = null,
     initialSource: String? = null,
-    onCreateCard: (String) -> Unit = {}
+    onCreateCard: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     
     // State
-    var inputText by remember { mutableStateOf(initialSharedText ?: "") }
-    var isLoading by remember { mutableStateOf(false) }
-    var hasResult by remember { mutableStateOf(initialBody?.isNotEmpty() == true) }
-    var generatedTitle by remember { mutableStateOf(initialTitle ?: "") }
-    var generatedBody by remember { mutableStateOf(initialBody ?: "") }
-    var generatedSource by remember { mutableStateOf(initialSource ?: "") }
-    var outputText by remember { mutableStateOf("") }
-    var isEditMode by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-    var keepStructure by remember { mutableStateOf(false) }
+    var inputText by rememberSaveable { mutableStateOf(initialSharedText ?: "") }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+    var hasResult by rememberSaveable { mutableStateOf(initialBody?.isNotEmpty() == true) }
+    var generatedTitle by rememberSaveable { mutableStateOf(initialTitle ?: "") }
+    var generatedBody by rememberSaveable { mutableStateOf(initialBody ?: "") }
+    var generatedSource by rememberSaveable { mutableStateOf(initialSource ?: "") }
+    var outputText by rememberSaveable { mutableStateOf("") }
+    var isEditMode by rememberSaveable { mutableStateOf(false) }
+    var error by rememberSaveable { mutableStateOf<String?>(null) }
+    var keepStructure by rememberSaveable { mutableStateOf(false) }
     
     // Output toggles
-    var includeTitle by remember { mutableStateOf(true) }
-    var includeHashtags by remember { mutableStateOf(prefsManager.areHashtagsEnabled()) }
-    var includeSource by remember { mutableStateOf(prefsManager.isSourceEnabled()) }
+    var includeTitle by rememberSaveable { mutableStateOf(true) }
+    var includeHashtags by rememberSaveable { mutableStateOf(prefsManager.areHashtagsEnabled()) }
+    var includeSource by rememberSaveable { mutableStateOf(prefsManager.isSourceEnabled()) }
     
     // Refinement state
     val refinementOptions = remember { mutableStateListOf<String>() }
@@ -597,6 +618,14 @@ fun MainScreen(
     // Rebuild output when toggles change
     LaunchedEffect(includeTitle, includeHashtags, includeSource) {
         if (hasResult) rebuildOutput()
+    }
+    
+    // Automatically sync output text to AppViewModel for the Card Generator to pick up
+    val currentAppViewModel = viewModel<AppViewModel>(viewModelStoreOwner = LocalContext.current as ComponentActivity)
+    LaunchedEffect(outputText) {
+        if (outputText.isNotBlank()) {
+            currentAppViewModel.syncGeneratedText(outputText)
+        }
     }
     
     // Initialize output if we have initial data
@@ -1186,7 +1215,7 @@ fun OutputCard(
     onCopyClick: () -> Unit,
     onShareClick: () -> Unit,
     onExpandClick: () -> Unit,
-    onCreateCard: (String) -> Unit = {},
+    onCreateCard: () -> Unit = {},
     textSize: Int
 ) {
     NeoCard(
@@ -1300,7 +1329,7 @@ fun OutputCard(
             // Create Card shortcut — appears after a successful generation
             NeoOutlinedButton(
                 text = "CREATE CARD",
-                onClick = { onCreateCard(outputText) },
+                onClick = { onCreateCard() },
                 modifier = Modifier.fillMaxWidth()
             )
     }

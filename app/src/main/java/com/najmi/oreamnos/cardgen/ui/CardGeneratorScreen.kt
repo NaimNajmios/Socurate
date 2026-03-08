@@ -106,12 +106,20 @@ fun CardGeneratorScreen(
     var showDataSheet by remember { mutableStateOf(false) }
     var selectedExportSize by remember { mutableStateOf(ExportSize.SQUARE) }
 
-    // Consume piped text from AppViewModel (from the Generate screen)
-    val pipedText by appViewModel.pipedArticleText.collectAsState()
-    LaunchedEffect(pipedText) {
-        if (pipedText.isNotBlank()) {
-            cardViewModel.pipeFromMainFlow(pipedText, context)
-            appViewModel.clearPipedText()
+    // Consume synced text from AppViewModel (auto-sync from Generate screen)
+    val latestText by appViewModel.latestGeneratedText.collectAsState()
+    val hasUnconsumedText by appViewModel.hasUnconsumedText.collectAsState()
+    
+    LaunchedEffect(hasUnconsumedText, latestText) {
+        if (hasUnconsumedText && latestText.isNotBlank()) {
+            cardViewModel.consumeSyncedText(latestText, context)
+            appViewModel.markTextConsumed()
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = "Auto-filled with latest generated text",
+                    withDismissAction = true
+                )
+            }
         }
     }
 

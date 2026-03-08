@@ -92,12 +92,12 @@ class CardGeneratorViewModel : ViewModel() {
     }
 
     /**
-     * Called by [com.najmi.oreamnos.viewmodel.AppViewModel] observer when the user taps
-     * "Create Card" from the generate screen to pre-fill the input and run extraction.
+     * Called when the user navigates to the Card screen, reading the synced text
+     * from AppViewModel and automatically running extraction.
      */
-    fun pipeFromMainFlow(text: String, context: Context) {
-        _inputText.value = text
-        if (text.isNotBlank()) {
+    fun consumeSyncedText(text: String, context: Context) {
+        if (text.isNotBlank() && text != _inputText.value) {
+            _inputText.value = text
             extractCardData(context)
         }
     }

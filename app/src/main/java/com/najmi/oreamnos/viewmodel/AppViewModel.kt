@@ -8,34 +8,34 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * Shared ViewModel scoped to [com.najmi.oreamnos.MainActivity]'s ViewModelStoreOwner.
  *
- * Used to pass the article text from the Generate screen to the Card Generator screen
- * when the user taps "Create Card" — avoiding Navigation argument size limits for long text.
- *
- * Both [com.najmi.oreamnos.cardgen.viewmodel.CardGeneratorViewModel] and
- * the main screen Composable read from [pipedArticleText].
+ * Used to pass the article text from the Generate screen to the Card Generator screen.
+ * This establishes an automatic sync bridge so the Card Generator can auto-fill
+ * and extract data seamlessly as the user navigates.
  */
 class AppViewModel : ViewModel() {
 
-    private val _pipedArticleText = MutableStateFlow("")
+    private val _latestGeneratedText = MutableStateFlow("")
+    val latestGeneratedText: StateFlow<String> = _latestGeneratedText.asStateFlow()
+
+    private val _hasUnconsumedText = MutableStateFlow(false)
+    val hasUnconsumedText: StateFlow<Boolean> = _hasUnconsumedText.asStateFlow()
 
     /**
-     * The article text to pipe into the Card Generator.
-     * Set by the Generate screen when the user taps "Create Card".
-     * Consumed and cleared by the Card Generator screen.
+     * Updates the latest generated output from the MainScreen.
+     * Sets the unconsumed flag to true so the CardScreen knows to fetch it.
      */
-    val pipedArticleText: StateFlow<String> = _pipedArticleText.asStateFlow()
-
-    /**
-     * Sets the article text to pass to the Card Generator screen.
-     */
-    fun pipeText(text: String) {
-        _pipedArticleText.value = text
+    fun syncGeneratedText(text: String) {
+        if (text.isNotBlank() && text != _latestGeneratedText.value) {
+            _latestGeneratedText.value = text
+            _hasUnconsumedText.value = true
+        }
     }
 
     /**
-     * Clears the piped text after the Card Generator screen has consumed it.
+     * Marks the synced text as consumed by the Card Generator so it doesn't
+     * repeatedly trigger re-extractions on configuration changes.
      */
-    fun clearPipedText() {
-        _pipedArticleText.value = ""
+    fun markTextConsumed() {
+        _hasUnconsumedText.value = false
     }
 }
