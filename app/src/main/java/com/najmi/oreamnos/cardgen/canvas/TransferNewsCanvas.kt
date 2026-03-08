@@ -83,9 +83,16 @@ fun TransferNewsCanvas(
                             fontSize = MaterialTheme.typography.titleMedium.fontSize.scaleSp(scale)
                         )
                     )
-                    if (data.fee.isNotBlank() && data.fee != "—") {
+                    val details = listOf(
+                        if (data.transferType.isNotBlank() && data.transferType != "—") data.transferType else null,
+                        if (data.contractLength.isNotBlank() && data.contractLength != "—") "KONTRAK: ${data.contractLength}" else null,
+                        if (data.fee.isNotBlank() && data.fee != "—") "YURAN: ${data.fee}" else null
+                    ).filterNotNull()
+
+                    if (details.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "FEE / TERM: ${data.fee}".uppercase(),
+                            text = details.joinToString(" • ").uppercase(),
                             color = CardTextMuted,
                             style = MaterialTheme.typography.labelSmall,
                             letterSpacing = 1.sp

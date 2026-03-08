@@ -19,6 +19,8 @@ sealed class CardData {
         val rating: Float,
         val goals: Int,
         val assists: Int,
+        val minutesPlayed: Int,
+        val keyAction: String,
         val keyQuote: String
     ) : CardData()
 
@@ -29,7 +31,9 @@ sealed class CardData {
     data class HeadlineQuote(
         val headline: String,
         val subtext: String,
-        val source: String
+        val quoteAuthor: String,
+        val source: String,
+        val dateReported: String
     ) : CardData()
 
     /**
@@ -37,6 +41,7 @@ sealed class CardData {
      * Always contains exactly 3 [StatItem] entries (extractor pads with placeholders if needed).
      */
     data class TopStats(
+        val matchContext: String,
         val stats: List<StatItem>
     ) : CardData()
 
@@ -49,6 +54,8 @@ sealed class CardData {
         val fromTeam: String,
         val toTeam: String,
         val fee: String,
+        val contractLength: String,
+        val transferType: String,
         val quote: String
     ) : CardData()
 
@@ -58,7 +65,9 @@ sealed class CardData {
     data class BreakingNews(
         val label: String, // e.g. "🚨 BREAKING", "OFFICIAL"
         val headline: String,
-        val subtext: String
+        val subtext: String,
+        val impactRating: Int, // 1 to 5
+        val relatedTeams: String
     ) : CardData()
 
     /**
@@ -68,6 +77,8 @@ sealed class CardData {
         val competition: String,
         val homeTeam: String,
         val awayTeam: String,
+        val homeForm: String, // e.g. "W-W-D-L-W"
+        val awayForm: String,
         val matchTime: String,
         val stadium: String
     ) : CardData()
@@ -82,6 +93,9 @@ sealed class CardData {
         val awayScore: Int,
         val homeScorers: String, // Comma separated list of scorers & minutes
         val awayScorers: String,
+        val possession: String, // e.g. "55% - 45%"
+        val shotsOnTarget: String, // e.g. "6 - 2"
+        val competition: String,
         val matchStatus: String // e.g. "FULL TIME", "AET"
     ) : CardData()
 
@@ -90,6 +104,8 @@ sealed class CardData {
      */
     data class OnThisDay(
         val dateLabel: String,
+        val yearsAgo: Int,
+        val competition: String,
         val headline: String,
         val keyStats: List<StatItem>
     ) : CardData()
@@ -102,7 +118,9 @@ sealed class CardData {
         val formation: String,
         val starters: List<LineupPlayer>,
         val subs: List<LineupPlayer>,
-        val manager: String
+        val manager: String,
+        val averageAge: String,
+        val keyAbsences: String
     ) : CardData()
 }
 

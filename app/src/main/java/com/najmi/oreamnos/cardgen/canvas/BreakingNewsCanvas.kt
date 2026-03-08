@@ -64,9 +64,10 @@ fun BreakingNewsCanvas(
             ) {
                 // Context Info
                 Column(modifier = Modifier.weight(1f)) {
+                    val labelColor = if (data.impactRating >= 4) Color(0xFFFF0000) else Color(0xFFFF4B4B) // Pure red if high impact, else standard bold red
                     Text(
                         text = data.label.uppercase(),
-                        color = Color(0xFFFF4B4B), // Bold red for breaking news
+                        color = labelColor,
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Black,
                             fontSize = MaterialTheme.typography.titleMedium.fontSize.scaleSp(scale)
@@ -82,6 +83,14 @@ fun BreakingNewsCanvas(
                             ),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    if (data.relatedTeams.isNotBlank() && data.relatedTeams != "—") {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = data.relatedTeams.uppercase(),
+                            color = Color(0xFFFFD100),
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))

@@ -49,6 +49,8 @@ object CardPromptManager {
           "rating": 7.5,
           "goals": 0,
           "assists": 0,
+          "minutesPlayed": 90,
+          "keyAction": "Satu frasa pendek (maks 3 patah perkataan, e.g. Wira Hat-Trick)",
           "keyQuote": "Satu ayat menerangkan prestasi pemain tersebut (maks 100 aksara)"
         }
     """.trimIndent()
@@ -59,7 +61,9 @@ object CardPromptManager {
         {
           "headline": "Tajuk utama atau petikan paling penting (maks 120 aksara)",
           "subtext": "Satu perenggan sokongan ringkas (maks 60 aksara)",
-          "source": "Nama julukan sumber / majalah"
+          "quoteAuthor": "Nama penutur (biarkan kosong jika bukan petikan)",
+          "source": "Nama julukan sumber / majalah",
+          "dateReported": "Tarikh laporan (e.g. 15 Mei 2024)"
         }
     """.trimIndent()
 
@@ -67,6 +71,7 @@ object CardPromptManager {
         Extract the 3 most interesting statistics from the football article below.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia):
         {
+          "matchContext": "Perlawanan atau kejohanan yang berkaitan (e.g. lwn Liverpool - Liga Perdana)",
           "stats": [
             { "label": "Nama stat (maks 30 aksara)", "value": "Nilai nombor", "context": "Konteks ringkas (maks 50 aksara)" },
             { "label": "Nama stat (maks 30 aksara)", "value": "Nilai nombor", "context": "Konteks ringkas (maks 50 aksara)" },
@@ -83,7 +88,9 @@ object CardPromptManager {
           "action": "Status (e.g. SAH, DIPINJAM, PINDAHAN SELESAI, RUMUR)",
           "fromTeam": "Pasukan Asal",
           "toTeam": "Pasukan Baru",
-          "fee": "Yuran Perpindahan / Tempoh Kontrak",
+          "fee": "Yuran Perpindahan",
+          "contractLength": "Tempoh Kontrak (e.g. 5 Tahun)",
+          "transferType": "Jenis (e.g. Tetap, Pinjaman, Percuma)",
           "quote": "Satu petikan ringkas dari pemain, ejen, atau kelab (maks 100 aksara)"
         }
     """.trimIndent()
@@ -94,7 +101,9 @@ object CardPromptManager {
         {
           "label": "Label Berita (e.g. 🚨 TERKINI, RASMI, EKSKLUSIF)",
           "headline": "Tajuk berita utama (maks 100 aksara)",
-          "subtext": "Satu atau dua ayat menerangkan konteks (maks 150 aksara)"
+          "subtext": "Satu atau dua ayat menerangkan konteks (maks 150 aksara)",
+          "impactRating": 5,
+          "relatedTeams": "Pasukan yang terjejas (e.g. Man Utd, Arsenal)"
         }
     """.trimIndent()
 
@@ -105,6 +114,8 @@ object CardPromptManager {
           "competition": "Nama Liga/Pertandingan",
           "homeTeam": "Nama Pasukan Tuan Rumah",
           "awayTeam": "Nama Pasukan Pelawat",
+          "homeForm": "Rekod 5 perlawanan tuan rumah (e.g. M-S-M-K-M)",
+          "awayForm": "Rekod 5 perlawanan pelawat (e.g. K-K-S-M-M)",
           "matchTime": "Tarikh dan masa",
           "stadium": "Nama Stadium"
         }
@@ -120,6 +131,9 @@ object CardPromptManager {
           "awayScore": 0,
           "homeScorers": "Senarai penjaring gol tuan rumah (e.g. Rashford 12', 45')",
           "awayScorers": "Senarai penjaring gol pelawat (e.g. Saka 80')",
+          "possession": "Penguasaan bola (e.g. 55% - 45%)",
+          "shotsOnTarget": "Percubaan tepat (e.g. 6 - 2)",
+          "competition": "Nama Liga atau Kejohanan",
           "matchStatus": "Status Tamat (e.g. MASA PENUH, MASA TAMBAHAN, PENALTI)"
         }
     """.trimIndent()
@@ -128,7 +142,9 @@ object CardPromptManager {
         Extract historical or 'on this day' information from the football article below.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia):
         {
-          "dateLabel": "Tarikh peristiwa (e.g. 📅 HARI INI DALAM SEJARAH: 2012)",
+          "dateLabel": "Tarikh peristiwa (e.g. 📅 15 Mei)",
+          "yearsAgo": 10,
+          "competition": "Nama Liga atau Kejohanan",
           "headline": "Satu ayat menerangkan apa yang berlaku (maks 100 aksara)",
           "keyStats": [
             { "label": "Stat 1", "value": "Nilai nombor", "context": "Konteks 1" },
@@ -152,7 +168,9 @@ object CardPromptManager {
             { "number": "No Jersi", "name": "Nama Pemain Simpanan 1" },
             { "number": "No Jersi", "name": "Nama Pemain Simpanan 2" }
           ],
-          "manager": "Nama Pengurus"
+          "manager": "Nama Pengurus",
+          "averageAge": "Purata Umur (e.g. 25.4 thn)",
+          "keyAbsences": "Pemain cedera/digantung, dipisahkan dengan koma"
         }
     """.trimIndent()
 }

@@ -43,8 +43,15 @@ fun StartingXICanvas(
             Spacer(modifier = Modifier.weight(0.2f))
             
             // Middle Content - Team & Formation
+            val titleText = buildString {
+                append("${data.teamName} • ${data.formation}")
+                if (data.averageAge.isNotBlank() && data.averageAge != "—") {
+                    append(" • ${data.averageAge}")
+                }
+            }.uppercase()
+
             AutoSizeText(
-                text = "${data.teamName} • ${data.formation}".uppercase(),
+                text = titleText,
                 color = Color(0xFFFFD100), // Gold
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Black,
@@ -87,6 +94,17 @@ fun StartingXICanvas(
             ) {
                 // Context Info
                 Column(modifier = Modifier.weight(1f)) {
+                    if (data.keyAbsences.isNotBlank() && data.keyAbsences != "—") {
+                        Text(
+                            text = "TIDAK HADIR: ${data.keyAbsences}".uppercase(),
+                            color = Color(0xFFFF4B4B),
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                    }
+                    
                     if (data.manager.isNotBlank() && data.manager != "—") {
                         Text(
                             text = "MANAGER: ${data.manager}".uppercase(),

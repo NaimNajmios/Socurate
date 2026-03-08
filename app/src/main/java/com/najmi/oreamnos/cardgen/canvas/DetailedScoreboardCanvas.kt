@@ -1,6 +1,7 @@
 package com.najmi.oreamnos.cardgen.renderer
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,6 +41,14 @@ fun DetailedScoreboardCanvas(
                 style = MaterialTheme.typography.labelSmall,
                 letterSpacing = 3.sp
             )
+            if (data.competition.isNotBlank() && data.competition != "—") {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = data.competition.uppercase(),
+                    color = Color(0xFFFFD100),
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                )
+            }
             
             Spacer(modifier = Modifier.weight(1f))
             
@@ -84,6 +93,26 @@ fun DetailedScoreboardCanvas(
                         maxLines = 2,
                         modifier = Modifier.weight(1f)
                     )
+                }
+                
+                if (data.possession.isNotBlank() && data.possession != "—" && data.shotsOnTarget.isNotBlank() && data.shotsOnTarget != "—") {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White.copy(alpha = 0.1f), MaterialTheme.shapes.small)
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = "POSSESSION", color = CardTextMuted, style = MaterialTheme.typography.labelSmall)
+                            Text(text = data.possession, color = CardTextPrimary, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = "SHOTS ON TARGET", color = CardTextMuted, style = MaterialTheme.typography.labelSmall)
+                            Text(text = data.shotsOnTarget, color = CardTextPrimary, style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold))
+                        }
+                    }
                 }
             }
             

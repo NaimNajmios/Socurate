@@ -48,18 +48,28 @@ fun MatchPreviewCanvas(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AutoSizeText(
-                    text = data.homeTeam.uppercase(),
-                    color = CardTextPrimary,
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontWeight = FontWeight.Black,
-                        fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale),
-                        lineHeight = 36.sp.scaleSp(scale),
-                        textAlign = TextAlign.Start
-                    ),
-                    maxLines = 2,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.Start) {
+                    AutoSizeText(
+                        text = data.homeTeam.uppercase(),
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale),
+                            lineHeight = 36.sp.scaleSp(scale),
+                            textAlign = TextAlign.Start
+                        ),
+                        maxLines = 2,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (data.homeForm.isNotBlank() && data.homeForm != "—") {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = data.homeForm.uppercase(),
+                            color = CardTextSecondary,
+                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                        )
+                    }
+                }
                 
                 Text(
                     text = "vs",
@@ -69,18 +79,28 @@ fun MatchPreviewCanvas(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 
-                AutoSizeText(
-                    text = data.awayTeam.uppercase(),
-                    color = CardTextSecondary,
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontWeight = FontWeight.Black,
-                        fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale),
-                        lineHeight = 36.sp.scaleSp(scale),
-                        textAlign = TextAlign.End
-                    ),
-                    maxLines = 2,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
+                    AutoSizeText(
+                        text = data.awayTeam.uppercase(),
+                        color = CardTextSecondary,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Black,
+                            fontSize = MaterialTheme.typography.headlineLarge.fontSize.scaleSp(scale),
+                            lineHeight = 36.sp.scaleSp(scale),
+                            textAlign = TextAlign.End
+                        ),
+                        maxLines = 2,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (data.awayForm.isNotBlank() && data.awayForm != "—") {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = data.awayForm.uppercase(),
+                            color = CardTextSecondary,
+                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                        )
+                    }
+                }
             }
 
             HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))

@@ -1,6 +1,7 @@
 package com.najmi.oreamnos.cardgen.renderer
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,15 +43,36 @@ fun OnThisDayCanvas(
             Spacer(modifier = Modifier.weight(1f))
             
             // Middle Content
-            Text(
-                text = data.dateLabel.uppercase(),
-                color = Color(0xFFFFD100), // Gold
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Black,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize.scaleSp(scale),
-                    letterSpacing = 1.sp
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (data.yearsAgo > 0) {
+                    androidx.compose.foundation.layout.Box(
+                        modifier = Modifier
+                            .background(Color(0xFFFFD100), MaterialTheme.shapes.small)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "${data.yearsAgo} TAHUN LALU",
+                            color = Color.Black,
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                
+                val dateText = buildString {
+                    append(data.dateLabel.uppercase())
+                    if (data.competition.isNotBlank() && data.competition != "—") append(" • ${data.competition.uppercase()}")
+                }
+                Text(
+                    text = dateText,
+                    color = Color(0xFFFFD100), // Gold
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Black,
+                        fontSize = MaterialTheme.typography.titleSmall.fontSize.scaleSp(scale),
+                        letterSpacing = 1.sp
+                    )
                 )
-            )
+            }
             
             Spacer(modifier = Modifier.height(4.dp))
             

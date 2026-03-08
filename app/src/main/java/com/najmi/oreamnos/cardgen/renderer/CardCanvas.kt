@@ -373,18 +373,27 @@ fun HeadlineQuoteCanvas(
                     )
                 }
                 
-                Spacer(modifier = Modifier.width(16.dp))
-                
-                AutoSizeText(
-                    text = data.headline.uppercase(),
-                    color = CardTextPrimary,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Black,
-                        lineHeight = 36.sp
-                    ),
-                    maxLines = 4,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    if (data.quoteAuthor.isNotBlank()) {
+                        Text(
+                            text = data.quoteAuthor.uppercase(),
+                            color = Color(0xFFFFD100),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                    
+                    AutoSizeText(
+                        text = data.headline.uppercase(),
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Black,
+                            lineHeight = 36.sp
+                        ),
+                        maxLines = 4,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
             
             // Bottom spacer removed to anchor content
@@ -393,9 +402,12 @@ fun HeadlineQuoteCanvas(
             
             // Bottom Section: Context (Left)
             Column(modifier = Modifier.fillMaxWidth()) {
-                if (data.source.isNotBlank()) {
+                if (data.source.isNotBlank() || data.dateReported.isNotBlank()) {
+                    val sourceText = listOf(data.source, data.dateReported)
+                        .filter { it.isNotBlank() }
+                        .joinToString(" • ")
                     Text(
-                        text = data.source.uppercase(),
+                        text = sourceText.uppercase(),
                         color = CardTextPrimary,
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                     )
@@ -480,6 +492,21 @@ fun PlayerSpotlightCanvas(
             
             Spacer(modifier = Modifier.weight(1f))
             
+            if (data.keyAction.isNotBlank() && data.keyAction != "—") {
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .background(Color(0xFFFFD100), MaterialTheme.shapes.small)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = data.keyAction.uppercase(),
+                        color = Color.Black,
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            
             // The Player Name (Center Stage if no photo)
             AutoSizeText(
                 text = data.playerName.uppercase(),
@@ -531,9 +558,10 @@ fun PlayerSpotlightCanvas(
                 
                 Spacer(modifier = Modifier.width(16.dp))
                 
-                // 3 Key Stats
+                // 4 Key Stats
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     val stats = listOf(
+                        StatItem(label = "Min", value = "${data.minutesPlayed}", context = ""),
                         StatItem(label = "Gl", value = "${data.goals}", context = ""),
                         StatItem(label = "Ast", value = "${data.assists}", context = ""),
                         StatItem(label = "Rat", value = String.format("%.1f", data.rating), context = "")
@@ -607,6 +635,14 @@ fun TopStatsCanvas(
             ) {
                 // Context Info
                 Column(modifier = Modifier.weight(1f)) {
+                    if (data.matchContext.isNotBlank()) {
+                        Text(
+                            text = data.matchContext.uppercase(),
+                            color = Color(0xFFFFD100),
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                    }
                     Text(
                         text = "MATCH STATS",
                         color = CardTextPrimary,
@@ -672,7 +708,9 @@ private fun PreviewHeadlineQuote() {
             data = CardData.HeadlineQuote(
                 headline = "Harimau Malaya layak ke pusingan akhir Piala AFF",
                 subtext = "Kemenangan bersejarah di Stadium Bukit Jalil",
-                source = "Utusan Malaysia"
+                quoteAuthor = "Kim Pan Gon",
+                source = "Utusan Malaysia",
+                dateReported = "12 Nov 2023"
             ),
             config = CardConfig()
         )
@@ -691,6 +729,8 @@ private fun PreviewPlayerSpotlight() {
                 rating = 8.5f,
                 goals = 2,
                 assists = 1,
+                minutesPlayed = 90,
+                keyAction = "MOTM",
                 keyQuote = "Prestasi cemerlang dengan dua gol dan satu aist malam ini"
             ),
             config = CardConfig()
@@ -704,6 +744,7 @@ private fun PreviewTopStats() {
     SocurateTheme {
         TopStatsCanvas(
             data = CardData.TopStats(
+                matchContext = "Piala FA Akhir: JDT 2-0 KL City",
                 stats = listOf(
                     StatItem(label = "Possession", value = "67%", context = "JDT dominated the match"),
                     StatItem(label = "Shots", value = "24", context = "14 on target"),

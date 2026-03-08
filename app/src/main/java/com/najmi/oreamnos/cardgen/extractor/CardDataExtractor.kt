@@ -200,6 +200,8 @@ class CardDataExtractor(private val context: Context) {
             rating = obj.optFloat("rating", 0f),
             goals = obj.optInt("goals", 0),
             assists = obj.optInt("assists", 0),
+            minutesPlayed = obj.optInt("minutesPlayed", 0),
+            keyAction = obj.optString("keyAction", UNKNOWN),
             keyQuote = obj.optString("keyQuote", UNKNOWN)
         )
     }
@@ -208,7 +210,9 @@ class CardDataExtractor(private val context: Context) {
         return CardData.HeadlineQuote(
             headline = obj.optString("headline", UNKNOWN),
             subtext = obj.optString("subtext", ""),
-            source = obj.optString("source", UNKNOWN)
+            quoteAuthor = obj.optString("quoteAuthor", ""),
+            source = obj.optString("source", UNKNOWN),
+            dateReported = obj.optString("dateReported", "")
         )
     }
 
@@ -237,7 +241,10 @@ class CardDataExtractor(private val context: Context) {
             items.add(StatItem(label = "Stat ${items.size + 1}", value = ZERO_STR, context = ""))
         }
 
-        return CardData.TopStats(stats = items)
+        return CardData.TopStats(
+            matchContext = obj.optString("matchContext", ""),
+            stats = items
+        )
     }
 
     private fun parseTransferNews(obj: JsonObject): CardData.TransferNews {
@@ -247,6 +254,8 @@ class CardDataExtractor(private val context: Context) {
             fromTeam = obj.optString("fromTeam", UNKNOWN),
             toTeam = obj.optString("toTeam", UNKNOWN),
             fee = obj.optString("fee", UNKNOWN),
+            contractLength = obj.optString("contractLength", ""),
+            transferType = obj.optString("transferType", ""),
             quote = obj.optString("quote", UNKNOWN)
         )
     }
@@ -255,7 +264,9 @@ class CardDataExtractor(private val context: Context) {
         return CardData.BreakingNews(
             label = obj.optString("label", "🚨 BREAKING"),
             headline = obj.optString("headline", UNKNOWN),
-            subtext = obj.optString("subtext", "")
+            subtext = obj.optString("subtext", ""),
+            impactRating = obj.optInt("impactRating", 3),
+            relatedTeams = obj.optString("relatedTeams", "")
         )
     }
 
@@ -264,6 +275,8 @@ class CardDataExtractor(private val context: Context) {
             competition = obj.optString("competition", UNKNOWN),
             homeTeam = obj.optString("homeTeam", UNKNOWN),
             awayTeam = obj.optString("awayTeam", UNKNOWN),
+            homeForm = obj.optString("homeForm", ""),
+            awayForm = obj.optString("awayForm", ""),
             matchTime = obj.optString("matchTime", UNKNOWN),
             stadium = obj.optString("stadium", UNKNOWN)
         )
@@ -277,6 +290,9 @@ class CardDataExtractor(private val context: Context) {
             awayScore = obj.optInt("awayScore", 0),
             homeScorers = obj.optString("homeScorers", ""),
             awayScorers = obj.optString("awayScorers", ""),
+            possession = obj.optString("possession", ""),
+            shotsOnTarget = obj.optString("shotsOnTarget", ""),
+            competition = obj.optString("competition", ""),
             matchStatus = obj.optString("matchStatus", UNKNOWN)
         )
     }
@@ -300,6 +316,8 @@ class CardDataExtractor(private val context: Context) {
         }
         return CardData.OnThisDay(
             dateLabel = obj.optString("dateLabel", "ON THIS DAY"),
+            yearsAgo = obj.optInt("yearsAgo", 0),
+            competition = obj.optString("competition", ""),
             headline = obj.optString("headline", UNKNOWN),
             keyStats = items
         )
@@ -340,7 +358,9 @@ class CardDataExtractor(private val context: Context) {
             formation = obj.optString("formation", ""),
             starters = starters,
             subs = subs,
-            manager = obj.optString("manager", "")
+            manager = obj.optString("manager", ""),
+            averageAge = obj.optString("averageAge", ""),
+            keyAbsences = obj.optString("keyAbsences", "")
         )
     }
 
