@@ -30,7 +30,7 @@ import java.util.Locale
 object BitmapExporter {
 
     private const val TAG = "BitmapExporter"
-    private const val ALBUM_NAME = "Socurate"
+    private const val ALBUM_NAME = "Oreamnos"
 
     /**
      * Saves [bitmap] to the device gallery (Pictures/Socurate/).
@@ -39,7 +39,7 @@ object BitmapExporter {
      */
     suspend fun saveToGallery(bitmap: Bitmap, context: Context): Uri = withContext(Dispatchers.IO) {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val filename = "socurate_card_$timestamp.jpg"
+        val filename = "oreamnos_card_$timestamp.jpg"
 
         val savedUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // API 29+ — use MediaStore (no WRITE_EXTERNAL_STORAGE needed)
@@ -94,7 +94,7 @@ object BitmapExporter {
     suspend fun shareImage(bitmap: Bitmap, context: Context) = withContext(Dispatchers.IO) {
         val cacheDir = File(context.cacheDir, "card_exports").also { it.mkdirs() }
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val file = File(cacheDir, "socurate_card_$timestamp.jpg")
+        val file = File(cacheDir, "oreamnos_card_$timestamp.jpg")
 
         FileOutputStream(file).use { stream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 95, stream)
@@ -117,7 +117,7 @@ object BitmapExporter {
 
         withContext(Dispatchers.Main) {
             context.startActivity(
-                Intent.createChooser(shareIntent, "Share Socurate Card")
+                Intent.createChooser(shareIntent, "Share Oreamnos Card")
                     .also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
             )
         }
