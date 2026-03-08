@@ -16,7 +16,8 @@ object CardPromptManager {
         "Do NOT include any explanation, preamble, markdown, code fences, or text outside the JSON. " +
         "Start your response with { and end it with }. " +
         "CRITICAL RULE 1: Translate ALL extracted text values into Malaysian Malay (Bahasa Malaysia) EXCEPT for proper nouns like player names, club names, or tournament acronyms. " +
-        "CRITICAL RULE 2: If a specific piece of information (e.g., stats, dates, source, fees) is NOT explicitly mentioned in the text, you MUST return an empty string \"\" or 0 for numeric fields. Do NOT guess, infer, or provide placeholders like 'N/A', '-', or '—'."
+        "CRITICAL RULE 2: Use common English football terminology naturally mixed within the Bahasa Malaysia context to avoid stiff or weird translation (e.g., use words like 'Clean Sheet', 'Offside', 'Hat-trick', 'Tackle', 'Assist', 'Playmaker', 'Derby', 'Derby', 'Comeback'). " +
+        "CRITICAL RULE 3: If a specific piece of information (e.g., stats, dates, fees) is NOT explicitly mentioned in the text, you MUST return an empty string \"\" or 0 for numeric fields. Do NOT guess, infer, or provide placeholders like 'N/A', '-', or '—'."
 
     fun buildPrompt(template: CardTemplate, articleText: String): String {
         val schema = when (template) {
@@ -57,13 +58,11 @@ object CardPromptManager {
 
     private fun headlineQuoteSchema(): String = """
         Extract the single most impactful headline or quote from the football article below.
-        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia):
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
           "headline": "Tajuk utama atau petikan paling penting (maks 120 aksara)",
           "subtext": "Satu perenggan sokongan ringkas (maks 60 aksara)",
-          "quoteAuthor": "Nama penutur (biarkan kosong jika bukan petikan)",
-          "source": "Nama julukan sumber / majalah",
-          "dateReported": "Tarikh laporan (e.g. 15 Mei 2024)"
+          "quoteAuthor": "Nama penutur (biarkan kosong jika bukan petikan)"
         }
     """.trimIndent()
 
@@ -82,10 +81,10 @@ object CardPromptManager {
 
     private fun transferNewsSchema(): String = """
         Extract the transfer news or rumors from the football article below.
-        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia):
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
           "playerName": "Full Name",
-          "action": "Status (e.g. SAH, DIPINJAM, PINDAHAN SELESAI, RUMUR)",
+          "action": "Status (MUST BE ONE OF: SAH, DIPINJAM, PINDAHAN SELESAI, KHABAR ANGIN)",
           "fromTeam": "Pasukan Asal",
           "toTeam": "Pasukan Baru",
           "fee": "Yuran Perpindahan",

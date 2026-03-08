@@ -133,8 +133,6 @@ fun MatchPreviewCanvas(
                             letterSpacing = 1.sp
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CardFooter()
                 }
             }
         }

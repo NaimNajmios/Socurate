@@ -210,9 +210,7 @@ class CardDataExtractor(private val context: Context) {
         return CardData.HeadlineQuote(
             headline = obj.optString("headline", UNKNOWN),
             subtext = obj.optString("subtext", ""),
-            quoteAuthor = obj.optString("quoteAuthor", ""),
-            source = obj.optString("source", UNKNOWN),
-            dateReported = obj.optString("dateReported", "")
+            quoteAuthor = obj.optString("quoteAuthor", "")
         )
     }
 

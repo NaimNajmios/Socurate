@@ -318,7 +318,7 @@ internal fun CardBackground(
 // ──────────────────────────────────────────────────────────────
 // 2. HEADLINE / QUOTE CANVAS
 // ──────────────────────────────────────────────────────────────
-    
+
 /**
  * Headline / Quote card with a Canvas-drawn decorative opening quotation mark.
  */
@@ -402,16 +402,6 @@ fun HeadlineQuoteCanvas(
             
             // Bottom Section: Context (Left)
             Column(modifier = Modifier.fillMaxWidth()) {
-                if (data.source.isNotBlank() || data.dateReported.isNotBlank()) {
-                    val sourceText = listOf(data.source, data.dateReported)
-                        .filter { it.isNotBlank() }
-                        .joinToString(" • ")
-                    Text(
-                        text = sourceText.uppercase(),
-                        color = CardTextPrimary,
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                    )
-                }
                 if (data.subtext.isNotBlank()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -421,7 +411,6 @@ fun HeadlineQuoteCanvas(
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                CardFooter()
             }
         }
     }
@@ -553,7 +542,6 @@ fun PlayerSpotlightCanvas(
                         )
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    CardFooter()
                 }
                 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -649,7 +637,6 @@ fun TopStatsCanvas(
                         style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    CardFooter()
                 }
                 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -681,19 +668,7 @@ fun TopStatsCanvas(
     }
 }
 
-// ──────────────────────────────────────────────────────────────
-// Shared footer branding
-// ──────────────────────────────────────────────────────────────
 
-@Composable
-internal fun CardFooter() {
-    Text(
-        text = "SOCURATE",
-        color = CardTextMuted,
-        style = MaterialTheme.typography.labelSmall,
-        letterSpacing = 3.sp
-    )
-}
 
 
 // ──────────────────────────────────────────────────────────────
@@ -708,9 +683,7 @@ private fun PreviewHeadlineQuote() {
             data = CardData.HeadlineQuote(
                 headline = "Harimau Malaya layak ke pusingan akhir Piala AFF",
                 subtext = "Kemenangan bersejarah di Stadium Bukit Jalil",
-                quoteAuthor = "Kim Pan Gon",
-                source = "Utusan Malaysia",
-                dateReported = "12 Nov 2023"
+                quoteAuthor = "Kim Pan Gon"
             ),
             config = CardConfig()
         )

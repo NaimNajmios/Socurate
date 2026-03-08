@@ -121,8 +121,6 @@ fun OnThisDayCanvas(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CardFooter()
                 }
             }
         }

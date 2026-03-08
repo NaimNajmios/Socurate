@@ -157,8 +157,6 @@ fun DetailedScoreboardCanvas(
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CardFooter()
                 }
             }
         }

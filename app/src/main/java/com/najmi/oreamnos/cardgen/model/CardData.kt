@@ -31,9 +31,7 @@ sealed class CardData {
     data class HeadlineQuote(
         val headline: String,
         val subtext: String,
-        val quoteAuthor: String,
-        val source: String,
-        val dateReported: String
+        val quoteAuthor: String
     ) : CardData()
 
     /**

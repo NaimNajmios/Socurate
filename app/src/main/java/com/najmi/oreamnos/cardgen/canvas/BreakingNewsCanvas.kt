@@ -93,8 +93,6 @@ fun BreakingNewsCanvas(
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CardFooter()
                 }
             }
         }
