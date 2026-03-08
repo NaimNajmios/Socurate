@@ -31,7 +31,7 @@ class CardDataExtractor(private val context: Context) {
         private const val TAG = "CardDataExtractor"
 
         // Fallback placeholder values for missing fields
-        private const val UNKNOWN = "—"
+        private const val UNKNOWN = ""
         private const val ZERO_STR = "0"
 
         // Regex to strip ```json ... ``` or ``` ... ``` fences from AI responses

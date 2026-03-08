@@ -417,12 +417,14 @@ fun MatchResultCanvas(
                             fontSize = MaterialTheme.typography.titleLarge.fontSize.scaleSp(scale)
                         )
                     )
-                    Text(
-                        text = data.matchDate.uppercase(),
-                        color = CardTextMuted,
-                        style = MaterialTheme.typography.labelSmall,
-                        letterSpacing = 1.sp
-                    )
+                    if (data.matchDate.isNotBlank()) {
+                        Text(
+                            text = data.matchDate.uppercase(),
+                            color = CardTextMuted,
+                            style = MaterialTheme.typography.labelSmall,
+                            letterSpacing = 1.sp
+                        )
+                    }
                     if (data.keyMoment.isNotBlank() && data.keyMoment != "—") {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -448,27 +450,29 @@ fun MatchResultCanvas(
                     val awayVals = listOf("${data.awayStats.possession}%", "${data.awayStats.shots}", "${data.awayStats.shotsOnTarget}")
                     
                     for (i in 0..2) {
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text(
-                                text = homeVals[i],
-                                color = Color(0xFFFFD100), // Gold for Home
-                                fontSize = 22.sp.scaleSp(scale),
-                                fontWeight = FontWeight.Black,
-                                lineHeight = 22.sp.scaleSp(scale)
-                            )
-                            Text(
-                                text = awayVals[i],
-                                color = CardTextPrimary, // White for Away
-                                fontSize = 18.sp.scaleSp(scale),
-                                fontWeight = FontWeight.Bold,
-                                lineHeight = 18.sp.scaleSp(scale)
-                            )
-                            Text(
-                                text = statNames[i].uppercase(),
-                                color = CardTextSecondary,
-                                style = MaterialTheme.typography.labelSmall,
-                                letterSpacing = 1.sp
-                            )
+                        if (homeVals[i] != "0%" && awayVals[i] != "0%" && homeVals[i] != "0" && awayVals[i] != "0") {
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text(
+                                    text = homeVals[i],
+                                    color = Color(0xFFFFD100), // Gold for Home
+                                    fontSize = 22.sp.scaleSp(scale),
+                                    fontWeight = FontWeight.Black,
+                                    lineHeight = 22.sp.scaleSp(scale)
+                                )
+                                Text(
+                                    text = awayVals[i],
+                                    color = CardTextPrimary, // White for Away
+                                    fontSize = 18.sp.scaleSp(scale),
+                                    fontWeight = FontWeight.Bold,
+                                    lineHeight = 18.sp.scaleSp(scale)
+                                )
+                                Text(
+                                    text = statNames[i].uppercase(),
+                                    color = CardTextSecondary,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    letterSpacing = 1.sp
+                                )
+                            }
                         }
                     }
                 }
@@ -553,11 +557,13 @@ fun HeadlineQuoteCanvas(
             
             // Bottom Section: Context (Left)
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = data.source.uppercase(),
-                    color = CardTextPrimary,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                )
+                if (data.source.isNotBlank()) {
+                    Text(
+                        text = data.source.uppercase(),
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
                 if (data.subtext.isNotBlank()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -777,20 +783,22 @@ fun TopStatsCanvas(
                 // 3 Key Stats
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     data.stats.forEach { stat ->
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text(
-                                text = stat.value,
-                                color = Color(0xFFFFD100), // Gold
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Black,
-                                lineHeight = 28.sp
-                            )
-                            Text(
-                                text = stat.label.uppercase(),
-                                color = CardTextSecondary,
-                                style = MaterialTheme.typography.labelSmall,
-                                letterSpacing = 1.sp
-                            )
+                        if (stat.label.isNotBlank() && stat.label != "—" && stat.value.isNotBlank() && stat.value != "—" && stat.value != "0") {
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text(
+                                    text = stat.value,
+                                    color = Color(0xFFFFD100), // Gold
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Black,
+                                    lineHeight = 28.sp
+                                )
+                                Text(
+                                    text = stat.label.uppercase(),
+                                    color = CardTextSecondary,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    letterSpacing = 1.sp
+                                )
+                            }
                         }
                     }
                 }

@@ -80,12 +80,14 @@ fun TransferNewsCanvas(
                             fontSize = MaterialTheme.typography.titleMedium.fontSize.scaleSp(scale)
                         )
                     )
-                    Text(
-                        text = "FEE / TERM: ${data.fee}".uppercase(),
-                        color = CardTextMuted,
-                        style = MaterialTheme.typography.labelSmall,
-                        letterSpacing = 1.sp
-                    )
+                    if (data.fee.isNotBlank() && data.fee != "—") {
+                        Text(
+                            text = "FEE / TERM: ${data.fee}".uppercase(),
+                            color = CardTextMuted,
+                            style = MaterialTheme.typography.labelSmall,
+                            letterSpacing = 1.sp
+                        )
+                    }
                     
                     if (data.quote.isNotBlank() && data.quote != "—") {
                         Spacer(modifier = Modifier.height(8.dp))

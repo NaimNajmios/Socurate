@@ -84,25 +84,30 @@ fun StartingXICanvas(
             ) {
                 // Context Info
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "MANAGER: ${data.manager}".uppercase(),
-                        color = CardTextPrimary,
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = MaterialTheme.typography.titleSmall.fontSize.scaleSp(scale)
+                    if (data.manager.isNotBlank() && data.manager != "—") {
+                        Text(
+                            text = "MANAGER: ${data.manager}".uppercase(),
+                            color = CardTextPrimary,
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = MaterialTheme.typography.titleSmall.fontSize.scaleSp(scale)
+                            )
                         )
-                    )
+                    }
                     
-                    val subsText = data.subs.joinToString(", ") { it.name }
-                    Text(
-                        text = "SUBS: $subsText",
-                        color = CardTextSecondary,
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
-                        ),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    val validSubs = data.subs.filter { it.name.isNotBlank() && it.name != "—" }
+                    if (validSubs.isNotEmpty()) {
+                        val subsText = validSubs.joinToString(", ") { it.name }
+                        Text(
+                            text = "SUBS: $subsText",
+                            color = CardTextSecondary,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     CardFooter()
                 }

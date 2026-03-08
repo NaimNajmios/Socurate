@@ -15,7 +15,8 @@ object CardPromptManager {
         "Your ONLY output must be a single valid JSON object. " +
         "Do NOT include any explanation, preamble, markdown, code fences, or text outside the JSON. " +
         "Start your response with { and end it with }. " +
-        "CRITICAL RULE: Translate ALL extracted text values into Malaysian Malay (Bahasa Malaysia) EXCEPT for proper nouns like player names, club names, or tournament acronyms."
+        "CRITICAL RULE 1: Translate ALL extracted text values into Malaysian Malay (Bahasa Malaysia) EXCEPT for proper nouns like player names, club names, or tournament acronyms. " +
+        "CRITICAL RULE 2: If a specific piece of information (e.g., stats, dates, source, fees) is NOT explicitly mentioned in the text, you MUST return an empty string \"\" or 0 for numeric fields. Do NOT guess, infer, or provide placeholders like 'N/A', '-', or '—'."
 
     fun buildPrompt(template: CardTemplate, articleText: String): String {
         val schema = when (template) {

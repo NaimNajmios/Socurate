@@ -100,25 +100,28 @@ fun DetailedScoreboardCanvas(
                             fontSize = MaterialTheme.typography.titleMedium.fontSize.scaleSp(scale)
                         )
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    if (data.homeScorers.isNotBlank() && data.homeScorers != "—") {
-                        Text(
-                            text = "${data.homeTeam}:\n${data.homeScorers}",
-                            color = CardTextPrimary,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
+                    if ((data.homeScorers.isNotBlank() && data.homeScorers != "—") || 
+                        (data.awayScorers.isNotBlank() && data.awayScorers != "—")) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        if (data.homeScorers.isNotBlank() && data.homeScorers != "—") {
+                            Text(
+                                text = "${data.homeTeam}:\n${data.homeScorers}",
+                                color = CardTextPrimary,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
+                                )
                             )
-                        )
-                    }
-                    if (data.awayScorers.isNotBlank() && data.awayScorers != "—") {
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "${data.awayTeam}:\n${data.awayScorers}",
-                            color = CardTextSecondary,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
+                        }
+                        if (data.awayScorers.isNotBlank() && data.awayScorers != "—") {
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "${data.awayTeam}:\n${data.awayScorers}",
+                                color = CardTextSecondary,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = MaterialTheme.typography.bodySmall.fontSize.scaleSp(scale)
+                                )
                             )
-                        )
+                        }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     CardFooter()

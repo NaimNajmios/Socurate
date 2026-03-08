@@ -98,12 +98,18 @@ fun MatchPreviewCanvas(
                             fontSize = MaterialTheme.typography.titleLarge.fontSize.scaleSp(scale)
                         )
                     )
-                    Text(
-                        text = "${data.matchTime} • ${data.stadium}".uppercase(),
-                        color = CardTextMuted,
-                        style = MaterialTheme.typography.labelSmall,
-                        letterSpacing = 1.sp
-                    )
+                    val timeStr = data.matchTime.takeIf { it.isNotBlank() && it != "—" }
+                    val stadiumStr = data.stadium.takeIf { it.isNotBlank() && it != "—" }
+                    val combinedStr = listOfNotNull(timeStr, stadiumStr).joinToString(" • ")
+                    
+                    if (combinedStr.isNotEmpty()) {
+                        Text(
+                            text = combinedStr.uppercase(),
+                            color = CardTextMuted,
+                            style = MaterialTheme.typography.labelSmall,
+                            letterSpacing = 1.sp
+                        )
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     CardFooter()
                 }
