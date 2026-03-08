@@ -11,6 +11,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.Alignment
 import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.ui.components.NeoButton
 
@@ -40,7 +42,34 @@ fun DataEditorSheet(
                 .verticalScroll(rememberScrollState())
         ) {
             // Source Text Input section
-            SectionHeader("ARTICLE SOURCE TEXT")
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "ARTICLE SOURCE TEXT",
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    letterSpacing = TextUnit(2f, TextUnitType.Sp)
+                )
+                
+                val clipboardManager = LocalClipboardManager.current
+                TextButton(
+                    onClick = {
+                        clipboardManager.getText()?.text?.let {
+                            // If there's already some text, we might want to append or replace.
+                            // Assuming most people want to replace if it's selected, or just append. 
+                            // Usually replacing is easier for "Paste" button on top. Let's replace the content.
+                            onInputTextChange(it)
+                        }
+                    },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                    modifier = Modifier.height(24.dp)
+                ) {
+                    Text("PASTE", style = MaterialTheme.typography.labelSmall)
+                }
+            }
             OutlinedTextField(
                 value = inputText,
                 onValueChange = onInputTextChange,
