@@ -252,6 +252,9 @@ fun CardGeneratorScreen(
                     cardViewModel.setBackgroundBitmap(newConfig.backgroundBitmap)
                 }
             },
+            onShuffleDesign = {
+                cardViewModel.shuffleDesign()
+            },
             onDismiss = { showBackgroundSheet = false }
         )
     }

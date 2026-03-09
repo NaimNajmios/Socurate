@@ -73,6 +73,7 @@ import com.najmi.oreamnos.cardgen.utils.GradientBuilder
 fun DesignBottomSheet(
     currentConfig: CardConfig,
     onConfigUpdate: (CardConfig) -> Unit,
+    onShuffleDesign: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -129,7 +130,11 @@ fun DesignBottomSheet(
             }
             
             Spacer(Modifier.height(24.dp))
-            GlobalDesignControls(currentConfig = currentConfig, onConfigUpdate = onConfigUpdate)
+            GlobalDesignControls(
+                currentConfig = currentConfig,
+                onConfigUpdate = onConfigUpdate,
+                onShuffleDesign = onShuffleDesign
+            )
         }
     }
 }
@@ -399,7 +404,8 @@ private fun PresetTab(
 @Composable
 private fun GlobalDesignControls(
     currentConfig: CardConfig,
-    onConfigUpdate: (CardConfig) -> Unit
+    onConfigUpdate: (CardConfig) -> Unit,
+    onShuffleDesign: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -472,5 +478,14 @@ private fun GlobalDesignControls(
                 }
             }
         }
+        
+        Spacer(Modifier.height(24.dp))
+
+        // Surprise Me Button
+        com.najmi.oreamnos.ui.components.NeoButton(
+            text = "SURPRISE ME 🎲",
+            onClick = onShuffleDesign,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

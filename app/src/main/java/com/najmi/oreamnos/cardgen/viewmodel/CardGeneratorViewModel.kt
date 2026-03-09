@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 // ──────────────────────────────────────────────────────────────
 // State types
@@ -87,13 +88,157 @@ class CardGeneratorViewModel : ViewModel() {
 
     /**
      * Called when the user taps a template in [com.najmi.oreamnos.cardgen.ui.TemplatePickerRow].
-     * Switches template and re-runs extraction if input text is present.
+     * If data has already been extracted, attempts a "hot swap" mapping instead of a full re-extraction.
      */
     fun selectTemplate(template: CardTemplate, context: Context) {
+        if (_selectedTemplate.value == template) return
+        
         _selectedTemplate.value = template
-        if (_inputText.value.isNotBlank()) {
+        
+        val currentData = _mutableCardData.value
+        if (currentData != null && _extractionState.value is ExtractionState.Success) {
+            // Hot swap!
+            swapTemplateAndMapData(currentData, template)
+        } else if (_inputText.value.isNotBlank()) {
             extractCardData(context)
         }
+    }
+
+    /**
+     * Intelligently maps the existing [CardData] fields into a new [CardTemplate]
+     * to prevent data loss when switching templates post-extraction.
+     */
+    private fun swapTemplateAndMapData(currentData: CardData, targetTemplate: CardTemplate) {
+        val newData: CardData = when (targetTemplate) {
+            CardTemplate.HeadlineQuote -> CardData.HeadlineQuote(
+                headline = findMostRelevantHeadline(currentData),
+                subtext = "",
+                quoteAuthor = ""
+            )
+            CardTemplate.PlayerSpotlight -> CardData.PlayerSpotlight(
+                playerName = extractPlayerName(currentData),
+                club = extractHomeOrAwayTeam(currentData),
+                position = "FW",
+                rating = 0f,
+                goals = 0,
+                assists = 0,
+                minutesPlayed = 90,
+                keyAction = "",
+                keyQuote = findMostRelevantHeadline(currentData)
+            )
+            CardTemplate.DetailedScoreboard -> CardData.DetailedScoreboard(
+                homeTeam = extractHomeTeam(currentData),
+                awayTeam = extractAwayTeam(currentData),
+                homeScore = 0,
+                awayScore = 0,
+                homeScorers = "",
+                awayScorers = "",
+                possession = "50% - 50%",
+                shotsOnTarget = "0 - 0",
+                competition = extractCompetition(currentData),
+                matchStatus = "FT"
+            )
+            CardTemplate.MatchPreview -> CardData.MatchPreview(
+                competition = extractCompetition(currentData),
+                homeTeam = extractHomeTeam(currentData),
+                awayTeam = extractAwayTeam(currentData),
+                homeForm = "W W W",
+                awayForm = "D L W",
+                matchTime = "TBC",
+                stadium = "TBC"
+            )
+            CardTemplate.TransferNews -> CardData.TransferNews(
+                playerName = extractPlayerName(currentData),
+                action = "SIGNED",
+                fromTeam = extractAwayTeam(currentData),
+                toTeam = extractHomeTeam(currentData),
+                fee = "Undisclosed",
+                contractLength = "Undisclosed",
+                transferType = "Permanent",
+                quote = findMostRelevantHeadline(currentData)
+            )
+            CardTemplate.TopStats -> CardData.TopStats(
+                matchContext = extractCompetition(currentData),
+                stats = listOf(
+                    com.najmi.oreamnos.cardgen.model.StatItem("Stat 1", "-", ""),
+                    com.najmi.oreamnos.cardgen.model.StatItem("Stat 2", "-", ""),
+                    com.najmi.oreamnos.cardgen.model.StatItem("Stat 3", "-", "")
+                )
+            )
+            CardTemplate.BreakingNews -> CardData.BreakingNews(
+                label = "BREAKING",
+                headline = findMostRelevantHeadline(currentData),
+                subtext = "",
+                impactRating = 5,
+                relatedTeams = extractHomeOrAwayTeam(currentData)
+            )
+            CardTemplate.OnThisDay -> CardData.OnThisDay(
+                dateLabel = "Today",
+                yearsAgo = 1,
+                competition = extractCompetition(currentData),
+                headline = findMostRelevantHeadline(currentData),
+                keyStats = emptyList()
+            )
+            CardTemplate.StartingXI -> CardData.StartingXI(
+                teamName = extractHomeTeam(currentData),
+                formation = "4-3-3",
+                manager = "Manager",
+                averageAge = "25.0",
+                keyAbsences = "None",
+                starters = emptyList(),
+                subs = emptyList()
+            )
+        }
+        
+        _mutableCardData.value = newData
+        _extractionState.value = ExtractionState.Success(newData)
+    }
+
+    // --- Helper extraction methods for mapping ---
+    private fun findMostRelevantHeadline(currentData: CardData): String = when (currentData) {
+        is CardData.HeadlineQuote -> currentData.headline
+        is CardData.BreakingNews -> currentData.headline
+        is CardData.OnThisDay -> currentData.headline
+        is CardData.PlayerSpotlight -> currentData.keyQuote ?: ""
+        is CardData.TransferNews -> "${currentData.playerName} Transfers to ${currentData.toTeam}"
+        is CardData.DetailedScoreboard -> "${currentData.homeTeam} vs ${currentData.awayTeam}"
+        is CardData.MatchPreview -> "${currentData.homeTeam} vs ${currentData.awayTeam} Preview"
+        else -> ""
+    }
+    
+    private fun extractPlayerName(currentData: CardData): String = when (currentData) {
+        is CardData.PlayerSpotlight -> currentData.playerName
+        is CardData.TransferNews -> currentData.playerName
+        is CardData.HeadlineQuote -> currentData.quoteAuthor ?: ""
+        else -> "Player Name"
+    }
+
+    private fun extractHomeTeam(currentData: CardData): String = when (currentData) {
+        is CardData.DetailedScoreboard -> currentData.homeTeam
+        is CardData.MatchPreview -> currentData.homeTeam
+        is CardData.StartingXI -> currentData.teamName
+        is CardData.TransferNews -> currentData.toTeam
+        is CardData.PlayerSpotlight -> currentData.club
+        else -> "Home Team"
+    }
+
+    private fun extractAwayTeam(currentData: CardData): String = when (currentData) {
+        is CardData.DetailedScoreboard -> currentData.awayTeam
+        is CardData.MatchPreview -> currentData.awayTeam
+        is CardData.TransferNews -> currentData.fromTeam
+        else -> "Away Team"
+    }
+    
+    private fun extractHomeOrAwayTeam(currentData: CardData): String {
+        val home = extractHomeTeam(currentData)
+        return if (home != "Home Team") home else extractAwayTeam(currentData)
+    }
+
+    private fun extractCompetition(currentData: CardData): String = when (currentData) {
+        is CardData.DetailedScoreboard -> currentData.competition
+        is CardData.MatchPreview -> currentData.competition
+        is CardData.TopStats -> currentData.matchContext
+        else -> "League"
     }
 
     /**
@@ -251,5 +396,36 @@ class CardGeneratorViewModel : ViewModel() {
         _mutableCardData.value = updatedData
         // Re-emit into the primary pipeline so CardPreviewPane recomposes 
         _extractionState.value = ExtractionState.Success(updatedData)
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Workflow Enhancements
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * Re-rolls the card's visual design settings (opacity, fonts)
+     * as part of the "Surprise Me" feature.
+     */
+    fun shuffleDesign() {
+        val availableFonts = listOf(
+            null, // Default
+            "Serif",
+            "Monospace"
+        )
+        val availableScrims = listOf(
+            com.najmi.oreamnos.cardgen.utils.GradientBuilder.ScrimType.DARK,
+            com.najmi.oreamnos.cardgen.utils.GradientBuilder.ScrimType.LIGHT,
+            com.najmi.oreamnos.cardgen.utils.GradientBuilder.ScrimType.HORIZONTAL,
+            com.najmi.oreamnos.cardgen.utils.GradientBuilder.ScrimType.REVERSE_HORIZONTAL,
+            com.najmi.oreamnos.cardgen.utils.GradientBuilder.ScrimType.MINIMAL
+        )
+
+        val newConfig = _cardConfig.value.copy(
+            primaryFontFamilyName = availableFonts.random(),
+            overlayOpacity = Random.nextFloat() * (0.8f - 0.2f) + 0.2f, // 0.2f to 0.8f
+            scrimType = availableScrims.random()
+        )
+        
+        _cardConfig.value = newConfig
     }
 }
