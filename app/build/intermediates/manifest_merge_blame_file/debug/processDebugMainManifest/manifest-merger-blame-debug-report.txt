@@ -100,8 +100,8 @@
 58-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:63:13-45
 59            android:exported="true"
 59-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:65:13-36
-60            android:icon="@drawable/ic_tile"
-60-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:67:13-45
+60            android:icon="@mipmap/oreamnos_white"
+60-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:67:13-50
 61            android:label="Create Card Graphic"
 61-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:66:13-48
 62            android:targetActivity="com.najmi.oreamnos.ShareRouterActivity" >
@@ -144,8 +144,8 @@
 82-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:42:13-49
 83            android:exported="true"
 83-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:44:13-36
-84            android:icon="@drawable/ic_tile"
-84-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:46:13-45
+84            android:icon="@mipmap/oreamnos_white"
+84-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:46:13-50
 85            android:label="Generate Post"
 85-->C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:45:13-42
 86            android:targetActivity="com.najmi.oreamnos.ShareRouterActivity" >

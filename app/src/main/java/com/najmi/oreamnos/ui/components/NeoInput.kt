@@ -32,6 +32,7 @@ fun NeoInput(
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     visualTransformation: androidx.compose.ui.text.input.VisualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
     keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default,
+    keyboardActions: androidx.compose.foundation.text.KeyboardActions = androidx.compose.foundation.text.KeyboardActions.Default,
     trailingIcon: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null
 ) {
@@ -48,6 +49,7 @@ fun NeoInput(
         textStyle = textStyle,
         visualTransformation = visualTransformation,
         keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         trailingIcon = trailingIcon,
         supportingText = supportingText,
         shape = NeoInputShape, // Sharp corners

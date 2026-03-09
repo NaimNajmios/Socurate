@@ -101,5 +101,11 @@ data class CardConfig(
     /** Optional accent color to override default text colorations */
     val accentColor: Color? = null,
     /** Stores X,Y offsets for draggable components (key = component ID, value = (x,y)) */
-    val elementOffsets: Map<String, Pair<Float, Float>> = emptyMap()
+    val elementOffsets: Map<String, Pair<Float, Float>> = emptyMap(),
+    /** Blur radius applied to the background image (0f means no blur) */
+    val backgroundBlurRadius: Float = 0f,
+    /** Optional URI to a user-uploaded watermark to overlay on the exported card */
+    val watermarkUri: String? = null,
+    /** Decoded bitmap for the watermark overlay */
+    val watermarkBitmap: Bitmap? = null
 )

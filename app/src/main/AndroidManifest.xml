@@ -43,7 +43,7 @@
             android:targetActivity=".ShareRouterActivity"
             android:exported="true"
             android:label="Generate Post"
-            android:icon="@drawable/ic_tile">
+            android:icon="@mipmap/oreamnos_white">
             <!-- Receive shared text from OS share sheet -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -64,7 +64,7 @@
             android:targetActivity=".ShareRouterActivity"
             android:exported="true"
             android:label="Create Card Graphic"
-            android:icon="@drawable/ic_tile">
+            android:icon="@mipmap/oreamnos_white">
             <!-- Receive shared text from OS share sheet -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

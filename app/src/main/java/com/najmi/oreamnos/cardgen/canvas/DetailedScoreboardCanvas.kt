@@ -20,14 +20,15 @@ import com.najmi.oreamnos.ui.components.AutoSizeText
 @Composable
 fun DetailedScoreboardCanvas(
     data: CardData.DetailedScoreboard,
-    config: CardConfig
+    config: CardConfig,
+    modifier: Modifier = Modifier
 ) {
     val scale = config.fontSizeMultiplier
     val gradientColors = ColorExtractor.getMatchColors(data.homeTeam, data.awayTeam)
 
     CardBackground(
         config = config.copy(colorPair = gradientColors),
-        modifier = Modifier.aspectRatio(1f)
+        modifier = modifier.aspectRatio(1f)
     ) {
         Column(
             modifier = Modifier

@@ -24,6 +24,11 @@ import com.najmi.oreamnos.cardgen.renderer.StartingXICanvas
 import com.najmi.oreamnos.cardgen.renderer.TransferNewsCanvas
 import com.najmi.oreamnos.cardgen.viewmodel.ExtractionState
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.geometry.Offset
 
 /**
  * Live preview pane for the card generator.
@@ -37,6 +42,7 @@ fun CardPreviewPane(
     extractionState: ExtractionState,
     selectedTemplate: CardTemplate,
     cardConfig: CardConfig,
+    onConfigUpdate: (CardConfig) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -55,6 +61,11 @@ fun CardPreviewPane(
                 CardCanvas(
                     cardData = extractionState.cardData,
                     cardConfig = cardConfig,
+                    onOffsetChange = { id, offset ->
+                        val newOffsets = cardConfig.elementOffsets.toMutableMap()
+                        newOffsets[id] = offset
+                        onConfigUpdate(cardConfig.copy(elementOffsets = newOffsets))
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -73,19 +84,20 @@ fun CardPreviewPane(
 fun CardCanvas(
     cardData: CardData,
     cardConfig: CardConfig,
+    onOffsetChange: (String, Pair<Float, Float>) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     when (cardData) {
 
-        is CardData.HeadlineQuote -> HeadlineQuoteCanvas(data = cardData, config = cardConfig, modifier = modifier)
-        is CardData.PlayerSpotlight -> PlayerSpotlightCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.HeadlineQuote -> HeadlineQuoteCanvas(data = cardData, config = cardConfig, onOffsetChange = onOffsetChange, modifier = modifier)
+        is CardData.PlayerSpotlight -> PlayerSpotlightCanvas(data = cardData, config = cardConfig, onOffsetChange = onOffsetChange, modifier = modifier)
         is CardData.TopStats -> TopStatsCanvas(data = cardData, config = cardConfig, modifier = modifier)
-        is CardData.TransferNews -> TransferNewsCanvas(data = cardData, config = cardConfig)
-        is CardData.BreakingNews -> BreakingNewsCanvas(data = cardData, config = cardConfig)
-        is CardData.MatchPreview -> MatchPreviewCanvas(data = cardData, config = cardConfig)
-        is CardData.DetailedScoreboard -> DetailedScoreboardCanvas(data = cardData, config = cardConfig)
-        is CardData.OnThisDay -> OnThisDayCanvas(data = cardData, config = cardConfig)
-        is CardData.StartingXI -> StartingXICanvas(data = cardData, config = cardConfig)
+        is CardData.TransferNews -> TransferNewsCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.BreakingNews -> BreakingNewsCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.MatchPreview -> MatchPreviewCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.DetailedScoreboard -> DetailedScoreboardCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.OnThisDay -> OnThisDayCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.StartingXI -> StartingXICanvas(data = cardData, config = cardConfig, modifier = modifier)
     }
 }
 
@@ -111,3 +123,31 @@ private fun CardPlaceholder(template: CardTemplate) {
 
 /** Aspect ratio for the card preview — all templates use compact square format. */
 private fun aspectForTemplate(template: CardTemplate): Float = 1f
+
+@Composable
+fun DraggableCanvasElement(
+    elementId: String,
+    cardConfig: CardConfig,
+    onOffsetChange: (String, Pair<Float, Float>) -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    val currentOffset = cardConfig.elementOffsets[elementId] ?: Pair(0f, 0f)
+    val density = androidx.compose.ui.platform.LocalDensity.current.density
+
+    Box(
+        modifier = modifier
+            .offset(x = currentOffset.first.dp, y = currentOffset.second.dp)
+            .pointerInput(elementId) {
+                detectDragGestures { change: PointerInputChange, dragAmount: Offset ->
+                    change.consume()
+                    // Convert pixel dragAmount to DP
+                    val deltaX = dragAmount.x / density
+                    val deltaY = dragAmount.y / density
+                    onOffsetChange(elementId, Pair(currentOffset.first + deltaX, currentOffset.second + deltaY))
+                }
+            }
+    ) {
+        content()
+    }
+}

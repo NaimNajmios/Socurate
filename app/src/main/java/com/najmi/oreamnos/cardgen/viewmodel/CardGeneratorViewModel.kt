@@ -62,6 +62,9 @@ class CardGeneratorViewModel : ViewModel() {
     private val _extractionState = MutableStateFlow<ExtractionState>(ExtractionState.Idle)
     val extractionState: StateFlow<ExtractionState> = _extractionState.asStateFlow()
 
+    private val _rewritingFields = MutableStateFlow<Set<String>>(emptySet())
+    val rewritingFields: StateFlow<Set<String>> = _rewritingFields.asStateFlow()
+
     // ── Dynamic Editable Data (For DataEditorSheet) ────────────
 
     private val _mutableCardData = MutableStateFlow<CardData?>(null)
@@ -302,6 +305,40 @@ class CardGeneratorViewModel : ViewModel() {
     }
 
     /**
+     * Re-writes a specific text field using the Gemini AI API.
+     */
+    fun rewriteField(context: Context, fieldLabel: String, currentText: String, onUpdate: (String) -> Unit) {
+        if (currentText.isBlank()) return
+        
+        viewModelScope.launch {
+            _rewritingFields.value = _rewritingFields.value + fieldLabel
+            try {
+                val curator = com.najmi.oreamnos.curator.CuratorFactory.create(context)
+                val prompt = """
+                    You are a professional sports media copywriter. 
+                    Rewrite the following football text to be punchier, more professional, and concise for social media.
+                    Ensure the output is in Bahasa Malaysia.
+                    Do NOT include any greetings, explanations, or quotes around the output. 
+                    Output ONLY the refined text.
+                    
+                    Text: $currentText
+                """.trimIndent()
+                
+                val result = curator.generateRaw(prompt).trim('"', '\'', ' ', '\n')
+                if (result.isNotBlank()) {
+                    onUpdate(result)
+                }
+            } catch (e: Exception) {
+                _extractionState.value = ExtractionState.Error(
+                    "Gagal menulis semula teks: ${e.message}"
+                )
+            } finally {
+                _rewritingFields.value = _rewritingFields.value - fieldLabel
+            }
+        }
+    }
+
+    /**
      * Updates the card configuration (background type, colors, size, etc.).
      */
     fun updateConfig(config: CardConfig) {
@@ -358,6 +395,43 @@ class CardGeneratorViewModel : ViewModel() {
      */
     fun setCutoutBitmap(bitmap: Bitmap?) {
         _cardConfig.value = _cardConfig.value.copy(cutoutBitmap = bitmap)
+    }
+
+    /**
+     * Sets the watermark URI and decodes it into a bitmap for overlay rendering.
+     */
+    fun setWatermarkUri(context: Context, uri: android.net.Uri?) {
+        if (uri == null) {
+            _cardConfig.value = _cardConfig.value.copy(
+                watermarkUri = null,
+                watermarkBitmap = null
+            )
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                // Wrap in software copy to avoid hardware bitmap issues during export
+                val source = android.graphics.ImageDecoder.createSource(context.contentResolver, uri)
+                val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                    android.graphics.ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
+                        decoder.allocator = android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE
+                        decoder.isMutableRequired = true
+                    }
+                } else {
+                    @Suppress("DEPRECATION")
+                    android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                        .copy(android.graphics.Bitmap.Config.ARGB_8888, true)
+                }
+                
+                _cardConfig.value = _cardConfig.value.copy(
+                    watermarkUri = uri.toString(),
+                    watermarkBitmap = bitmap
+                )
+            } catch (e: Exception) {
+                _extractionState.value = ExtractionState.Error("Gagal memuat watermark: ${e.message}")
+            }
+        }
     }
 
     /**

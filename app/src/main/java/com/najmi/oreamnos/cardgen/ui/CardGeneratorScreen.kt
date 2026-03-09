@@ -149,7 +149,13 @@ fun CardGeneratorScreen(
                 title = {
                     Text(
                         text = "OREAMNOS",
-                        style = MaterialTheme.typography.displaySmall
+                        style = MaterialTheme.typography.displaySmall.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = androidx.compose.ui.unit.TextUnit(
+                                4f,
+                                androidx.compose.ui.unit.TextUnitType.Sp
+                            )
+                        )
                     )
                 },
                 actions = {
@@ -228,6 +234,7 @@ fun CardGeneratorScreen(
                 extractionState = extractionState,
                 selectedTemplate = selectedTemplate,
                 cardConfig = cardConfig,
+                onConfigUpdate = { cardViewModel.updateConfig(it) },
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             // ── 3. Layout Options ──────────────────────────────────
@@ -255,18 +262,26 @@ fun CardGeneratorScreen(
             onShuffleDesign = {
                 cardViewModel.shuffleDesign()
             },
+            onWatermarkUpload = { uri ->
+                cardViewModel.setWatermarkUri(context, uri)
+            },
             onDismiss = { showBackgroundSheet = false }
         )
     }
 
     if (showDataSheet) {
         val mutableCardData by cardViewModel.mutableCardData.collectAsState()
+        val rewritingFields by cardViewModel.rewritingFields.collectAsState()
         
         DataEditorSheet(
             inputText = inputText,
             onInputTextChange = { cardViewModel.updateInputText(it) },
             cardData = mutableCardData,
             onCardDataChange = { updater -> cardViewModel.updateCardData(updater) },
+            rewritingFields = rewritingFields,
+            onRewriteField = { label, text, onUpdate ->
+                cardViewModel.rewriteField(context, label, text, onUpdate)
+            },
             isExtracting = extractionState is ExtractionState.Loading,
             onExtractClick = { cardViewModel.extractCardData(context) },
             onDismiss = { showDataSheet = false }
@@ -339,8 +354,9 @@ private fun LayoutOptionsSection(
         // Font Size Slider
         Text(
             text = "FONT SIZE",
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            letterSpacing = androidx.compose.ui.unit.TextUnit(2f, androidx.compose.ui.unit.TextUnitType.Sp)
         )
         Slider(
             value = cardConfig.fontSizeMultiplier,
@@ -352,8 +368,9 @@ private fun LayoutOptionsSection(
         // Image Position
         Text(
             text = "DESIGN LAYOUT",
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            letterSpacing = androidx.compose.ui.unit.TextUnit(2f, androidx.compose.ui.unit.TextUnitType.Sp)
         )
         // A simple row of options using a LazyRow (horizontal scroll)
         LazyRow(
@@ -362,40 +379,22 @@ private fun LayoutOptionsSection(
         ) {
             items(ImagePosition.entries.toList()) { position ->
                 val isSelected = cardConfig.imagePosition == position
-                Surface(
-                    modifier = Modifier
-                        .width(100.dp)
-                        .height(48.dp)
-                        .clickable { onConfigUpdate(cardConfig.copy(imagePosition = position)) },
-                    shape = RoundedCornerShape(8.dp),
-                    border = BorderStroke(
-                        width = if (isSelected) 2.dp else 1.dp,
-                        color = if (isSelected) MaterialTheme.colorScheme.primary 
-                               else MaterialTheme.colorScheme.outline
-                    ),
-                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) 
-                           else MaterialTheme.colorScheme.surface
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = position.displayName,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            color = if (isSelected) MaterialTheme.colorScheme.primary 
-                                   else MaterialTheme.colorScheme.onSurface,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
+                com.najmi.oreamnos.ui.components.NeoChip(
+                    text = position.displayName,
+                    selected = isSelected,
+                    onClick = { onConfigUpdate(cardConfig.copy(imagePosition = position)) },
+                    modifier = Modifier.width(100.dp)
+                )
             }
         }
         
         // Image Opacity
         if (cardConfig.backgroundBitmap != null || cardConfig.imagePosition == ImagePosition.MINIMAL) {
             Text(
-                text = "IMAGE OPACITY: ${(cardConfig.imageOpacity * 100).toInt()}%",
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                text = "IMAGE OPACITY",
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                letterSpacing = androidx.compose.ui.unit.TextUnit(2f, androidx.compose.ui.unit.TextUnitType.Sp)
             )
             Slider(
                 value = cardConfig.imageOpacity,

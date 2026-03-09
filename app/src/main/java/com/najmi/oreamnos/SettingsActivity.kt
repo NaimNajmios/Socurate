@@ -498,7 +498,13 @@ fun ApiKeyInput(
         modifier = Modifier.fillMaxWidth(),
         maxLines = 1,
         visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = androidx.compose.ui.text.input.ImeAction.Done),
+        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { onSave() }),
+        trailingIcon = {
+            androidx.compose.material3.TextButton(onClick = onSave) {
+                Text("Save", style = MaterialTheme.typography.labelMedium)
+            }
+        }
     )
 }
 

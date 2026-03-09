@@ -57,7 +57,7 @@
         <activity-alias
             android:name="com.najmi.oreamnos.ShareToCardAlias"
             android:exported="true"
-            android:icon="@drawable/ic_tile"
+            android:icon="@mipmap/oreamnos_white"
             android:label="Create Card Graphic"
             android:targetActivity="com.najmi.oreamnos.ShareRouterActivity" >
 
@@ -81,7 +81,7 @@
         <activity-alias
             android:name="com.najmi.oreamnos.ShareToGenerateAlias"
             android:exported="true"
-            android:icon="@drawable/ic_tile"
+            android:icon="@mipmap/oreamnos_white"
             android:label="Generate Post"
             android:targetActivity="com.najmi.oreamnos.ShareRouterActivity" >
 

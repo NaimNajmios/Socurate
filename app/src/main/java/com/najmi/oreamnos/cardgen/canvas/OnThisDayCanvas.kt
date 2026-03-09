@@ -19,13 +19,14 @@ import com.najmi.oreamnos.cardgen.model.CardData
 @Composable
 fun OnThisDayCanvas(
     data: CardData.OnThisDay,
-    config: CardConfig
+    config: CardConfig,
+    modifier: Modifier = Modifier
 ) {
     val scale = config.fontSizeMultiplier
 
     CardBackground(
         config = config,
-        modifier = Modifier.aspectRatio(1f)
+        modifier = modifier.aspectRatio(1f)
     ) {
         Column(
             modifier = Modifier

@@ -19,13 +19,14 @@ import com.najmi.oreamnos.ui.components.AutoSizeText
 @Composable
 fun MatchPreviewCanvas(
     data: CardData.MatchPreview,
-    config: CardConfig
+    config: CardConfig,
+    modifier: Modifier = Modifier
 ) {
     val scale = config.fontSizeMultiplier
 
     CardBackground(
         config = config,
-        modifier = Modifier.aspectRatio(1f)
+        modifier = modifier.aspectRatio(1f)
     ) {
         Column(
             modifier = Modifier

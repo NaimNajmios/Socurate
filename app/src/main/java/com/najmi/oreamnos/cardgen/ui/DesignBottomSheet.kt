@@ -26,8 +26,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +41,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -74,6 +78,7 @@ fun DesignBottomSheet(
     currentConfig: CardConfig,
     onConfigUpdate: (CardConfig) -> Unit,
     onShuffleDesign: () -> Unit,
+    onWatermarkUpload: (android.net.Uri?) -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -85,6 +90,12 @@ fun DesignBottomSheet(
         }
     ) }
     val tabs = listOf("Gradient", "Gallery", "Preset")
+
+    val watermarkLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        onWatermarkUpload(uri)
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -114,7 +125,7 @@ fun DesignBottomSheet(
                         text = {
                             Text(
                                 text = title.uppercase(),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
                             )
                         }
                     )
@@ -133,7 +144,9 @@ fun DesignBottomSheet(
             GlobalDesignControls(
                 currentConfig = currentConfig,
                 onConfigUpdate = onConfigUpdate,
-                onShuffleDesign = onShuffleDesign
+                onShuffleDesign = onShuffleDesign,
+                onWatermarkClick = { watermarkLauncher.launch("image/*") },
+                onWatermarkUpload = onWatermarkUpload
             )
         }
     }
@@ -405,7 +418,9 @@ private fun PresetTab(
 private fun GlobalDesignControls(
     currentConfig: CardConfig,
     onConfigUpdate: (CardConfig) -> Unit,
-    onShuffleDesign: () -> Unit
+    onShuffleDesign: () -> Unit,
+    onWatermarkClick: () -> Unit,
+    onWatermarkUpload: (android.net.Uri?) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -437,6 +452,31 @@ private fun GlobalDesignControls(
 
         Spacer(Modifier.height(16.dp))
 
+        // Background Blur
+        Text(
+            text = "BACKGROUND BLUR",
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "${currentConfig.backgroundBlurRadius.toInt()}px",
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.width(40.dp)
+            )
+            Slider(
+                value = currentConfig.backgroundBlurRadius,
+                onValueChange = { onConfigUpdate(currentConfig.copy(backgroundBlurRadius = it)) },
+                valueRange = 0f..25f,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
         // Typography Selector
         Text(
             text = "TYPOGRAPHY",
@@ -445,40 +485,50 @@ private fun GlobalDesignControls(
         )
         Spacer(Modifier.height(8.dp))
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
             val fonts = listOf(null to "Default", "Serif" to "Classic", "Monospace" to "Type")
             fonts.forEach { (fontName, label) ->
                 val isSelected = currentConfig.primaryFontFamilyName == fontName
-                Surface(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable { onConfigUpdate(currentConfig.copy(primaryFontFamilyName = fontName)) },
-                    shape = RoundedCornerShape(4.dp),
-                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
-                    )
-                ) {
-                    Text(
-                        text = label,
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            fontFamily = when(fontName) {
-                                "Serif" -> androidx.compose.ui.text.font.FontFamily.Serif
-                                "Monospace" -> androidx.compose.ui.text.font.FontFamily.Monospace
-                                else -> androidx.compose.ui.text.font.FontFamily.Default
-                            }
-                        ),
-                        color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                com.najmi.oreamnos.ui.components.NeoChip(
+                    text = label,
+                    selected = isSelected,
+                    onClick = { onConfigUpdate(currentConfig.copy(primaryFontFamilyName = fontName)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        
+        Spacer(Modifier.height(24.dp))
+
+        // PUBLISHER WATERMARK
+        Text(
+            text = "PUBLISHER WATERMARK",
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            com.najmi.oreamnos.ui.components.NeoOutlinedButton(
+                text = if (currentConfig.watermarkUri == null) "UPLOAD LOGO" else "CHANGE LOGO",
+                onClick = onWatermarkClick,
+                modifier = Modifier.weight(1f)
+            )
+            if (currentConfig.watermarkUri != null) {
+                IconButton(onClick = { onWatermarkUpload(null) }) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.Delete,
+                        contentDescription = "Remove Watermark",
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }
         }
-        
+
         Spacer(Modifier.height(24.dp))
 
         // Surprise Me Button

@@ -72,7 +72,8 @@ object CardRenderer {
         // Pre-process the config to ensure no hardware bitmaps leak into the software rendering pass
         val safeConfig = cardConfig.copy(
             backgroundBitmap = cardConfig.backgroundBitmap.toSoftware(),
-            cutoutBitmap = cardConfig.cutoutBitmap.toSoftware()
+            cutoutBitmap = cardConfig.cutoutBitmap.toSoftware(),
+            watermarkBitmap = cardConfig.watermarkBitmap.toSoftware()
         )
 
         suspendCancellableCoroutine { continuation ->

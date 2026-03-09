@@ -17,12 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.Alignment
@@ -50,6 +50,7 @@ import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.model.ImagePosition
 import com.najmi.oreamnos.cardgen.model.StatItem
+import com.najmi.oreamnos.cardgen.ui.DraggableCanvasElement
 import com.najmi.oreamnos.cardgen.utils.ColorExtractor
 import com.najmi.oreamnos.cardgen.utils.GradientBuilder
 import com.najmi.oreamnos.ui.components.AutoSizeText
@@ -120,229 +121,249 @@ internal fun CardBackground(
         CompositionLocalProvider(
             LocalDensity provides Density(density = density.density, fontScale = density.fontScale * config.fontSizeMultiplier)
         ) {
-        when (config.imagePosition) {
-        ImagePosition.BACKGROUND -> {
-            // Original: Full background with scrim
-            Box(
-                modifier = modifier
-                    .background(GradientBuilder.vertical(config.colorPair))
-            ) {
-                if (config.backgroundBitmap != null) {
-                    Image(
-                        bitmap = config.backgroundBitmap.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                        alpha = config.imageOpacity
-                    )
-                    if (config.showScrim) {
+            Box(modifier = modifier) {
+                when (config.imagePosition) {
+                    ImagePosition.BACKGROUND -> {
+                        // Original: Full background with scrim
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(GradientBuilder.getScrim(config.scrimType, config.overlayOpacity))
-                        )
-                    }
-                }
-                content()
-            }
-        }
-
-        ImagePosition.SPLIT_LEFT -> {
-            // Image on left (60%), text on right - NBA quote card style
-            Box(modifier = modifier) {
-                Row(modifier = Modifier.fillMaxSize()) {
-                    // Left side - Image
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth(0.55f)
-                    ) {
-                        if (config.backgroundBitmap != null) {
-                            Image(
-                                bitmap = config.backgroundBitmap.asImageBitmap(),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
-                                alpha = config.imageOpacity
-                            )
-                            // Horizontal scrim darkening from left to right
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(GradientBuilder.horizontalScrim(config.overlayOpacity))
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(GradientBuilder.vertical(config.colorPair))
-                            )
+                                .background(GradientBuilder.vertical(config.colorPair))
+                        ) {
+                            if (config.backgroundBitmap != null) {
+                                Image(
+                                    bitmap = config.backgroundBitmap.asImageBitmap(),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .let { if (config.backgroundBlurRadius > 0f) it.blur(config.backgroundBlurRadius.dp) else it },
+                                    contentScale = ContentScale.Crop,
+                                    alpha = config.imageOpacity
+                                )
+                                if (config.showScrim) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(GradientBuilder.getScrim(config.scrimType, config.overlayOpacity))
+                                    )
+                                }
+                            }
+                            content()
                         }
                     }
-                    // Right side - Text content with gradient
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth()
-                            .background(
-                                Brush.horizontalGradient(
-                                    listOf(
-                                        Color.Black.copy(alpha = 0.7f),
-                                        Color.Black.copy(alpha = 0.9f)
-                                    )
-                                )
-                            )
-                    ) {
-                        content()
-                    }
-                }
-            }
-        }
 
-        ImagePosition.SPLIT_RIGHT -> {
-            // Image on right (60%), text on left - match highlights style
-            Box(modifier = modifier) {
-                Row(modifier = Modifier.fillMaxSize()) {
-                    // Left side - Text content with gradient
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth(0.45f)
-                            .background(
-                                Brush.horizontalGradient(
-                                    listOf(
-                                        Color.Black.copy(alpha = 0.9f),
-                                        Color.Black.copy(alpha = 0.7f)
+                    ImagePosition.SPLIT_LEFT -> {
+                        // Image on left (60%), text on right - NBA quote card style
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            // Left side - Image
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(0.55f)
+                            ) {
+                                if (config.backgroundBitmap != null) {
+                                    Image(
+                                        bitmap = config.backgroundBitmap.asImageBitmap(),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .let { if (config.backgroundBlurRadius > 0f) it.blur(config.backgroundBlurRadius.dp) else it },
+                                        contentScale = ContentScale.Crop,
+                                        alpha = config.imageOpacity
                                     )
-                                )
-                            )
-                    ) {
-                        content()
+                                    // Horizontal scrim darkening from left to right
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(GradientBuilder.horizontalScrim(config.overlayOpacity))
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(GradientBuilder.vertical(config.colorPair))
+                                    )
+                                }
+                            }
+                            // Right side - Text content with gradient
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .fillMaxWidth()
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            listOf(
+                                                Color.Black.copy(alpha = 0.7f),
+                                                Color.Black.copy(alpha = 0.9f)
+                                            )
+                                        )
+                                    )
+                            ) {
+                                content()
+                            }
+                        }
                     }
-                    // Right side - Image
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth()
-                    ) {
-                        if (config.backgroundBitmap != null) {
-                            Image(
-                                bitmap = config.backgroundBitmap.asImageBitmap(),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop,
-                                alpha = config.imageOpacity
-                            )
-                            // Reverse horizontal scrim
+
+                    ImagePosition.SPLIT_RIGHT -> {
+                        // Image on right (60%), text on left - match highlights style
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            // Left side - Text content with gradient
                             Box(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(GradientBuilder.reverseHorizontalScrim(config.overlayOpacity))
-                            )
-                        } else {
+                                    .fillMaxHeight()
+                                    .fillMaxWidth(0.45f)
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            listOf(
+                                                Color.Black.copy(alpha = 0.9f),
+                                                Color.Black.copy(alpha = 0.7f)
+                                            )
+                                        )
+                                    )
+                            ) {
+                                content()
+                            }
+                            // Right side - Image
                             Box(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(GradientBuilder.vertical(config.colorPair))
-                            )
+                                    .fillMaxHeight()
+                                    .fillMaxWidth()
+                            ) {
+                                if (config.backgroundBitmap != null) {
+                                    Image(
+                                        bitmap = config.backgroundBitmap.asImageBitmap(),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .let { if (config.backgroundBlurRadius > 0f) it.blur(config.backgroundBlurRadius.dp) else it },
+                                        contentScale = ContentScale.Crop,
+                                        alpha = config.imageOpacity
+                                    )
+                                    // Reverse horizontal scrim
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(GradientBuilder.reverseHorizontalScrim(config.overlayOpacity))
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(GradientBuilder.vertical(config.colorPair))
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    ImagePosition.OVERLAY_TOP -> {
+                        // Full-bleed image with text at bottom - player spotlight style
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            // Full image background
+                            if (config.backgroundBitmap != null) {
+                                Image(
+                                    bitmap = config.backgroundBitmap.asImageBitmap(),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                    alpha = config.imageOpacity
+                                )
+                                if (config.showScrim) {
+                                    // Bottom-heavy scrim for text legibility
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(GradientBuilder.lightScrim(config.overlayOpacity))
+                                    )
+                                }
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(GradientBuilder.vertical(config.colorPair))
+                                )
+                            }
+                            content()
+                        }
+                    }
+
+                    ImagePosition.CUTOUT -> {
+                        // Cutout mode - player image with transparent background, text beside/overlay
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(GradientBuilder.vertical(config.colorPair))
+                        ) {
+                            // Background image if present (will show through transparent areas)
+                            if (config.backgroundBitmap != null) {
+                                Image(
+                                    bitmap = config.backgroundBitmap.asImageBitmap(),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                    alpha = 0.3f
+                                )
+                            }
+                            
+                            // Cutout bitmap overlay (transparent PNG of player)
+                            if (config.cutoutBitmap != null) {
+                                Image(
+                                    bitmap = config.cutoutBitmap.asImageBitmap(),
+                                    contentDescription = "Player cutout",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(16.dp),
+                                    contentScale = ContentScale.Fit,
+                                    alpha = config.imageOpacity
+                                )
+                            }
+                            
+                            content()
+                        }
+                    }
+
+                    ImagePosition.MINIMAL -> {
+                        // Subtle background, prominent text
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(GradientBuilder.vertical(config.colorPair))
+                        ) {
+                            if (config.backgroundBitmap != null) {
+                                Image(
+                                    bitmap = config.backgroundBitmap.asImageBitmap(),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .graphicsLayer { alpha = 0.25f },
+                                    contentScale = ContentScale.Crop
+                                )
+                                if (config.showScrim) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(GradientBuilder.minimalScrim(config.overlayOpacity))
+                                    )
+                                }
+                            }
+                            content()
                         }
                     }
                 }
-            }
-        }
 
-        ImagePosition.OVERLAY_TOP -> {
-            // Full-bleed image with text at bottom - player spotlight style
-            Box(modifier = modifier.fillMaxSize()) {
-                // Full image background
-                if (config.backgroundBitmap != null) {
+                // Watermark Branding Overlay
+                if (config.watermarkBitmap != null) {
                     Image(
-                        bitmap = config.backgroundBitmap.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                        alpha = config.imageOpacity
-                    )
-                    if (config.showScrim) {
-                        // Bottom-heavy scrim for text legibility
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(GradientBuilder.lightScrim(config.overlayOpacity))
-                        )
-                    }
-                } else {
-                    Box(
+                        bitmap = config.watermarkBitmap.asImageBitmap(),
+                        contentDescription = "Watermark",
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(GradientBuilder.vertical(config.colorPair))
+                            .align(Alignment.BottomEnd)
+                            .padding(12.dp)
+                            .size(60.dp),
+                        alpha = 0.6f
                     )
                 }
-                content()
             }
-        }
-
-        ImagePosition.CUTOUT -> {
-            // Cutout mode - player image with transparent background, text beside/overlay
-            Box(
-                modifier = modifier
-                    .background(GradientBuilder.vertical(config.colorPair))
-            ) {
-                // Background image if present (will show through transparent areas)
-                if (config.backgroundBitmap != null) {
-                    Image(
-                        bitmap = config.backgroundBitmap.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                        alpha = 0.3f
-                    )
-                }
-                
-                // Cutout bitmap overlay (transparent PNG of player)
-                if (config.cutoutBitmap != null) {
-                    Image(
-                        bitmap = config.cutoutBitmap.asImageBitmap(),
-                        contentDescription = "Player cutout",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentScale = ContentScale.Fit,
-                        alpha = config.imageOpacity
-                    )
-                }
-                
-                content()
-            }
-        }
-
-        ImagePosition.MINIMAL -> {
-            // Subtle background, prominent text
-            Box(
-                modifier = modifier
-                    .background(GradientBuilder.vertical(config.colorPair))
-            ) {
-                if (config.backgroundBitmap != null) {
-                    Image(
-                        bitmap = config.backgroundBitmap.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer { alpha = 0.25f },
-                        contentScale = ContentScale.Crop
-                    )
-                    if (config.showScrim) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(GradientBuilder.minimalScrim(config.overlayOpacity))
-                        )
-                    }
-                }
-                content()
-            }
-        }
-    }
         }
     }
 }
@@ -358,96 +379,103 @@ internal fun CardBackground(
 fun HeadlineQuoteCanvas(
     data: CardData.HeadlineQuote,
     config: CardConfig,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onOffsetChange: (String, Pair<Float, Float>) -> Unit = { _, _ -> }
 ) {
     CardBackground(
         config = config,
         modifier = modifier.aspectRatio(1f)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp)
+        DraggableCanvasElement(
+            elementId = "headline_quote",
+            cardConfig = config,
+            onOffsetChange = onOffsetChange,
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Top branding
-            Text(
-                text = "HEADLINE",
-                color = CardTextMuted,
-                style = MaterialTheme.typography.labelSmall,
-                letterSpacing = 3.sp
-            )
-            
-            Spacer(modifier = Modifier.weight(1f))
-            
-            // The Quote
-            Row(modifier = Modifier.fillMaxWidth()) {
-                // Large quote mark graphic
-                Canvas(modifier = Modifier.size(32.dp)) {
-                    val w = size.width
-                    val h = size.height
-                    val stroke = Stroke(width = 4.dp.toPx())
-                    
-                    drawArc(
-                        color = Color(0xFFFFD100), // Gold accent
-                        startAngle = 180f, sweepAngle = 180f,
-                        useCenter = false,
-                        topLeft = Offset(0f, 0f),
-                        size = Size(w * 0.4f, h * 0.5f),
-                        style = stroke
-                    )
-                    drawArc(
-                        color = Color(0xFFFFD100),
-                        startAngle = 180f, sweepAngle = 180f,
-                        useCenter = false,
-                        topLeft = Offset(w * 0.5f, 0f),
-                        size = Size(w * 0.4f, h * 0.5f),
-                        style = stroke
-                    )
-                }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
+            ) {
+                // Top branding
+                Text(
+                    text = "HEADLINE",
+                    color = CardTextMuted,
+                    style = MaterialTheme.typography.labelSmall,
+                    letterSpacing = 3.sp
+                )
                 
-                Column(modifier = Modifier.weight(1f)) {
-                    if (data.quoteAuthor.isNotBlank()) {
-                        Text(
-                            text = data.quoteAuthor.uppercase(),
-                            color = Color(0xFFFFD100),
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Spacer(modifier = Modifier.weight(1f))
+                
+                // The Quote
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    // Large quote mark graphic
+                    Canvas(modifier = Modifier.size(32.dp)) {
+                        val w = size.width
+                        val h = size.height
+                        val stroke = Stroke(width = 4.dp.toPx())
+                        
+                        drawArc(
+                            color = Color(0xFFFFD100), // Gold accent
+                            startAngle = 180f, sweepAngle = 180f,
+                            useCenter = false,
+                            topLeft = Offset(0f, 0f),
+                            size = Size(w * 0.4f, h * 0.5f),
+                            style = stroke
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        drawArc(
+                            color = Color(0xFFFFD100),
+                            startAngle = 180f, sweepAngle = 180f,
+                            useCenter = false,
+                            topLeft = Offset(w * 0.5f, 0f),
+                            size = Size(w * 0.4f, h * 0.5f),
+                            style = stroke
+                        )
                     }
                     
-                    AutoSizeText(
-                        text = data.headline.uppercase(),
-                        color = CardTextPrimary,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Black,
-                            lineHeight = 36.sp
-                        ),
-                        maxLines = 4,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        if (data.quoteAuthor.isNotBlank()) {
+                            Text(
+                                text = data.quoteAuthor.uppercase(),
+                                color = Color(0xFFFFD100),
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                        
+                        AutoSizeText(
+                            text = data.headline.uppercase(),
+                            color = CardTextPrimary,
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Black,
+                                lineHeight = 36.sp
+                            ),
+                            maxLines = 4,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
-            }
-            
-            // Bottom spacer removed to anchor content
-            
-            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
-            
-            // Bottom Section: Context (Left)
-            Column(modifier = Modifier.fillMaxWidth()) {
-                if (data.subtext.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = data.subtext,
-                        color = CardTextSecondary,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                
+                // Bottom spacer removed to anchor content
+                
+                androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
+                
+                // Bottom Section: Context (Left)
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    if (data.subtext.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = data.subtext,
+                            color = CardTextSecondary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
 }
-
 /** Draws a stylised double-quotation mark using DrawScope lines. */
 private fun drawQuoteMark(scope: DrawScope, color: Color) {
     val strokeWidthPx = with(scope) { 4.dp.toPx() }
@@ -492,115 +520,123 @@ private fun drawQuoteMark(scope: DrawScope, color: Color) {
 fun PlayerSpotlightCanvas(
     data: CardData.PlayerSpotlight,
     config: CardConfig,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onOffsetChange: (String, Pair<Float, Float>) -> Unit = { _, _ -> }
 ) {
     CardBackground(
         config = config,
         modifier = modifier.aspectRatio(1f) // Square compact
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp)
+        DraggableCanvasElement(
+            elementId = "player_spotlight",
+            cardConfig = config,
+            onOffsetChange = onOffsetChange,
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Top branding
-            Text(
-                text = "PLAYER SPOTLIGHT",
-                color = CardTextMuted,
-                style = MaterialTheme.typography.labelSmall,
-                letterSpacing = 3.sp
-            )
-            
-            Spacer(modifier = Modifier.weight(1f))
-            
-            if (data.keyAction.isNotBlank() && data.keyAction != "—") {
-                androidx.compose.foundation.layout.Box(
-                    modifier = Modifier
-                        .background(Color(0xFFFFD100), MaterialTheme.shapes.small)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = data.keyAction.uppercase(),
-                        color = Color.Black,
-                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-                    )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            
-            // The Player Name (Center Stage if no photo)
-            AutoSizeText(
-                text = data.playerName.uppercase(),
-                color = CardTextPrimary,
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Black,
-                    lineHeight = 40.sp
-                ),
-                maxLines = 1,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            // Bottom spacer removed to anchor content
-            
-            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
-            
-            // Bottom Section: Context (Left) and Stats (Right)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
             ) {
-                // Author/Context Info
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = data.club.uppercase(),
-                        color = CardTextPrimary,
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                    )
-                    Text(
-                        text = data.position.uppercase(),
-                        color = CardTextMuted,
-                        style = MaterialTheme.typography.labelSmall,
-                        letterSpacing = 1.sp
-                    )
-                    if (data.keyQuote.isNotBlank() && data.keyQuote != "—") {
-                        Spacer(modifier = Modifier.height(8.dp))
+                // Top branding
+                Text(
+                    text = "PLAYER SPOTLIGHT",
+                    color = CardTextMuted,
+                    style = MaterialTheme.typography.labelSmall,
+                    letterSpacing = 3.sp
+                )
+                
+                Spacer(modifier = Modifier.weight(1f))
+                
+                if (data.keyAction.isNotBlank() && data.keyAction != "—") {
+                    androidx.compose.foundation.layout.Box(
+                        modifier = Modifier
+                            .background(Color(0xFFFFD100), MaterialTheme.shapes.small)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
                         Text(
-                            text = "\u201C${data.keyQuote}\u201D",
-                            color = CardTextSecondary,
-                            style = MaterialTheme.typography.bodySmall,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis
+                            text = data.keyAction.uppercase(),
+                            color = Color.Black,
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
                 
-                Spacer(modifier = Modifier.width(16.dp))
+                // The Player Name (Center Stage if no photo)
+                AutoSizeText(
+                    text = data.playerName.uppercase(),
+                    color = CardTextPrimary,
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Black,
+                        lineHeight = 40.sp
+                    ),
+                    maxLines = 1,
+                    modifier = Modifier.fillMaxWidth()
+                )
                 
-                // 4 Key Stats
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    val stats = listOf(
-                        StatItem(label = "Min", value = "${data.minutesPlayed}", context = ""),
-                        StatItem(label = "Gl", value = "${data.goals}", context = ""),
-                        StatItem(label = "Ast", value = "${data.assists}", context = ""),
-                        StatItem(label = "Rat", value = String.format("%.1f", data.rating), context = "")
-                    )
-                    stats.forEach { stat ->
-                        Column(horizontalAlignment = Alignment.End) {
+                // Bottom spacer removed to anchor content
+                
+                androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
+                
+                // Bottom Section: Context (Left) and Stats (Right)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    // Author/Context Info
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = data.club.uppercase(),
+                            color = CardTextPrimary,
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                        Text(
+                            text = data.position.uppercase(),
+                            color = CardTextMuted,
+                            style = MaterialTheme.typography.labelSmall,
+                            letterSpacing = 1.sp
+                        )
+                        if (data.keyQuote.isNotBlank() && data.keyQuote != "—") {
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = stat.value,
-                                color = Color(0xFFFFD100), // Gold
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Black,
-                                lineHeight = 28.sp
-                            )
-                            Text(
-                                text = stat.label.uppercase(),
+                                text = "\u201C${data.keyQuote}\u201D",
                                 color = CardTextSecondary,
-                                style = MaterialTheme.typography.labelSmall,
-                                letterSpacing = 1.sp
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis
                             )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                    
+                    Spacer(modifier = Modifier.width(16.dp))
+                    
+                    // 4 Key Stats
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        val stats = listOf(
+                            StatItem(label = "Min", value = "${data.minutesPlayed}", context = ""),
+                            StatItem(label = "Gl", value = "${data.goals}", context = ""),
+                            StatItem(label = "Ast", value = "${data.assists}", context = ""),
+                            StatItem(label = "Rat", value = String.format("%.1f", data.rating), context = "")
+                        )
+                        stats.forEach { stat ->
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text(
+                                    text = stat.value,
+                                    color = Color(0xFFFFD100), // Gold
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Black,
+                                    lineHeight = 28.sp
+                                )
+                                Text(
+                                    text = stat.label.uppercase(),
+                                    color = CardTextSecondary,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    letterSpacing = 1.sp
+                                )
+                            }
                         }
                     }
                 }

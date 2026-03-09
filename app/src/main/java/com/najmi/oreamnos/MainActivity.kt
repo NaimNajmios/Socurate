@@ -510,7 +510,7 @@ fun MainScreen(
             inputText = viewModel.currentInputText
             
             if (viewModel.autoGenerateFlag) {
-                if (prefsManager.hasApiKey()) {
+                if (prefsManager.hasApiKeyForCurrentProvider()) {
                     onGenerate(inputText, includeSource, keepStructure)
                 } else {
                     Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
@@ -839,7 +839,6 @@ fun MainScreen(
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Generate button in body
             val infiniteTransition = rememberInfiniteTransition(label = "generatePulse")
             val pulseScale = infiniteTransition.animateFloat(
                 initialValue = 1f,
@@ -859,7 +858,6 @@ fun MainScreen(
                 ),
                 label = "pulse_alpha"
             )
-            // Input Card
             val inputShakeOffset = animateFloatAsState(
                 targetValue = if (triggerInputShake) 1f else 0f,
                 animationSpec = if (triggerInputShake) {
@@ -871,34 +869,6 @@ fun MainScreen(
                     tween(0)
                 },
                 label = "inputShake"
-            )
-            // Generate button — now lives in the scrollable body, not the bottom bar
-            NeoButton(
-                onClick = {
-                    inputHasChanged = false
-                    if (inputText.isBlank()) {
-                        isInputError = true
-                        triggerInputShake = true
-                        HapticHelper(context).onError()
-                    } else if (!prefsManager.hasApiKey()) {
-                        Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
-                        onNavigateToSettings()
-                    } else {
-                        isLoading = true
-                        error = null
-                        onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
-                    }
-                },
-                text = "GENERATE",
-                isLoading = isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .graphicsLayer {
-                        val currentScale = if (inputHasChanged) pulseScale.value else 1f
-                        scaleX = currentScale
-                        scaleY = currentScale
-                        alpha = if (inputHasChanged) pulseAlpha.value else 1f
-                    }
             )
 
             val onInputChange = remember {
@@ -944,6 +914,35 @@ fun MainScreen(
                     isError = isInputError
                 )
             }
+
+            // Generate button — now repositioned BELOW the InputCard
+            NeoButton(
+                onClick = {
+                    inputHasChanged = false
+                    if (inputText.isBlank()) {
+                        isInputError = true
+                        triggerInputShake = true
+                        HapticHelper(context).onError()
+                    } else if (!prefsManager.hasApiKeyForCurrentProvider()) {
+                        Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
+                        onNavigateToSettings()
+                    } else {
+                        isLoading = true
+                        error = null
+                        onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                    }
+                },
+                text = "GENERATE",
+                isLoading = isLoading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        val currentScale = if (inputHasChanged) pulseScale.value else 1f
+                        scaleX = currentScale
+                        scaleY = currentScale
+                        alpha = if (inputHasChanged) pulseAlpha.value else 1f
+                    }
+            )
             
             // Loading State
             AnimatedVisibility(visible = isLoading, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {

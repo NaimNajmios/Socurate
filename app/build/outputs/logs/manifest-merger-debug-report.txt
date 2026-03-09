@@ -207,7 +207,7 @@ ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\Androi
 	android:targetActivity
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:43:13-58
 	android:icon
-		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:46:13-45
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:46:13-50
 	android:name
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:42:13-49
 intent-filter#action:name:android.intent.action.SEND+category:name:android.intent.category.DEFAULT+data:mimeType:text/plain
@@ -239,7 +239,7 @@ ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\Androi
 	android:targetActivity
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:64:13-58
 	android:icon
-		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:67:13-45
+		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:67:13-50
 	android:name
 		ADDED from C:\Users\NAIM\Documents\Personal\Project\Socurate\app\src\main\AndroidManifest.xml:63:13-45
 activity#com.najmi.oreamnos.SettingsActivity
