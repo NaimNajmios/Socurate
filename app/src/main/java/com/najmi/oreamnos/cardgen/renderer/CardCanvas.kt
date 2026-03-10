@@ -161,7 +161,10 @@ internal fun CardBackground(
 
     MaterialTheme(typography = scaledTypography) {
         CompositionLocalProvider(
-            LocalDensity provides Density(density = density.density, fontScale = density.fontScale * config.fontSizeMultiplier)
+            LocalDensity provides Density(
+                density = density.density * config.previewScale, 
+                fontScale = density.fontScale * config.fontSizeMultiplier
+            )
         ) {
             Box(modifier = modifier) {
                 when (config.imagePosition) {
@@ -364,7 +367,6 @@ internal fun CardBackground(
                                     alpha = config.imageOpacity
                                 )
                             }
-                            
                             content()
                         }
                     }
@@ -561,14 +563,14 @@ internal fun CardBackground(
                 }
 
                 // Watermark Branding Overlay
-                if (config.watermarkBitmap != null) {
+                if (config.watermarkBitmap != null && config.isWatermarkEnabled) {
                     Image(
                         bitmap = config.watermarkBitmap.asImageBitmap(),
                         contentDescription = "Watermark",
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(12.dp)
-                            .size(60.dp),
+                            .size(config.watermarkSize.dp),
                         alpha = 0.6f
                     )
                 }

@@ -127,9 +127,9 @@ fun DesignBottomSheet(
                 ) {
                     CardCanvas(
                         cardData = currentData,
-                        cardConfig = currentConfig,
+                        cardConfig = currentConfig.copy(previewScale = 0.45f),
                         modifier = Modifier
-                            .fillMaxWidth(0.5f) // Smaller preview
+                            .fillMaxWidth(0.6f) // Smaller preview
                             .aspectRatio(1f)
                             .clip(RoundedCornerShape(8.dp))
                     )
@@ -628,6 +628,49 @@ private fun GlobalDesignControls(
                     )
                 }
             }
+        }
+
+        if (currentConfig.watermarkUri != null) {
+            Spacer(Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "SHOW WATERMARK",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
+                Switch(
+                    checked = currentConfig.isWatermarkEnabled,
+                    onCheckedChange = { onConfigUpdate(currentConfig.copy(isWatermarkEnabled = it)) }
+                )
+            }
+            
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "WATERMARK SIZE",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
+                Text(
+                    text = "${currentConfig.watermarkSize.toInt()}DP",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Slider(
+                value = currentConfig.watermarkSize,
+                onValueChange = { onConfigUpdate(currentConfig.copy(watermarkSize = it)) },
+                valueRange = 20f..150f,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
 
         Spacer(Modifier.height(24.dp))

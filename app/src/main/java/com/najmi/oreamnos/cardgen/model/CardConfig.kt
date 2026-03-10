@@ -138,5 +138,11 @@ data class CardConfig(
     /** Whether to apply an outer glow to text instead of a drop shadow */
     val isGlowEnabled: Boolean = false,
     /** Photo filter applied to the background image */
-    val photoFilter: PhotoFilter = PhotoFilter.NONE
+    val photoFilter: PhotoFilter = PhotoFilter.NONE,
+    /** Scale factor for preview rendering (1.0 = full size) */
+    val previewScale: Float = 1.0f,
+    /** Default size for the watermark logo in DP */
+    val watermarkSize: Float = 60f,
+    /** Whether to show the watermark/logo on the card */
+    val isWatermarkEnabled: Boolean = true
 )
