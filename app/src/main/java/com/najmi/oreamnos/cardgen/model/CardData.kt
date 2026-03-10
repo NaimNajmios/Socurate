@@ -6,7 +6,7 @@ package com.najmi.oreamnos.cardgen.model
  *
  * All String fields are guaranteed non-null (extractor substitutes placeholders for missing/null values).
  */
-sealed class CardData {
+sealed class CardData(open val suggestedTemplate: CardTemplate? = null) {
 
     /**
      * Data for the Player Spotlight card.
@@ -21,8 +21,9 @@ sealed class CardData {
         val assists: Int,
         val minutesPlayed: Int,
         val keyAction: String,
-        val keyQuote: String
-    ) : CardData()
+        val keyQuote: String,
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
 
     /**
      * Data for the Headline / Quote card.
@@ -31,8 +32,9 @@ sealed class CardData {
     data class HeadlineQuote(
         val headline: String,
         val subtext: String,
-        val quoteAuthor: String
-    ) : CardData()
+        val quoteAuthor: String,
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
 
     /**
      * Data for the Top 3 Stats card.
@@ -40,8 +42,9 @@ sealed class CardData {
      */
     data class TopStats(
         val matchContext: String,
-        val stats: List<StatItem>
-    ) : CardData()
+        val stats: List<StatItem>,
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
 
     /**
      * Data for the Transfer News / Here We Go card.
@@ -54,8 +57,9 @@ sealed class CardData {
         val fee: String,
         val contractLength: String,
         val transferType: String,
-        val quote: String
-    ) : CardData()
+        val quote: String,
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
 
     /**
      * Data for the Breaking News / Flash card.
@@ -65,8 +69,9 @@ sealed class CardData {
         val headline: String,
         val subtext: String,
         val impactRating: Int, // 1 to 5
-        val relatedTeams: String
-    ) : CardData()
+        val relatedTeams: String,
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
 
     /**
      * Data for the Upcoming Match Preview card.
@@ -78,8 +83,9 @@ sealed class CardData {
         val homeForm: String, // e.g. "W-W-D-L-W"
         val awayForm: String,
         val matchTime: String,
-        val stadium: String
-    ) : CardData()
+        val stadium: String,
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
 
     /**
      * Data for the Detailed Scoreboard / Full-Time card.
@@ -94,8 +100,9 @@ sealed class CardData {
         val possession: String, // e.g. "55% - 45%"
         val shotsOnTarget: String, // e.g. "6 - 2"
         val competition: String,
-        val matchStatus: String // e.g. "FULL TIME", "AET"
-    ) : CardData()
+        val matchStatus: String, // e.g. "FULL TIME", "AET"
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
 
     /**
      * Data for the On This Day / Historical card.
@@ -105,8 +112,9 @@ sealed class CardData {
         val yearsAgo: Int,
         val competition: String,
         val headline: String,
-        val keyStats: List<StatItem>
-    ) : CardData()
+        val keyStats: List<StatItem>,
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
 
     /**
      * Data for the Starting XI / Lineup card.
@@ -118,8 +126,9 @@ sealed class CardData {
         val subs: List<LineupPlayer>,
         val manager: String,
         val averageAge: String,
-        val keyAbsences: String
-    ) : CardData()
+        val keyAbsences: String,
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
 }
 
 /**

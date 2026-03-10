@@ -29,6 +29,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,6 +69,10 @@ import com.najmi.oreamnos.cardgen.model.ImagePosition
 import com.najmi.oreamnos.cardgen.model.PresetBackground
 import com.najmi.oreamnos.cardgen.utils.ColorExtractor
 import com.najmi.oreamnos.cardgen.utils.GradientBuilder
+import com.najmi.oreamnos.cardgen.model.CardData
+import com.najmi.oreamnos.cardgen.ui.CardCanvas
+import com.najmi.oreamnos.cardgen.model.PhotoFilter
+import com.najmi.oreamnos.cardgen.renderer.toColorFilter
 
 /**
  * Bottom sheet for selecting the card design.
@@ -75,6 +81,7 @@ import com.najmi.oreamnos.cardgen.utils.GradientBuilder
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DesignBottomSheet(
+    currentData: CardData?,
     currentConfig: CardConfig,
     onConfigUpdate: (CardConfig) -> Unit,
     onShuffleDesign: () -> Unit,
@@ -105,8 +112,29 @@ fun DesignBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(bottom = 24.dp)
         ) {
+            // --- Sticky Preview ---
+            if (currentData != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CardCanvas(
+                        cardData = currentData,
+                        cardConfig = currentConfig,
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f) // Smaller preview
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                }
+            }
+
             Text(
                 text = "CARDS DESIGN",
                 style = MaterialTheme.typography.titleMedium,
@@ -175,7 +203,8 @@ private fun GradientTab(
             columns = GridCells.Fixed(3),
             contentPadding = PaddingValues(4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.height(240.dp)
         ) {
             items(ColorExtractor.presetSwatches) { (name, start, end) ->
                 val isSelected = currentConfig.colorPair == Pair(start, end)
@@ -453,6 +482,31 @@ private fun GlobalDesignControls(
 
         Spacer(Modifier.height(16.dp))
 
+        // --- Photo Filters ---
+        Text(
+            text = "PHOTO FILTER",
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            val filterOptions = PhotoFilter.entries.take(4) // Just the main ones to fit Row
+            filterOptions.forEach { filter ->
+                val isSelected = currentConfig.photoFilter == filter
+                com.najmi.oreamnos.ui.components.NeoChip(
+                    text = filter.name.replace("_", " "),
+                    selected = isSelected,
+                    onClick = { onConfigUpdate(currentConfig.copy(photoFilter = filter)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
         // Background Blur
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -500,6 +554,48 @@ private fun GlobalDesignControls(
                     modifier = Modifier.weight(1f)
                 )
             }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // --- Text Shadow / Glow ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "TEXT SHADOW / GLOW",
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            )
+            Text(
+                text = "${currentConfig.textShadowRadius.toInt()}PX",
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        Slider(
+            value = currentConfig.textShadowRadius,
+            onValueChange = { onConfigUpdate(currentConfig.copy(textShadowRadius = it)) },
+            valueRange = 0f..20f,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "OUTER GLOW MODE",
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            )
+            Switch(
+                checked = currentConfig.isGlowEnabled,
+                onCheckedChange = { onConfigUpdate(currentConfig.copy(isGlowEnabled = it)) }
+            )
         }
         
         Spacer(Modifier.height(24.dp))

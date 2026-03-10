@@ -284,6 +284,18 @@ class CardGeneratorViewModel : ViewModel() {
                 val result = extractor.extract(_selectedTemplate.value, text, isRefresh)
                 _extractionState.value = if (result.isSuccess) {
                     val data = result.getOrThrow()
+                    
+                    // Smart Template Suggestion logic:
+                    // If the AI suggests a different template and it's not a manual refresh,
+                    // we switch to that template.
+                    val suggested = data.suggestedTemplate
+                    if (suggested != null && suggested != _selectedTemplate.value && !isRefresh) {
+                        _selectedTemplate.value = suggested
+                        // Note: In a production app, we might want to trigger a second extraction
+                        // here with the correct template schema, but for now we'll switch
+                        // to the layout and let the user see the suggested fit.
+                    }
+                    
                     _mutableCardData.value = data // Cache for live editing
                     ExtractionState.Success(data)
                 } else {
@@ -498,7 +510,10 @@ class CardGeneratorViewModel : ViewModel() {
             primaryFontFamilyName = availableFonts.random(),
             imagePosition = com.najmi.oreamnos.cardgen.model.ImagePosition.entries.random(),
             overlayOpacity = Random.nextFloat() * (0.8f - 0.2f) + 0.2f, // 0.2f to 0.8f
-            scrimType = availableScrims.random()
+            scrimType = availableScrims.random(),
+            photoFilter = com.najmi.oreamnos.cardgen.model.PhotoFilter.entries.random(),
+            textShadowRadius = Random.nextFloat() * 12f,
+            isGlowEnabled = Random.nextBoolean()
         )
         
         _cardConfig.value = newConfig

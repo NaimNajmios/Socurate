@@ -251,7 +251,9 @@ fun CardGeneratorScreen(
     // ── Sheets ─────────────────────────────────────────────────
 
     if (showBackgroundSheet) {
+        val cardData by cardViewModel.mutableCardData.collectAsState()
         DesignBottomSheet(
+            currentData = cardData,
             currentConfig = cardConfig,
             onConfigUpdate = { newConfig ->
                 cardViewModel.updateConfig(newConfig)

@@ -81,6 +81,17 @@ enum class PresetBackground(val resourceName: String) {
 }
 
 /**
+ * Professional photo filters for background images.
+ */
+enum class PhotoFilter(val displayName: String) {
+    NONE("None"),
+    BLACK_WHITE("B&W"),
+    VINTAGE("Vintage"),
+    VIBRANT("Vibrant"),
+    HIGH_CONTRAST("High Contrast")
+}
+
+/**
  * Full configuration for a card currently being generated.
  * Drives both the live preview and the final bitmap export.
  */
@@ -119,5 +130,13 @@ data class CardConfig(
     /** Optional URI to a user-uploaded watermark to overlay on the exported card */
     val watermarkUri: String? = null,
     /** Decoded bitmap for the watermark overlay */
-    val watermarkBitmap: Bitmap? = null
+    val watermarkBitmap: Bitmap? = null,
+    /** Text shadow radius (0f means no shadow) */
+    val textShadowRadius: Float = 0f,
+    /** Text shadow color */
+    val textShadowColor: Color = Color.Black.copy(alpha = 0.5f),
+    /** Whether to apply an outer glow to text instead of a drop shadow */
+    val isGlowEnabled: Boolean = false,
+    /** Photo filter applied to the background image */
+    val photoFilter: PhotoFilter = PhotoFilter.NONE
 )

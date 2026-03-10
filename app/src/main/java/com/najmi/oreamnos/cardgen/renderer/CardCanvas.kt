@@ -32,6 +32,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -49,6 +52,7 @@ import androidx.compose.ui.unit.times
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.model.ImagePosition
+import com.najmi.oreamnos.cardgen.model.PhotoFilter
 import com.najmi.oreamnos.cardgen.model.StatItem
 import com.najmi.oreamnos.cardgen.ui.DraggableCanvasElement
 import com.najmi.oreamnos.cardgen.utils.ColorExtractor
@@ -74,6 +78,36 @@ internal val CardTextMuted = Color.White.copy(alpha = 0.55f)
 internal fun Int.scaleSp(multiplier: Float): TextUnit = (this * multiplier).sp
 
 /**
+ * Maps [PhotoFilter] to Compose [ColorFilter].
+ */
+internal fun PhotoFilter.toColorFilter(): ColorFilter? = when (this) {
+    PhotoFilter.NONE -> null
+    PhotoFilter.BLACK_WHITE -> ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
+    PhotoFilter.VINTAGE -> ColorFilter.colorMatrix(ColorMatrix().apply {
+        // Subtle sepia/vintage tones
+        val matrix = floatArrayOf(
+            0.9f, 0.5f, 0.1f, 0f, 0f,
+            0.3f, 0.8f, 0.1f, 0f, 0f,
+            0.2f, 0.3f, 0.5f, 0f, 0f,
+            0f, 0f, 0f, 1f, 0f
+        )
+        set(ColorMatrix(matrix))
+    })
+    PhotoFilter.VIBRANT -> ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(1.8f) })
+    PhotoFilter.HIGH_CONTRAST -> ColorFilter.colorMatrix(ColorMatrix().apply {
+        val contrast = 1.5f
+        val translate = (-0.5f * contrast + 0.5f) * 255f
+        val matrix = floatArrayOf(
+            contrast, 0f, 0f, 0f, translate,
+            0f, contrast, 0f, 0f, translate,
+            0f, 0f, contrast, 0f, translate,
+            0f, 0f, 0f, 1f, 0f
+        )
+        set(ColorMatrix(matrix))
+    })
+}
+
+/**
  * Returns scaled sp value from a TextUnit based on multiplier.
  */
 internal fun TextUnit.scaleSp(multiplier: Float): TextUnit = (this.value * multiplier).sp
@@ -97,24 +131,32 @@ internal fun CardBackground(
         else -> null
     }
 
-    // Apply scaling and optionally override the font family
+    // Apply scaling, shadows, and optionally override the font family
+    val textShadow = if (config.textShadowRadius > 0f) {
+        Shadow(
+            color = config.textShadowColor,
+            offset = if (config.isGlowEnabled) Offset.Zero else Offset(2f, 2f),
+            blurRadius = config.textShadowRadius
+        )
+    } else null
+
     val baseTypography = MaterialTheme.typography
     val scaledTypography = Typography(
-        displayLarge = baseTypography.displayLarge.copy(fontSize = baseTypography.displayLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.displayLarge.fontFamily),
-        displayMedium = baseTypography.displayMedium.copy(fontSize = baseTypography.displayMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.displayMedium.fontFamily),
-        displaySmall = baseTypography.displaySmall.copy(fontSize = baseTypography.displaySmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.displaySmall.fontFamily),
-        headlineLarge = baseTypography.headlineLarge.copy(fontSize = baseTypography.headlineLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.headlineLarge.fontFamily),
-        headlineMedium = baseTypography.headlineMedium.copy(fontSize = baseTypography.headlineMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.headlineMedium.fontFamily),
-        headlineSmall = baseTypography.headlineSmall.copy(fontSize = baseTypography.headlineSmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.headlineSmall.fontFamily),
-        titleLarge = baseTypography.titleLarge.copy(fontSize = baseTypography.titleLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.titleLarge.fontFamily),
-        titleMedium = baseTypography.titleMedium.copy(fontSize = baseTypography.titleMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.titleMedium.fontFamily),
-        titleSmall = baseTypography.titleSmall.copy(fontSize = baseTypography.titleSmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.titleSmall.fontFamily),
-        bodyLarge = baseTypography.bodyLarge.copy(fontSize = baseTypography.bodyLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.bodyLarge.fontFamily),
-        bodyMedium = baseTypography.bodyMedium.copy(fontSize = baseTypography.bodyMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.bodyMedium.fontFamily),
-        bodySmall = baseTypography.bodySmall.copy(fontSize = baseTypography.bodySmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.bodySmall.fontFamily),
-        labelLarge = baseTypography.labelLarge.copy(fontSize = baseTypography.labelLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.labelLarge.fontFamily),
-        labelMedium = baseTypography.labelMedium.copy(fontSize = baseTypography.labelMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.labelMedium.fontFamily),
-        labelSmall = baseTypography.labelSmall.copy(fontSize = baseTypography.labelSmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.labelSmall.fontFamily)
+        displayLarge = baseTypography.displayLarge.copy(fontSize = baseTypography.displayLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.displayLarge.fontFamily, shadow = textShadow),
+        displayMedium = baseTypography.displayMedium.copy(fontSize = baseTypography.displayMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.displayMedium.fontFamily, shadow = textShadow),
+        displaySmall = baseTypography.displaySmall.copy(fontSize = baseTypography.displaySmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.displaySmall.fontFamily, shadow = textShadow),
+        headlineLarge = baseTypography.headlineLarge.copy(fontSize = baseTypography.headlineLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.headlineLarge.fontFamily, shadow = textShadow),
+        headlineMedium = baseTypography.headlineMedium.copy(fontSize = baseTypography.headlineMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.headlineMedium.fontFamily, shadow = textShadow),
+        headlineSmall = baseTypography.headlineSmall.copy(fontSize = baseTypography.headlineSmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.headlineSmall.fontFamily, shadow = textShadow),
+        titleLarge = baseTypography.titleLarge.copy(fontSize = baseTypography.titleLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.titleLarge.fontFamily, shadow = textShadow),
+        titleMedium = baseTypography.titleMedium.copy(fontSize = baseTypography.titleMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.titleMedium.fontFamily, shadow = textShadow),
+        titleSmall = baseTypography.titleSmall.copy(fontSize = baseTypography.titleSmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.titleSmall.fontFamily, shadow = textShadow),
+        bodyLarge = baseTypography.bodyLarge.copy(fontSize = baseTypography.bodyLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.bodyLarge.fontFamily, shadow = textShadow),
+        bodyMedium = baseTypography.bodyMedium.copy(fontSize = baseTypography.bodyMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.bodyMedium.fontFamily, shadow = textShadow),
+        bodySmall = baseTypography.bodySmall.copy(fontSize = baseTypography.bodySmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.bodySmall.fontFamily, shadow = textShadow),
+        labelLarge = baseTypography.labelLarge.copy(fontSize = baseTypography.labelLarge.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.labelLarge.fontFamily, shadow = textShadow),
+        labelMedium = baseTypography.labelMedium.copy(fontSize = baseTypography.labelMedium.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.labelMedium.fontFamily, shadow = textShadow),
+        labelSmall = baseTypography.labelSmall.copy(fontSize = baseTypography.labelSmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.labelSmall.fontFamily, shadow = textShadow)
     )
 
     MaterialTheme(typography = scaledTypography) {
@@ -138,7 +180,8 @@ internal fun CardBackground(
                                         .fillMaxSize()
                                         .let { if (config.backgroundBlurRadius > 0f) it.blur(config.backgroundBlurRadius.dp) else it },
                                     contentScale = ContentScale.Crop,
-                                    alpha = config.imageOpacity
+                                    alpha = config.imageOpacity,
+                                    colorFilter = config.photoFilter.toColorFilter()
                                 )
                                 if (config.showScrim) {
                                     Box(
@@ -169,7 +212,8 @@ internal fun CardBackground(
                                             .fillMaxSize()
                                             .let { if (config.backgroundBlurRadius > 0f) it.blur(config.backgroundBlurRadius.dp) else it },
                                         contentScale = ContentScale.Crop,
-                                        alpha = config.imageOpacity
+                                        alpha = config.imageOpacity,
+                                        colorFilter = config.photoFilter.toColorFilter()
                                     )
                                     // Horizontal scrim darkening from left to right
                                     Box(
@@ -237,7 +281,8 @@ internal fun CardBackground(
                                             .fillMaxSize()
                                             .let { if (config.backgroundBlurRadius > 0f) it.blur(config.backgroundBlurRadius.dp) else it },
                                         contentScale = ContentScale.Crop,
-                                        alpha = config.imageOpacity
+                                        alpha = config.imageOpacity,
+                                        colorFilter = config.photoFilter.toColorFilter()
                                     )
                                     // Reverse horizontal scrim
                                     Box(
@@ -266,7 +311,8 @@ internal fun CardBackground(
                                     contentDescription = null,
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop,
-                                    alpha = config.imageOpacity
+                                    alpha = config.imageOpacity,
+                                    colorFilter = config.photoFilter.toColorFilter()
                                 )
                                 if (config.showScrim) {
                                     // Bottom-heavy scrim for text legibility
@@ -301,7 +347,8 @@ internal fun CardBackground(
                                     contentDescription = null,
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop,
-                                    alpha = 0.3f
+                                    alpha = 0.3f,
+                                    colorFilter = config.photoFilter.toColorFilter()
                                 )
                             }
                             
@@ -336,7 +383,8 @@ internal fun CardBackground(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .graphicsLayer { alpha = 0.25f },
-                                    contentScale = ContentScale.Crop
+                                    contentScale = ContentScale.Crop,
+                                    colorFilter = config.photoFilter.toColorFilter()
                                 )
                                 if (config.showScrim) {
                                     Box(
@@ -363,7 +411,8 @@ internal fun CardBackground(
                                     contentDescription = null,
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop,
-                                    alpha = config.imageOpacity
+                                    alpha = config.imageOpacity,
+                                    colorFilter = config.photoFilter.toColorFilter()
                                 )
                                 if (config.showScrim) {
                                     Box(
@@ -414,7 +463,8 @@ internal fun CardBackground(
                                         contentDescription = null,
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop,
-                                        alpha = config.imageOpacity
+                                        alpha = config.imageOpacity,
+                                        colorFilter = config.photoFilter.toColorFilter()
                                     )
                                 }
                             }
@@ -455,7 +505,8 @@ internal fun CardBackground(
                                         contentDescription = null,
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop,
-                                        alpha = config.imageOpacity
+                                        alpha = config.imageOpacity,
+                                        colorFilter = config.photoFilter.toColorFilter()
                                     )
                                 }
                             }
@@ -483,7 +534,8 @@ internal fun CardBackground(
                                         .fillMaxSize()
                                         .blur(20.dp),
                                     contentScale = ContentScale.Crop,
-                                    alpha = config.imageOpacity
+                                    alpha = config.imageOpacity,
+                                    colorFilter = config.photoFilter.toColorFilter()
                                 )
                             } else {
                                 Box(

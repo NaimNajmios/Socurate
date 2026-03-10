@@ -188,6 +188,21 @@ class CardDataExtractor(private val context: Context) {
         return null
     }
 
+    private fun mapIntentToTemplate(intent: String?): CardTemplate? {
+        return when (intent?.uppercase()) {
+            "PLAYER" -> CardTemplate.PlayerSpotlight
+            "HEADLINE" -> CardTemplate.HeadlineQuote
+            "STATS" -> CardTemplate.TopStats
+            "TRANSFER" -> CardTemplate.TransferNews
+            "BREAKING" -> CardTemplate.BreakingNews
+            "PREVIEW" -> CardTemplate.MatchPreview
+            "FULL_TIME" -> CardTemplate.DetailedScoreboard
+            "HISTORY" -> CardTemplate.OnThisDay
+            "LINEUP" -> CardTemplate.StartingXI
+            else -> null
+        }
+    }
+
     // ──────────────────────────────────────────────────────────────
     // Per-template parsers
     // ──────────────────────────────────────────────────────────────
@@ -202,7 +217,8 @@ class CardDataExtractor(private val context: Context) {
             assists = obj.optInt("assists", 0),
             minutesPlayed = obj.optInt("minutesPlayed", 0),
             keyAction = obj.optString("keyAction", UNKNOWN),
-            keyQuote = obj.optString("keyQuote", UNKNOWN)
+            keyQuote = obj.optString("keyQuote", UNKNOWN),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }
 
@@ -210,7 +226,8 @@ class CardDataExtractor(private val context: Context) {
         return CardData.HeadlineQuote(
             headline = obj.optString("headline", UNKNOWN),
             subtext = obj.optString("subtext", ""),
-            quoteAuthor = obj.optString("quoteAuthor", "")
+            quoteAuthor = obj.optString("quoteAuthor", ""),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }
 
@@ -241,7 +258,8 @@ class CardDataExtractor(private val context: Context) {
 
         return CardData.TopStats(
             matchContext = obj.optString("matchContext", ""),
-            stats = items
+            stats = items,
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }
 
@@ -254,7 +272,8 @@ class CardDataExtractor(private val context: Context) {
             fee = obj.optString("fee", UNKNOWN),
             contractLength = obj.optString("contractLength", ""),
             transferType = obj.optString("transferType", ""),
-            quote = obj.optString("quote", UNKNOWN)
+            quote = obj.optString("quote", UNKNOWN),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }
 
@@ -264,7 +283,8 @@ class CardDataExtractor(private val context: Context) {
             headline = obj.optString("headline", UNKNOWN),
             subtext = obj.optString("subtext", ""),
             impactRating = obj.optInt("impactRating", 3),
-            relatedTeams = obj.optString("relatedTeams", "")
+            relatedTeams = obj.optString("relatedTeams", ""),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }
 
@@ -276,7 +296,8 @@ class CardDataExtractor(private val context: Context) {
             homeForm = obj.optString("homeForm", ""),
             awayForm = obj.optString("awayForm", ""),
             matchTime = obj.optString("matchTime", UNKNOWN),
-            stadium = obj.optString("stadium", UNKNOWN)
+            stadium = obj.optString("stadium", UNKNOWN),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }
 
@@ -291,7 +312,8 @@ class CardDataExtractor(private val context: Context) {
             possession = obj.optString("possession", ""),
             shotsOnTarget = obj.optString("shotsOnTarget", ""),
             competition = obj.optString("competition", ""),
-            matchStatus = obj.optString("matchStatus", UNKNOWN)
+            matchStatus = obj.optString("matchStatus", UNKNOWN),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }
 
@@ -317,7 +339,8 @@ class CardDataExtractor(private val context: Context) {
             yearsAgo = obj.optInt("yearsAgo", 0),
             competition = obj.optString("competition", ""),
             headline = obj.optString("headline", UNKNOWN),
-            keyStats = items
+            keyStats = items,
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }
 
@@ -358,7 +381,8 @@ class CardDataExtractor(private val context: Context) {
             subs = subs,
             manager = obj.optString("manager", ""),
             averageAge = obj.optString("averageAge", ""),
-            keyAbsences = obj.optString("keyAbsences", "")
+            keyAbsences = obj.optString("keyAbsences", ""),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }
 

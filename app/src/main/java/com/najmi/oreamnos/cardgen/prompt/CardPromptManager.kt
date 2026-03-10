@@ -18,7 +18,9 @@ object CardPromptManager {
         "CRITICAL RULE 1: Translate ALL extracted text values into Malaysian Malay (Bahasa Malaysia) EXCEPT for proper nouns like player names, club names, or tournament acronyms. " +
         "CRITICAL RULE 2: ALWAYS use these accepted English football terms instead of making up stiff direct translations in Bahasa Malaysia. Do NOT translate: " +
         "'Clean Sheet', 'Offside', 'Hat-trick', 'Tackle', 'Assist', 'Playmaker', 'Derby', 'Comeback', 'Winger', 'Striker', 'Midfielder', 'Defender', 'Full-back', 'Center-back', 'Goalkeeper', 'Free-kick', 'Penalty', 'Corner Kicks', 'VAR', 'Counter-attack', 'Pressing', 'Cross', 'Header', 'Nutmeg', 'Dribble', 'Volley', 'Bicycle Kick', 'Man of the Match', 'Golden Boot', 'Pitch', 'Box-to-box', 'Sweeper', 'Target Man', 'False Nine', 'High Press', 'Through Ball', 'Overhead Kick'. " +
-        "CRITICAL RULE 3: If a specific piece of information (e.g., stats, dates, fees) is NOT explicitly mentioned in the text, you MUST return an empty string \"\" or 0 for numeric fields. Do NOT guess, infer, or provide placeholders like 'N/A', '-', or '—'."
+        "CRITICAL RULE 3: If a specific piece of information (e.g., stats, dates, fees) is NOT explicitly mentioned in the text, you MUST return an empty string \"\" or 0 for numeric fields. Do NOT guess, infer, or provide placeholders like 'N/A', '-', or '—'." +
+        "CRITICAL RULE 4: You MUST include a field called 'template_intent' in your JSON. This field should suggest the BEST card template (not necessarily the current one) based on the content. " +
+        "Values MUST be one of: 'PLAYER', 'HEADLINE', 'STATS', 'TRANSFER', 'BREAKING', 'PREVIEW', 'FULL_TIME', 'HISTORY', 'LINEUP'."
 
     fun buildPrompt(template: CardTemplate, articleText: String, isRefresh: Boolean = false): String {
         val schema = when (template) {
