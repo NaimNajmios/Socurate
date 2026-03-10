@@ -3,6 +3,7 @@ package com.najmi.oreamnos.cardgen.renderer
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,7 +45,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
@@ -347,6 +347,163 @@ internal fun CardBackground(
                                 }
                             }
                             content()
+                        }
+                    }
+
+                    ImagePosition.MAGAZINE_BOLD -> {
+                        // High-impact solid blocks with thick borders
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(GradientBuilder.vertical(config.colorPair))
+                        ) {
+                            if (config.backgroundBitmap != null) {
+                                Image(
+                                    bitmap = config.backgroundBitmap.asImageBitmap(),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                    alpha = config.imageOpacity
+                                )
+                                if (config.showScrim) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(GradientBuilder.getScrim(config.scrimType, config.overlayOpacity))
+                                    )
+                                }
+                            }
+                            // Text is housed in a bold rectangle
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp)
+                                    .background(
+                                        (config.accentColor ?: config.colorPair.first).copy(alpha = 0.9f),
+                                        RoundedCornerShape(0.dp)
+                                    )
+                                    .border(
+                                        4.dp,
+                                        Color.White.copy(alpha = 0.3f),
+                                        RoundedCornerShape(0.dp)
+                                    )
+                            ) {
+                                content()
+                            }
+                        }
+                    }
+
+                    ImagePosition.OFFSET_CARD -> {
+                        // Inset image with overlapping text card
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(GradientBuilder.vertical(config.colorPair))
+                        ) {
+                            // Inset background image
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize(0.85f)
+                                    .align(Alignment.TopStart)
+                                    .padding(16.dp)
+                                    .border(2.dp, CardBorder)
+                            ) {
+                                if (config.backgroundBitmap != null) {
+                                    Image(
+                                        bitmap = config.backgroundBitmap.asImageBitmap(),
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop,
+                                        alpha = config.imageOpacity
+                                    )
+                                }
+                            }
+                            
+                            // Overlapping text card
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.9f)
+                                    .fillMaxHeight(0.6f)
+                                    .align(Alignment.BottomEnd)
+                                    .padding(8.dp)
+                                    .background(Color.Black.copy(alpha = 0.95f), RoundedCornerShape(0.dp))
+                                    .border(1.dp, CardBorder)
+                            ) {
+                                content()
+                            }
+                        }
+                    }
+
+                    ImagePosition.BRUTALIST -> {
+                        // Raw grid, high contrast, no rounded corners
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .border(4.dp, Color.White)
+                        ) {
+                            // Left column: Image or Color
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .weight(0.4f)
+                                    .border(4.dp, Color.White)
+                                    .background(GradientBuilder.vertical(config.colorPair))
+                            ) {
+                                if (config.backgroundBitmap != null) {
+                                    Image(
+                                        bitmap = config.backgroundBitmap.asImageBitmap(),
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop,
+                                        alpha = config.imageOpacity
+                                    )
+                                }
+                            }
+                            // Right column: Pure black background for text
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .weight(0.6f)
+                                    .background(Color.Black)
+                            ) {
+                                content()
+                            }
+                        }
+                    }
+
+                    ImagePosition.FLOAT_WINDOW -> {
+                        // Floating window over blurred background
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            // Full background image with heavy blur
+                            if (config.backgroundBitmap != null) {
+                                Image(
+                                    bitmap = config.backgroundBitmap.asImageBitmap(),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .blur(20.dp),
+                                    contentScale = ContentScale.Crop,
+                                    alpha = config.imageOpacity
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(GradientBuilder.vertical(config.colorPair))
+                                        .blur(20.dp)
+                                )
+                            }
+                            
+                            // Floating window
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize(0.9f)
+                                    .align(Alignment.Center)
+                                    .background(Color.Black.copy(alpha = 0.85f), RoundedCornerShape(0.dp))
+                                    .border(2.dp, CardBorder)
+                            ) {
+                                content()
+                            }
                         }
                     }
                 }

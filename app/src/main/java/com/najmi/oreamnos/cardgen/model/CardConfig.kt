@@ -40,7 +40,19 @@ enum class ImagePosition(
     CUTOUT("Cutout Mode", "Transparent player image overlay"),
 
     /** Minimal background - image subtle in background, text prominent */
-    MINIMAL("Minimal", "Subtle background, prominent text")
+    MINIMAL("Minimal", "Subtle background, prominent text"),
+
+    /** High-impact solid color blocks with thick borders */
+    MAGAZINE_BOLD("Magazine Bold", "Bold solid blocks, 4dp borders"),
+
+    /** Layered depth with overlapping image and text boxes */
+    OFFSET_CARD("Offset Card", "Inset image, overlapping text card"),
+
+    /** Raw, high-contrast bold typography and grid blocks */
+    BRUTALIST("Brutalist", "High-contrast, no rounding, raw grid"),
+
+    /** Clean floating content window over blurred background */
+    FLOAT_WINDOW("Float Window", "Floating text box over blur")
 }
 
 /**

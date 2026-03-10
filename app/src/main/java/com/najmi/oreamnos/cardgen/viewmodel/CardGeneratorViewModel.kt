@@ -496,6 +496,7 @@ class CardGeneratorViewModel : ViewModel() {
 
         val newConfig = _cardConfig.value.copy(
             primaryFontFamilyName = availableFonts.random(),
+            imagePosition = com.najmi.oreamnos.cardgen.model.ImagePosition.entries.random(),
             overlayOpacity = Random.nextFloat() * (0.8f - 0.2f) + 0.2f, // 0.2f to 0.8f
             scrimType = availableScrims.random()
         )
