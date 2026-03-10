@@ -2,6 +2,6 @@
 <paths>
     <!-- Used by FileProvider to share exported card images via ACTION_SEND intent -->
     <cache-path
-        name="card_exports"
-        path="card_exports/" />
+        name="ocr_temp"
+        path="." />
 </paths>

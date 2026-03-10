@@ -233,6 +233,16 @@
     <string name="switch_and_retry">Switch &amp; Retry</string>
     <string name="wait_button">Wait</string>
     <string name="go_to_settings">Go to Settings</string>
+
+    <!-- OCR Feature -->
+    <string name="from_screenshot">From Screenshot</string>
+    <string name="import_from_screenshot">Import from Screenshot</string>
+    <string name="use_this_text">Use This Text</string>
+    <string name="ocr_error">OCR Error</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="extracted_text">Extracted Text</string>
+    <string name="camera_permission_rationale">Camera permission is required to take photos of match details for OCR.</string>
 </resources>
 
 

@@ -154,6 +154,42 @@ object PromptManager {
     }
 
     /**
+     * Builds a prompt specifically for text extracted via OCR from screenshots.
+     * Tells the AI to interpret the data as football stats or match details.
+     *
+     * @param ocrText   The text extracted from the screenshot
+     * @param tone      Post tone ("formal" or "casual")
+     * @param hashtags  Formatted hashtags to include (if any)
+     * @return The formatted prompt string
+     */
+    fun buildPromptFromOcr(ocrText: String, tone: String, hashtags: String): String {
+        val prompt = StringBuilder()
+        val toneDesc = if (tone == "formal") "formal, professional" else "engaging, conversational"
+        
+        prompt.append("You are a professional social media content writer for a Malaysian football club. ")
+        prompt.append("The following text was extracted via OCR from a matchday/stats screenshot. ")
+        prompt.append("Your task is to interpret this technical data and generate an engaging ")
+        prompt.append(toneDesc).append(" social media post in Malaysian Malay (Bahasa Malaysia) for our fans.\n\n")
+        
+        prompt.append("STRICT REQUIREMENTS:\n")
+        prompt.append("1. Write in Bahasa Malaysia (Malaysian Malay).\n")
+        prompt.append("2. Use standard English football terms for technical actions (e.g., 'Clean Sheet', 'Hat-trick', 'Assist', 'Tackle').\n")
+        prompt.append("3. Present the stats or match result in a clear, exciting way.\n")
+        prompt.append("4. Do NOT use em-dashes (—).\n")
+        prompt.append("5. Do NOT include any hashtags in the body.\n\n")
+
+        prompt.append("EXTRACTED OCR DATA:\n---\n")
+        prompt.append(ocrText).append("\n---\n\n")
+        
+        prompt.append("Provide ONLY the Bahasa Malaysia post. ")
+        if (hashtags.isNotEmpty()) {
+            prompt.append("After the post, add a double newline and append these hashtags: ").append(hashtags)
+        }
+        
+        return prompt.toString()
+    }
+
+    /**
      * Builds a refinement prompt based on selected options.
      *
      * @param originalPost  The original post to refine

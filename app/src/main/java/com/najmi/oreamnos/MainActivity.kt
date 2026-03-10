@@ -149,11 +149,13 @@ import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
 import com.najmi.oreamnos.ui.components.EmptyStateCard
 import com.najmi.oreamnos.ui.components.FluidRefinementFlow
 import com.najmi.oreamnos.ui.components.LinkPreviewSection
+import com.najmi.oreamnos.ui.components.OcrInputSheet
 import com.najmi.oreamnos.ui.components.PasteAction
 import com.najmi.oreamnos.ui.components.ClearAction
 import com.najmi.oreamnos.ui.components.SuccessOverlay
 import com.najmi.oreamnos.viewmodel.MainViewModel
 import com.najmi.oreamnos.viewmodel.AppViewModel
+import com.najmi.oreamnos.viewmodel.OcrViewModel
 import androidx.compose.animation.animateContentSize
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -162,6 +164,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import com.najmi.oreamnos.cardgen.ui.CardGeneratorScreen
 import com.najmi.oreamnos.cardgen.viewmodel.CardGeneratorViewModel
 
@@ -496,6 +500,20 @@ fun MainScreen(
     // Input validation state
     var isInputError by remember { mutableStateOf(false) }
     var triggerInputShake by remember { mutableStateOf(false) }
+
+    // OCR State
+    val ocrViewModel: OcrViewModel = viewModel()
+    var showOcrSheet by remember { mutableStateOf(false) }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            showOcrSheet = true
+        } else {
+            Toast.makeText(context, R.string.camera_permission_rationale, Toast.LENGTH_LONG).show()
+        }
+    }
 
     
     // Load custom pills
@@ -911,7 +929,15 @@ fun MainScreen(
                     isLoadingPreview = isLoadingPreview,
                     onExtractContent = onExtractContent,
                     onDismissPreview = onDismissPreview,
-                    isError = isInputError
+                    isError = isInputError,
+                    onOcrClick = {
+                        val permission = android.Manifest.permission.CAMERA
+                        if (androidx.core.content.ContextCompat.checkSelfPermission(context, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                            showOcrSheet = true
+                        } else {
+                            cameraPermissionLauncher.launch(permission)
+                        }
+                    }
                 )
             }
 
@@ -1111,6 +1137,21 @@ fun MainScreen(
 
         // Success Animation Overlay
         SuccessOverlay(visible = showSuccessAnimation)
+
+        // OCR Input Sheet
+        if (showOcrSheet) {
+            OcrInputSheet(
+                viewModel = ocrViewModel,
+                onConfirm = { text ->
+                    inputText = text
+                    if (isInputError) isInputError = false
+                    inputHasChanged = true
+                },
+                onDismiss = {
+                    showOcrSheet = false
+                }
+            )
+        }
     }
 }
 
@@ -1125,7 +1166,8 @@ fun InputCard(
     isLoadingPreview: Boolean,
     onExtractContent: (String) -> Unit,
     onDismissPreview: () -> Unit,
-    isError: Boolean = false
+    isError: Boolean = false,
+    onOcrClick: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -1213,6 +1255,15 @@ fun InputCard(
                     onCheckedChange = onKeepStructureChange
                 )
             }
+
+            Spacer(Modifier.height(16.dp))
+
+            NeoChip(
+                text = "FROM SCREENSHOT",
+                selected = false,
+                onClick = onOcrClick,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             // Animated Link Preview Section
             AnimatedVisibility(
