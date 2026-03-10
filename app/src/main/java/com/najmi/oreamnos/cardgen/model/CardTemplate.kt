@@ -66,8 +66,8 @@ sealed class CardTemplate(
         /** All templates in display order. Lazy to avoid class init order NPE. */
         val all: List<CardTemplate> by lazy {
             listOf(
-                PlayerSpotlight, HeadlineQuote, TopStats,
-                TransferNews, BreakingNews, MatchPreview, DetailedScoreboard, OnThisDay, StartingXI
+                HeadlineQuote, BreakingNews, PlayerSpotlight, TopStats,
+                OnThisDay, TransferNews, MatchPreview, StartingXI, DetailedScoreboard
             )
         }
     }
