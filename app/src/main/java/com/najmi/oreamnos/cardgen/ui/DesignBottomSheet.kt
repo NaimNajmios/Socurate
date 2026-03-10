@@ -428,52 +428,54 @@ private fun GlobalDesignControls(
             .padding(horizontal = 16.dp)
     ) {
         // Overlay Opacity
-        Text(
-            text = "OVERLAY OPACITY",
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-        )
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${(currentConfig.overlayOpacity * 100).toInt()}%",
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.width(40.dp)
+                text = "OVERLAY OPACITY",
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             )
-            Slider(
-                value = currentConfig.overlayOpacity,
-                onValueChange = { onConfigUpdate(currentConfig.copy(overlayOpacity = it)) },
-                valueRange = 0f..1f,
-                modifier = Modifier.weight(1f)
+            Text(
+                text = "${(currentConfig.overlayOpacity * 100).toInt()}%",
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.primary
             )
         }
+        Slider(
+            value = currentConfig.overlayOpacity,
+            onValueChange = { onConfigUpdate(currentConfig.copy(overlayOpacity = it)) },
+            valueRange = 0f..1f,
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(Modifier.height(16.dp))
 
         // Background Blur
-        Text(
-            text = "BACKGROUND BLUR",
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-        )
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${currentConfig.backgroundBlurRadius.toInt()}px",
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.width(40.dp)
+                text = "BACKGROUND BLUR",
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
             )
-            Slider(
-                value = currentConfig.backgroundBlurRadius,
-                onValueChange = { onConfigUpdate(currentConfig.copy(backgroundBlurRadius = it)) },
-                valueRange = 0f..25f,
-                modifier = Modifier.weight(1f)
+            Text(
+                text = "${currentConfig.backgroundBlurRadius.toInt()}PX",
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.primary
             )
         }
+        Slider(
+            value = currentConfig.backgroundBlurRadius,
+            onValueChange = { onConfigUpdate(currentConfig.copy(backgroundBlurRadius = it)) },
+            valueRange = 0f..25f,
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(Modifier.height(16.dp))
 

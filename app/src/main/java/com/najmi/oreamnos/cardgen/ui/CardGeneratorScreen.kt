@@ -352,12 +352,23 @@ private fun LayoutOptionsSection(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Font Size Slider
-        Text(
-            text = "FONT SIZE",
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-            letterSpacing = androidx.compose.ui.unit.TextUnit(2f, androidx.compose.ui.unit.TextUnitType.Sp)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "FONT SIZE",
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                letterSpacing = androidx.compose.ui.unit.TextUnit(2f, androidx.compose.ui.unit.TextUnitType.Sp)
+            )
+            Text(
+                text = String.format("%.1fx", cardConfig.fontSizeMultiplier),
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
         Slider(
             value = cardConfig.fontSizeMultiplier,
             onValueChange = { onConfigUpdate(cardConfig.copy(fontSizeMultiplier = it)) },
@@ -390,12 +401,23 @@ private fun LayoutOptionsSection(
         
         // Image Opacity
         if (cardConfig.backgroundBitmap != null || cardConfig.imagePosition == ImagePosition.MINIMAL) {
-            Text(
-                text = "IMAGE OPACITY",
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                letterSpacing = androidx.compose.ui.unit.TextUnit(2f, androidx.compose.ui.unit.TextUnitType.Sp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "IMAGE OPACITY",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    letterSpacing = androidx.compose.ui.unit.TextUnit(2f, androidx.compose.ui.unit.TextUnitType.Sp)
+                )
+                Text(
+                    text = "${(cardConfig.imageOpacity * 100).toInt()}%",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
             Slider(
                 value = cardConfig.imageOpacity,
                 onValueChange = { onConfigUpdate(cardConfig.copy(imageOpacity = it)) },
