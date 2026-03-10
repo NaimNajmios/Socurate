@@ -141,6 +141,16 @@ class PreferencesManager(context: Context) {
         return securePrefs.getBoolean(KEY_SOURCE_ENABLED, true)
     }
 
+    // ==================== WATERMARK ====================
+    
+    fun saveWatermarkPath(path: String?) {
+        securePrefs.edit().putString(KEY_SAVED_WATERMARK_PATH, path).apply()
+    }
+
+    fun getWatermarkPath(): String? {
+        return securePrefs.getString(KEY_SAVED_WATERMARK_PATH, null)
+    }
+
     // ==================== AI PROVIDER ====================
 
     fun saveProvider(provider: String) {
@@ -403,6 +413,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_PILLS = "generation_pills"
         private const val KEY_USAGE_STATS = "usage_stats"
         private const val KEY_TEXT_SIZE = "output_text_size"
+        private const val KEY_SAVED_WATERMARK_PATH = "saved_watermark_path"
 
         // Defaults
         private const val DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"

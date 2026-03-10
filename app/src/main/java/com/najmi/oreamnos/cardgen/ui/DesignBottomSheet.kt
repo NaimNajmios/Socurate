@@ -86,6 +86,7 @@ fun DesignBottomSheet(
     onConfigUpdate: (CardConfig) -> Unit,
     onShuffleDesign: () -> Unit,
     onWatermarkUpload: (android.net.Uri?) -> Unit,
+    onWatermarkClear: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -174,7 +175,8 @@ fun DesignBottomSheet(
                 onConfigUpdate = onConfigUpdate,
                 onShuffleDesign = onShuffleDesign,
                 onWatermarkClick = { watermarkLauncher.launch("image/*") },
-                onWatermarkUpload = onWatermarkUpload
+                onWatermarkUpload = onWatermarkUpload,
+                onWatermarkClear = onWatermarkClear
             )
         }
     }
@@ -449,7 +451,8 @@ private fun GlobalDesignControls(
     onConfigUpdate: (CardConfig) -> Unit,
     onShuffleDesign: () -> Unit,
     onWatermarkClick: () -> Unit,
-    onWatermarkUpload: (android.net.Uri?) -> Unit
+    onWatermarkUpload: (android.net.Uri?) -> Unit,
+    onWatermarkClear: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -617,7 +620,7 @@ private fun GlobalDesignControls(
                 modifier = Modifier.weight(1f)
             )
             if (currentConfig.watermarkUri != null) {
-                IconButton(onClick = { onWatermarkUpload(null) }) {
+                IconButton(onClick = onWatermarkClear) {
                     Icon(
                         imageVector = androidx.compose.material.icons.Icons.Default.Delete,
                         contentDescription = "Remove Watermark",

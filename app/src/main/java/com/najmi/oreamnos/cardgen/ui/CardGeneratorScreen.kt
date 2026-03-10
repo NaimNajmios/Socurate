@@ -98,6 +98,11 @@ fun CardGeneratorScreen(
     val selectedTemplate by cardViewModel.selectedTemplate.collectAsState()
     val extractionState by cardViewModel.extractionState.collectAsState()
     val cardConfig by cardViewModel.cardConfig.collectAsState()
+
+    // Initialize persistence
+    LaunchedEffect(Unit) {
+        cardViewModel.loadPersistentWatermark(context)
+    }
     val exportState by cardViewModel.exportState.collectAsState()
 
     // Sheet visibility
@@ -266,6 +271,9 @@ fun CardGeneratorScreen(
             },
             onWatermarkUpload = { uri ->
                 cardViewModel.setWatermarkUri(context, uri)
+            },
+            onWatermarkClear = {
+                cardViewModel.clearWatermark(context)
             },
             onDismiss = { showBackgroundSheet = false }
         )

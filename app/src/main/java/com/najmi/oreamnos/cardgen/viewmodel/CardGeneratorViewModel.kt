@@ -13,6 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+import java.io.File
+import java.io.FileOutputStream
+import android.graphics.BitmapFactory
+import com.najmi.oreamnos.utils.PreferencesManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 // ──────────────────────────────────────────────────────────────
 // State types
@@ -440,8 +446,79 @@ class CardGeneratorViewModel : ViewModel() {
                     watermarkUri = uri.toString(),
                     watermarkBitmap = bitmap
                 )
+
+                // Persist this watermark for future use
+                saveBitmapToInternalStorage(context, bitmap)?.let { path ->
+                    PreferencesManager(context).saveWatermarkPath(path)
+                }
             } catch (e: Exception) {
                 _extractionState.value = ExtractionState.Error("Gagal memuat watermark: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Clears the watermark from the current session and persistent storage.
+     */
+    fun clearWatermark(context: Context) {
+        _cardConfig.value = _cardConfig.value.copy(
+            watermarkUri = null,
+            watermarkBitmap = null
+        )
+        val prefs = PreferencesManager(context)
+        prefs.getWatermarkPath()?.let { path ->
+            try {
+                File(path).delete()
+            } catch (e: Exception) {
+                // Ignore delete errors
+            }
+        }
+        prefs.saveWatermarkPath(null)
+    }
+
+    /**
+     * Loads the persistent watermark from internal storage if it exists.
+     */
+    fun loadPersistentWatermark(context: Context) {
+        val path = PreferencesManager(context).getWatermarkPath() ?: return
+        
+        viewModelScope.launch {
+            try {
+                val file = File(path)
+                if (file.exists()) {
+                    val bitmap = withContext(Dispatchers.IO) {
+                        BitmapFactory.decodeFile(path)
+                    }
+                    if (bitmap != null) {
+                        _cardConfig.value = _cardConfig.value.copy(
+                            watermarkUri = android.net.Uri.fromFile(file).toString(),
+                            watermarkBitmap = bitmap
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                // Silently fail if persistent watermark cannot be loaded
+            }
+        }
+    }
+
+    /**
+     * Saves a bitmap to the app's internal files directory.
+     */
+    private suspend fun saveBitmapToInternalStorage(context: Context, bitmap: Bitmap): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val directory = File(context.filesDir, "watermarks")
+                if (!directory.exists()) directory.mkdirs()
+                
+                val file = File(directory, "default_watermark.png")
+                val out = FileOutputStream(file)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                out.flush()
+                out.close()
+                file.absolutePath
+            } catch (e: Exception) {
+                null
             }
         }
     }
