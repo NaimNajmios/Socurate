@@ -38,3 +38,6 @@
 
 # Keep Jsoup
 -keep class org.jsoup.** { *; }
+
+# JSpecify annotations
+-dontwarn org.jspecify.**

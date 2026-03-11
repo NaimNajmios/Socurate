@@ -1,58 +1,58 @@
 [
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/layout_shimmer_loading.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/layout_shimmer_loading.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/fragment_share_bottom_sheet.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/fragment_share_bottom_sheet.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/activity_share_receiver.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/activity_share_receiver.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/activity_main.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/activity_main.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/activity_main.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/activity_main.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/activity_share_receiver.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/activity_share_receiver.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/layout_empty_state.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/layout_empty_state.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/dialog_log_details.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/dialog_log_details.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/dialog_create_pill.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/dialog_create_pill.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/item_log_entry.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/item_log_entry.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/fragment_share_bottom_sheet.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/fragment_share_bottom_sheet.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/item_session_entry.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/item_session_entry.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/activity_settings.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/activity_settings.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/activity_usage.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/activity_usage.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/activity_usage.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/activity_usage.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/layout_shimmer_loading.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/layout_shimmer_loading.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/dialog_log_details.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/dialog_log_details.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/activity_settings.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/activity_settings.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/activity_hashtag_manager.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/activity_hashtag_manager.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/layout_empty_state.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/layout_empty_state.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/item_log_entry.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/item_log_entry.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/activity_hashtag_manager.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/activity_hashtag_manager.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/item_session_entry.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/item_session_entry.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/activity_log_list.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/activity_log_list.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/activity_session_list.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/activity_session_list.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/activity_session_list.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/activity_session_list.xml"
     },
     {
-        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-63:/layout/activity_log_list.xml",
-        "source": "com.najmi.oreamnos.app-main-65:/layout/activity_log_list.xml"
+        "merged": "com.najmi.oreamnos.app-mergeReleaseResources-65:/layout/dialog_create_pill.xml",
+        "source": "com.najmi.oreamnos.app-main-68:/layout/dialog_create_pill.xml"
     }
 ]

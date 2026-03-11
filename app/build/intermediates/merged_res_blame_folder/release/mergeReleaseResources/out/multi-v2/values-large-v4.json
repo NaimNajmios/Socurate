@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.najmi.oreamnos.app-mergeReleaseResources-62:/values-large-v4/values-large-v4.xml",
+            "outputFile": "com.najmi.oreamnos.app-mergeReleaseResources-64:/values-large-v4/values-large-v4.xml",
             "map": [
                 {
                     "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\8ec59684a75d200fc253ec19f6b95bd8\\transformed\\material-1.11.0\\res\\values-large-v4\\values-large-v4.xml",

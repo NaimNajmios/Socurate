@@ -57,7 +57,7 @@
     <string name="all_reset">Everything has been reset</string>
     <string name="all_sessions_title">Recent Sessions</string>
     <string name="all_time">All Time</string>
-    <string name="api_endpoint_default">https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent</string>
+    <string name="api_endpoint_default">https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent</string>
     <string name="api_endpoint_label">API Endpoint</string>
     <string name="api_error">API error: %1$s</string>
     <string name="api_key_help">Get your API key from https://ai.google.dev</string>
@@ -69,6 +69,8 @@
     <string name="app_description">Football news curator for Malaysian Malay content</string>
     <string name="app_name">Oreamnos</string>
     <string name="app_version">Version 1.0</string>
+    <string name="camera">Camera</string>
+    <string name="camera_permission_rationale">Camera permission is required to take photos of match details for OCR.</string>
     <string name="cancel_edit">Cancel</string>
     <string name="cerebras_api_key_hint">Enter your Cerebras API key</string>
     <string name="cerebras_api_key_label">Cerebras API Key</string>
@@ -104,8 +106,11 @@
     <string name="error_state_network">We lost the connection</string>
     <string name="error_state_title">Something went wrong</string>
     <string name="error_title">Error</string>
+    <string name="extracted_text">Extracted Text</string>
     <string name="extracting_content">Extracting content from URL…</string>
     <string name="failed_requests">Failed</string>
+    <string name="from_screenshot">From Screenshot</string>
+    <string name="gallery">Gallery</string>
     <string name="generate_background">Generate in background</string>
     <string name="generate_button">Generate Post</string>
     <string name="generated_draft">Generated Draft</string>
@@ -118,6 +123,7 @@
     <string name="hashtags_hint">e.g., #BolaSepak #Football #JDT</string>
     <string name="hashtags_label">Default Hashtags</string>
     <string name="hashtags_section">Hashtag Settings</string>
+    <string name="import_from_screenshot">Import from Screenshot</string>
     <string name="include_hashtags">Include hashtags</string>
     <string name="include_source">Include Source</string>
     <string name="include_title">Include title</string>
@@ -126,10 +132,10 @@
     <string name="input_required">Please enter some text or URL</string>
     <string name="invalid_url">Could not extract content from URL</string>
     <string name="logs_cleared">Logs cleared</string>
-    <string name="model_2_0_flash">Gemini 2.0 Flash</string>
-    <string name="model_2_5_flash">Gemini 2.5 Flash</string>
     <string name="model_2_5_flash_lite">Gemini 2.5 Flash Lite</string>
-    <string name="model_2_5_pro">Gemini 2.5 Pro</string>
+    <string name="model_3_1_flash_lite">Gemini 3.1 Flash Lite</string>
+    <string name="model_3_1_pro">Gemini 3.1 Pro</string>
+    <string name="model_3_flash">Gemini 3 Flash</string>
     <string name="model_label">AI Model</string>
     <string name="nav_generate">Generate</string>
     <string name="nav_settings">Settings</string>
@@ -146,6 +152,7 @@
     <string name="notification_error_title">Generation Failed</string>
     <string name="notification_generating_message">Creating your curated content…</string>
     <string name="notification_generating_title">Generating Post</string>
+    <string name="ocr_error">OCR Error</string>
     <string name="open_in_app">Open in Main App</string>
     <string name="openrouter_api_key_hint">Enter your OpenRouter API key</string>
     <string name="openrouter_api_key_label">OpenRouter API Key</string>
@@ -226,6 +233,7 @@
     <string name="total_tokens">Total Tokens Used</string>
     <string name="total_tokens_label">tokens used</string>
     <string name="try_again_button">Try Again</string>
+    <string name="use_this_text">Use This Text</string>
     <string name="view_all">View All</string>
     <string name="wait_button">Wait</string>
     <string name="warning_title">Warning</string>

@@ -1491,6 +1491,235 @@ library {
     value: 1
   }
 }
+library {
+  maven_library {
+    groupId: "com.google.mlkit"
+    artifactId: "text-recognition"
+    version: "16.0.0"
+  }
+  digests {
+    sha256: "\3207\365\205_\250Sd\036\235\264\323R5t\262\226t\221d\260%\271\344\265u@\241o$\223v"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.android.gms"
+    artifactId: "play-services-base"
+    version: "18.1.0"
+  }
+  digests {
+    sha256: "N\312V\316\354\3242Z7l\330C\257V7~#v\316(M\fo\005\245\320\250/L\033\370\315"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.android.gms"
+    artifactId: "play-services-basement"
+    version: "18.1.0"
+  }
+  digests {
+    sha256: "\003\272\025\363\206\317&\v\336r\374@\020\373\211\250 \304}Q\316c\274\t)~\253\346\314\340\233\335"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.android.gms"
+    artifactId: "play-services-tasks"
+    version: "18.0.2"
+  }
+  digests {
+    sha256: "\003F\\\3656\200\332#\323\324\243\231\\\003)\267\367;!\0358y\036\3136\345\221\376\273\211fd"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.android.gms"
+    artifactId: "play-services-mlkit-text-recognition"
+    version: "19.0.0"
+  }
+  digests {
+    sha256: "\r$\362\227+\006\266v\033\264x/\202*w\357\0247\2102\215n\225\252\330-H\255\276\206\3662"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.android.gms"
+    artifactId: "play-services-mlkit-text-recognition-common"
+    version: "19.0.0"
+  }
+  digests {
+    sha256: "\206ocr\233CmM \311\346\236\210\313\213\231\345\370\310\t\276\021h\233\rND\311B$\213\022"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.android.datatransport"
+    artifactId: "transport-api"
+    version: "2.2.1"
+  }
+  digests {
+    sha256: "\346/s\272\034\177]\025\365\330m\216\232)\214B\314\320d\216|\346\v\2361/.\315\022;^\320"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.android.datatransport"
+    artifactId: "transport-backend-cct"
+    version: "2.3.3"
+  }
+  digests {
+    sha256: "\262*\024\325`\245\220\334\207^\220$$\262\232\023\240-\037\257){|9\251\000yg\377\255\314\275"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.android.datatransport"
+    artifactId: "transport-runtime"
+    version: "2.2.6"
+  }
+  digests {
+    sha256: "\330:\322<\023D)i\021a\311$v\243\310=\3626\315\037\213\255\277\324\360\a#\264\354\315t\034"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "javax.inject"
+    artifactId: "javax.inject"
+    version: "1"
+  }
+  digests {
+    sha256: "\221\307pD\245\fH\0266\303-\221o\330\234\221\030\247!\2259\004R\310\020e\b\017\225}\347\377"
+  }
+  repo_index {
+    value: 1
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.firebase"
+    artifactId: "firebase-encoders"
+    version: "16.1.0"
+  }
+  digests {
+    sha256: "\217\211\247B\230\273\314\302\305C8R\b\242\360\306\177`<\346~n\302\034\307r\351\216h\217|\365"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.firebase"
+    artifactId: "firebase-encoders-json"
+    version: "17.1.0"
+  }
+  digests {
+    sha256: "\202\225\307U\274\255\310z*\256\345\271\345h\362\177\3218\375E\377\021Y\250\356t|\364\303\243\215\205"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.android.odml"
+    artifactId: "image"
+    version: "1.0.0-beta1"
+  }
+  digests {
+    sha256: ".q\2521\370:\224\025\'\177\021\235\346q\225ro\a\321v\016\225B\301\021w\2142\016:\241\362"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.firebase"
+    artifactId: "firebase-components"
+    version: "16.1.0"
+  }
+  digests {
+    sha256: "\202\351\032\245\355\030n\355\257\037\"\020\365\322A\272nDV\317\f2\224\235\\\333\341R\260\342\350\213"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.firebase"
+    artifactId: "firebase-annotations"
+    version: "16.0.0"
+  }
+  digests {
+    sha256: "\2100\362\350\245\3444\313\305\344\275\030\0230s\266\350Q\212\214\350\354,\346\363\262s\311\035\226d\302"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.mlkit"
+    artifactId: "common"
+    version: "18.8.0"
+  }
+  digests {
+    sha256: "\235\3371\237s+!\371i\370\022\245\216\035\245$\363\033& \255\272~\256\177o\326\352#\356\221\245"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.mlkit"
+    artifactId: "vision-common"
+    version: "17.3.0"
+  }
+  digests {
+    sha256: "\300\b\\\245\373\240\017\021R\234\n\203\261(Q\352lY\233\274\310\257\375\222~\221K)\247CE\237"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.mlkit"
+    artifactId: "vision-interfaces"
+    version: "16.2.0"
+  }
+  digests {
+    sha256: "*\320\364xM\255$J\250\205\332\341}P\213\330T\301\331v\276 Z\222\332\030R\350\237\256\036\005"
+  }
+  repo_index {
+  }
+}
+library {
+  maven_library {
+    groupId: "com.google.mlkit"
+    artifactId: "text-recognition-bundled-common"
+    version: "16.0.0"
+  }
+  digests {
+    sha256: "\325^u\202\270\373)\021U`\002\335j\335\275\240|\347\366TF\343\222\215\236;h\375\226\320@K"
+  }
+  repo_index {
+  }
+}
 library_dependencies {
   library_dep_index: 1
 }
@@ -2566,6 +2795,128 @@ library_dependencies {
   library_dep_index: 125
   library_dep_index: 3
 }
+library_dependencies {
+  library_index: 128
+  library_dep_index: 129
+  library_dep_index: 130
+  library_dep_index: 132
+  library_dep_index: 143
+  library_dep_index: 146
+}
+library_dependencies {
+  library_index: 129
+  library_dep_index: 10
+  library_dep_index: 13
+  library_dep_index: 81
+  library_dep_index: 130
+  library_dep_index: 131
+}
+library_dependencies {
+  library_index: 130
+  library_dep_index: 10
+  library_dep_index: 13
+  library_dep_index: 81
+}
+library_dependencies {
+  library_index: 131
+  library_dep_index: 130
+}
+library_dependencies {
+  library_index: 132
+  library_dep_index: 129
+  library_dep_index: 130
+  library_dep_index: 133
+  library_dep_index: 143
+}
+library_dependencies {
+  library_index: 133
+  library_dep_index: 134
+  library_dep_index: 135
+  library_dep_index: 136
+  library_dep_index: 129
+  library_dep_index: 130
+  library_dep_index: 131
+  library_dep_index: 140
+  library_dep_index: 141
+  library_dep_index: 138
+  library_dep_index: 139
+  library_dep_index: 143
+  library_dep_index: 144
+  library_dep_index: 145
+}
+library_dependencies {
+  library_index: 134
+  library_dep_index: 1
+}
+library_dependencies {
+  library_index: 135
+  library_dep_index: 1
+  library_dep_index: 134
+  library_dep_index: 136
+  library_dep_index: 138
+  library_dep_index: 139
+}
+library_dependencies {
+  library_index: 136
+  library_dep_index: 1
+  library_dep_index: 134
+  library_dep_index: 137
+}
+library_dependencies {
+  library_index: 138
+  library_dep_index: 1
+}
+library_dependencies {
+  library_index: 139
+  library_dep_index: 1
+  library_dep_index: 138
+}
+library_dependencies {
+  library_index: 141
+  library_dep_index: 1
+  library_dep_index: 142
+}
+library_dependencies {
+  library_index: 143
+  library_dep_index: 13
+  library_dep_index: 134
+  library_dep_index: 135
+  library_dep_index: 136
+  library_dep_index: 129
+  library_dep_index: 130
+  library_dep_index: 131
+  library_dep_index: 141
+  library_dep_index: 138
+  library_dep_index: 139
+}
+library_dependencies {
+  library_index: 144
+  library_dep_index: 126
+  library_dep_index: 134
+  library_dep_index: 135
+  library_dep_index: 136
+  library_dep_index: 129
+  library_dep_index: 130
+  library_dep_index: 131
+  library_dep_index: 140
+  library_dep_index: 141
+  library_dep_index: 138
+  library_dep_index: 139
+  library_dep_index: 143
+}
+library_dependencies {
+  library_index: 145
+  library_dep_index: 130
+  library_dep_index: 131
+}
+library_dependencies {
+  library_index: 146
+  library_dep_index: 129
+  library_dep_index: 130
+  library_dep_index: 131
+  library_dep_index: 143
+  library_dep_index: 144
+}
 module_dependencies {
   module_name: "base"
   dependency_index: 0
@@ -2590,6 +2941,7 @@ module_dependencies {
   dependency_index: 31
   dependency_index: 117
   dependency_index: 122
+  dependency_index: 128
 }
 repositories {
   maven_repo {

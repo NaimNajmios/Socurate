@@ -327,6 +327,8 @@ string api_requests
 string app_description
 string app_name
 string app_version
+string camera
+string camera_permission_rationale
 string cancel_edit
 string cerebras_api_key_hint
 string cerebras_api_key_label
@@ -362,8 +364,11 @@ string error_state_api
 string error_state_network
 string error_state_title
 string error_title
+string extracted_text
 string extracting_content
 string failed_requests
+string from_screenshot
+string gallery
 string generate_background
 string generate_button
 string generated_draft
@@ -376,6 +381,7 @@ string hashtags_help
 string hashtags_hint
 string hashtags_label
 string hashtags_section
+string import_from_screenshot
 string include_hashtags
 string include_source
 string include_title
@@ -384,10 +390,10 @@ string input_hint
 string input_required
 string invalid_url
 string logs_cleared
-string model_2_0_flash
-string model_2_5_flash
 string model_2_5_flash_lite
-string model_2_5_pro
+string model_3_1_flash_lite
+string model_3_1_pro
+string model_3_flash
 string model_label
 string nav_generate
 string nav_settings
@@ -404,6 +410,7 @@ string notification_complete_title
 string notification_error_title
 string notification_generating_message
 string notification_generating_title
+string ocr_error
 string open_in_app
 string openrouter_api_key_hint
 string openrouter_api_key_label
@@ -484,6 +491,7 @@ string tone_quick_toggle
 string total_tokens
 string total_tokens_label
 string try_again_button
+string use_this_text
 string view_all
 string wait_button
 string warning_title
