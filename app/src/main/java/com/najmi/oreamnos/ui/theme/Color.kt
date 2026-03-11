@@ -39,3 +39,28 @@ val DarkBackground = NeoBlack
 val DarkSurface = NeoBlack
 val DarkOnSurface = NeoWhite
 val DarkBorder = NeoWhite
+
+// Midnight Noir Palette
+val MidnightBlack = Color(0xFF000000)
+val MidnightGrey = Color(0xFF1A1A1A)
+val MidnightAccent = Color(0xFF404040)
+
+// Solarized Light Palette
+val SolarizedBackground = Color(0xFFFDF6E3)
+val SolarizedSurface = Color(0xFFEEE8D5)
+val SolarizedOnSurface = Color(0xFF073642)
+val SolarizedAccent = Color(0xFF268BD2)
+val SolarizedSecondary = Color(0xFF2AA198)
+
+// Cyberpunk Palette
+val CyberpunkBackground = Color(0xFF0D0221)
+val CyberpunkSurface = Color(0xFF1B033A)
+val CyberpunkPrimary = Color(0xFFFE00FE) // Neon Pink
+val CyberpunkSecondary = Color(0xFF00F3FF) // Neon Cyan
+val CyberpunkTertiary = Color(0xFFFFFF00) // Neon Yellow
+
+// Matchday Palette (White-based Brand Centric)
+val MatchdayBackground = Color(0xFFF0F2F5)
+val MatchdaySurface = Color(0xFFFFFFFF)
+val MatchdayAccent = InternationalOrange
+val MatchdaySecondary = NeoBlack

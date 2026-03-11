@@ -82,6 +82,72 @@ private val DeepBlueColorScheme = darkColorScheme(
     inversePrimary = DeepBlueAccent
 )
 
+private val MidnightColorScheme = darkColorScheme(
+    primary = NeoWhite,
+    onPrimary = NeoBlack,
+    primaryContainer = MidnightGrey,
+    onPrimaryContainer = NeoWhite,
+    secondary = NeoLightGrey,
+    onSecondary = NeoBlack,
+    background = MidnightBlack,
+    onBackground = NeoWhite,
+    surface = MidnightBlack,
+    onSurface = NeoWhite,
+    surfaceVariant = MidnightGrey,
+    onSurfaceVariant = NeoWhite,
+    outline = MidnightAccent
+)
+
+private val SolarizedColorScheme = lightColorScheme(
+    primary = SolarizedAccent,
+    onPrimary = NeoWhite,
+    primaryContainer = SolarizedSurface,
+    onPrimaryContainer = SolarizedOnSurface,
+    secondary = SolarizedSecondary,
+    onSecondary = NeoWhite,
+    background = SolarizedBackground,
+    onBackground = SolarizedOnSurface,
+    surface = SolarizedSurface,
+    onSurface = SolarizedOnSurface,
+    surfaceVariant = SolarizedSurface,
+    onSurfaceVariant = SolarizedOnSurface,
+    outline = SolarizedOnSurface
+)
+
+private val CyberpunkColorScheme = darkColorScheme(
+    primary = CyberpunkPrimary,
+    onPrimary = NeoBlack,
+    primaryContainer = CyberpunkSurface,
+    onPrimaryContainer = NeoWhite,
+    secondary = CyberpunkSecondary,
+    onSecondary = NeoBlack,
+    tertiary = CyberpunkTertiary,
+    onTertiary = NeoBlack,
+    background = CyberpunkBackground,
+    onBackground = NeoWhite,
+    surface = CyberpunkSurface,
+    onSurface = NeoWhite,
+    surfaceVariant = CyberpunkSurface,
+    onSurfaceVariant = NeoWhite,
+    outline = CyberpunkPrimary
+)
+
+private val MatchdayColorScheme = lightColorScheme(
+    primary = MatchdayAccent,
+    onPrimary = NeoWhite,
+    primaryContainer = MatchdaySurface,
+    onPrimaryContainer = MatchdaySecondary,
+    secondary = MatchdaySecondary,
+    onSecondary = NeoWhite,
+    background = MatchdayBackground,
+    onBackground = MatchdaySecondary,
+    surface = MatchdaySurface,
+    onSurface = MatchdaySecondary,
+    surfaceVariant = NeoOffWhite,
+    onSurfaceVariant = MatchdaySecondary,
+    outline = MatchdayAccent
+)
+
 private val LightColorScheme = lightColorScheme(
     primary = InternationalOrange,
     onPrimary = NeoWhite,
@@ -125,6 +191,10 @@ fun SocurateTheme(
         "light" -> LightColorScheme
         "dark" -> DarkColorScheme
         "deep_blue" -> DeepBlueColorScheme
+        "midnight" -> MidnightColorScheme
+        "solarized" -> SolarizedColorScheme
+        "cyberpunk" -> CyberpunkColorScheme
+        "matchday" -> MatchdayColorScheme
         else -> if (darkTheme) DarkColorScheme else LightColorScheme
     }
     

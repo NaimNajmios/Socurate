@@ -382,7 +382,11 @@ fun SettingsScreen(
                         "System" to PreferencesManager.THEME_SYSTEM,
                         "Light" to PreferencesManager.THEME_LIGHT,
                         "Dark" to PreferencesManager.THEME_DARK,
-                        "Deep Blue" to PreferencesManager.THEME_DEEP_BLUE
+                        "Deep Blue" to PreferencesManager.THEME_DEEP_BLUE,
+                        "Midnight" to PreferencesManager.THEME_MIDNIGHT,
+                        "Solarized" to PreferencesManager.THEME_SOLARIZED,
+                        "Cyberpunk" to PreferencesManager.THEME_CYBERPUNK,
+                        "Matchday" to PreferencesManager.THEME_MATCHDAY
                     )
                     themeOptions.forEach { (label, value) ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
