@@ -144,5 +144,9 @@ data class CardConfig(
     /** Default size for the watermark logo in DP */
     val watermarkSize: Float = 60f,
     /** Whether to show the watermark/logo on the card */
-    val isWatermarkEnabled: Boolean = true
+    val isWatermarkEnabled: Boolean = true,
+    /** Text to display in the card's badge/label corner */
+    val badgeText: String? = null,
+    /** Whether to automatically extract and apply colors from the background image */
+    val useAutoPalette: Boolean = false
 )

@@ -15,8 +15,14 @@ class GeminiCurator(
     private val geminiService = GeminiService(apiKey, endpoint, tone)
 
     @Throws(Exception::class)
-    override suspend fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
-        return geminiService.curatePost(inputText, includeSource, keepStructure) ?: ""
+    override suspend fun curatePost(
+        inputText: String,
+        includeSource: Boolean,
+        keepStructure: Boolean,
+        tone: String?,
+        length: String?
+    ): String {
+        return geminiService.curatePost(inputText, includeSource, keepStructure, tone, length) ?: ""
     }
 
     @Throws(Exception::class)

@@ -46,7 +46,13 @@ class GeminiService(
      * Implements retry logic with exponential backoff for transient errors.
      */
     @Throws(Exception::class)
-    override suspend fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
+    override suspend fun curatePost(
+        inputText: String,
+        includeSource: Boolean,
+        keepStructure: Boolean,
+        tone: String?,
+        length: String?
+    ): String {
         val startTime = System.currentTimeMillis()
         val requestId = UUID.randomUUID().toString().substring(0, 8)
 
@@ -60,9 +66,9 @@ class GeminiService(
         if (endpoint.isBlank()) throw Exception("Invalid Gemini API endpoint")
         if (inputText.isBlank()) throw Exception("Input text is required")
 
-        // Build the prompt based on tone
+        // Build the prompt based on tone and length
         // OPTIMIZATION: Use Singleton PromptManager to avoid allocation
-        val prompt = PromptManager.buildInitialPrompt(tone, inputText, includeSource, keepStructure)
+        val prompt = PromptManager.buildInitialPrompt(tone ?: this.tone, inputText, includeSource, keepStructure, length)
 
         // Build request JSON
         val requestJson = buildRequestJson(prompt)

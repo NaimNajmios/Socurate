@@ -35,6 +35,10 @@ class MainViewModel : ViewModel() {
     // Auto-generate flag triggered by Share intent
     var autoGenerateFlag: Boolean = false
 
+    // Generation settings
+    var selectedTone: String = "formal"
+    var selectedLength: String = "medium"
+
     /**
      * Gets the current state value (non-observable).
      */

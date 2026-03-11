@@ -138,6 +138,8 @@ class CardDataExtractor(private val context: Context) {
             CardTemplate.DetailedScoreboard -> parseDetailedScoreboard(obj)
             CardTemplate.OnThisDay -> parseOnThisDay(obj)
             CardTemplate.StartingXI -> parseStartingXI(obj)
+            CardTemplate.MatchStatsComparison -> parseMatchStatsComparison(obj)
+            CardTemplate.SocialPost -> parseSocialPost(obj)
         }
     }
 
@@ -382,6 +384,42 @@ class CardDataExtractor(private val context: Context) {
             manager = obj.optString("manager", ""),
             averageAge = obj.optString("averageAge", ""),
             keyAbsences = obj.optString("keyAbsences", ""),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
+        )
+    }
+
+    private fun parseMatchStatsComparison(obj: JsonObject): CardData.MatchStatsComparison {
+        val statsArray = try { obj.getAsJsonArray("stats") } catch (e: Exception) { null }
+        val items = mutableListOf<com.najmi.oreamnos.cardgen.model.ComparisonStat>()
+        if (statsArray != null) {
+            for (i in 0 until statsArray.size()) {
+                val item = statsArray[i]?.asJsonObject
+                if (item != null) {
+                    items.add(
+                        com.najmi.oreamnos.cardgen.model.ComparisonStat(
+                            label = item.optString("label", "Stat ${i + 1}"),
+                            homeValue = item.optString("homeValue", ZERO_STR),
+                            awayValue = item.optString("awayValue", ZERO_STR)
+                        )
+                    )
+                }
+            }
+        }
+        return CardData.MatchStatsComparison(
+            homeTeam = obj.optString("homeTeam", UNKNOWN),
+            awayTeam = obj.optString("awayTeam", UNKNOWN),
+            stats = items,
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
+        )
+    }
+
+    private fun parseSocialPost(obj: JsonObject): CardData.SocialPost {
+        return CardData.SocialPost(
+            handle = obj.optString("handle", UNKNOWN),
+            name = obj.optString("name", UNKNOWN),
+            content = obj.optString("content", UNKNOWN),
+            timestamp = obj.optString("timestamp", UNKNOWN),
+            metrics = obj.optString("metrics", UNKNOWN),
             suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }

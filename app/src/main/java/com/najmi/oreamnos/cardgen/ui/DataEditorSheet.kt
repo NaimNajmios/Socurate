@@ -223,6 +223,40 @@ private fun DynamicDataEditor(
             MagicEditorField("Manager", cardData.manager) { v -> onCardDataChange { (it as CardData.StartingXI).copy(manager = v) } }
             MagicEditorField("Absent/Injured", cardData.keyAbsences) { v -> onCardDataChange { (it as CardData.StartingXI).copy(keyAbsences = v) } }
         }
+        is CardData.MatchStatsComparison -> {
+            MagicEditorField("Home Team", cardData.homeTeam) { v -> onCardDataChange { (it as CardData.MatchStatsComparison).copy(homeTeam = v) } }
+            MagicEditorField("Away Team", cardData.awayTeam) { v -> onCardDataChange { (it as CardData.MatchStatsComparison).copy(awayTeam = v) } }
+            cardData.stats.forEachIndexed { index, stat ->
+                MagicEditorField("Stat ${index+1} Label", stat.label) { v ->
+                    onCardDataChange {
+                        val current = it as CardData.MatchStatsComparison
+                        val newStats = current.stats.toMutableList().apply { this[index] = stat.copy(label = v) }
+                        current.copy(stats = newStats)
+                    }
+                }
+                MagicEditorField("Stat ${index+1} Home Value", stat.homeValue) { v ->
+                    onCardDataChange {
+                        val current = it as CardData.MatchStatsComparison
+                        val newStats = current.stats.toMutableList().apply { this[index] = stat.copy(homeValue = v) }
+                        current.copy(stats = newStats)
+                    }
+                }
+                MagicEditorField("Stat ${index+1} Away Value", stat.awayValue) { v ->
+                    onCardDataChange {
+                        val current = it as CardData.MatchStatsComparison
+                        val newStats = current.stats.toMutableList().apply { this[index] = stat.copy(awayValue = v) }
+                        current.copy(stats = newStats)
+                    }
+                }
+            }
+        }
+        is CardData.SocialPost -> {
+            MagicEditorField("Handle", cardData.handle) { v -> onCardDataChange { (it as CardData.SocialPost).copy(handle = v) } }
+            MagicEditorField("Name", cardData.name) { v -> onCardDataChange { (it as CardData.SocialPost).copy(name = v) } }
+            MagicEditorField("Content", cardData.content, hasMagic = true) { v -> onCardDataChange { (it as CardData.SocialPost).copy(content = v) } }
+            MagicEditorField("Timestamp", cardData.timestamp) { v -> onCardDataChange { (it as CardData.SocialPost).copy(timestamp = v) } }
+            MagicEditorField("Metrics", cardData.metrics) { v -> onCardDataChange { (it as CardData.SocialPost).copy(metrics = v) } }
+        }
     }
 }
 

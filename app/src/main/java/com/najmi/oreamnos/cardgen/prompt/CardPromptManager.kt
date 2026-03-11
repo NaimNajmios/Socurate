@@ -34,6 +34,8 @@ object CardPromptManager {
             CardTemplate.DetailedScoreboard -> detailedScoreboardSchema()
             CardTemplate.OnThisDay -> onThisDaySchema()
             CardTemplate.StartingXI -> startingXISchema()
+            CardTemplate.MatchStatsComparison -> matchStatsComparisonSchema()
+            CardTemplate.SocialPost -> socialPostSchema()
         }
         
         val cacheBuster = if (isRefresh) {
@@ -178,6 +180,32 @@ object CardPromptManager {
           "manager": "Nama Pengurus",
           "averageAge": "Purata Umur (e.g. 25.4 thn)",
           "keyAbsences": "Pemain cedera/digantung, dipisahkan dengan koma"
+        }
+    """.trimIndent()
+
+    private fun matchStatsComparisonSchema(): String = """
+        Extract high-level match stats for a side-by-side comparison between two teams from the football article below.
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
+        {
+          "homeTeam": "Nama Pasukan Rumah",
+          "awayTeam": "Nama Pasukan Pelawat",
+          "stats": [
+            { "label": "Stat Label (e.g. Possession)", "homeValue": "55%", "awayValue": "45%" },
+            { "label": "Shots", "homeValue": "12", "awayValue": "8" },
+            { "label": "Corners", "homeValue": "5", "awayValue": "3" }
+          ]
+        }
+    """.trimIndent()
+
+    private fun socialPostSchema(): String = """
+        Extract the most shareable quote or breaking news insight as a minimalist 'Social Post' from the football article below.
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
+        {
+          "handle": "@username_sumber (e.g. @ASTROARENA)",
+          "name": "Nama Sumber (e.g. Astro Arena)",
+          "content": "Kandungan post yang paling menarik (maks 280 aksara)",
+          "timestamp": "Masa/Tarikh post (e.g. 2 Jam Yang Lalu)",
+          "metrics": "Metrik interaksi (e.g. 1.5K Suka • 230 Simpan)"
         }
     """.trimIndent()
 }

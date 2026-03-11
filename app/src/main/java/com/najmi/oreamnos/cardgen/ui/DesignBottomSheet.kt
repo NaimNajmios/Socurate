@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -43,6 +44,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -482,6 +484,39 @@ private fun GlobalDesignControls(
             valueRange = 0f..1f,
             modifier = Modifier.fillMaxWidth()
         )
+        Slider(
+            value = currentConfig.overlayOpacity,
+            onValueChange = { onConfigUpdate(currentConfig.copy(overlayOpacity = it)) },
+            valueRange = 0f..1f,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        // Auto-Palette Toggle
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "AUTO-PALETTE",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
+                Text(
+                    text = "Extract colors from image",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                )
+            }
+            Switch(
+                checked = currentConfig.useAutoPalette,
+                onCheckedChange = { onConfigUpdate(currentConfig.copy(useAutoPalette = it)) },
+                enabled = currentConfig.backgroundBitmap != null
+            )
+        }
 
         Spacer(Modifier.height(16.dp))
 
@@ -584,6 +619,33 @@ private fun GlobalDesignControls(
             valueRange = 0f..20f,
             modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(Modifier.height(16.dp))
+
+        // --- Badge Text ---
+        Text(
+            text = "CORNER BADGE",
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        )
+        Spacer(Modifier.height(8.dp))
+        OutlinedTextField(
+            value = currentConfig.badgeText ?: "",
+            onValueChange = { onConfigUpdate(currentConfig.copy(badgeText = it.ifBlank { null })) },
+            placeholder = { Text("E.g. TRENDING, BREAKING", style = MaterialTheme.typography.labelMedium) },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = MaterialTheme.typography.bodyMedium,
+            singleLine = true,
+            trailingIcon = {
+                if (!currentConfig.badgeText.isNullOrEmpty()) {
+                    IconButton(onClick = { onConfigUpdate(currentConfig.copy(badgeText = null)) }) {
+                        Icon(Icons.Default.Add, contentDescription = "Clear", modifier = Modifier.size(18.dp))
+                    }
+                }
+            }
+        )
+
+        Spacer(Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),

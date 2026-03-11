@@ -1,6 +1,9 @@
 package com.najmi.oreamnos.cardgen.utils
 
+import android.graphics.Bitmap
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.palette.graphics.Palette
 
 /**
  * Maps Malaysian football club names to a color pair (start, end) for gradient backgrounds.
@@ -75,4 +78,14 @@ object ColorExtractor {
         Triple("Perak",       Color(0xFF4A90D9), Color(0xFFC0C0C0)),
         Triple("Malaysia",    Color(0xFFCC0001), Color(0xFF003087)),
     )
+
+    /**
+     * Extracts a vibrant color pair from a bitmap using the Palette library.
+     */
+    fun extractPalette(bitmap: Bitmap): Pair<Color, Color> {
+        val palette = Palette.from(bitmap).generate()
+        val primary = palette.getVibrantColor(palette.getMutedColor(fallback.first.toArgb()))
+        val secondary = palette.getDarkVibrantColor(palette.getDarkMutedColor(fallback.second.toArgb()))
+        return Pair(Color(primary), Color(secondary))
+    }
 }

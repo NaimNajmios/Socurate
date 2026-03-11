@@ -18,7 +18,13 @@ object PromptManager {
      * @param keepStructure Whether to preserve original formatting/structure
      * @return The formatted prompt string
      */
-    fun buildInitialPrompt(tone: String, inputText: String, includeSource: Boolean, keepStructure: Boolean): String {
+    fun buildInitialPrompt(
+        tone: String,
+        inputText: String,
+        includeSource: Boolean,
+        keepStructure: Boolean,
+        length: String? = "medium"
+    ): String {
         val originalLength = inputText.length
         var targetMinLength = (originalLength * 0.4).toInt()
         var targetMaxLength = (originalLength * 0.6).toInt()
@@ -27,11 +33,18 @@ object PromptManager {
         if (targetMinLength < 50) targetMinLength = 50
         if (targetMaxLength < 100) targetMaxLength = 100
 
-        val toneDesc = if (tone == "formal") "formal, professional" else "engaging, conversational"
-        val toneInstruction = if (tone == "formal")
-            "Maintain a formal, professional tone suitable for official club communication"
-        else
-            "Maintain an engaging, conversational tone suitable for fan communities"
+        val toneDesc = when (tone) {
+            "formal" -> "formal, professional"
+            "casual" -> "engaging, conversational"
+            "humorous" -> "witty, humorous"
+            else -> "formal, professional"
+        }
+        val toneInstruction = when (tone) {
+            "formal" -> "Maintain a formal, professional tone suitable for official club communication."
+            "casual" -> "Maintain an engaging, conversational tone suitable for fan communities."
+            "humorous" -> "Maintain a witty, humorous, and slightly provocative tone. Use clever puns or lighthearted banter common in football fan culture."
+            else -> "Maintain a formal, professional tone."
+        }
 
         // Detect quotes in input
         val hasQuotes = containsQuotes(inputText)
@@ -57,8 +70,18 @@ object PromptManager {
                 "3. STRICTLY PRESERVE the original formatting, bullet points, lists, and structure. Do NOT summarize into paragraphs if the original used a list format. Translate the content line-by-line while keeping the visual layout exactly the same.\n"
             )
         } else {
-            prompt.append("3. The output must be approximately 40-60% of the original content length (target: ")
-                .append(targetMinLength).append("-").append(targetMaxLength).append(" characters)\n")
+            val lengthMultiplier = when (length) {
+                "short" -> 0.2 to 0.3
+                "long" -> 0.7 to 0.9
+                else -> 0.4 to 0.6 // medium (default)
+            }
+            targetMinLength = (originalLength * lengthMultiplier.first).toInt().coerceAtLeast(50)
+            targetMaxLength = (originalLength * lengthMultiplier.second).toInt().coerceAtLeast(100)
+
+            prompt.append("3. The output MUST be ")
+                .append(if (length == "short") "concise and brief" else if (length == "long") "detailed and comprehensive" else "moderate in length")
+                .append(" (approximately ").append((lengthMultiplier.first * 100).toInt()).append("-").append((lengthMultiplier.second * 100).toInt())
+                .append("% of original, target: ").append(targetMinLength).append("-").append(targetMaxLength).append(" characters).\n")
         }
 
         // Add quote handling instruction if quotes detected

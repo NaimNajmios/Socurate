@@ -11,7 +11,13 @@ interface IContentCurator {
      * Curates the input text into a social media post.
      */
     @Throws(Exception::class)
-    suspend fun curatePost(inputText: String, includeSource: Boolean, keepStructure: Boolean): String
+    suspend fun curatePost(
+        inputText: String,
+        includeSource: Boolean,
+        keepStructure: Boolean,
+        tone: String? = null,
+        length: String? = null
+    ): String
 
     /**
      * Sends [prompt] to the AI provider exactly as-is, with no additional system
@@ -23,7 +29,7 @@ interface IContentCurator {
      */
     @Throws(Exception::class)
     suspend fun generateRaw(prompt: String): String =
-        curatePost(inputText = prompt, includeSource = false, keepStructure = true)
+        curatePost(inputText = prompt, includeSource = false, keepStructure = true, tone = null, length = null)
 
     /**
      * Refines an existing post based on selected refinement options.

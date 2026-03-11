@@ -324,7 +324,9 @@ class MainActivity : ComponentActivity() {
                                 onClearResult = { generationResult.value = null },
                                 onNavigateToSettings = { startActivity(Intent(this@MainActivity, SettingsActivity::class.java)) },
                                 onNavigateToUsage = { startActivity(Intent(this@MainActivity, UsageActivity::class.java)) },
-                                onGenerate = { input, includeSource, keepStructure -> startGeneration(input, includeSource, keepStructure) },
+                                onGenerate = { input, includeSource, keepStructure, tone, length ->
+                                    startGeneration(input, includeSource, keepStructure, tone, length)
+                                },
                                 onRefine = { originalPost, refinements, includeSource -> startRefinement(originalPost, refinements, includeSource) },
                                 initialSharedText = sharedText,
                                 initialTitle = intentTitle,
@@ -396,12 +398,14 @@ class MainActivity : ComponentActivity() {
         AppCompatDelegate.setDefaultNightMode(mode)
     }
     
-    private fun startGeneration(input: String, includeSource: Boolean, keepStructure: Boolean) {
+    private fun startGeneration(input: String, includeSource: Boolean, keepStructure: Boolean, tone: String? = null, length: String? = null) {
         val serviceIntent = Intent(this, ContentGenerationService::class.java).apply {
             action = ContentGenerationService.ACTION_GENERATE
             putExtra(ContentGenerationService.EXTRA_INPUT_TEXT, input)
             putExtra(ContentGenerationService.EXTRA_INCLUDE_SOURCE, includeSource)
             putExtra(ContentGenerationService.EXTRA_KEEP_STRUCTURE, keepStructure)
+            putExtra(ContentGenerationService.EXTRA_TONE, tone)
+            putExtra(ContentGenerationService.EXTRA_LENGTH, length)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent)
@@ -434,7 +438,7 @@ fun MainScreen(
     onClearResult: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToUsage: () -> Unit,
-    onGenerate: (String, Boolean, Boolean) -> Unit,
+    onGenerate: (String, Boolean, Boolean, String?, String?) -> Unit,
     onRefine: (String, List<String>, Boolean) -> Unit,
     initialSharedText: String? = null,
     initialTitle: String? = null,
@@ -529,7 +533,7 @@ fun MainScreen(
             
             if (viewModel.autoGenerateFlag) {
                 if (prefsManager.hasApiKeyForCurrentProvider()) {
-                    onGenerate(inputText, includeSource, keepStructure)
+                    onGenerate(inputText, includeSource, keepStructure, viewModel.selectedTone, viewModel.selectedLength)
                 } else {
                     Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
                 }
@@ -756,7 +760,7 @@ fun MainScreen(
                                 customPills.filter { selectedPillIds.contains(it.id) }.map { it.command }
                         onRefine(outputText, allRefinements, prefsManager.isSourceEnabled())
                     } else {
-                        onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                        onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure, viewModel.selectedTone, viewModel.selectedLength)
                     }
                 },
                 onDismiss = { showRateLimitDialog = false }
@@ -774,7 +778,7 @@ fun MainScreen(
                 if (error != null) {
                     error = null
                     isLoading = true
-                    onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                    onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure, viewModel.selectedTone, viewModel.selectedLength)
                 }
             },
             onDismiss = { showProviderSelector = false }
@@ -941,6 +945,43 @@ fun MainScreen(
                 )
             }
 
+            // --- Tone & Length Selection ---
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "TONE",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val tones = listOf("formal" to "FORMAL", "casual" to "CASUAL", "humorous" to "HUMOROUS")
+                    tones.forEach { (value, label) ->
+                        NeoChip(
+                            selected = viewModel.selectedTone == value,
+                            onClick = { viewModel.selectedTone = value },
+                            text = label
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(4.dp))
+
+                Text(
+                    text = "LENGTH",
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val lengths = listOf("short" to "SHORT", "medium" to "MEDIUM", "long" to "LONG")
+                    lengths.forEach { (value, label) ->
+                        NeoChip(
+                            selected = viewModel.selectedLength == value,
+                            onClick = { viewModel.selectedLength = value },
+                            text = label
+                        )
+                    }
+                }
+            }
+
             // Generate button — now repositioned BELOW the InputCard
             NeoButton(
                 onClick = {
@@ -955,7 +996,7 @@ fun MainScreen(
                     } else {
                         isLoading = true
                         error = null
-                        onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                        onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure, viewModel.selectedTone, viewModel.selectedLength)
                     }
                 },
                 text = "GENERATE",
@@ -1000,7 +1041,7 @@ fun MainScreen(
                         onRetry = {
                             error = null
                             isLoading = true
-                            onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure)
+                            onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure, viewModel.selectedTone, viewModel.selectedLength)
                         },
                         onChangeProvider = {
                             showProviderSelector = true

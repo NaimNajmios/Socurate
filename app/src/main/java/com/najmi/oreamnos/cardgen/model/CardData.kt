@@ -129,7 +129,37 @@ sealed class CardData(open val suggestedTemplate: CardTemplate? = null) {
         val keyAbsences: String,
         override val suggestedTemplate: CardTemplate? = null
     ) : CardData(suggestedTemplate)
+    /**
+     * Data for the Match Stats Comparison card.
+     */
+    data class MatchStatsComparison(
+        val homeTeam: String,
+        val awayTeam: String,
+        val stats: List<ComparisonStat>,
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
+
+    /**
+     * Data for the minimalist Social Post card.
+     */
+    data class SocialPost(
+        val handle: String,
+        val name: String,
+        val content: String,
+        val timestamp: String,
+        val metrics: String, // e.g. "1.2K Likes • 450 Reposts"
+        override val suggestedTemplate: CardTemplate? = null
+    ) : CardData(suggestedTemplate)
 }
+
+/**
+ * A single stat row for the Match Stats Comparison card.
+ */
+data class ComparisonStat(
+    val label: String,
+    val homeValue: String,
+    val awayValue: String
+)
 
 /**
  * A single stat row for the Top 3 Stats card.

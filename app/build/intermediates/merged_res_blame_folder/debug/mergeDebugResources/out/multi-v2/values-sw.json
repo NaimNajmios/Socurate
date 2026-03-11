@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.najmi.oreamnos.app-mergeDebugResources-67:/values-sw/values-sw.xml",
+            "outputFile": "com.najmi.oreamnos.app-mergeDebugResources-68:/values-sw/values-sw.xml",
             "map": [
                 {
                     "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\ea78c2605f36b99caa57efe594fbfd8a\\transformed\\play-services-base-18.1.0\\res\\values-sw\\values.xml",

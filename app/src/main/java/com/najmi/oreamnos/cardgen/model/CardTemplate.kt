@@ -62,12 +62,25 @@ sealed class CardTemplate(
         description = "Starting XI / Pitch"
     )
 
+    /** Match stats comparison card: side-by-side stats comparison. */
+    object MatchStatsComparison : CardTemplate(
+        displayName = "Comparison",
+        description = "Match Stats Comparison"
+    )
+
+    /** Social post card: minimalist X/Twitter/Threads style post. */
+    object SocialPost : CardTemplate(
+        displayName = "Social",
+        description = "Minimalist Social Post"
+    )
+
     companion object {
         /** All templates in display order. Lazy to avoid class init order NPE. */
         val all: List<CardTemplate> by lazy {
             listOf(
-                HeadlineQuote, BreakingNews, PlayerSpotlight, TopStats,
-                OnThisDay, TransferNews, MatchPreview, StartingXI, DetailedScoreboard
+                HeadlineQuote, BreakingNews, SocialPost, PlayerSpotlight, TopStats,
+                OnThisDay, TransferNews, MatchPreview, StartingXI, DetailedScoreboard,
+                MatchStatsComparison
             )
         }
     }

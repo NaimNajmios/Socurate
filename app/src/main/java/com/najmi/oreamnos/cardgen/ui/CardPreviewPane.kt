@@ -22,6 +22,8 @@ import com.najmi.oreamnos.cardgen.renderer.MatchPreviewCanvas
 import com.najmi.oreamnos.cardgen.renderer.OnThisDayCanvas
 import com.najmi.oreamnos.cardgen.renderer.StartingXICanvas
 import com.najmi.oreamnos.cardgen.renderer.TransferNewsCanvas
+import com.najmi.oreamnos.cardgen.renderer.MatchStatsComparisonCanvas
+import com.najmi.oreamnos.cardgen.renderer.SocialPostCanvas
 import com.najmi.oreamnos.cardgen.viewmodel.ExtractionState
 import com.najmi.oreamnos.ui.components.EnhancedLoadingCard
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -98,6 +100,8 @@ fun CardCanvas(
         is CardData.DetailedScoreboard -> DetailedScoreboardCanvas(data = cardData, config = cardConfig, modifier = modifier)
         is CardData.OnThisDay -> OnThisDayCanvas(data = cardData, config = cardConfig, modifier = modifier)
         is CardData.StartingXI -> StartingXICanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.MatchStatsComparison -> MatchStatsComparisonCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.SocialPost -> SocialPostCanvas(data = cardData, config = cardConfig, modifier = modifier)
     }
 }
 

@@ -47,6 +47,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.times
 import com.najmi.oreamnos.cardgen.model.CardConfig
@@ -159,6 +165,11 @@ internal fun CardBackground(
         labelSmall = baseTypography.labelSmall.copy(fontSize = baseTypography.labelSmall.fontSize * config.fontSizeMultiplier, fontFamily = customFontFamily ?: baseTypography.labelSmall.fontFamily, shadow = textShadow)
     )
 
+    val configWithPalette = if (config.useAutoPalette && config.backgroundBitmap != null) {
+        val extractedPair = ColorExtractor.extractPalette(config.backgroundBitmap)
+        config.copy(colorPair = extractedPair)
+    } else config
+
     MaterialTheme(typography = scaledTypography) {
         CompositionLocalProvider(
             LocalDensity provides Density(
@@ -167,30 +178,30 @@ internal fun CardBackground(
             )
         ) {
             Box(modifier = modifier) {
-                when (config.imagePosition) {
+                // Background Layer
+                when (configWithPalette.imagePosition) {
                     ImagePosition.BACKGROUND -> {
-                        // Original: Full background with scrim
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(GradientBuilder.vertical(config.colorPair))
+                                .background(GradientBuilder.vertical(configWithPalette.colorPair))
                         ) {
-                            if (config.backgroundBitmap != null) {
+                            if (configWithPalette.backgroundBitmap != null) {
                                 Image(
-                                    bitmap = config.backgroundBitmap.asImageBitmap(),
+                                    bitmap = configWithPalette.backgroundBitmap.asImageBitmap(),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .let { if (config.backgroundBlurRadius > 0f) it.blur(config.backgroundBlurRadius.dp) else it },
+                                        .let { if (configWithPalette.backgroundBlurRadius > 0f) it.blur(configWithPalette.backgroundBlurRadius.dp) else it },
                                     contentScale = ContentScale.Crop,
-                                    alpha = config.imageOpacity,
-                                    colorFilter = config.photoFilter.toColorFilter()
+                                    alpha = configWithPalette.imageOpacity,
+                                    colorFilter = configWithPalette.photoFilter.toColorFilter()
                                 )
-                                if (config.showScrim) {
+                                if (configWithPalette.showScrim) {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize()
-                                            .background(GradientBuilder.getScrim(config.scrimType, config.overlayOpacity))
+                                            .background(GradientBuilder.getScrim(configWithPalette.scrimType, configWithPalette.overlayOpacity))
                                     )
                                 }
                             }
@@ -199,201 +210,83 @@ internal fun CardBackground(
                     }
 
                     ImagePosition.SPLIT_LEFT -> {
-                        // Image on left (60%), text on right - NBA quote card style
                         Row(modifier = Modifier.fillMaxSize()) {
-                            // Left side - Image
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .fillMaxWidth(0.55f)
-                            ) {
-                                if (config.backgroundBitmap != null) {
+                            Box(modifier = Modifier.fillMaxHeight().fillMaxWidth(0.55f)) {
+                                if (configWithPalette.backgroundBitmap != null) {
                                     Image(
-                                        bitmap = config.backgroundBitmap.asImageBitmap(),
+                                        bitmap = configWithPalette.backgroundBitmap.asImageBitmap(),
                                         contentDescription = null,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .let { if (config.backgroundBlurRadius > 0f) it.blur(config.backgroundBlurRadius.dp) else it },
+                                        modifier = Modifier.fillMaxSize().let { if (configWithPalette.backgroundBlurRadius > 0f) it.blur(configWithPalette.backgroundBlurRadius.dp) else it },
                                         contentScale = ContentScale.Crop,
-                                        alpha = config.imageOpacity,
-                                        colorFilter = config.photoFilter.toColorFilter()
+                                        alpha = configWithPalette.imageOpacity,
+                                        colorFilter = configWithPalette.photoFilter.toColorFilter()
                                     )
-                                    // Horizontal scrim darkening from left to right
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(GradientBuilder.horizontalScrim(config.overlayOpacity))
-                                    )
+                                    Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.horizontalScrim(configWithPalette.overlayOpacity)))
                                 } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(GradientBuilder.vertical(config.colorPair))
-                                    )
+                                    Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.vertical(configWithPalette.colorPair)))
                                 }
                             }
-                            // Right side - Text content with gradient
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .fillMaxWidth()
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            listOf(
-                                                Color.Black.copy(alpha = 0.7f),
-                                                Color.Black.copy(alpha = 0.9f)
-                                            )
-                                        )
-                                    )
-                            ) {
+                            Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(Brush.horizontalGradient(listOf(Color.Black.copy(alpha = 0.7f), Color.Black.copy(alpha = 0.9f))))) {
                                 content()
                             }
                         }
                     }
 
                     ImagePosition.SPLIT_RIGHT -> {
-                        // Image on right (60%), text on left - match highlights style
                         Row(modifier = Modifier.fillMaxSize()) {
-                            // Left side - Text content with gradient
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .fillMaxWidth(0.45f)
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            listOf(
-                                                Color.Black.copy(alpha = 0.9f),
-                                                Color.Black.copy(alpha = 0.7f)
-                                            )
-                                        )
-                                    )
-                            ) {
+                            Box(modifier = Modifier.fillMaxHeight().fillMaxWidth(0.45f).background(Brush.horizontalGradient(listOf(Color.Black.copy(alpha = 0.9f), Color.Black.copy(alpha = 0.7f))))) {
                                 content()
                             }
-                            // Right side - Image
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .fillMaxWidth()
-                            ) {
-                                if (config.backgroundBitmap != null) {
+                            Box(modifier = Modifier.fillMaxHeight().fillMaxWidth()) {
+                                if (configWithPalette.backgroundBitmap != null) {
                                     Image(
-                                        bitmap = config.backgroundBitmap.asImageBitmap(),
+                                        bitmap = configWithPalette.backgroundBitmap.asImageBitmap(),
                                         contentDescription = null,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .let { if (config.backgroundBlurRadius > 0f) it.blur(config.backgroundBlurRadius.dp) else it },
+                                        modifier = Modifier.fillMaxSize().let { if (configWithPalette.backgroundBlurRadius > 0f) it.blur(configWithPalette.backgroundBlurRadius.dp) else it },
                                         contentScale = ContentScale.Crop,
-                                        alpha = config.imageOpacity,
-                                        colorFilter = config.photoFilter.toColorFilter()
+                                        alpha = configWithPalette.imageOpacity,
+                                        colorFilter = configWithPalette.photoFilter.toColorFilter()
                                     )
-                                    // Reverse horizontal scrim
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(GradientBuilder.reverseHorizontalScrim(config.overlayOpacity))
-                                    )
+                                    Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.reverseHorizontalScrim(configWithPalette.overlayOpacity)))
                                 } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(GradientBuilder.vertical(config.colorPair))
-                                    )
+                                    Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.vertical(configWithPalette.colorPair)))
                                 }
                             }
                         }
                     }
 
                     ImagePosition.OVERLAY_TOP -> {
-                        // Full-bleed image with text at bottom - player spotlight style
                         Box(modifier = Modifier.fillMaxSize()) {
-                            // Full image background
-                            if (config.backgroundBitmap != null) {
-                                Image(
-                                    bitmap = config.backgroundBitmap.asImageBitmap(),
-                                    contentDescription = null,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop,
-                                    alpha = config.imageOpacity,
-                                    colorFilter = config.photoFilter.toColorFilter()
-                                )
-                                if (config.showScrim) {
-                                    // Bottom-heavy scrim for text legibility
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(GradientBuilder.lightScrim(config.overlayOpacity))
-                                    )
+                            if (configWithPalette.backgroundBitmap != null) {
+                                Image(bitmap = configWithPalette.backgroundBitmap.asImageBitmap(), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop, alpha = configWithPalette.imageOpacity, colorFilter = configWithPalette.photoFilter.toColorFilter())
+                                if (configWithPalette.showScrim) {
+                                    Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.lightScrim(configWithPalette.overlayOpacity)))
                                 }
                             } else {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(GradientBuilder.vertical(config.colorPair))
-                                )
+                                Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.vertical(configWithPalette.colorPair)))
                             }
                             content()
                         }
                     }
 
                     ImagePosition.CUTOUT -> {
-                        // Cutout mode - player image with transparent background, text beside/overlay
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(GradientBuilder.vertical(config.colorPair))
-                        ) {
-                            // Background image if present (will show through transparent areas)
-                            if (config.backgroundBitmap != null) {
-                                Image(
-                                    bitmap = config.backgroundBitmap.asImageBitmap(),
-                                    contentDescription = null,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop,
-                                    alpha = 0.3f,
-                                    colorFilter = config.photoFilter.toColorFilter()
-                                )
+                        Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.vertical(configWithPalette.colorPair))) {
+                            if (configWithPalette.backgroundBitmap != null) {
+                                Image(bitmap = configWithPalette.backgroundBitmap.asImageBitmap(), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop, alpha = 0.3f, colorFilter = configWithPalette.photoFilter.toColorFilter())
                             }
-                            
-                            // Cutout bitmap overlay (transparent PNG of player)
-                            if (config.cutoutBitmap != null) {
-                                Image(
-                                    bitmap = config.cutoutBitmap.asImageBitmap(),
-                                    contentDescription = "Player cutout",
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(16.dp),
-                                    contentScale = ContentScale.Fit,
-                                    alpha = config.imageOpacity
-                                )
+                            if (configWithPalette.cutoutBitmap != null) {
+                                Image(bitmap = configWithPalette.cutoutBitmap.asImageBitmap(), contentDescription = "Player cutout", modifier = Modifier.fillMaxSize().padding(16.dp), contentScale = ContentScale.Fit, alpha = configWithPalette.imageOpacity)
                             }
                             content()
                         }
                     }
 
                     ImagePosition.MINIMAL -> {
-                        // Subtle background, prominent text
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(GradientBuilder.vertical(config.colorPair))
-                        ) {
-                            if (config.backgroundBitmap != null) {
-                                Image(
-                                    bitmap = config.backgroundBitmap.asImageBitmap(),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .graphicsLayer { alpha = 0.25f },
-                                    contentScale = ContentScale.Crop,
-                                    colorFilter = config.photoFilter.toColorFilter()
-                                )
-                                if (config.showScrim) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(GradientBuilder.minimalScrim(config.overlayOpacity))
-                                    )
+                        Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.vertical(configWithPalette.colorPair))) {
+                            if (configWithPalette.backgroundBitmap != null) {
+                                Image(bitmap = configWithPalette.backgroundBitmap.asImageBitmap(), contentDescription = null, modifier = Modifier.fillMaxSize().graphicsLayer { alpha = 0.25f }, contentScale = ContentScale.Crop, colorFilter = configWithPalette.photoFilter.toColorFilter())
+                                if (configWithPalette.showScrim) {
+                                    Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.minimalScrim(configWithPalette.overlayOpacity)))
                                 }
                             }
                             content()
@@ -401,161 +294,53 @@ internal fun CardBackground(
                     }
 
                     ImagePosition.MAGAZINE_BOLD -> {
-                        // High-impact solid blocks with thick borders
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(GradientBuilder.vertical(config.colorPair))
-                        ) {
-                            if (config.backgroundBitmap != null) {
-                                Image(
-                                    bitmap = config.backgroundBitmap.asImageBitmap(),
-                                    contentDescription = null,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop,
-                                    alpha = config.imageOpacity,
-                                    colorFilter = config.photoFilter.toColorFilter()
-                                )
-                                if (config.showScrim) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(GradientBuilder.getScrim(config.scrimType, config.overlayOpacity))
-                                    )
+                        Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.vertical(configWithPalette.colorPair))) {
+                            if (configWithPalette.backgroundBitmap != null) {
+                                Image(bitmap = configWithPalette.backgroundBitmap.asImageBitmap(), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop, alpha = configWithPalette.imageOpacity, colorFilter = configWithPalette.photoFilter.toColorFilter())
+                                if (configWithPalette.showScrim) {
+                                    Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.getScrim(configWithPalette.scrimType, configWithPalette.overlayOpacity)))
                                 }
                             }
-                            // Text is housed in a bold rectangle
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(16.dp)
-                                    .background(
-                                        (config.accentColor ?: config.colorPair.first).copy(alpha = 0.9f),
-                                        RoundedCornerShape(0.dp)
-                                    )
-                                    .border(
-                                        4.dp,
-                                        Color.White.copy(alpha = 0.3f),
-                                        RoundedCornerShape(0.dp)
-                                    )
-                            ) {
+                            Box(modifier = Modifier.fillMaxSize().padding(16.dp).background((configWithPalette.accentColor ?: configWithPalette.colorPair.first).copy(alpha = 0.9f), RoundedCornerShape(0.dp)).border(4.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(0.dp))) {
                                 content()
                             }
                         }
                     }
 
                     ImagePosition.OFFSET_CARD -> {
-                        // Inset image with overlapping text card
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(GradientBuilder.vertical(config.colorPair))
-                        ) {
-                            // Inset background image
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize(0.85f)
-                                    .align(Alignment.TopStart)
-                                    .padding(16.dp)
-                                    .border(2.dp, CardBorder)
-                            ) {
-                                if (config.backgroundBitmap != null) {
-                                    Image(
-                                        bitmap = config.backgroundBitmap.asImageBitmap(),
-                                        contentDescription = null,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop,
-                                        alpha = config.imageOpacity,
-                                        colorFilter = config.photoFilter.toColorFilter()
-                                    )
+                        Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.vertical(configWithPalette.colorPair))) {
+                            Box(modifier = Modifier.fillMaxSize(0.85f).align(Alignment.TopStart).padding(16.dp).border(2.dp, CardBorder)) {
+                                if (configWithPalette.backgroundBitmap != null) {
+                                    Image(bitmap = configWithPalette.backgroundBitmap.asImageBitmap(), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop, alpha = configWithPalette.imageOpacity, colorFilter = configWithPalette.photoFilter.toColorFilter())
                                 }
                             }
-                            
-                            // Overlapping text card
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(0.9f)
-                                    .fillMaxHeight(0.6f)
-                                    .align(Alignment.BottomEnd)
-                                    .padding(8.dp)
-                                    .background(Color.Black.copy(alpha = 0.95f), RoundedCornerShape(0.dp))
-                                    .border(1.dp, CardBorder)
-                            ) {
+                            Box(modifier = Modifier.fillMaxWidth(0.9f).fillMaxHeight(0.6f).align(Alignment.BottomEnd).padding(8.dp).background(Color.Black.copy(alpha = 0.95f), RoundedCornerShape(0.dp)).border(1.dp, CardBorder)) {
                                 content()
                             }
                         }
                     }
 
                     ImagePosition.BRUTALIST -> {
-                        // Raw grid, high contrast, no rounded corners
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .border(4.dp, Color.White)
-                        ) {
-                            // Left column: Image or Color
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .weight(0.4f)
-                                    .border(4.dp, Color.White)
-                                    .background(GradientBuilder.vertical(config.colorPair))
-                            ) {
-                                if (config.backgroundBitmap != null) {
-                                    Image(
-                                        bitmap = config.backgroundBitmap.asImageBitmap(),
-                                        contentDescription = null,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop,
-                                        alpha = config.imageOpacity,
-                                        colorFilter = config.photoFilter.toColorFilter()
-                                    )
+                        Row(modifier = Modifier.fillMaxSize().border(4.dp, Color.White)) {
+                            Box(modifier = Modifier.fillMaxHeight().weight(0.4f).border(4.dp, Color.White).background(GradientBuilder.vertical(configWithPalette.colorPair))) {
+                                if (configWithPalette.backgroundBitmap != null) {
+                                    Image(bitmap = configWithPalette.backgroundBitmap.asImageBitmap(), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop, alpha = configWithPalette.imageOpacity, colorFilter = configWithPalette.photoFilter.toColorFilter())
                                 }
                             }
-                            // Right column: Pure black background for text
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .weight(0.6f)
-                                    .background(Color.Black)
-                            ) {
+                            Box(modifier = Modifier.fillMaxHeight().weight(0.6f).background(Color.Black)) {
                                 content()
                             }
                         }
                     }
 
                     ImagePosition.FLOAT_WINDOW -> {
-                        // Floating window over blurred background
                         Box(modifier = Modifier.fillMaxSize()) {
-                            // Full background image with heavy blur
-                            if (config.backgroundBitmap != null) {
-                                Image(
-                                    bitmap = config.backgroundBitmap.asImageBitmap(),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .blur(20.dp),
-                                    contentScale = ContentScale.Crop,
-                                    alpha = config.imageOpacity,
-                                    colorFilter = config.photoFilter.toColorFilter()
-                                )
+                            if (configWithPalette.backgroundBitmap != null) {
+                                Image(bitmap = configWithPalette.backgroundBitmap.asImageBitmap(), contentDescription = null, modifier = Modifier.fillMaxSize().blur(20.dp), contentScale = ContentScale.Crop, alpha = configWithPalette.imageOpacity, colorFilter = configWithPalette.photoFilter.toColorFilter())
                             } else {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(GradientBuilder.vertical(config.colorPair))
-                                        .blur(20.dp)
-                                )
+                                Box(modifier = Modifier.fillMaxSize().background(GradientBuilder.vertical(configWithPalette.colorPair)).blur(20.dp))
                             }
-                            
-                            // Floating window
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize(0.9f)
-                                    .align(Alignment.Center)
-                                    .background(Color.Black.copy(alpha = 0.85f), RoundedCornerShape(0.dp))
-                                    .border(2.dp, CardBorder)
-                            ) {
+                            Box(modifier = Modifier.fillMaxSize(0.9f).align(Alignment.Center).background(Color.Black.copy(alpha = 0.85f), RoundedCornerShape(0.dp)).border(2.dp, CardBorder)) {
                                 content()
                             }
                         }
@@ -563,19 +348,55 @@ internal fun CardBackground(
                 }
 
                 // Watermark Branding Overlay
-                if (config.watermarkBitmap != null && config.isWatermarkEnabled) {
+                if (configWithPalette.watermarkBitmap != null && configWithPalette.isWatermarkEnabled) {
                     Image(
-                        bitmap = config.watermarkBitmap.asImageBitmap(),
+                        bitmap = configWithPalette.watermarkBitmap.asImageBitmap(),
                         contentDescription = "Watermark",
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(12.dp)
-                            .size(config.watermarkSize.dp),
+                            .size(configWithPalette.watermarkSize.dp),
                         alpha = 0.6f
+                    )
+                }
+
+                // Badge Overlay
+                if (!configWithPalette.badgeText.isNullOrBlank()) {
+                    CardBadge(
+                        text = configWithPalette.badgeText,
+                        color = configWithPalette.accentColor ?: configWithPalette.colorPair.first,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp)
                     )
                 }
             }
         }
+    }
+}
+
+/**
+ * A stylized badge positioned in the corner of the card.
+ */
+@Composable
+private fun CardBadge(
+    text: String,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .background(color, RoundedCornerShape(4.dp))
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        Text(
+            text = text.uppercase(),
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontWeight = FontWeight.Black,
+                letterSpacing = 1.5.sp
+            ),
+            color = if (color.luminance() > 0.5f) Color.Black else Color.White
+        )
     }
 }
 
@@ -878,71 +699,268 @@ fun TopStatsCanvas(
                 .fillMaxSize()
                 .padding(20.dp)
         ) {
+            Text(
+                text = data.matchContext.uppercase(),
+                color = CardTextSecondary,
+                style = MaterialTheme.typography.labelMedium,
+                letterSpacing = 2.sp
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                data.stats.forEachIndexed { index, stat ->
+                    val rowColor = if (index % 2 == 0) config.colorPair.first else config.colorPair.second
+                    
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(rowColor.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
+                            .border(1.dp, rowColor.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stat.label.uppercase(),
+                                color = rowColor,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp
+                            )
+                            if (stat.context.isNotEmpty()) {
+                                Text(
+                                    text = stat.context,
+                                    color = CardTextPrimary,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                        Text(
+                            text = stat.value,
+                            color = CardTextPrimary,
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// 5. MATCH STATS COMPARISON CANVAS
+// ──────────────────────────────────────────────────────────────
+
+/**
+ * Match Stats Comparison card — side-by-side stats comparison for two teams.
+ */
+@Composable
+fun MatchStatsComparisonCanvas(
+    data: CardData.MatchStatsComparison,
+    config: CardConfig,
+    modifier: Modifier = Modifier
+) {
+    CardBackground(
+        config = config,
+        modifier = modifier.aspectRatio(1f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
+        ) {
             // Top branding
             Text(
-                text = "TOP STATS",
+                text = "MATCH COMPARISON",
                 color = CardTextMuted,
                 style = MaterialTheme.typography.labelSmall,
                 letterSpacing = 3.sp
             )
             
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(16.dp))
             
-            // Center Content: Huge graphic or just leave blank if there's a photo
-            
-            // Bottom spacer removed to anchor content
-            
-            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp, modifier = Modifier.padding(vertical = 10.dp))
-            
-            // Bottom Section: Context (Left) and Stats (Right)
+            // Teams Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Context Info
-                Column(modifier = Modifier.weight(1f)) {
-                    if (data.matchContext.isNotBlank()) {
-                        Text(
-                            text = data.matchContext.uppercase(),
-                            color = Color(0xFFFFD100),
-                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-                        )
-                        Spacer(modifier = Modifier.height(6.dp))
-                    }
-                    Text(
-                        text = "MATCH STATS",
-                        color = CardTextPrimary,
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-                
-                Spacer(modifier = Modifier.width(16.dp))
-                
-                // 3 Key Stats
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    data.stats.forEach { stat ->
-                        if (stat.label.isNotBlank() && stat.label != "—" && stat.value.isNotBlank() && stat.value != "—" && stat.value != "0") {
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(
-                                    text = stat.value,
-                                    color = Color(0xFFFFD100), // Gold
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Black,
-                                    lineHeight = 28.sp
-                                )
-                                Text(
-                                    text = stat.label.uppercase(),
-                                    color = CardTextSecondary,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    letterSpacing = 1.sp
-                                )
-                            }
+                Text(
+                    text = data.homeTeam.uppercase(),
+                    color = CardTextPrimary,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = "VS",
+                    color = Color(0xFFFFD100),
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Black),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                Text(
+                    text = data.awayTeam.uppercase(),
+                    color = CardTextPrimary,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            androidx.compose.material3.HorizontalDivider(color = CardBorder, thickness = 1.dp)
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Stats Rows
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                data.stats.forEach { stat ->
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stat.homeValue,
+                                color = CardTextPrimary,
+                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                            )
+                            Text(
+                                text = stat.label.uppercase(),
+                                color = CardTextMuted,
+                                style = MaterialTheme.typography.labelSmall,
+                                letterSpacing = 1.sp
+                            )
+                            Text(
+                                text = stat.awayValue,
+                                color = CardTextPrimary,
+                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                            )
+                        }
+                        // Simple bar comparison
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(4.dp)
+                                .padding(top = 4.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                        ) {
+                            val hVal = stat.homeValue.filter { it.isDigit() }.toFloatOrNull() ?: 1f
+                            val aVal = stat.awayValue.filter { it.isDigit() }.toFloatOrNull() ?: 1f
+                            val total = hVal + aVal
+                            val hWeight = if (total > 0) hVal / total else 0.5f
+                            
+                            Box(modifier = Modifier.weight(hWeight).fillMaxHeight().background(config.colorPair.first))
+                            Box(modifier = Modifier.weight(1f - hWeight).fillMaxHeight().background(config.colorPair.second))
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// 6. SOCIAL POST CANVAS
+// ──────────────────────────────────────────────────────────────
+
+/**
+ * Minimalist Social Post card — designed to look like a premium social media post.
+ */
+@Composable
+fun SocialPostCanvas(
+    data: CardData.SocialPost,
+    config: CardConfig,
+    modifier: Modifier = Modifier
+) {
+    CardBackground(
+        config = config,
+        modifier = modifier.aspectRatio(1f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+        ) {
+            // Header: Avatar (placeholder) + Name + Handle
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(CardTextMuted.copy(alpha = 0.2f))
+                        .border(1.dp, CardBorder, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = data.name.take(1).uppercase(),
+                        color = Color(0xFFFFD100),
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black)
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = data.name,
+                        color = CardTextPrimary,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = data.handle,
+                        color = CardTextMuted,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = null,
+                    tint = CardTextMuted,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(20.dp))
+            
+            // Content
+            AutoSizeText(
+                text = data.content,
+                color = CardTextPrimary,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    lineHeight = 32.sp,
+                    fontWeight = FontWeight.Medium
+                ),
+                maxLines = 6,
+                modifier = Modifier.fillMaxWidth().weight(1f)
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Timestamp
+            Text(
+                text = data.timestamp,
+                color = CardTextMuted,
+                style = MaterialTheme.typography.labelMedium
+            )
+            
+            androidx.compose.material3.HorizontalDivider(
+                color = CardBorder,
+                thickness = 0.5.dp,
+                modifier = Modifier.padding(vertical = 12.dp)
+            )
+            
+            // Metrics
+            Text(
+                text = data.metrics,
+                color = CardTextSecondary,
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+            )
         }
     }
 }
@@ -1008,3 +1026,38 @@ private fun PreviewTopStats() {
     }
 }
 
+@Preview(showBackground = true, name = "Match Stats Comparison Card")
+@Composable
+private fun PreviewMatchStatsComparison() {
+    SocurateTheme {
+        MatchStatsComparisonCanvas(
+            data = CardData.MatchStatsComparison(
+                homeTeam = "JDT",
+                awayTeam = "Selangor",
+                stats = listOf(
+                    com.najmi.oreamnos.cardgen.model.ComparisonStat("Possession", "60%", "40%"),
+                    com.najmi.oreamnos.cardgen.model.ComparisonStat("Shots", "15", "8"),
+                    com.najmi.oreamnos.cardgen.model.ComparisonStat("Corners", "7", "3")
+                )
+            ),
+            config = CardConfig()
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Social Post Card")
+@Composable
+private fun PreviewSocialPost() {
+    SocurateTheme {
+        SocialPostCanvas(
+            data = CardData.SocialPost(
+                handle = "@ASTROARENA",
+                name = "Astro Arena",
+                content = "🚨 RASMI: Kim Pan Gon meletak jawatan sebagai ketua jurulatih kebangsaan Harimau Malaya berkuat kuasa serta-merta. Terima kasih Coach KPG!",
+                timestamp = "1 Jam Yang Lalu",
+                metrics = "12.5K Suka • 4.2K Repost"
+            ),
+            config = CardConfig(useAutoPalette = true)
+        )
+    }
+}

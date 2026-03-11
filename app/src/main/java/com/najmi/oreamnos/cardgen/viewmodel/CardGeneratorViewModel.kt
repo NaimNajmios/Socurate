@@ -197,6 +197,18 @@ class CardGeneratorViewModel : ViewModel() {
                 starters = emptyList(),
                 subs = emptyList()
             )
+            CardTemplate.MatchStatsComparison -> CardData.MatchStatsComparison(
+                homeTeam = extractHomeTeam(currentData),
+                awayTeam = extractAwayTeam(currentData),
+                stats = emptyList()
+            )
+            CardTemplate.SocialPost -> CardData.SocialPost(
+                handle = "@USER",
+                name = extractPlayerName(currentData),
+                content = findMostRelevantHeadline(currentData),
+                timestamp = "Just Now",
+                metrics = "0 Likes"
+            )
         }
         
         _mutableCardData.value = newData
@@ -212,6 +224,8 @@ class CardGeneratorViewModel : ViewModel() {
         is CardData.TransferNews -> "${currentData.playerName} Transfers to ${currentData.toTeam}"
         is CardData.DetailedScoreboard -> "${currentData.homeTeam} vs ${currentData.awayTeam}"
         is CardData.MatchPreview -> "${currentData.homeTeam} vs ${currentData.awayTeam} Preview"
+        is CardData.MatchStatsComparison -> "${currentData.homeTeam} vs ${currentData.awayTeam} Stats"
+        is CardData.SocialPost -> currentData.content
         else -> ""
     }
     
@@ -219,6 +233,7 @@ class CardGeneratorViewModel : ViewModel() {
         is CardData.PlayerSpotlight -> currentData.playerName
         is CardData.TransferNews -> currentData.playerName
         is CardData.HeadlineQuote -> currentData.quoteAuthor ?: ""
+        is CardData.SocialPost -> currentData.name
         else -> "Player Name"
     }
 
@@ -228,6 +243,7 @@ class CardGeneratorViewModel : ViewModel() {
         is CardData.StartingXI -> currentData.teamName
         is CardData.TransferNews -> currentData.toTeam
         is CardData.PlayerSpotlight -> currentData.club
+        is CardData.MatchStatsComparison -> currentData.homeTeam
         else -> "Home Team"
     }
 
@@ -235,6 +251,7 @@ class CardGeneratorViewModel : ViewModel() {
         is CardData.DetailedScoreboard -> currentData.awayTeam
         is CardData.MatchPreview -> currentData.awayTeam
         is CardData.TransferNews -> currentData.fromTeam
+        is CardData.MatchStatsComparison -> currentData.awayTeam
         else -> "Away Team"
     }
     

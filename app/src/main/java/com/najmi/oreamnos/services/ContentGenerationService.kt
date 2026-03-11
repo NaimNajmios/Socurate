@@ -76,6 +76,8 @@ class ContentGenerationService : Service() {
         val inputText = intent.getStringExtra(EXTRA_INPUT_TEXT)
         val includeSource = intent.getBooleanExtra(EXTRA_INCLUDE_SOURCE, false)
         val keepStructure = intent.getBooleanExtra(EXTRA_KEEP_STRUCTURE, false)
+        val tone = intent.getStringExtra(EXTRA_TONE)
+        val length = intent.getStringExtra(EXTRA_LENGTH)
 
         serviceScope.launch {
             // Validation moved inside coroutine to prevent race conditions with stopSelf
@@ -111,7 +113,7 @@ class ContentGenerationService : Service() {
 
                 // Generate post using curator abstraction
                 val curator = CuratorFactory.create(this@ContentGenerationService)
-                val result = curator.curatePost(content, includeSource, keepStructure)
+                val result = curator.curatePost(content, includeSource, keepStructure, tone, length)
 
                 // Calculate duration
                 val durationMs = System.currentTimeMillis() - startTime
@@ -325,6 +327,8 @@ class ContentGenerationService : Service() {
         const val EXTRA_REFINEMENTS = "extra_refinements"
         const val EXTRA_INCLUDE_SOURCE = "extra_include_source"
         const val EXTRA_KEEP_STRUCTURE = "extra_keep_structure"
+        const val EXTRA_TONE = "extra_tone"
+        const val EXTRA_LENGTH = "extra_length"
 
         // Result extras
         const val EXTRA_SUCCESS = "extra_success"
