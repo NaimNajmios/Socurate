@@ -80,18 +80,6 @@ class PreferencesManager(context: Context) {
         saveApiEndpoint(DEFAULT_ENDPOINT)
     }
 
-    // ==================== TONE ====================
-
-    fun saveTone(tone: String) {
-        securePrefs.edit().putString(KEY_TONE, tone).apply()
-    }
-
-    fun getTone(): String {
-        return securePrefs.getString(KEY_TONE, TONE_FORMAL) ?: TONE_FORMAL
-    }
-
-    fun isFormalTone(): Boolean = getTone() == TONE_FORMAL
-
     // ==================== HASHTAGS ====================
 
     fun saveHashtags(hashtags: String) {
@@ -397,7 +385,6 @@ class PreferencesManager(context: Context) {
         // Keys
         private const val KEY_API_KEY = "gemini_api_key"
         private const val KEY_API_ENDPOINT = "api_endpoint"
-        private const val KEY_TONE = "post_tone"
         private const val KEY_HASHTAGS = "default_hashtags"
         private const val KEY_HASHTAGS_ENABLED = "hashtags_enabled"
         private const val KEY_SOURCE_ENABLED = "source_enabled"
@@ -423,9 +410,6 @@ class PreferencesManager(context: Context) {
         private const val DEFAULT_OPENROUTER_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
         private const val DEFAULT_CEREBRAS_MODEL = "llama-3.3-70b"
 
-        // Tone constants
-        const val TONE_FORMAL = "formal"
-        const val TONE_CASUAL = "casual"
 
         // Theme constants
         const val THEME_SYSTEM = "system"

@@ -41,7 +41,6 @@ object CuratorFactory {
     fun create(context: Context): IContentCurator {
         val prefs = PreferencesManager(context)
         val provider = prefs.getProvider()
-        val tone = prefs.getTone()
 
         return when (provider) {
             PROVIDER_GROQ -> {
@@ -50,7 +49,6 @@ object CuratorFactory {
                     apiKey = groqKey.orEmpty(),
                     baseUrl = GROQ_API_URL,
                     modelId = GROQ_MODEL_ID,
-                    tone = tone,
                     isOpenRouter = false
                 )
             }
@@ -60,7 +58,6 @@ object CuratorFactory {
                     apiKey = openRouterKey.orEmpty(),
                     baseUrl = OPENROUTER_API_URL,
                     modelId = OPENROUTER_MODEL_ID,
-                    tone = tone,
                     isOpenRouter = true
                 )
             }
@@ -70,14 +67,13 @@ object CuratorFactory {
                     apiKey = cerebrasKey.orEmpty(),
                     baseUrl = CEREBRAS_API_URL,
                     modelId = CEREBRAS_MODEL_ID,
-                    tone = tone,
                     isOpenRouter = false
                 )
             }
             else -> {
                 val geminiKey = prefs.getApiKey()
                 val endpoint = prefs.getApiEndpoint()
-                GeminiCurator(geminiKey.orEmpty(), endpoint.orEmpty(), tone)
+                GeminiCurator(geminiKey.orEmpty(), endpoint.orEmpty())
             }
         }
     }
@@ -87,8 +83,8 @@ object CuratorFactory {
      * Useful for services that don't need PreferencesManager lookup.
      */
     @JvmStatic
-    fun create(apiKey: String, endpoint: String, tone: String): IContentCurator {
-        return GeminiCurator(apiKey, endpoint, tone)
+    fun create(apiKey: String, endpoint: String): IContentCurator {
+        return GeminiCurator(apiKey, endpoint)
     }
 
     /**

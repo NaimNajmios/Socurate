@@ -1,5 +1,8 @@
 package com.najmi.oreamnos.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -36,8 +39,7 @@ class MainViewModel : ViewModel() {
     var autoGenerateFlag: Boolean = false
 
     // Generation settings
-    var selectedTone: String = "formal"
-    var selectedLength: String = "medium"
+    var selectedLength by mutableStateOf("medium")
 
     /**
      * Gets the current state value (non-observable).

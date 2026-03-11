@@ -28,8 +28,7 @@ import java.util.regex.Pattern
  */
 class GeminiService(
     private val apiKey: String,
-    private val endpoint: String,
-    private val tone: String = "formal"
+    private val endpoint: String
 ) : IContentCurator {
 
     // Last request usage metadata
@@ -50,7 +49,6 @@ class GeminiService(
         inputText: String,
         includeSource: Boolean,
         keepStructure: Boolean,
-        tone: String?,
         length: String?
     ): String {
         val startTime = System.currentTimeMillis()
@@ -66,9 +64,9 @@ class GeminiService(
         if (endpoint.isBlank()) throw Exception("Invalid Gemini API endpoint")
         if (inputText.isBlank()) throw Exception("Input text is required")
 
-        // Build the prompt based on tone and length
+        // Build the prompt based on length
         // OPTIMIZATION: Use Singleton PromptManager to avoid allocation
-        val prompt = PromptManager.buildInitialPrompt(tone ?: this.tone, inputText, includeSource, keepStructure, length)
+        val prompt = PromptManager.buildInitialPrompt(inputText, includeSource, keepStructure, length)
 
         // Build request JSON
         val requestJson = buildRequestJson(prompt)

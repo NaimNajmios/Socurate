@@ -8,21 +8,19 @@ import com.najmi.oreamnos.services.GeminiService
  */
 class GeminiCurator(
     apiKey: String,
-    endpoint: String,
-    tone: String
+    endpoint: String
 ) : IContentCurator {
 
-    private val geminiService = GeminiService(apiKey, endpoint, tone)
+    private val geminiService = GeminiService(apiKey, endpoint)
 
     @Throws(Exception::class)
     override suspend fun curatePost(
         inputText: String,
         includeSource: Boolean,
         keepStructure: Boolean,
-        tone: String?,
         length: String?
     ): String {
-        return geminiService.curatePost(inputText, includeSource, keepStructure, tone, length) ?: ""
+        return geminiService.curatePost(inputText, includeSource, keepStructure, length) ?: ""
     }
 
     @Throws(Exception::class)

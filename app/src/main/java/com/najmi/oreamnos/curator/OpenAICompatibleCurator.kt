@@ -28,7 +28,6 @@ class OpenAICompatibleCurator(
     private val apiKey: String,
     private val baseUrl: String,
     private val modelId: String,
-    private val tone: String,
     private val isOpenRouter: Boolean
 ) : IContentCurator {
 
@@ -61,12 +60,11 @@ class OpenAICompatibleCurator(
         inputText: String,
         includeSource: Boolean,
         keepStructure: Boolean,
-        tone: String?,
         length: String?
     ): String {
         val systemPrompt = "You are a professional social media content writer for a Malaysian football club. " +
                 "Write in Malaysian Malay (Bahasa Malaysia) only. Do not include hashtags. Do not include emojis."
-        val userPrompt = PromptManager.buildInitialPrompt(tone ?: this.tone, inputText, includeSource, keepStructure, length)
+        val userPrompt = PromptManager.buildInitialPrompt(inputText, includeSource, keepStructure, length)
         val rawResult = callApi(systemPrompt, userPrompt)
         return cleanUpResponse(rawResult, includeSource)
     }

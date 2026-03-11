@@ -15,7 +15,6 @@ interface IContentCurator {
         inputText: String,
         includeSource: Boolean,
         keepStructure: Boolean,
-        tone: String? = null,
         length: String? = null
     ): String
 
@@ -29,7 +28,7 @@ interface IContentCurator {
      */
     @Throws(Exception::class)
     suspend fun generateRaw(prompt: String): String =
-        curatePost(inputText = prompt, includeSource = false, keepStructure = true, tone = null, length = null)
+        curatePost(inputText = prompt, includeSource = false, keepStructure = true, length = null)
 
     /**
      * Refines an existing post based on selected refinement options.

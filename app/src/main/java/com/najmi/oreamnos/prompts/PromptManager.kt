@@ -19,7 +19,6 @@ object PromptManager {
      * @return The formatted prompt string
      */
     fun buildInitialPrompt(
-        tone: String,
         inputText: String,
         includeSource: Boolean,
         keepStructure: Boolean,
@@ -33,19 +32,6 @@ object PromptManager {
         if (targetMinLength < 50) targetMinLength = 50
         if (targetMaxLength < 100) targetMaxLength = 100
 
-        val toneDesc = when (tone) {
-            "formal" -> "formal, professional"
-            "casual" -> "engaging, conversational"
-            "humorous" -> "witty, humorous"
-            else -> "formal, professional"
-        }
-        val toneInstruction = when (tone) {
-            "formal" -> "Maintain a formal, professional tone suitable for official club communication."
-            "casual" -> "Maintain an engaging, conversational tone suitable for fan communities."
-            "humorous" -> "Maintain a witty, humorous, and slightly provocative tone. Use clever puns or lighthearted banter common in football fan culture."
-            else -> "Maintain a formal, professional tone."
-        }
-
         // Detect quotes in input
         val hasQuotes = containsQuotes(inputText)
 
@@ -58,12 +44,12 @@ object PromptManager {
         // Build base prompt
         val prompt = StringBuilder()
         prompt.append(
-            "You are a professional social media content writer for a Malaysian football club. Your task is to transform the following English football news article into a "
-        ).append(toneDesc).append(" social media post written in Malaysian Malay (Bahasa Malaysia).\n\n")
+            "You are a professional social media content writer for a Malaysian football club. Your task is to transform the following English football news article into a professional social media post written in Malaysian Malay (Bahasa Malaysia).\n\n"
+        )
 
         prompt.append("STRICT REQUIREMENTS:\n")
             .append("1. Write in Bahasa Malaysia (Malaysian Malay), BUT ALWAYS use accepted English football terms instead of making up stiff direct translations. Do NOT translate: 'Clean Sheet', 'Offside', 'Hat-trick', 'Tackle', 'Assist', 'Playmaker', 'Derby', 'Comeback', 'Winger', 'Striker', 'Midfielder', 'Defender', 'Full-back', 'Center-back', 'Goalkeeper', 'Free-kick', 'Penalty', 'Corner Kicks', 'VAR', 'Counter-attack', 'Pressing', 'Cross', 'Header', 'Nutmeg', 'Dribble', 'Volley', 'Bicycle Kick', 'Man of the Match', 'Golden Boot', 'Pitch', 'Box-to-box', 'Sweeper', 'Target Man', 'False Nine', 'High Press', 'Through Ball', 'Overhead Kick'.\n")
-            .append("2. ").append(toneInstruction).append("\n")
+            .append("2. Maintain a professional and authoritative Malaysian Malay (Bahasa Malaysia) specifically for a football club's voice.\n")
 
         if (keepStructure) {
             prompt.append(
@@ -185,14 +171,13 @@ object PromptManager {
      * @param hashtags  Formatted hashtags to include (if any)
      * @return The formatted prompt string
      */
-    fun buildPromptFromOcr(ocrText: String, tone: String, hashtags: String): String {
+    fun buildPromptFromOcr(ocrText: String, hashtags: String): String {
         val prompt = StringBuilder()
-        val toneDesc = if (tone == "formal") "formal, professional" else "engaging, conversational"
         
         prompt.append("You are a professional social media content writer for a Malaysian football club. ")
         prompt.append("The following text was extracted via OCR from a matchday/stats screenshot. ")
         prompt.append("Your task is to interpret this technical data and generate an engaging ")
-        prompt.append(toneDesc).append(" social media post in Malaysian Malay (Bahasa Malaysia) for our fans.\n\n")
+        prompt.append("professional social media post in Malaysian Malay (Bahasa Malaysia) for our fans.\n\n")
         
         prompt.append("STRICT REQUIREMENTS:\n")
         prompt.append("1. Write in Bahasa Malaysia (Malaysian Malay).\n")

@@ -179,7 +179,6 @@ fun SettingsScreen(
     var openRouterKey by remember { mutableStateOf(prefsManager.getOpenRouterApiKey() ?: "") }
     var cerebrasKey by remember { mutableStateOf(prefsManager.getCerebrasApiKey() ?: "") }
     var selectedModelIndex by remember { mutableIntStateOf(0) }
-    var tone by remember { mutableStateOf(prefsManager.getTone()) }
     var theme by remember { mutableStateOf(prefsManager.getTheme()) }
     var hashtagsEnabled by remember { mutableStateOf(prefsManager.areHashtagsEnabled()) }
     var sourceEnabled by remember { mutableStateOf(prefsManager.isSourceEnabled()) }
@@ -301,7 +300,7 @@ fun SettingsScreen(
                         scope.launch {
                             try {
                                 val result = withContext(Dispatchers.IO) {
-                                    testConnection(provider, apiKey, modelIds[selectedModelIndex], tone)
+                                    testConnection(provider, apiKey, modelIds[selectedModelIndex])
                                 }
                                 Toast.makeText(context, "Connection successful! API key saved.", Toast.LENGTH_LONG).show()
                             } catch (e: Exception) {
@@ -319,25 +318,6 @@ fun SettingsScreen(
                         Spacer(Modifier.width(8.dp))
                     }
                     Text(if (isTesting) "Testing..." else "Test Connection")
-                }
-            }
-            
-            // Writing Style Section
-            SettingsCard(title = "Writing Style") {
-                Text("Tone", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = tone == PreferencesManager.TONE_CASUAL,
-                        onClick = { tone = PreferencesManager.TONE_CASUAL; prefsManager.saveTone(tone); showSaved() }
-                    )
-                    Text("Casual", modifier = Modifier.clickable { tone = PreferencesManager.TONE_CASUAL; prefsManager.saveTone(tone); showSaved() })
-                    Spacer(Modifier.width(24.dp))
-                    RadioButton(
-                        selected = tone == PreferencesManager.TONE_FORMAL,
-                        onClick = { tone = PreferencesManager.TONE_FORMAL; prefsManager.saveTone(tone); showSaved() }
-                    )
-                    Text("Formal", modifier = Modifier.clickable { tone = PreferencesManager.TONE_FORMAL; prefsManager.saveTone(tone); showSaved() })
                 }
             }
             
@@ -565,22 +545,22 @@ fun NavigationRow(
     }
 }
 
-private suspend fun testConnection(provider: String, apiKey: String, modelId: String, tone: String): String {
+private suspend fun testConnection(provider: String, apiKey: String, modelId: String): String {
     return when (provider) {
         PreferencesManager.PROVIDER_GROQ -> {
-            val curator = OpenAICompatibleCurator(apiKey, "https://api.groq.com/openai/v1/chat/completions", modelId, tone, false)
+            val curator = OpenAICompatibleCurator(apiKey, "https://api.groq.com/openai/v1/chat/completions", modelId, false)
             curator.curatePost("Test connection: Manchester United won 3-0.", true, false)
         }
         PreferencesManager.PROVIDER_OPENROUTER -> {
-            val curator = OpenAICompatibleCurator(apiKey, "https://openrouter.ai/api/v1/chat/completions", modelId, tone, true)
+            val curator = OpenAICompatibleCurator(apiKey, "https://openrouter.ai/api/v1/chat/completions", modelId, true)
             curator.curatePost("Test connection: Manchester United won 3-0.", true, false)
         }
         PreferencesManager.PROVIDER_CEREBRAS -> {
-            val curator = OpenAICompatibleCurator(apiKey, "https://api.cerebras.ai/v1/chat/completions", modelId, tone, false)
+            val curator = OpenAICompatibleCurator(apiKey, "https://api.cerebras.ai/v1/chat/completions", modelId, false)
             curator.curatePost("Test connection: Manchester United won 3-0.", true, false)
         }
         else -> {
-            val gemini = GeminiService(apiKey, modelId, tone)
+            val gemini = GeminiService(apiKey, modelId)
             gemini.curatePost("Test connection: Manchester United won 3-0.", true, false)
         }
     }
