@@ -507,19 +507,8 @@ fun MainScreen(
     var isInputError by remember { mutableStateOf(false) }
     var triggerInputShake by remember { mutableStateOf(false) }
 
-    // OCR State
     val ocrViewModel: OcrViewModel = viewModel()
     var showOcrSheet by remember { mutableStateOf(false) }
-
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            showOcrSheet = true
-        } else {
-            Toast.makeText(context, R.string.camera_permission_rationale, Toast.LENGTH_LONG).show()
-        }
-    }
 
     
     // Load custom pills
@@ -937,12 +926,7 @@ fun MainScreen(
                     onDismissPreview = onDismissPreview,
                     isError = isInputError,
                     onOcrClick = {
-                        val permission = android.Manifest.permission.CAMERA
-                        if (androidx.core.content.ContextCompat.checkSelfPermission(context, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                            showOcrSheet = true
-                        } else {
-                            cameraPermissionLauncher.launch(permission)
-                        }
+                        showOcrSheet = true
                     }
                 )
             }

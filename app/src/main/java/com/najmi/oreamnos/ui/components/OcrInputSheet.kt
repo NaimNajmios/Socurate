@@ -20,9 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import com.najmi.oreamnos.viewmodel.OcrViewModel
-import java.io.File
 
 /**
  * Bottom sheet for importing player stats from screenshots via OCR.
@@ -53,27 +51,6 @@ fun OcrInputSheet(
         }
     }
 
-    // Camera Launcher
-    val tempFile = remember { 
-        File(context.cacheDir, "ocr_temp").apply { if (!exists()) mkdirs() }
-        File(context.cacheDir, "temp_ocr_image.jpg") 
-    }
-    val tempUri = remember {
-        FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            tempFile
-        )
-    }
-    
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            val bitmap = BitmapFactory.decodeFile(tempFile.absolutePath)
-            bitmap?.let { viewModel.onImageSelected(it) }
-        }
-    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -105,23 +82,12 @@ fun OcrInputSheet(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Image Source Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                NeoChip(
-                    text = "GALLERY",
-                    selected = false,
-                    onClick = { galleryLauncher.launch("image/*") },
-                    modifier = Modifier.weight(1f)
-                )
-                NeoChip(
-                    text = "CAMERA",
-                    selected = false,
-                    onClick = { cameraLauncher.launch(tempUri) },
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            NeoChip(
+                text = "IMPORT FROM GALLERY",
+                selected = false,
+                onClick = { galleryLauncher.launch("image/*") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
