@@ -177,6 +177,7 @@ fun OcrInputSheet(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
+            /*
             // Extracted Text Field
             if (viewModel.extractedText.isNotEmpty() && !viewModel.isLoading) {
                 Text(
@@ -194,6 +195,7 @@ fun OcrInputSheet(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
             }
+            */
 
             // Confirm Button
             NeoButton(
@@ -201,7 +203,7 @@ fun OcrInputSheet(
                     onConfirm(viewModel.extractedText)
                     onDismiss()
                 },
-                text = "USE THIS TEXT",
+                text = "GENERATE POST",
                 modifier = Modifier.fillMaxWidth(),
                 enabled = viewModel.extractedText.isNotEmpty() && !viewModel.isLoading
             )

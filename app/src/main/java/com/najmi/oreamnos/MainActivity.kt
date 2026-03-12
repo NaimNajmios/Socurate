@@ -34,6 +34,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -111,9 +112,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -1032,6 +1035,31 @@ fun MainScreen(
                 }
             }
             
+            // OCR Image Preview - Show original source image alongside result
+            ocrViewModel.selectedBitmap?.let { bitmap ->
+                AnimatedVisibility(visible = hasResult && !isLoading, enter = fadeIn() + expandVertically()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text(
+                            text = "SOURCE IMAGE",
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
+                        NeoCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        ) {
+                            Image(
+                                bitmap = bitmap.asImageBitmap(),
+                                contentDescription = "OCR Source",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+            }
+            
             // Output Card
             AnimatedVisibility(visible = hasResult && !isLoading, enter = fadeIn() + expandVertically()) {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -1169,6 +1197,18 @@ fun MainScreen(
                     inputText = text
                     if (isInputError) isInputError = false
                     inputHasChanged = true
+                    
+                    // Auto-trigger generation after OCR confirmation
+                    if (inputText.isNotBlank()) {
+                        if (prefsManager.hasApiKeyForCurrentProvider()) {
+                            isLoading = true
+                            error = null
+                            onGenerate(inputText, prefsManager.isSourceEnabled(), keepStructure, viewModel.selectedLength)
+                        } else {
+                            Toast.makeText(context, R.string.api_key_required, Toast.LENGTH_LONG).show()
+                            onNavigateToSettings()
+                        }
+                    }
                 },
                 onDismiss = {
                     showOcrSheet = false
