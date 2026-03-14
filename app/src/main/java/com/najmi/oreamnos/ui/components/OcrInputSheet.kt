@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -20,10 +21,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.najmi.oreamnos.viewmodel.OcrViewModel
+import com.najmi.oreamnos.vision.VisionModel
 
 /**
- * Bottom sheet for importing player stats from screenshots via OCR.
+ * Bottom sheet for importing player stats from screenshots via Vision AI or OCR.
+ * Implements a 7-state UI machine.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +38,7 @@ fun OcrInputSheet(
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val state = viewModel.uiState
     
     // Gallery Launcher
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -46,11 +51,10 @@ fun OcrInputSheet(
                     bitmap?.let { viewModel.onImageSelected(it) }
                 }
             } catch (e: Exception) {
-                // Error handling handled by ViewModel or UI state
+                // Handled in VM
             }
         }
     }
-
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -63,6 +67,7 @@ fun OcrInputSheet(
                 .fillMaxWidth()
                 .padding(24.dp)
                 .verticalScroll(scrollState)
+                .animateContentSize()
         ) {
             // Header
             Row(
@@ -72,7 +77,10 @@ fun OcrInputSheet(
             ) {
                 Text(
                     text = "IMPORT FROM SCREENSHOT",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
+                    )
                 )
                 IconButton(onClick = onDismiss) {
                     Icon(Icons.Default.Close, contentDescription = "Close")
@@ -91,12 +99,13 @@ fun OcrInputSheet(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Image Preview
-            viewModel.selectedBitmap?.let { bitmap ->
+            // 1. IDLE / PICKED IMAGE PREVIEW
+            state.selectedBitmap?.let { bitmap ->
+                val thumbnailHeight = if (state.editableText.isNotEmpty()) 100.dp else 200.dp
                 NeoCard(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(thumbnailHeight)
                 ) {
                     Image(
                         bitmap = bitmap.asImageBitmap(),
@@ -105,73 +114,145 @@ fun OcrInputSheet(
                         contentScale = ContentScale.Crop
                     )
                 }
+                Spacer(modifier = Modifier.height(16.dp))
+                if (state.editableText.isEmpty()) {
+                    TextButton(
+                        onClick = { galleryLauncher.launch("image/*") },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text("CHANGE IMAGE", style = MaterialTheme.typography.labelLarge)
+                    }
+                }
+            } ?: run {
+                // Idle state: Drop zone
+                NeoCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                ) {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = "Tap Gallery above to select a screenshot",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 2. MODEL DOWNLOAD CARD (Conditional)
+            val showDownloadCard = !state.geminiNanoAvailable && 
+                                  state.installedMediaPipeModels.isEmpty() && 
+                                  !state.isExtracting && 
+                                  state.extractionResult == null
+
+            if (showDownloadCard || state.isModelDownloading) {
+                VisionModelDownloadCard(
+                    isDownloading = state.isModelDownloading,
+                    downloadProgress = state.modelDownloadProgress,
+                    onDownloadClick = { viewModel.startDownload(it) },
+                    onSkipClick = { /* User just proceeds with OCR */ },
+                    onCancelClick = { viewModel.cancelDownload() },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Loading State
-            if (viewModel.isLoading) {
-                EnhancedLoadingCard(estimatedDurationMs = 3000L)
+            // 3. EXTRACTING (Loading)
+            if (state.isExtracting) {
+                val loadingLabel = when (state.activeExtractorModel) {
+                    VisionModel.GEMINI_NANO -> "Analysing with On-Device OCR…"
+                    VisionModel.PALIGEMMA_2_3B -> "Analysing with PaliGemma…"
+                    VisionModel.GEMMA_3_4B -> "Analysing with Gemma 3…"
+                    VisionModel.ML_KIT -> "Reading image…"
+                }
+                
+                EnhancedLoadingCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    // Vision models take longer
+                    estimatedDurationMs = if (state.activeExtractorModel == VisionModel.ML_KIT) 3000L else 12000L
+                )
+                Text(
+                    text = loadingLabel,
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Error State
-            viewModel.error?.let { err ->
+            // 4. EXTRACTION RESULT
+            AnimatedVisibility(visible = state.editableText.isNotEmpty() && !state.isExtracting) {
+                Column {
+                    state.extractionResult?.let { result ->
+                        ExtractionSourceBadge(
+                            model = result.source,
+                            durationMs = result.durationMs,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    if (state.showFallbackNotice) {
+                        FallbackNotificationCard(modifier = Modifier.fillMaxWidth())
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    NeoInput(
+                        value = state.editableText,
+                        onValueChange = { viewModel.updateEditableText(it) },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 5,
+                        maxLines = 10,
+                        placeholder = "Extracted data will appear here..."
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+            }
+
+            // 5. ERROR STATE
+            state.error?.let { err ->
                 NeoCard(
                     borderColor = MaterialTheme.colorScheme.error,
                     backgroundColor = MaterialTheme.colorScheme.errorContainer
                 ) {
-                    Column {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "OCR ERROR",
+                            text = "EXTRACTION ERROR",
                             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onErrorContainer
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = err,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onErrorContainer
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         NeoButton(
                             onClick = { viewModel.retry() },
-                            text = "RETRY",
+                            text = "TRY AGAIN",
                             containerColor = MaterialTheme.colorScheme.error,
-                            contentColor = MaterialTheme.colorScheme.onError
+                            contentColor = MaterialTheme.colorScheme.onError,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            /*
-            // Extracted Text Field
-            if (viewModel.extractedText.isNotEmpty() && !viewModel.isLoading) {
-                Text(
-                    text = "EXTRACTED TEXT",
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                NeoInput(
-                    value = viewModel.extractedText,
-                    onValueChange = { viewModel.extractedText = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    minLines = 5,
-                    maxLines = 10
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-            */
-
-            // Confirm Button
+            // 6. CONFIRM BUTTON
             NeoButton(
                 onClick = { 
-                    onConfirm(viewModel.extractedText)
+                    onConfirm(state.editableText)
                     onDismiss()
                 },
-                text = "GENERATE POST",
+                text = "USE THIS TEXT",
                 modifier = Modifier.fillMaxWidth(),
-                enabled = viewModel.extractedText.isNotEmpty() && !viewModel.isLoading
+                enabled = state.editableText.isNotEmpty() && !state.isExtracting
             )
             
             Spacer(modifier = Modifier.height(16.dp))

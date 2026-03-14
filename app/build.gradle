@@ -112,6 +112,9 @@ dependencies {
     // ML Kit Text Recognition
     implementation 'com.google.mlkit:text-recognition:16.0.0'
 
+    // Coroutines Play Services (for await() on Tasks)
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3'
+
     // Palette for color extraction
     implementation 'androidx.palette:palette-ktx:1.0.0'
 }

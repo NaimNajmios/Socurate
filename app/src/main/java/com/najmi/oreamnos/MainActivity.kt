@@ -1020,7 +1020,7 @@ fun MainScreen(
             }
             
             // OCR Image Preview - Show original source image alongside result
-            ocrViewModel.selectedBitmap?.let { bitmap ->
+            ocrViewModel.uiState.selectedBitmap?.let { bitmap ->
                 AnimatedVisibility(visible = hasResult && !isLoading, enter = fadeIn() + expandVertically()) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text(

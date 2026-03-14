@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<paths>
-    <!-- Used by FileProvider to share exported card images via ACTION_SEND intent -->
-    <cache-path
-        name="ocr_temp"
-        path="." />
-</paths>

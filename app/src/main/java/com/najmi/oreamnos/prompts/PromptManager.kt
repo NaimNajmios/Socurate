@@ -198,6 +198,41 @@ object PromptManager {
     }
 
     /**
+     * Builds a prompt specifically for text extracted via Vision AI (Gemini Nano, PaliGemma, Gemma 3).
+     * Vision models return structured labeled data, so the prompt instructs the AI to format it into a post.
+     *
+     * @param structuredText The structured text extracted from the vision model
+     * @param hashtags      Formatted hashtags to include (if any)
+     * @return The formatted prompt string
+     */
+    fun buildPromptFromVisionExtraction(structuredText: String, hashtags: String): String {
+        val prompt = StringBuilder()
+        
+        prompt.append("You are a professional social media content writer for a Malaysian football club. ")
+        prompt.append("The following data was extracted via AI vision from a football screenshot. ")
+        prompt.append("Your task is to transform this structured data into an engaging ")
+        prompt.append("professional social media post in Malaysian Malay (Bahasa Malaysia) for our fans.\n\n")
+        
+        prompt.append("STRICT REQUIREMENTS:\n")
+        prompt.append("1. Write in Bahasa Malaysia (Malaysian Malay).\n")
+        prompt.append("2. Use standard English football terms for technical actions (e.g., 'Clean Sheet', 'Hat-trick', 'Assist', 'Tackle', 'Offside', 'Derby').\n")
+        prompt.append("3. Make the post exciting and engaging - celebrate wins, acknowledge good performances.\n")
+        prompt.append("4. Do NOT use em-dashes (—).\n")
+        prompt.append("5. Do NOT include any hashtags in the body.\n")
+        prompt.append("6. The extracted data may contain labeled fields like 'Match:', 'Score:', 'Player:', etc. - interpret and present this data naturally in the post.\n\n")
+
+        prompt.append("EXTRACTED VISION DATA:\n---\n")
+        prompt.append(structuredText).append("\n---\n\n")
+        
+        prompt.append("Provide ONLY the Bahasa Malaysia post. ")
+        if (hashtags.isNotEmpty()) {
+            prompt.append("After the post, add a double newline and append these hashtags: ").append(hashtags)
+        }
+        
+        return prompt.toString()
+    }
+
+    /**
      * Builds a refinement prompt based on selected options.
      *
      * @param originalPost  The original post to refine
