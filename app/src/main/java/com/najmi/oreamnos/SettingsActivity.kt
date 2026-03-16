@@ -27,9 +27,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -70,6 +72,9 @@ import com.najmi.oreamnos.utils.PreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.najmi.oreamnos.vision.VisionModel
+import com.najmi.oreamnos.utils.VisionModelManager
+import kotlinx.coroutines.flow.collect
 
 /**
  * Settings activity for configuring API key, tone, and model selection.
@@ -325,108 +330,143 @@ fun SettingsScreen(
             // Vision AI Section
             SettingsCard(title = "Vision AI") {
                 val context = LocalContext.current
-                val visionModelManager = remember(context) { com.najmi.oreamnos.utils.VisionModelManager(context) }
-                val geminiNanoAvailable = remember(context) { com.najmi.oreamnos.vision.GeminiNanoExtractor.isAvailable(context) }
-                val installedModels = remember { visionModelManager.getInstalledModels() }
+                val visionModelManager = remember(context) { VisionModelManager(context) }
+                var installedModels by remember { mutableStateOf(visionModelManager.getInstalledModels()) }
+                var downloadingModel by remember { mutableStateOf<VisionModel?>(null) }
+                var downloadProgress by remember { mutableStateOf(0f) }
                 
-                // On-Device OCR Status
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "On-Device OCR",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                        )
-                        Text(
-                            text = "Ready - ML Kit with AI structuring",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Text(
-                        text = "READY",
-                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+                // On-Device OCR Status (Always Ready)
+                VisionModelRow(
+                    name = "On-Device OCR",
+                    description = "Ready - ML Kit with AI structuring",
+                    status = "READY",
+                    isReady = true
+                )
                 
                 Spacer(Modifier.height(16.dp))
                 
                 // PaliGemma Status
-                val paligemmaDownloaded = installedModels.contains(com.najmi.oreamnos.vision.VisionModel.PALIGEMMA_3B)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "PaliGemma 2 3B",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                        )
-                        Text(
-                            text = "~1.5GB · Mid-range friendly",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                val paligemma = VisionModel.PALIGEMMA_3B
+                VisionModelRow(
+                    name = "PaliGemma 2 3B",
+                    description = "~3GB · Mid-range friendly",
+                    status = if (installedModels.contains(paligemma)) "READY" else "NOT DOWNLOADED",
+                    isReady = installedModels.contains(paligemma),
+                    isDownloading = downloadingModel == paligemma,
+                    progress = downloadProgress,
+                    onDownload = {
+                        downloadingModel = paligemma
+                        scope.launch {
+                            visionModelManager.downloadModelFlow(paligemma).collect { progress ->
+                                when (progress) {
+                                    is VisionModelManager.DownloadProgress.InProgress -> {
+                                        downloadProgress = progress.progress
+                                    }
+                                    is VisionModelManager.DownloadProgress.Completed -> {
+                                        downloadingModel = null
+                                        installedModels = visionModelManager.getInstalledModels()
+                                        Toast.makeText(context, "PaliGemma downloaded!", Toast.LENGTH_SHORT).show()
+                                    }
+                                    is VisionModelManager.DownloadProgress.Failed -> {
+                                        downloadingModel = null
+                                        Toast.makeText(context, "Download failed: ${progress.error}", Toast.LENGTH_LONG).show()
+                                    }
+                                    else -> {}
+                                }
+                            }
+                        }
+                    },
+                    onDelete = {
+                        visionModelManager.deleteModel(paligemma)
+                        installedModels = visionModelManager.getInstalledModels()
+                        Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show()
                     }
-                    if (paligemmaDownloaded) {
-                        Text(
-                            text = "READY",
-                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    } else {
-                        Text(
-                            text = "NOT DOWNLOADED",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+                )
                 
                 Spacer(Modifier.height(16.dp))
                 
                 // Gemma 3n Status
-                val gemma3Downloaded = installedModels.contains(com.najmi.oreamnos.vision.VisionModel.GEMMA_3N_E2B)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Gemma 3n E2B",
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                        )
-                        Text(
-                            text = "~2.9GB · Multimodal (vision + text)",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                val gemma3n = VisionModel.GEMMA_3N_E2B
+                VisionModelRow(
+                    name = "Gemma 3n E2B",
+                    description = "~2.9GB · Multimodal (vision + text)",
+                    status = if (installedModels.contains(gemma3n)) "READY" else "NOT DOWNLOADED",
+                    isReady = installedModels.contains(gemma3n),
+                    isDownloading = downloadingModel == gemma3n,
+                    progress = downloadProgress,
+                    onDownload = {
+                        downloadingModel = gemma3n
+                        scope.launch {
+                            visionModelManager.downloadModelFlow(gemma3n).collect { progress ->
+                                when (progress) {
+                                    is VisionModelManager.DownloadProgress.InProgress -> {
+                                        downloadProgress = progress.progress
+                                    }
+                                    is VisionModelManager.DownloadProgress.Completed -> {
+                                        downloadingModel = null
+                                        installedModels = visionModelManager.getInstalledModels()
+                                        Toast.makeText(context, "Gemma 3n downloaded!", Toast.LENGTH_SHORT).show()
+                                    }
+                                    is VisionModelManager.DownloadProgress.Failed -> {
+                                        downloadingModel = null
+                                        Toast.makeText(context, "Download failed: ${progress.error}", Toast.LENGTH_LONG).show()
+                                    }
+                                    else -> {}
+                                }
+                            }
+                        }
+                    },
+                    onDelete = {
+                        visionModelManager.deleteModel(gemma3n)
+                        installedModels = visionModelManager.getInstalledModels()
+                        Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show()
                     }
-                    if (gemma3Downloaded) {
-                        Text(
-                            text = "READY",
-                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    } else {
-                        Text(
-                            text = "NOT DOWNLOADED",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                )
+                
+                Spacer(Modifier.height(16.dp))
+                
+                // Gemma 3 1B Status
+                val gemma3_1b = VisionModel.GEMMA_3_1B
+                VisionModelRow(
+                    name = "Gemma 3 1B",
+                    description = "~557MB · Fast text structuring",
+                    status = if (installedModels.contains(gemma3_1b)) "READY" else "NOT DOWNLOADED",
+                    isReady = installedModels.contains(gemma3_1b),
+                    isDownloading = downloadingModel == gemma3_1b,
+                    progress = downloadProgress,
+                    onDownload = {
+                        downloadingModel = gemma3_1b
+                        scope.launch {
+                            visionModelManager.downloadModelFlow(gemma3_1b).collect { progress ->
+                                when (progress) {
+                                    is VisionModelManager.DownloadProgress.InProgress -> {
+                                        downloadProgress = progress.progress
+                                    }
+                                    is VisionModelManager.DownloadProgress.Completed -> {
+                                        downloadingModel = null
+                                        installedModels = visionModelManager.getInstalledModels()
+                                        Toast.makeText(context, "Gemma 3 1B downloaded!", Toast.LENGTH_SHORT).show()
+                                    }
+                                    is VisionModelManager.DownloadProgress.Failed -> {
+                                        downloadingModel = null
+                                        Toast.makeText(context, "Download failed: ${progress.error}", Toast.LENGTH_LONG).show()
+                                    }
+                                    else -> {}
+                                }
+                            }
+                        }
+                    },
+                    onDelete = {
+                        visionModelManager.deleteModel(gemma3_1b)
+                        installedModels = visionModelManager.getInstalledModels()
+                        Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show()
                     }
-                }
+                )
                 
                 Spacer(Modifier.height(16.dp))
                 
                 // Storage Used
-                val totalStorage = installedModels.sumOf { it.approximateSizeMb }
+                val totalStorage = visionModelManager.getTotalStorageUsedMb()
                 Text(
                     text = "Storage used: ${totalStorage}MB",
                     style = MaterialTheme.typography.bodySmall,
@@ -436,7 +476,7 @@ fun SettingsScreen(
                 Spacer(Modifier.height(8.dp))
                 
                 Text(
-                    text = "Vision models are downloaded on-demand when you first use screenshot extraction. Gemini Nano works automatically on supported devices.",
+                    text = "Vision models enable advanced screenshot extraction. Gemma 3n is recommended for the best visual understanding.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -667,6 +707,80 @@ fun NavigationRow(
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+@Composable
+fun VisionModelRow(
+    name: String,
+    description: String,
+    status: String,
+    isReady: Boolean,
+    isDownloading: Boolean = false,
+    progress: Float = 0f,
+    onDownload: () -> Unit = {},
+    onDelete: () -> Unit = {}
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isDownloading) {
+                    CircularProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(Modifier.width(8.dp))
+                }
+                
+                Text(
+                    text = if (isDownloading) "${(progress * 100).toInt()}%" else status,
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    color = if (isReady) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                if (status != "READY" || name != "On-Device OCR") {
+                    Spacer(Modifier.width(8.dp))
+                    IconButton(
+                        onClick = if (isReady) onDelete else onDownload,
+                        modifier = Modifier.size(24.dp),
+                        enabled = !isDownloading
+                    ) {
+                        Icon(
+                            imageVector = if (isReady) Icons.Default.Delete 
+                                         else Icons.Default.Download,
+                            contentDescription = if (isReady) "Delete" else "Download",
+                            modifier = Modifier.size(16.dp),
+                            tint = if (isReady) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        }
+        
+        if (isDownloading) {
+            Spacer(Modifier.height(4.dp))
+            androidx.compose.material3.LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxWidth().height(2.dp)
+            )
+        }
     }
 }
 
