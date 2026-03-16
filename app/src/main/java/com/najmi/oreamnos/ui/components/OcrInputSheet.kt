@@ -3,6 +3,7 @@ package com.najmi.oreamnos.ui.components
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import androidx.compose.foundation.horizontalScroll
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
@@ -12,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -143,6 +145,59 @@ fun OcrInputSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // MODEL SELECTION ROW
+            Text(
+                text = "VISION MODEL",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(androidx.compose.foundation.rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                val models = listOf(
+                    "auto" to "Auto",
+                    VisionModel.GEMMA_3N_E2B.id to "Gemma 3n",
+                    VisionModel.GEMMA_3_1B.id to "Gemma 3",
+                    VisionModel.PALIGEMMA_3B.id to "PaliGemma",
+                    VisionModel.ML_KIT.id to "OCR Only"
+                )
+                
+                models.forEach { (id, label) ->
+                    val isSelected = state.preferredModelId == id
+                    val model = if (id == "auto") null else VisionModel.fromId(id)
+                    val isAvailable = model == null || model == VisionModel.ML_KIT || state.installedMediaPipeModels.contains(model)
+                    
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { viewModel.onModelSelected(id) },
+                        label = { 
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(label)
+                                if (id != "auto" && id != VisionModel.ML_KIT.id && !isAvailable) {
+                                    Spacer(Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = androidx.compose.material.icons.Icons.Default.Download,
+                                        contentDescription = "Needs Download",
+                                        modifier = Modifier.size(12.dp)
+                                    )
+                                }
+                            }
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             // 2. MODEL DOWNLOAD CARD (Conditional)
             val showDownloadCard = !state.geminiNanoAvailable && 
                                   state.installedMediaPipeModels.isEmpty() && 
@@ -167,25 +222,39 @@ fun OcrInputSheet(
 
             // 3. EXTRACTING (Loading)
             if (state.isExtracting) {
-                val loadingLabel = when (state.activeExtractorModel) {
-                    VisionModel.GEMINI_NANO -> "Analysing with On-Device OCR…"
-                    VisionModel.GEMMA_3N_E2B -> "Analysing with Gemma 3n…"
-                    VisionModel.GEMMA_3_1B -> "Analysing with Gemma 3…"
-                    VisionModel.PALIGEMMA_3B -> "Analysing with PaliGemma…"
-                    VisionModel.ML_KIT -> "Reading image…"
+                val loadingLabel = when (state.extractionStep) {
+                    com.najmi.oreamnos.viewmodel.ExtractionStep.INITIALIZING -> "Initializing AI Engine…"
+                    com.najmi.oreamnos.viewmodel.ExtractionStep.INFERRING -> "Analyzing screenshot…"
+                    else -> "Processing…"
+                }
+                
+                val modelLabel = when (state.activeExtractorModel) {
+                    VisionModel.GEMINI_NANO -> "On-Device OCR"
+                    VisionModel.GEMMA_3N_E2B -> "Gemma 3n"
+                    VisionModel.GEMMA_3_1B -> "Gemma 3"
+                    VisionModel.PALIGEMMA_3B -> "PaliGemma"
+                    VisionModel.ML_KIT -> "ML Kit"
                 }
                 
                 EnhancedLoadingCard(
                     modifier = Modifier.fillMaxWidth(),
-                    // Vision models take longer
                     estimatedDurationMs = if (state.activeExtractorModel == VisionModel.ML_KIT) 3000L else 12000L
                 )
-                Text(
-                    text = loadingLabel,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = loadingLabel,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "Using $modelLabel",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 Spacer(modifier = Modifier.height(24.dp))
             }
 

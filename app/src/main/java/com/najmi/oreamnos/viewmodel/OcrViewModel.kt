@@ -15,8 +15,19 @@ import com.najmi.oreamnos.utils.VisionModelManager
 import com.najmi.oreamnos.vision.IVisionExtractor
 import com.najmi.oreamnos.vision.VisionExtractorFactory
 import com.najmi.oreamnos.vision.VisionModel
+import com.najmi.oreamnos.utils.PreferencesManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+
+/**
+ * Extraction steps for the loading UI.
+ */
+enum class ExtractionStep {
+    IDLE,
+    INITIALIZING,
+    INFERRING,
+    DONE
+}
 
 /**
  * Enhanced UI State for the vision-powered OCR flow.
@@ -24,11 +35,13 @@ import kotlinx.coroutines.launch
 data class OcrUiState(
     val selectedBitmap: Bitmap? = null,
     val isExtracting: Boolean = false,
+    val extractionStep: ExtractionStep = ExtractionStep.IDLE,
     val editableText: String = "",
     val extractionResult: VisionExtractionResult? = null,
     val isModelDownloading: Boolean = false,
     val modelDownloadProgress: Float = 0f,
     val activeExtractorModel: VisionModel = VisionModel.ML_KIT,
+    val preferredModelId: String = "auto",
     val geminiNanoAvailable: Boolean = false,
     val installedMediaPipeModels: List<VisionModel> = emptyList(),
     val error: String? = null,
@@ -41,6 +54,7 @@ data class OcrUiState(
  */
 class OcrViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val prefsManager = PreferencesManager(application)
     private val modelManager = VisionModelManager(application)
     private val extractorFactory = VisionExtractorFactory(application, modelManager)
     private var activeExtractor: IVisionExtractor? = null
@@ -58,8 +72,20 @@ class OcrViewModel(application: Application) : AndroidViewModel(application) {
     private fun refreshModelState() {
         uiState = uiState.copy(
             geminiNanoAvailable = com.najmi.oreamnos.vision.GeminiNanoExtractor.isAvailable(getApplication()),
-            installedMediaPipeModels = modelManager.getInstalledModels()
+            installedMediaPipeModels = modelManager.getInstalledModels(),
+            preferredModelId = prefsManager.getVisionModelPreference()
         )
+    }
+
+    fun onModelSelected(modelId: String) {
+        prefsManager.saveVisionModelPreference(modelId)
+        uiState = uiState.copy(preferredModelId = modelId)
+        
+        // If image is already picked and we switch to an available model, re-run
+        val model = if (modelId == "auto") null else VisionModel.fromId(modelId)
+        if (uiState.selectedBitmap != null && (model == null || extractorFactory.isModelAvailable(model))) {
+            processImage(uiState.selectedBitmap!!)
+        }
     }
 
     /**
@@ -75,12 +101,20 @@ class OcrViewModel(application: Application) : AndroidViewModel(application) {
      */
     private fun processImage(bitmap: Bitmap) {
         viewModelScope.launch {
-            uiState = uiState.copy(isExtracting = true, showFallbackNotice = false)
+            uiState = uiState.copy(
+                isExtracting = true, 
+                extractionStep = ExtractionStep.INITIALIZING,
+                showFallbackNotice = false
+            )
             
-            // Create best available extractor
-            val extractor = extractorFactory.create()
+            // Create best available extractor respecting preference
+            val prefId = if (uiState.preferredModelId == "auto") null else uiState.preferredModelId
+            val extractor = extractorFactory.create(prefId)
             activeExtractor = extractor
-            uiState = uiState.copy(activeExtractorModel = extractor.model)
+            uiState = uiState.copy(
+                activeExtractorModel = extractor.model,
+                extractionStep = ExtractionStep.INFERRING
+            )
 
             val result = extractor.extractFromImage(bitmap)
             
@@ -107,7 +141,8 @@ class OcrViewModel(application: Application) : AndroidViewModel(application) {
                 uiState = uiState.copy(
                     editableText = result.extractedText,
                     extractionResult = result,
-                    isExtracting = false
+                    isExtracting = false,
+                    extractionStep = ExtractionStep.DONE
                 )
             }
             
@@ -150,9 +185,14 @@ class OcrViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun clearState() {
-        uiState = OcrUiState(
-            geminiNanoAvailable = uiState.geminiNanoAvailable,
-            installedMediaPipeModels = uiState.installedMediaPipeModels
+        uiState = uiState.copy(
+            selectedBitmap = null,
+            isExtracting = false,
+            extractionStep = ExtractionStep.IDLE,
+            editableText = "",
+            extractionResult = null,
+            error = null,
+            showFallbackNotice = false
         )
         activeExtractor?.release()
         activeExtractor = null
@@ -167,9 +207,14 @@ class OcrViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun clearSelection() {
-        uiState = OcrUiState(
-            geminiNanoAvailable = uiState.geminiNanoAvailable,
-            installedMediaPipeModels = uiState.installedMediaPipeModels
+        uiState = uiState.copy(
+            selectedBitmap = null,
+            isExtracting = false,
+            extractionStep = ExtractionStep.IDLE,
+            editableText = "",
+            extractionResult = null,
+            error = null,
+            showFallbackNotice = false
         )
         activeExtractor?.release()
         activeExtractor = null

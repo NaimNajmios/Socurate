@@ -129,6 +129,16 @@ class PreferencesManager(context: Context) {
         return securePrefs.getBoolean(KEY_SOURCE_ENABLED, true)
     }
 
+    // ==================== VISION AI PREFERENCE ====================
+
+    fun saveVisionModelPreference(modelId: String) {
+        securePrefs.edit().putString(KEY_VISION_MODEL_PREFERENCE, modelId).apply()
+    }
+
+    fun getVisionModelPreference(): String {
+        return securePrefs.getString(KEY_VISION_MODEL_PREFERENCE, "auto") ?: "auto"
+    }
+
     // ==================== WATERMARK ====================
     
     fun saveWatermarkPath(path: String?) {
@@ -401,6 +411,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_USAGE_STATS = "usage_stats"
         private const val KEY_TEXT_SIZE = "output_text_size"
         private const val KEY_SAVED_WATERMARK_PATH = "saved_watermark_path"
+        private const val KEY_VISION_MODEL_PREFERENCE = "vision_model_preference"
 
         // Defaults
         private const val DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
