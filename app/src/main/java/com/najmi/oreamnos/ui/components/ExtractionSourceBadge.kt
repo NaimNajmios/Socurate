@@ -23,8 +23,9 @@ fun ExtractionSourceBadge(
 
     val badgeLabel = when (model) {
         VisionModel.GEMINI_NANO -> "✓ On-Device OCR"
-        VisionModel.PALIGEMMA_2_3B -> "✓ PaliGemma Vision"
-        VisionModel.GEMMA_3_4B -> "✓ Gemma 3 Vision"
+        VisionModel.GEMMA_3N_E2B -> "✓ Gemma 3n Vision"
+        VisionModel.GEMMA_3_1B -> "✓ Gemma 3 1B"
+        VisionModel.PALIGEMMA_3B -> "✓ PaliGemma Vision"
         VisionModel.ML_KIT -> "OCR Fallback"
     }
 
@@ -69,8 +70,9 @@ private fun getTooltipText(model: VisionModel, durationMs: Long?): String {
     val durationText = if (durationMs != null) " Extracted in ${"%.1f".format(durationMs / 1000.0)}s." else ""
     return when (model) {
         VisionModel.GEMINI_NANO -> "Extracted using on-device OCR with ML Kit. Text is then intelligently structured using AI.$durationText"
-        VisionModel.PALIGEMMA_2_3B -> "Extracted using PaliGemma 2 3B running fully offline on your device.$durationText"
-        VisionModel.GEMMA_3_4B -> "Extracted using Gemma 3 4B running fully offline on your device.$durationText"
+        VisionModel.GEMMA_3N_E2B -> "Extracted using Gemma 3n E2B running fully offline on your device (multimodal).$durationText"
+        VisionModel.GEMMA_3_1B -> "Extracted using Gemma 3 1B running fully offline on your device (text-only, uses OCR first).$durationText"
+        VisionModel.PALIGEMMA_3B -> "Extracted using PaliGemma 3B running fully offline on your device.$durationText"
         VisionModel.ML_KIT -> "Extracted using ML Kit OCR. Text only — no AI interpretation. For better results, use the on-device OCR option."
     }
 }

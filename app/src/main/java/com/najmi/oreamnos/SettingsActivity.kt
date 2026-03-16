@@ -356,7 +356,7 @@ fun SettingsScreen(
                 Spacer(Modifier.height(16.dp))
                 
                 // PaliGemma Status
-                val paligemmaDownloaded = installedModels.contains(com.najmi.oreamnos.vision.VisionModel.PALIGEMMA_2_3B)
+                val paligemmaDownloaded = installedModels.contains(com.najmi.oreamnos.vision.VisionModel.PALIGEMMA_3B)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -390,8 +390,8 @@ fun SettingsScreen(
                 
                 Spacer(Modifier.height(16.dp))
                 
-                // Gemma 3 Status
-                val gemma3Downloaded = installedModels.contains(com.najmi.oreamnos.vision.VisionModel.GEMMA_3_4B)
+                // Gemma 3n Status
+                val gemma3Downloaded = installedModels.contains(com.najmi.oreamnos.vision.VisionModel.GEMMA_3N_E2B)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -399,11 +399,11 @@ fun SettingsScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Gemma 3 4B",
+                            text = "Gemma 3n E2B",
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                         )
                         Text(
-                            text = "~2GB · Flagship devices",
+                            text = "~2.9GB · Multimodal (vision + text)",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

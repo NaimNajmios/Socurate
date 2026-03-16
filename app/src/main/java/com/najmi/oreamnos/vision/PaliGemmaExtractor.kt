@@ -18,7 +18,7 @@ class PaliGemmaExtractor(
     private val context: Context,
     private val modelManager: VisionModelManager
 ) : IVisionExtractor {
-    override val model: VisionModel = VisionModel.PALIGEMMA_2_3B
+    override val model: VisionModel = VisionModel.PALIGEMMA_3B
 
     private val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 

@@ -153,6 +153,10 @@ fun OcrInputSheet(
                 VisionModelDownloadCard(
                     isDownloading = state.isModelDownloading,
                     downloadProgress = state.modelDownloadProgress,
+                    downloadedMb = 0,
+                    totalMb = 0,
+                    selectedModel = VisionModel.GEMMA_3N_E2B,
+                    onModelSelect = { },
                     onDownloadClick = { viewModel.startDownload(it) },
                     onSkipClick = { /* User just proceeds with OCR */ },
                     onCancelClick = { viewModel.cancelDownload() },
@@ -165,8 +169,9 @@ fun OcrInputSheet(
             if (state.isExtracting) {
                 val loadingLabel = when (state.activeExtractorModel) {
                     VisionModel.GEMINI_NANO -> "Analysing with On-Device OCR…"
-                    VisionModel.PALIGEMMA_2_3B -> "Analysing with PaliGemma…"
-                    VisionModel.GEMMA_3_4B -> "Analysing with Gemma 3…"
+                    VisionModel.GEMMA_3N_E2B -> "Analysing with Gemma 3n…"
+                    VisionModel.GEMMA_3_1B -> "Analysing with Gemma 3…"
+                    VisionModel.PALIGEMMA_3B -> "Analysing with PaliGemma…"
                     VisionModel.ML_KIT -> "Reading image…"
                 }
                 

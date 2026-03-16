@@ -87,7 +87,7 @@ class OcrViewModel(application: Application) : AndroidViewModel(application) {
             if (result.error != null) {
                 // If vision failed, try ML Kit fallback silently
                 if (extractor.model != VisionModel.ML_KIT) {
-                    val fallback = extractorFactory.create(VisionModel.ML_KIT)
+                    val fallback = extractorFactory.create(VisionModel.ML_KIT.id)
                     val fallbackResult = fallback.extractFromImage(bitmap)
                     
                     uiState = uiState.copy(
@@ -124,9 +124,9 @@ class OcrViewModel(application: Application) : AndroidViewModel(application) {
         downloadJob = viewModelScope.launch {
             uiState = uiState.copy(isModelDownloading = true, modelDownloadProgress = 0f)
             
-            val result = modelManager.downloadModel(model) { progress ->
+            val result = modelManager.downloadModel(model, onProgress = { progress ->
                 uiState = uiState.copy(modelDownloadProgress = progress)
-            }
+            })
             
             uiState = uiState.copy(isModelDownloading = false)
             

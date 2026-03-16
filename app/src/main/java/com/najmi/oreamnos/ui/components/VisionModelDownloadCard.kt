@@ -15,17 +15,27 @@ import com.najmi.oreamnos.vision.VisionModel
 
 /**
  * Card shown when a vision model needs to be downloaded.
+ * Shows options for Gemma 3n E2B (recommended), Gemma 3 1B (lighter), and PaliGemma.
+ * 
+ * Note: Full LiteRT integration requires Kotlin 2.0+.
  */
 @Composable
 fun VisionModelDownloadCard(
     isDownloading: Boolean,
     downloadProgress: Float,
+    downloadedMb: Long,
+    totalMb: Long,
+    selectedModel: VisionModel,
+    onModelSelect: (VisionModel) -> Unit,
     onDownloadClick: (VisionModel) -> Unit,
     onSkipClick: () -> Unit,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var selectedModel by remember { mutableStateOf(VisionModel.PALIGEMMA_2_3B) }
+    // Default to Gemma 3n E2B as recommended
+    var currentSelected by remember { 
+        mutableStateOf(VisionModel.GEMMA_3N_E2B) 
+    }
 
     NeoCard(
         modifier = modifier.animateContentSize(),
@@ -43,48 +53,56 @@ fun VisionModelDownloadCard(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Extract player stats and match data directly from screenshots — no OCR step needed. One-time download, fully offline after.",
+                    text = "Extract player stats and match data directly from screenshots. One-time download, fully offline after.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Gemini Nano status (informational)
+                // Info about coming soon
                 Text(
-                    text = "• Gemini Nano: Not supported on this device",
+                    text = "Coming Soon",
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Model options - showing as coming soon
+                val availableModels = listOf(
+                    VisionModel.GEMMA_3N_E2B,
+                    VisionModel.GEMMA_3_1B,
+                    VisionModel.PALIGEMMA_3B
+                )
+
+                availableModels.forEach { model ->
+                    ModelOptionRow(
+                        model = model,
+                        selected = currentSelected == model,
+                        onClick = { 
+                            currentSelected = model
+                            onModelSelect(model)
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Note about Kotlin version
+                Text(
+                    text = "Requires Kotlin 2.0+ (coming in next update)",
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Select a model to download:",
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    ModelChoiceChip(
-                        model = VisionModel.PALIGEMMA_2_3B,
-                        selected = selectedModel == VisionModel.PALIGEMMA_2_3B,
-                        onClick = { selectedModel = VisionModel.PALIGEMMA_2_3B },
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    ModelChoiceChip(
-                        model = VisionModel.GEMMA_3_4B,
-                        selected = selectedModel == VisionModel.GEMMA_3_4B,
-                        onClick = { selectedModel = VisionModel.GEMMA_3_4B },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 NeoButton(
-                    onClick = { onDownloadClick(selectedModel) },
-                    text = "DOWNLOAD SELECTED MODEL",
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = { onDownloadClick(currentSelected) },
+                    text = "NOTIFY WHEN AVAILABLE",
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = false
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -101,7 +119,7 @@ fun VisionModelDownloadCard(
                 }
             } else {
                 Text(
-                    text = "DOWNLOADING ${selectedModel.displayName}...",
+                    text = "DOWNLOADING ${selectedModel.displayName.toUpperCase()}...",
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -109,7 +127,9 @@ fun VisionModelDownloadCard(
                 
                 LinearProgressIndicator(
                     progress = { downloadProgress },
-                    modifier = Modifier.fillMaxWidth().height(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp),
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
                     strokeCap = androidx.compose.ui.graphics.StrokeCap.Butt
@@ -125,11 +145,13 @@ fun VisionModelDownloadCard(
                         text = "${(downloadProgress * 100).toInt()}%",
                         style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
                     )
-                    Text(
-                        text = "${(selectedModel.approximateSizeMb * downloadProgress).toInt()} MB of ${selectedModel.approximateSizeMb} MB",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    if (totalMb > 0) {
+                        Text(
+                            text = "$downloadedMb MB of $totalMb MB",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -147,16 +169,23 @@ fun VisionModelDownloadCard(
 }
 
 @Composable
-private fun ModelChoiceChip(
+private fun ModelOptionRow(
     model: VisionModel,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val displayInfo = when (model) {
+        VisionModel.GEMMA_3N_E2B -> "Gemma 3n E2B" to "~2.9GB - Best for screenshots (multimodal)"
+        VisionModel.GEMMA_3_1B -> "Gemma 3 1B" to "~557MB - Fast, uses OCR first"
+        VisionModel.PALIGEMMA_3B -> "PaliGemma 3B" to "~3GB - Legacy option"
+        else -> model.displayName to "~${model.approximateSizeMb}MB"
+    }
+    
     NeoChip(
-        text = "${model.displayName}\n~${model.approximateSizeMb / 1000.0}GB\n${if (model == VisionModel.PALIGEMMA_2_3B) "Mid-range" else "Flagship"}",
+        text = "${displayInfo.first}\n${displayInfo.second}",
         selected = selected,
         onClick = onClick,
-        modifier = modifier
+        modifier = modifier.fillMaxWidth()
     )
 }

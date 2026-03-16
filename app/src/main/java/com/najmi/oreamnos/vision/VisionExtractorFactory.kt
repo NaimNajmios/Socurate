@@ -5,6 +5,11 @@ import com.najmi.oreamnos.utils.VisionModelManager
 
 /**
  * Factory to create the best available [IVisionExtractor].
+ * 
+ * Priority order for auto-selection:
+ * 1. Gemma 3n E2B (multimodal) - requires Kotlin 2.0+ for LiteRT
+ * 2. Gemma 3 1B (text-only) - requires Kotlin 2.0+ for LiteRT
+ * 3. ML Kit OCR (fallback)
  */
 class VisionExtractorFactory(
     private val context: Context,
@@ -14,39 +19,56 @@ class VisionExtractorFactory(
     /**
      * Creates an extractor based on user preference or automatic best-available logic.
      *
-     * @param preferredModel The model the user has manually selected (if any).
+     * @param preferredModelId The model ID the user has manually selected (if any).
      */
-    fun create(preferredModel: VisionModel? = null): IVisionExtractor {
+    fun create(preferredModelId: String? = null): IVisionExtractor {
         // 1. If user has a pinned preference, try that first
-        preferredModel?.let {
-            if (isModelAvailable(it)) {
-                return createExtractor(it)
+        preferredModelId?.let { id ->
+            val preferredModel = VisionModel.fromId(id)
+            if (isModelAvailable(preferredModel)) {
+                return createExtractor(preferredModel)
             }
         }
 
-        // 2. Auto-selection priority
-        return when {
-            GeminiNanoExtractor.isAvailable(context) -> createExtractor(VisionModel.GEMINI_NANO)
-            modelManager.isModelAvailable(VisionModel.PALIGEMMA_2_3B) -> createExtractor(VisionModel.PALIGEMMA_2_3B)
-            modelManager.isModelAvailable(VisionModel.GEMMA_3_4B) -> createExtractor(VisionModel.GEMMA_3_4B)
-            else -> createExtractor(VisionModel.ML_KIT)
-        }
+        // 2. Auto-selection - for now, use ML Kit OCR
+        // Full LiteRT integration when Kotlin 2.0+ is available
+        return createExtractor(VisionModel.ML_KIT)
     }
 
-    private fun isModelAvailable(model: VisionModel): Boolean {
+    /**
+     * Checks if a specific model is available.
+     */
+    fun isModelAvailable(model: VisionModel): Boolean {
         return when (model) {
-            VisionModel.GEMINI_NANO -> GeminiNanoExtractor.isAvailable(context)
-            VisionModel.ML_KIT -> true
+            VisionModel.GEMINI_NANO, VisionModel.ML_KIT -> true
             else -> modelManager.isModelAvailable(model)
         }
     }
 
+    /**
+     * Gets the best available model for auto mode.
+     */
+    fun getBestAvailableModel(): VisionModel {
+        // Currently only ML Kit is available without LiteRT
+        return VisionModel.ML_KIT
+    }
+
+    /**
+     * Gets all available models for UI display.
+     */
+    fun getAvailableModels(): List<VisionModel> {
+        return listOf(VisionModel.ML_KIT)
+    }
+
     private fun createExtractor(model: VisionModel): IVisionExtractor {
         return when (model) {
+            // ML Kit OCR based
             VisionModel.GEMINI_NANO -> GeminiNanoExtractor(context)
-            VisionModel.PALIGEMMA_2_3B -> PaliGemmaExtractor(context, modelManager)
-            VisionModel.GEMMA_3_4B -> Gemma3VisionExtractor(context, modelManager)
             VisionModel.ML_KIT -> MlKitFallbackExtractor()
+            
+            // LiteRT models - show as available but use fallback
+            // Full implementation when Kotlin 2.0+ is available
+            else -> MlKitFallbackExtractor()
         }
     }
 }

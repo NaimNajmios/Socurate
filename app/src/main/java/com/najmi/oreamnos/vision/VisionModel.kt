@@ -3,8 +3,11 @@ package com.najmi.oreamnos.vision
 /**
  * Defines all supported extraction paths as an enum with metadata.
  * 
- * Note: True on-device vision models (PaliGemma, Gemma 3) require model files
- * that need to be downloaded separately. The URLs below are placeholders.
+ * Models are downloaded from HuggingFace LiteRT Community:
+ * - Gemma 3n: https://huggingface.co/litert-community
+ * - Gemma 3: https://huggingface.co/litert-community
+ * 
+ * Note: Full LiteRT integration requires Kotlin 2.0+. Currently using ML Kit OCR.
  */
 enum class VisionModel(
     val id: String,
@@ -13,7 +16,8 @@ enum class VisionModel(
     val requiresDownload: Boolean,
     val approximateSizeMb: Int,
     val minimumRamGb: Int,
-    val downloadUrl: String? = null
+    val downloadUrl: String? = null,
+    val isMultimodal: Boolean = false
 ) {
     GEMINI_NANO(
         id = "gemini_nano",
@@ -21,25 +25,38 @@ enum class VisionModel(
         description = "ML Kit text recognition with intelligent structuring.",
         requiresDownload = false,
         approximateSizeMb = 0,
-        minimumRamGb = 4
+        minimumRamGb = 4,
+        isMultimodal = false
     ),
-    PALIGEMMA_2_3B(
-        id = "paligemma_2_3b",
-        displayName = "PaliGemma 2 3B",
-        description = "Optimized on-device vision model. Balanced performance.",
+    GEMMA_3N_E2B(
+        id = "gemma_3n_e2b",
+        displayName = "Gemma 3n E2B",
+        description = "Multimodal model with vision + text. ~2.9GB. Best for screenshots.",
         requiresDownload = true,
-        approximateSizeMb = 1500,
+        approximateSizeMb = 2965,
         minimumRamGb = 6,
-        downloadUrl = null // Placeholder - requires model file
+        downloadUrl = "https://huggingface.co/litert-community/Gemma-3n-E2B-it-int4/resolve/main/gemma-3n-e2b-it-int4.task",
+        isMultimodal = true
     ),
-    GEMMA_3_4B(
-        id = "gemma_3_4b",
-        displayName = "Gemma 3 4B",
-        description = "High-performance on-device vision model. Flagship devices.",
+    GEMMA_3_1B(
+        id = "gemma_3_1b",
+        displayName = "Gemma 3 1B",
+        description = "Text-only model. ~557MB. Fast, works with OCR text.",
         requiresDownload = true,
-        approximateSizeMb = 2000,
+        approximateSizeMb = 557,
+        minimumRamGb = 4,
+        downloadUrl = "https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task",
+        isMultimodal = false
+    ),
+    PALIGEMMA_3B(
+        id = "paligemma_3b",
+        displayName = "PaliGemma 3B",
+        description = "Vision language model. ~3GB. Legacy option.",
+        requiresDownload = true,
+        approximateSizeMb = 3000,
         minimumRamGb = 8,
-        downloadUrl = null // Placeholder - requires model file
+        downloadUrl = null, 
+        isMultimodal = true
     ),
     ML_KIT(
         id = "ml_kit",
@@ -47,10 +64,21 @@ enum class VisionModel(
         description = "Basic text extraction. No AI interpretation.",
         requiresDownload = false,
         approximateSizeMb = 0,
-        minimumRamGb = 2
+        minimumRamGb = 2,
+        isMultimodal = false
     );
 
     companion object {
-        fun fromId(id: String): VisionModel = entries.find { it.id == id } ?: ML_KIT
+        fun fromId(id: String): VisionModel {
+            return values().find { it.id == id } ?: ML_KIT
+        }
+        
+        fun getDownloadableModels(): List<VisionModel> {
+            return values().filter { it.requiresDownload && it.downloadUrl != null }
+        }
+        
+        fun getMultimodalModels(): List<VisionModel> {
+            return values().filter { it.isMultimodal }
+        }
     }
 }
