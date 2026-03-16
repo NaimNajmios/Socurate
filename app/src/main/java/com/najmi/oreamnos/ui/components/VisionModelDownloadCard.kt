@@ -119,7 +119,7 @@ fun VisionModelDownloadCard(
                 }
             } else {
                 Text(
-                    text = "DOWNLOADING ${selectedModel.displayName.toUpperCase()}...",
+                    text = "DOWNLOADING ${selectedModel.displayName.uppercase()}...",
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )

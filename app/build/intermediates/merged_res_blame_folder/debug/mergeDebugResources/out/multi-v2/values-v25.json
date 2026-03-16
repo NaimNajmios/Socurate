@@ -4,7 +4,7 @@
             "outputFile": "com.najmi.oreamnos.app-mergeDebugResources-68:/values-v25/values-v25.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\218776c5ea69f9e66b4cbc140bc1a1ee\\transformed\\appcompat-1.6.1\\res\\values-v25\\values-v25.xml",
+                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\fe19f04d268639021f779893b4d9829f\\transformed\\appcompat-1.6.1\\res\\values-v25\\values-v25.xml",
                     "from": {
                         "startLines": "2,3,4,6",
                         "startColumns": "4,4,4,4",

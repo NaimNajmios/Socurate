@@ -4,24 +4,7 @@
             "outputFile": "com.najmi.oreamnos.app-mergeDebugResources-68:/values-pt/values-pt.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\c9e25c85ddececcde349f04632da7774\\transformed\\ui-release\\res\\values-pt\\values-pt.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "105,200,286,383,482,568,651,748,839,926,998,1067,1152,1242,1318,1394,1461",
-                        "endColumns": "94,85,96,98,85,82,96,90,86,71,68,84,89,75,75,66,112",
-                        "endOffsets": "195,281,378,477,563,646,743,834,921,993,1062,1147,1237,1313,1389,1456,1569"
-                    },
-                    "to": {
-                        "startLines": "36,37,38,39,40,41,42,99,100,101,102,103,104,106,108,109,110",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "3578,3673,3759,3856,3955,4041,4124,10361,10452,10539,10611,10680,10765,10941,11118,11194,11261",
-                        "endColumns": "94,85,96,98,85,82,96,90,86,71,68,84,89,75,75,66,112",
-                        "endOffsets": "3668,3754,3851,3950,4036,4119,4216,10447,10534,10606,10675,10760,10850,11012,11189,11256,11369"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\218776c5ea69f9e66b4cbc140bc1a1ee\\transformed\\appcompat-1.6.1\\res\\values-pt\\values-pt.xml",
+                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\fe19f04d268639021f779893b4d9829f\\transformed\\appcompat-1.6.1\\res\\values-pt\\values-pt.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -38,24 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\1bf65c8bfce9a53a4f5cf6083cfe99b8\\transformed\\foundation-release\\res\\values-pt\\values-pt.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,138",
-                        "endColumns": "82,84",
-                        "endOffsets": "133,218"
-                    },
-                    "to": {
-                        "startLines": "111,112",
-                        "startColumns": "4,4",
-                        "startOffsets": "11374,11457",
-                        "endColumns": "82,84",
-                        "endOffsets": "11452,11537"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\c0847ad8133f09c118e93849e62b87d1\\transformed\\material3-release\\res\\values-pt\\values-pt.xml",
+                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\ee5fa1d55a84a29af2ba044e3082f0fd\\transformed\\material3-release\\res\\values-pt\\values-pt.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -72,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\789747e16abeb4d1ce2bf836353a844a\\transformed\\core-1.12.0\\res\\values-pt\\values-pt.xml",
+                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\5fb22c80d588c0e8a10de75eb57da42d\\transformed\\core-1.12.0\\res\\values-pt\\values-pt.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -86,6 +52,40 @@
                         "startOffsets": "2843,2940,3042,3141,3241,3348,3458,11017",
                         "endColumns": "96,101,98,99,106,109,119,100",
                         "endOffsets": "2935,3037,3136,3236,3343,3453,3573,11113"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\2fc8462d8f5e540d8b24e8b8b8e3e14d\\transformed\\ui-release\\res\\values-pt\\values-pt.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "105,200,286,383,482,568,651,748,839,926,998,1067,1152,1242,1318,1394,1461",
+                        "endColumns": "94,85,96,98,85,82,96,90,86,71,68,84,89,75,75,66,112",
+                        "endOffsets": "195,281,378,477,563,646,743,834,921,993,1062,1147,1237,1313,1389,1456,1569"
+                    },
+                    "to": {
+                        "startLines": "36,37,38,39,40,41,42,99,100,101,102,103,104,106,108,109,110",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "3578,3673,3759,3856,3955,4041,4124,10361,10452,10539,10611,10680,10765,10941,11118,11194,11261",
+                        "endColumns": "94,85,96,98,85,82,96,90,86,71,68,84,89,75,75,66,112",
+                        "endOffsets": "3668,3754,3851,3950,4036,4119,4216,10447,10534,10606,10675,10760,10850,11012,11189,11256,11369"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\NAIM\\.gradle\\caches\\transforms-4\\61327632b7fe2a6214a95507e020f384\\transformed\\foundation-release\\res\\values-pt\\values-pt.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,138",
+                        "endColumns": "82,84",
+                        "endOffsets": "133,218"
+                    },
+                    "to": {
+                        "startLines": "111,112",
+                        "startColumns": "4,4",
+                        "startOffsets": "11374,11457",
+                        "endColumns": "82,84",
+                        "endOffsets": "11452,11537"
                     }
                 }
             ]

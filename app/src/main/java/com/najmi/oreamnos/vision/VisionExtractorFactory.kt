@@ -24,15 +24,18 @@ class VisionExtractorFactory(
     fun create(preferredModelId: String? = null): IVisionExtractor {
         // 1. If user has a pinned preference, try that first
         preferredModelId?.let { id ->
-            val preferredModel = VisionModel.fromId(id)
-            if (isModelAvailable(preferredModel)) {
-                return createExtractor(preferredModel)
-            }
+            val model = VisionModel.fromId(id)
+            if (isModelAvailable(model)) return createExtractor(model)
         }
 
-        // 2. Auto-selection - for now, use ML Kit OCR
-        // Full LiteRT integration when Kotlin 2.0+ is available
-        return createExtractor(VisionModel.ML_KIT)
+        // 2. Auto-selection priority
+        return when {
+            modelManager.isModelAvailable(VisionModel.GEMMA_3N_E2B) -> 
+                createExtractor(VisionModel.GEMMA_3N_E2B)
+            modelManager.isModelAvailable(VisionModel.GEMMA_3_1B) -> 
+                createExtractor(VisionModel.GEMMA_3_1B)
+            else -> createExtractor(VisionModel.ML_KIT)
+        }
     }
 
     /**
@@ -49,25 +52,30 @@ class VisionExtractorFactory(
      * Gets the best available model for auto mode.
      */
     fun getBestAvailableModel(): VisionModel {
-        // Currently only ML Kit is available without LiteRT
-        return VisionModel.ML_KIT
+        return when {
+            modelManager.isModelAvailable(VisionModel.GEMMA_3N_E2B) -> VisionModel.GEMMA_3N_E2B
+            modelManager.isModelAvailable(VisionModel.GEMMA_3_1B) -> VisionModel.GEMMA_3_1B
+            else -> VisionModel.ML_KIT
+        }
     }
 
     /**
      * Gets all available models for UI display.
      */
     fun getAvailableModels(): List<VisionModel> {
-        return listOf(VisionModel.ML_KIT)
+        val models = mutableListOf<VisionModel>()
+        models.add(VisionModel.ML_KIT)
+        if (modelManager.isModelAvailable(VisionModel.GEMMA_3N_E2B)) models.add(VisionModel.GEMMA_3N_E2B)
+        if (modelManager.isModelAvailable(VisionModel.GEMMA_3_1B)) models.add(VisionModel.GEMMA_3_1B)
+        return models
     }
 
     private fun createExtractor(model: VisionModel): IVisionExtractor {
         return when (model) {
-            // ML Kit OCR based
+            VisionModel.GEMMA_3N_E2B -> Gemma3nVisionExtractor(context, modelManager)
+            VisionModel.GEMMA_3_1B -> Gemma3TextExtractor(context, modelManager)
+            VisionModel.PALIGEMMA_3B -> Gemma3TextExtractor(context, modelManager) // Fallback to same logic if needed
             VisionModel.GEMINI_NANO -> GeminiNanoExtractor(context)
-            VisionModel.ML_KIT -> MlKitFallbackExtractor()
-            
-            // LiteRT models - show as available but use fallback
-            // Full implementation when Kotlin 2.0+ is available
             else -> MlKitFallbackExtractor()
         }
     }

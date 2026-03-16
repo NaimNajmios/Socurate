@@ -1,5 +1,7 @@
 package com.najmi.oreamnos.vision
 
+import kotlin.collections.*
+
 /**
  * Defines all supported extraction paths as an enum with metadata.
  * 
@@ -70,15 +72,35 @@ enum class VisionModel(
 
     companion object {
         fun fromId(id: String): VisionModel {
-            return values().find { it.id == id } ?: ML_KIT
+            val v = VisionModel.values()
+            for (i in 0 until v.size) {
+                if (v[i].id == id) return v[i]
+            }
+            return ML_KIT
         }
         
         fun getDownloadableModels(): List<VisionModel> {
-            return values().filter { it.requiresDownload && it.downloadUrl != null }
+            val list = java.util.ArrayList<VisionModel>()
+            val v = VisionModel.values()
+            for (i in 0 until v.size) {
+                val m = v[i]
+                if (m.requiresDownload && m.downloadUrl != null) {
+                    list.add(m)
+                }
+            }
+            return list
         }
         
         fun getMultimodalModels(): List<VisionModel> {
-            return values().filter { it.isMultimodal }
+            val list = java.util.ArrayList<VisionModel>()
+            val v = VisionModel.values()
+            for (i in 0 until v.size) {
+                val m = v[i]
+                if (m.isMultimodal) {
+                    list.add(m)
+                }
+            }
+            return list
         }
     }
 }

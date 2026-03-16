@@ -1,0 +1,6 @@
+com.najmi.oreamnos.test.app-core-1.5.0-0 C:\Users\NAIM\.gradle\caches\transforms-4\39f4ee7163c497a30df3c4b901834c99\transformed\core-1.5.0\res
+com.najmi.oreamnos.test.app-annotation-experimental-1.4.0-1 C:\Users\NAIM\.gradle\caches\transforms-4\43d742ecddc16819ec8876e02e8b7816\transformed\annotation-experimental-1.4.0\res
+com.najmi.oreamnos.test.app-androidTest-2 C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build\generated\res\resValues\androidTest\debug
+com.najmi.oreamnos.test.app-mergeDebugAndroidTestResources-3 C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.najmi.oreamnos.test.app-mergeDebugAndroidTestResources-4 C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.najmi.oreamnos.test.app-debugAndroidTest-5 C:\Users\NAIM\Documents\Personal\Project\Socurate\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources
