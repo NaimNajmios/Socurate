@@ -329,12 +329,30 @@ fun SettingsScreen(
             
             // Vision AI Section
             SettingsCard(title = "Vision AI") {
-                val context = LocalContext.current
                 val visionModelManager = remember(context) { VisionModelManager(context) }
                 var installedModels by remember { mutableStateOf(visionModelManager.getInstalledModels()) }
                 var downloadingModel by remember { mutableStateOf<VisionModel?>(null) }
                 var downloadProgress by remember { mutableStateOf(0f) }
+                var hfToken by remember { mutableStateOf(prefsManager.getHfToken() ?: "") }
                 
+                // HF Token Input
+                ApiKeyInput(
+                    label = "HuggingFace Read Token (for gated models)",
+                    value = hfToken,
+                    onValueChange = { hfToken = it },
+                    onSave = { 
+                        prefsManager.saveHfToken(hfToken)
+                        Toast.makeText(context, "HF Token saved", Toast.LENGTH_SHORT).show()
+                    }
+                )
+                
+                Text(
+                    text = "Gemma 3 and PaliGemma models are gated. Please accept terms on HuggingFace and provide a Read Token.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
+                )
+
                 // On-Device OCR Status (Always Ready)
                 VisionModelRow(
                     name = "On-Device OCR",
@@ -357,7 +375,7 @@ fun SettingsScreen(
                     onDownload = {
                         downloadingModel = paligemma
                         scope.launch {
-                            visionModelManager.downloadModelFlow(paligemma).collect { progress ->
+                            visionModelManager.downloadModelFlow(paligemma, hfToken = hfToken).collect { progress ->
                                 when (progress) {
                                     is VisionModelManager.DownloadProgress.InProgress -> {
                                         downloadProgress = progress.progress
@@ -397,7 +415,7 @@ fun SettingsScreen(
                     onDownload = {
                         downloadingModel = gemma3n
                         scope.launch {
-                            visionModelManager.downloadModelFlow(gemma3n).collect { progress ->
+                            visionModelManager.downloadModelFlow(gemma3n, hfToken = hfToken).collect { progress ->
                                 when (progress) {
                                     is VisionModelManager.DownloadProgress.InProgress -> {
                                         downloadProgress = progress.progress
@@ -437,7 +455,7 @@ fun SettingsScreen(
                     onDownload = {
                         downloadingModel = gemma3_1b
                         scope.launch {
-                            visionModelManager.downloadModelFlow(gemma3_1b).collect { progress ->
+                            visionModelManager.downloadModelFlow(gemma3_1b, hfToken = hfToken).collect { progress ->
                                 when (progress) {
                                     is VisionModelManager.DownloadProgress.InProgress -> {
                                         downloadProgress = progress.progress

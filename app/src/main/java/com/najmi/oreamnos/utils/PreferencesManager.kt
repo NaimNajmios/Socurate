@@ -215,6 +215,26 @@ class PreferencesManager(context: Context) {
         }
     }
 
+    // ==================== HUGGING FACE TOKEN ====================
+
+    fun saveHfToken(token: String): Boolean {
+        return try {
+            securePrefs.edit().putString(KEY_HF_TOKEN, token).apply()
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save HF token", e)
+            false
+        }
+    }
+
+    fun getHfToken(): String? {
+        return try {
+            securePrefs.getString(KEY_HF_TOKEN, null)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     fun hasApiKeyForCurrentProvider(): Boolean {
         return when (getProvider()) {
             PROVIDER_GROQ -> !getGroqApiKey().isNullOrBlank()
@@ -412,6 +432,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_TEXT_SIZE = "output_text_size"
         private const val KEY_SAVED_WATERMARK_PATH = "saved_watermark_path"
         private const val KEY_VISION_MODEL_PREFERENCE = "vision_model_preference"
+        private const val KEY_HF_TOKEN = "huggingface_token"
 
         // Defaults
         private const val DEFAULT_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"

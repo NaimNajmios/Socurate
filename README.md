@@ -4,9 +4,34 @@ A sleek, modern Android application that transforms global football news into po
 
 ## ✨ What's New
 
+### 👁️ On-Device Vision AI (Screenshot Extraction)
+- **Multi-Model Vision Extraction**: Extract football stats directly from screenshots
+- **Gemma 3n E2B** (~2.9GB): Best for screenshots - multimodal model that processes images directly
+- **Gemma 3 1B** (~557MB): Lightweight text-only model (uses OCR first)
+- **PaliGemma 3B** (~3GB): Legacy vision option
+- **HuggingFace Download**: One-time model download from LiteRT Community
+- **Fully Offline**: All processing on-device after download
+- **ML Kit Fallback**: Always-available OCR backup for any device
+- **Auto-Selection**: Automatically picks the best available model
+
 ### 🖼️ Automated Sports Card Generator (with Design Studio)
 - **Premium Graphics**: Generate 1:1 square sports cards resembling premium NBA coverage and sports media.
-- **Multiple Templates**: Built-in templates for Match Result, Player Spotlight, Headline Quote, and Top Stats.
+- **Multiple Templates**: 10+ built-in templates:
+  - **Breaking News**: High-impact headline card
+  - **Match Preview**: Pre-match analysis layout
+  - **Match Result**: Full scoreboard design
+  - **Detailed Scoreboard**: Stats-heavy format
+  - **Transfer News**: Player transfer announcement
+  - **Starting XI**: Team lineup display
+  - **On This Day**: Historical moment card
+  - **Player Spotlight**: Individual player highlight
+  - **Headline Quote**: Quote with attribution
+  - **Top Stats**: Statistical comparison
+- **Image Position Modes**: 10 visual layouts:
+  - Full Background, Split Left/Right, Overlay Top
+  - Cutout (transparent PNG), Minimal, Magazine Bold
+  - Offset Card, Brutalist, Float Window
+- **Inline Editing**: Dynamically edit the extracted AI fields right in the app to perfect the copy before rendering.
 - **Inline Editing**: Dynamically edit the extracted AI fields right in the app to perfect the copy before rendering.
 - **Dynamic Backgrounds & Opacity**: Custom GradientBuilder and an interactive background picker UI for versatile styling. Adjust overlay opacity via a granular slider.
 - **Typography Controls**: Instantly swap between Default, Classic Serif, and Typewriter Monospace fonts across all components.
@@ -111,7 +136,8 @@ A sleek, modern Android application that transforms global football news into po
 
 ## 📋 Requirements
 
-- Android 7.0 (API 24) or higher
+- **Android 8.0 (API 26)** or higher
+- **Note**: Vision AI features require API 26+. ML Kit OCR fallback works on API 24+
 - At least one AI provider API key:
   - Google Gemini: [Get one here](https://ai.google.dev)
   - Groq: [Get one here](https://console.groq.com)
@@ -203,6 +229,17 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 2. Full-screen immersive content view
 3. Swipe down to dismiss
 
+### Extracting from Screenshots
+
+1. From the main screen, tap the **"From Screenshot"** chip below the input field
+2. Select an image from Gallery or Camera
+3. The app automatically extracts text using the best available model:
+   - **Gemma 3n E2B**: Direct image understanding (best results)
+   - **Gemma 3 1B**: OCR + text structuring
+   - **ML Kit OCR**: Always-available fallback
+4. Review and edit the extracted text
+5. Tap "Use This Text" to proceed with generation
+
 ## 🏗️ Architecture
 
 ### Package Structure
@@ -210,19 +247,22 @@ Download the latest APK from the [Releases](https://github.com/NaimNajmios/Socur
 ```
 com.najmi.oreamnos/
 ├── cardgen/                    # Sports Card Generator Features
+│   ├── canvas/                # Canvas renderers (BreakingNews, MatchPreview, etc.)
 │   ├── extractor/             # Parsing AI output to structural data
-│   ├── model/                 # Card configuration & templates
+│   ├── model/                # Card configuration, templates, ImagePosition
 │   ├── prompt/                # Card-specific AI prompts
-│   ├── renderer/              # Custom Canvas rendering (1:1 format)
-│   └── ui/                    # Generator UI & background picker
+│   ├── renderer/             # Custom Compose-to-Bitmap rendering
+│   ├── ui/                   # Generator UI, background picker, export
+│   └── viewmodel/            # CardGeneratorViewModel
 ├── curator/                    # AI Provider Abstraction
 │   ├── IContentCurator.kt     # Content curator interface
 │   ├── CuratorFactory.kt      # Factory for creating curators
-│   ├── GeminiCurator.kt       # Gemini implementation
+│   ├── GeminiCurator.kt      # Gemini implementation
 │   └── OpenAICompatibleCurator.kt  # Groq/OpenRouter/Cerebras
 ├── model/                      # Data Models
 │   ├── GenerationPill.kt      # Custom refinement pill model
-│   └── UsageStats.kt          # Usage statistics with chart data
+│   ├── UsageStats.kt         # Usage statistics with chart data
+│   └── VisionExtractionResult.kt  # Vision extraction result
 ├── prompts/                    # Prompt Engineering
 │   └── PromptManager.kt       # Centralized prompt building
 ├── services/                   # Background Services
@@ -232,13 +272,16 @@ com.najmi.oreamnos/
 │   └── WebContentExtractor.kt # URL content extraction
 ├── ui/                         # UI Layer
 │   ├── components/            # Reusable Compose components
-│   │   ├── NeoCard.kt         # Base card component
-│   │   ├── NeoChip.kt         # Selection chip with animations
-│   │   ├── NeoButton.kt       # Primary action button
-│   │   ├── NeoInput.kt        # Text input field
-│   │   ├── NeoCopyButton.kt   # Copy button with feedback
+│   │   ├── NeoCard.kt        # Base card component
+│   │   ├── NeoChip.kt        # Selection chip with animations
+│   │   ├── NeoButton.kt      # Primary action button
+│   │   ├── NeoInput.kt       # Text input field
+│   │   ├── NeoCopyButton.kt  # Copy button with feedback
 │   │   ├── FluidRefinementFlow.kt  # Refinement UI
-│   │   ├── TypewriterText.kt  # Animated text reveal
+│   │   ├── OcrInputSheet.kt  # Vision extraction bottom sheet
+│   │   ├── VisionModelDownloadCard.kt  # Model download UI
+│   │   ├── ExtractionSourceBadge.kt  # Source indicator
+│   │   ├── TypewriterText.kt # Animated text reveal
 │   │   ├── AnimatedCheckmark.kt    # Success animation
 │   │   ├── EnhancedLoadingCard.kt  # Progress indicator
 │   │   ├── TokenUsageChart.kt # Usage line chart
@@ -250,11 +293,22 @@ com.najmi.oreamnos/
 │       └── Type.kt            # Typography styles
 ├── utils/                      # Utilities
 │   ├── PreferencesManager.kt  # Encrypted settings
+│   ├── VisionModelManager.kt  # LiteRT model download & storage
 │   ├── HapticHelper.kt        # Vibration feedback
-│   ├── NotificationHelper.kt  # Notification management
+│   ├── NotificationHelper.kt   # Notification management
 │   ├── ReadabilityUtils.kt    # Flesch-Kincaid scoring
 │   ├── MarkdownUtils.kt       # Markdown parsing
-│   └── StringUtils.kt         # Text processing
+│   ├── OcrUtils.kt           # ML Kit OCR wrapper
+│   └── FootballOcrParser.kt   # Football-specific OCR formatting
+├── vision/                     # On-Device Vision AI
+│   ├── IVisionExtractor.kt   # Extractor interface
+│   ├── VisionExtractorFactory.kt  # Model selection
+│   ├── VisionModel.kt        # Model definitions (Gemma3n, Gemma3, etc.)
+│   ├── LiteRTEngine.kt       # LiteRT runtime wrapper
+│   ├── Gemma3nVisionExtractor.kt  # Multimodal extractor
+│   ├── Gemma3TextExtractor.kt # Text-only extractor
+│   ├── GeminiNanoExtractor.kt # ML Kit-based extractor
+│   └── MlKitFallbackExtractor.kt  # OCR fallback
 ├── viewmodel/                  # MVVM ViewModels
 ├── MainActivity.kt            # Main screen (Compose)
 ├── SettingsActivity.kt        # Settings (Compose)
@@ -278,6 +332,23 @@ The app uses a **Neo-Editorial** design language:
 | **NeoButton** | Primary buttons with haptic feedback |
 | **NeoInput** | Monospace text fields with labels |
 
+### Vision AI Architecture
+
+The app implements a multi-path on-device vision extraction system:
+
+```
+IVisionExtractor (interface)
+├── Gemma3nVisionExtractor    # Multimodal - processes images directly
+├── Gemma3TextExtractor       # Text-only - uses OCR first
+├── GeminiNanoExtractor        # ML Kit + structuring
+└── MlKitFallbackExtractor    # Always-available OCR fallback
+```
+
+**Model Selection Priority:**
+1. Gemma 3n E2B (if downloaded) - Best results
+2. Gemma 3 1B (if downloaded) - Lightweight option
+3. ML Kit OCR - Always available
+
 ### Animation System
 
 | Animation | Implementation |
@@ -292,7 +363,7 @@ The app uses a **Neo-Editorial** design language:
 
 - **Language**: Kotlin 100%
 - **UI Framework**: Jetpack Compose with Material 3
-- **Minimum SDK**: API 24 (Android 7.0)
+- **Minimum SDK**: API 26 (Android 8.0)
 - **Target SDK**: API 34 (Android 14)
 - **Architecture**: MVVM with ViewModels
 
@@ -308,6 +379,9 @@ The app uses a **Neo-Editorial** design language:
 | Security Crypto | 1.1.0-alpha06 | Encrypted preferences |
 | Shimmer | 0.5.0 | Skeleton loading |
 | Markwon | 4.6.2 | Markdown rendering |
+| ML Kit Text Recognition | 16.0.0 | OCR fallback |
+| LiteRT-LM | latest.release | On-device GenAI (vision models) |
+| Coil | 2.6.0 | Image loading |
 
 ## 🎨 Theme Configuration
 
@@ -374,6 +448,23 @@ Look for these tags:
 - `GeminiService` - API calls, retries
 - `OpenAICompatibleCurator` - Groq/OpenRouter/Cerebras API calls
 - `WebContentExtractor` - URL parsing
+- `LiteRTEngine` - Vision model inference
+- `VisionModelManager` - Model download
+
+### Vision Extraction Issues
+
+**"No text detected"**
+- Try a clearer screenshot with more visible text
+- Ensure the image has good contrast
+
+**Download failing**
+- Check internet connection
+- Ensure sufficient storage space (models are 557MB-3GB)
+- For gated models, provide HuggingFace token in Settings
+
+**Slow extraction**
+- Gemma 3n E2B is optimized for GPU; may be slower on older devices
+- Use Gemma 3 1B (557MB) for faster processing on mid-range devices
 
 ## 📝 License
 

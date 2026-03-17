@@ -159,9 +159,13 @@ class OcrViewModel(application: Application) : AndroidViewModel(application) {
         downloadJob = viewModelScope.launch {
             uiState = uiState.copy(isModelDownloading = true, modelDownloadProgress = 0f)
             
-            val result = modelManager.downloadModel(model, onProgress = { progress ->
-                uiState = uiState.copy(modelDownloadProgress = progress)
-            })
+            val result = modelManager.downloadModel(
+                model, 
+                onProgress = { progress ->
+                    uiState = uiState.copy(modelDownloadProgress = progress)
+                },
+                hfToken = prefsManager.getHfToken()
+            )
             
             uiState = uiState.copy(isModelDownloading = false)
             

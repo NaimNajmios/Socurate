@@ -5,6 +5,7 @@ import com.najmi.oreamnos.vision.VisionModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -215,7 +216,7 @@ class VisionModelManager(private val context: Context) {
             }
             emit(DownloadProgress.Failed(e.message ?: "Download failed"))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     /**
      * Deletes a model file from disk.
@@ -239,7 +240,15 @@ class VisionModelManager(private val context: Context) {
      * Returns a list of all downloaded models.
      */
     fun getInstalledModels(): List<VisionModel> {
-        return VisionModel.entries.filter { it.requiresDownload && isModelAvailable(it) }
+        val list = mutableListOf<VisionModel>()
+        val v = VisionModel.values()
+        for (i in 0 until v.size) {
+            val m = v[i]
+            if (m.requiresDownload && isModelAvailable(m)) {
+                list.add(m)
+            }
+        }
+        return list
     }
 
     /**

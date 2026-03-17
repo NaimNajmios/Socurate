@@ -57,7 +57,7 @@ enum class VisionModel(
         requiresDownload = true,
         approximateSizeMb = 3000,
         minimumRamGb = 8,
-        downloadUrl = null, 
+        downloadUrl = "https://huggingface.co/litert-community/PaliGemma-2-3b-it-int4/resolve/main/paligemma-2-3b-it-int4.task", 
         isMultimodal = true
     ),
     ML_KIT(
