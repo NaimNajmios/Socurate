@@ -75,57 +75,48 @@ object PromptManager {
             prompt.append(
                 "4. QUOTE HANDLING: If the original text contains quotes, you MUST translate them directly into Bahasa Malaysia. Do NOT paraphrase or turn quotes into normal phrases. Maintain the conversational tone of the quote - not too formal, not too laid back.\n"
             )
-            prompt.append(
-                "5. FORBIDDEN: Do not use personal commentary phrases like \"Saya cuba\", \"Saya rasa\", \"Pada pendapat saya\"\n"
-            )
-            prompt.append("6. FORBIDDEN: Do not use em-dashes (—) anywhere in the output\n")
-            prompt.append("7. FORBIDDEN: Do NOT include any hashtags in the output\n")
-        } else {
-            prompt.append(
-                "4. FORBIDDEN: Do not use personal commentary phrases like \"Saya cuba\", \"Saya rasa\", \"Pada pendapat saya\"\n"
-            )
-            prompt.append("5. FORBIDDEN: Do not use em-dashes (—) anywhere in the output\n")
-            prompt.append("6. FORBIDDEN: Do NOT include any hashtags in the output\n")
         }
 
+        // Consolidated FORBIDDEN rules (applies to all cases)
+        val forbiddenStart = if (hasQuotes) 5 else 4
+        prompt.append("$forbiddenStart. FORBIDDEN: Do not use personal commentary phrases like \"Saya cuba\", \"Saya rasa\", \"Pada pendapat saya\"\n")
+        prompt.append("${forbiddenStart + 1}. FORBIDDEN: Do not use em-dashes (—) anywhere in the output\n")
+        prompt.append("${forbiddenStart + 2}. FORBIDDEN: Do NOT include any hashtags in the output\n")
+        prompt.append("${forbiddenStart + 3}. FORBIDDEN: Do NOT include any emojis in the output\n")
+
         if (!includeSource) {
-            prompt.append("8. FORBIDDEN: Do NOT include any 'Sumber:' citation in the output\n")
+            prompt.append("${forbiddenStart + 4}. FORBIDDEN: Do NOT include any 'Sumber:' citation in the output\n")
         }
 
         // Adapt structure based on content type
         if (!keepStructure) {
-            val structureNum = if (hasQuotes) "8" else "7"
+            val structureNum = forbiddenStart + 4
             if (isTechnicalArticle) {
-                prompt.append(structureNum)
-                    .append(". STRUCTURE FOR TECHNICAL ANALYSIS: Start with a clear, engaging Headline. Then organize content focusing on:\n")
+                prompt.append("$structureNum. STRUCTURE FOR TECHNICAL ANALYSIS: Start with a clear, engaging Headline. Then organize content focusing on:\n")
                     .append("   - Key Stats: Highlight important statistics and numbers\n")
                     .append("   - Formations: Describe tactical setups and player positions\n")
                     .append("   - Tactical Shifts: Explain strategic changes and their impact\n")
                     .append("   Separate sections with blank lines.\n")
             } else {
-                prompt.append(structureNum)
-                    .append(". STRUCTURE: Start with a clear, engaging Headline. Separate paragraphs with a blank line.\n")
+                prompt.append("$structureNum. STRUCTURE: Start with a clear, engaging Headline. Separate paragraphs with a blank line.\n")
             }
         }
 
-        var nextNum = if (isTechnicalArticle || hasQuotes) 9 else 8
-        if (hasQuotes && isTechnicalArticle) nextNum = 10
+        var nextNum = forbiddenStart + 5
+        if (hasQuotes && isTechnicalArticle) nextNum = forbiddenStart + 6
 
         prompt.append(nextNum).append(". Preserve key facts, names, dates, and statistics from the original\n")
         prompt.append(nextNum + 1).append(". Make the content engaging but maintain journalistic objectivity\n")
-        prompt.append(nextNum + 2).append(
-            ". Do NOT include any emojis anywhere in the output.\n"
-        )
         if (hasBulletPoints) {
-            prompt.append(nextNum + 3).append(
+            prompt.append(nextNum + 2).append(
                 ". The original content contains bullet points/lists - preserve this format using the • character only.\n"
             )
         } else {
-            prompt.append(nextNum + 3).append(
+            prompt.append(nextNum + 2).append(
                 ". Do NOT use bullet points or lists. Write in flowing paragraph format only.\n"
             )
         }
-        prompt.append(nextNum + 4)
+        prompt.append(nextNum + 3)
             .append(". The tone should be that of an official club announcement or news update\n\n")
 
         prompt.append("ORIGINAL ENGLISH TEXT:\n---\n")
@@ -133,19 +124,19 @@ object PromptManager {
 
         when {
             keepStructure -> prompt.append(
-                "Provide ONLY the Bahasa Malaysia social media post. STRICTLY PRESERVE the original formatting (lists, bullets, spacing). Use • for any bullet points. Do NOT include any hashtags or emojis."
+                "Provide ONLY the Bahasa Malaysia social media post. STRICTLY PRESERVE the original formatting (lists, bullets, spacing). Use • for any bullet points. Do NOT include any hashtags or emojis. Do NOT use markdown formatting."
             )
             isTechnicalArticle && hasBulletPoints -> prompt.append(
-                "Provide ONLY the Bahasa Malaysia social media post. Structure it with a headline followed by Key Stats, Formations, and Tactical Shifts sections. Use • for bullet points in lists. Separate sections with blank lines. Do NOT include any hashtags or emojis."
+                "Provide ONLY the Bahasa Malaysia social media post. Structure it with a headline followed by Key Stats, Formations, and Tactical Shifts sections. Use • for bullet points in lists. Separate sections with blank lines. Do NOT include any hashtags or emojis. Do NOT use markdown formatting."
             )
             isTechnicalArticle -> prompt.append(
-                "Provide ONLY the Bahasa Malaysia social media post. Structure it with a headline followed by Key Stats, Formations, and Tactical Shifts paragraphs. Write in flowing paragraph format, do NOT use bullet points. Separate sections with blank lines. Do NOT include any hashtags or emojis."
+                "Provide ONLY the Bahasa Malaysia social media post. Structure it with a headline followed by Key Stats, Formations, and Tactical Shifts paragraphs. Write in flowing paragraph format, do NOT use bullet points. Separate sections with blank lines. Do NOT include any hashtags or emojis. Do NOT use markdown formatting."
             )
             hasBulletPoints -> prompt.append(
-                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Use • for any bullet points from the original. Do NOT include any hashtags or emojis."
+                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Use • for any bullet points from the original. Do NOT include any hashtags or emojis. Do NOT use markdown formatting."
             )
             else -> prompt.append(
-                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Do NOT use bullet points or lists - write in paragraph format only. Do NOT include any hashtags or emojis."
+                "Provide ONLY the Bahasa Malaysia social media post. Ensure the output is structured with a headline and paragraphs separated by blank lines. Do NOT use bullet points or lists - write in paragraph format only. Do NOT include any hashtags or emojis. Do NOT use markdown formatting."
             )
         }
 
@@ -189,7 +180,7 @@ object PromptManager {
         prompt.append("EXTRACTED OCR DATA:\n---\n")
         prompt.append(ocrText).append("\n---\n\n")
         
-        prompt.append("Provide ONLY the Bahasa Malaysia post. ")
+        prompt.append("Provide ONLY the Bahasa Malaysia post. Do NOT use markdown formatting. ")
         if (hashtags.isNotEmpty()) {
             prompt.append("After the post, add a double newline and append these hashtags: ").append(hashtags)
         }
@@ -224,7 +215,7 @@ object PromptManager {
         prompt.append("EXTRACTED VISION DATA:\n---\n")
         prompt.append(structuredText).append("\n---\n\n")
         
-        prompt.append("Provide ONLY the Bahasa Malaysia post. ")
+        prompt.append("Provide ONLY the Bahasa Malaysia post. Do NOT use markdown formatting. ")
         if (hashtags.isNotEmpty()) {
             prompt.append("After the post, add a double newline and append these hashtags: ").append(hashtags)
         }

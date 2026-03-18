@@ -52,6 +52,7 @@ object CardPromptManager {
 
     private fun playerSpotlightSchema(): String = """
         Extract the standout player's data from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia):
         {
           "playerName": "Full Name",
@@ -68,6 +69,7 @@ object CardPromptManager {
 
     private fun headlineQuoteSchema(): String = """
         Extract the single most impactful headline or quote from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
           "headline": "Tajuk utama atau petikan paling penting (maks 120 aksara)",
@@ -78,6 +80,7 @@ object CardPromptManager {
 
     private fun topStatsSchema(): String = """
         Extract the 3 most interesting statistics from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
           "matchContext": "Perlawanan atau kejohanan yang berkaitan (e.g. lwn Liverpool - Liga Perdana)",
@@ -91,10 +94,11 @@ object CardPromptManager {
 
     private fun transferNewsSchema(): String = """
         Extract the transfer news or rumors from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
           "playerName": "Full Name",
-          "action": "Status (MUST BE ONE OF: SAH, DIPINJAM, PINDAHAN SELESAI, KHABAR ANGIN)",
+          "action": "Status (MUST BE ONE OF: SAH, DIPINJAM, SELESAI, KHABAR_ANGLIN)",
           "fromTeam": "Pasukan Asal",
           "toTeam": "Pasukan Baru",
           "fee": "Yuran Perpindahan",
@@ -106,9 +110,10 @@ object CardPromptManager {
 
     private fun breakingNewsSchema(): String = """
         Extract the breaking or urgent news from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
-          "label": "Label Berita (e.g. 🚨 TERKINI, RASMI, EKSKLUSIF)",
+          "label": "Label Berita (e.g. [URGEN], [RASMI], [EKSKLUSIF])",
           "headline": "Tajuk berita utama (maks 100 aksara)",
           "subtext": "Satu atau dua ayat menerangkan konteks (maks 150 aksara)",
           "impactRating": 5,
@@ -118,6 +123,7 @@ object CardPromptManager {
 
     private fun matchPreviewSchema(): String = """
         Extract the match preview details for an upcoming game from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
           "competition": "Nama Liga/Pertandingan",
@@ -132,6 +138,7 @@ object CardPromptManager {
 
     private fun detailedScoreboardSchema(): String = """
         Extract the detailed match result from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
           "homeTeam": "Team Name",
@@ -149,9 +156,10 @@ object CardPromptManager {
 
     private fun onThisDaySchema(): String = """
         Extract historical or 'on this day' information from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
-          "dateLabel": "Tarikh peristiwa (e.g. 📅 15 Mei)",
+          "dateLabel": "Tarikh peristiwa (e.g. [TARIKH] 15 Mei)",
           "yearsAgo": 10,
           "competition": "Nama Liga atau Kejohanan",
           "headline": "Satu ayat menerangkan apa yang berlaku (maks 100 aksara)",
@@ -165,6 +173,7 @@ object CardPromptManager {
 
     private fun startingXISchema(): String = """
         Extract the starting lineup or predicted lineup from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
           "teamName": "Nama Pasukan",
@@ -185,6 +194,7 @@ object CardPromptManager {
 
     private fun matchStatsComparisonSchema(): String = """
         Extract high-level match stats for a side-by-side comparison between two teams from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
           "homeTeam": "Nama Pasukan Rumah",
@@ -199,6 +209,7 @@ object CardPromptManager {
 
     private fun socialPostSchema(): String = """
         Extract the most shareable quote or breaking news insight as a minimalist 'Social Post' from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
           "handle": "@username_sumber (e.g. @ASTROARENA)",
