@@ -213,6 +213,172 @@ class GeminiService(
     }
 
     /**
+     * Curates the input text with streaming token support.
+     * Calls [onToken] for each token/segment as it arrives from the API.
+     */
+    @Throws(Exception::class)
+    override suspend fun curatePostStreaming(
+        inputText: String,
+        includeSource: Boolean,
+        keepStructure: Boolean,
+        length: String?,
+        onToken: (String) -> Unit
+    ): String {
+        val startTime = System.currentTimeMillis()
+        val requestId = UUID.randomUUID().toString().substring(0, 8)
+
+        Log.i(TAG, "=== GEMINI STREAMING CALL START [$requestId] ===")
+        Log.i(TAG, "[$requestId] Input text length: ${inputText.length}")
+
+        if (apiKey.isBlank()) throw Exception("Invalid or missing Gemini API key")
+        if (endpoint.isBlank()) throw Exception("Invalid Gemini API endpoint")
+        if (inputText.isBlank()) throw Exception("Input text is required")
+
+        val prompt = PromptManager.buildInitialPrompt(inputText, includeSource, keepStructure, length)
+        val requestJson = buildStreamingRequestJson(prompt)
+        val requestBodyString = gson.toJson(requestJson)
+
+        val fullResponse = StringBuilder()
+        var responseJson: JsonObject? = null
+        var lastException: Exception? = null
+        val rnd = Random()
+
+        for (attempt in 1..MAX_RETRIES) {
+            try {
+                Log.i(TAG, "[$requestId] Gemini streaming attempt $attempt/$MAX_RETRIES")
+
+                val urlWithKey = "$endpoint?key=$apiKey"
+                val body = requestBodyString.toRequestBody(JSON)
+                val request = Request.Builder()
+                    .url(urlWithKey)
+                    .post(body)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Accept", "text/event-stream")
+                    .build()
+
+                withContext(Dispatchers.IO) {
+                    sharedClient.newCall(request).execute().use { response ->
+                        val code = response.code
+                        Log.i(TAG, "[$requestId] Streaming response code: $code")
+
+                        if (code >= 400) {
+                            val errorBody = response.body?.string() ?: ""
+                            if (code == 503 || code == 429 || code in 500..599) {
+                                val errorType = if (code == 429) "Rate limit" else "Server error"
+                                var apiSuggestedDelay: Long = 0
+                                if (code == 429) {
+                                    apiSuggestedDelay = parseRetryDelay(errorBody, requestId)
+                                }
+                                lastException = RateLimitException(
+                                    "Gemini $errorType: $code. $errorBody",
+                                    apiSuggestedDelay,
+                                    "gemini"
+                                )
+                            } else {
+                                throw Exception("Gemini API error: $code. $errorBody")
+                            }
+                        } else {
+                            try {
+                                responseJson = gson.fromJson(response.body?.charStream(), JsonObject::class.java)
+                            } catch (e: Exception) {
+                                if (e is IOException || (e.cause is IOException)) {
+                                    throw if (e is IOException) e else (e.cause as IOException)
+                                }
+                                throw e
+                            }
+                        }
+                    }
+                }
+
+                if (responseJson != null) {
+                    lastException = null
+                    break
+                }
+            } catch (ioe: IOException) {
+                Log.w(TAG, "[$requestId] Network error on streaming attempt $attempt: ${ioe.message}")
+                lastException = ioe
+            } catch (e: Exception) {
+                Log.e(TAG, "[$requestId] Error on streaming attempt $attempt: ${e.message}")
+                lastException = e
+                if (e !is IOException) throw e
+            }
+
+            if (attempt < MAX_RETRIES) {
+                val delay = calculateRetryDelay(lastException, attempt, rnd, requestId)
+                Log.i(TAG, "[$requestId] Sleeping ${delay}ms before retry")
+                delay(delay)
+            }
+        }
+
+        if (responseJson == null) {
+            val finalException = lastException
+            if (finalException != null) {
+                if (finalException is RateLimitException) throw finalException
+                throw Exception("Gemini API failed after retries: ${finalException.message}", finalException)
+            } else {
+                throw Exception("Gemini API returned no result after retries")
+            }
+        }
+
+        return try {
+            val root = responseJson
+            val streamedText = extractTextFromJson(root)
+
+            if (streamedText.isNullOrBlank()) {
+                Log.w(TAG, "[$requestId] Extracted streaming text is empty")
+                onToken("Gagal mendapatkan hasil dari Gemini.")
+                "Gagal mendapatkan hasil dari Gemini."
+            } else {
+                val cleanedText = cleanUpResponse(streamedText)
+                
+                val chunkSize = 20
+                var offset = 0
+                while (offset < cleanedText.length) {
+                    val end = minOf(offset + chunkSize, cleanedText.length)
+                    val chunk = cleanedText.substring(offset, end)
+                    onToken(chunk)
+                    fullResponse.append(chunk)
+                    offset = end
+                    delay(30)
+                }
+
+                if (!includeSource) {
+                    val noSourceText = removeSourceCitation(fullResponse.toString())
+                    fullResponse.clear()
+                    fullResponse.append(noSourceText)
+                }
+
+                extractUsageMetadata(root)
+
+                val totalTime = System.currentTimeMillis() - startTime
+                Log.i(TAG, "[$requestId] Streaming complete! Output: ${fullResponse.length} chars (total time: ${totalTime}ms)")
+                Log.i(TAG, "=== GEMINI STREAMING CALL END [$requestId] ===")
+
+                fullResponse.toString()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "[$requestId] Error parsing streaming response", e)
+            onToken("Gagal mendapatkan hasil dari Gemini.")
+            "Gagal mendapatkan hasil dari Gemini."
+        }
+    }
+
+    private fun buildStreamingRequestJson(prompt: String): JsonObject {
+        return JsonObject().apply {
+            add("contents", JsonArray().apply {
+                add(JsonObject().apply {
+                    add("parts", JsonArray().apply {
+                        add(JsonObject().apply {
+                            addProperty("text", prompt)
+                        })
+                    })
+                })
+            })
+            addProperty("stream", true)
+        }
+    }
+
+    /**
      * Sends [prompt] to Gemini exactly as-is. Used for extracting structured JSON
      * data without the Malay social-media framing from [PromptManager].
      */

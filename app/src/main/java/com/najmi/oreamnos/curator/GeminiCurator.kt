@@ -24,6 +24,17 @@ class GeminiCurator(
     }
 
     @Throws(Exception::class)
+    override suspend fun curatePostStreaming(
+        inputText: String,
+        includeSource: Boolean,
+        keepStructure: Boolean,
+        length: String?,
+        onToken: (String) -> Unit
+    ): String {
+        return geminiService.curatePostStreaming(inputText, includeSource, keepStructure, length, onToken) ?: ""
+    }
+
+    @Throws(Exception::class)
     override suspend fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String {
         return geminiService.refinePost(originalPost, refinements, includeSource) ?: ""
     }

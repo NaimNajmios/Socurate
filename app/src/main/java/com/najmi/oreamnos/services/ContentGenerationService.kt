@@ -77,6 +77,7 @@ class ContentGenerationService : Service() {
         val includeSource = intent.getBooleanExtra(EXTRA_INCLUDE_SOURCE, false)
         val keepStructure = intent.getBooleanExtra(EXTRA_KEEP_STRUCTURE, false)
         val length = intent.getStringExtra(EXTRA_LENGTH)
+        val useStreaming = intent.getBooleanExtra(EXTRA_USE_STREAMING, true)
 
         serviceScope.launch {
             // Validation moved inside coroutine to prevent race conditions with stopSelf
@@ -89,14 +90,12 @@ class ContentGenerationService : Service() {
             var success = false
             val startTime = System.currentTimeMillis()
             try {
-                Log.i(TAG, "Starting content generation...")
+                Log.i(TAG, "Starting content generation... (streaming: $useStreaming)")
                 var content = inputText
 
                 // Check if input is a URL
                 if (WebContentExtractor.isUrl(inputText)) {
                     Log.i(TAG, "Input is URL, extracting content...")
-                    // Web content extraction is a blocking IO operation, so we explicitly run it on IO
-                    // even though we are already on IO, just to be explicit and safe.
                     content = withContext(Dispatchers.IO) {
                         val extractor = WebContentExtractor()
                         extractor.extractContent(inputText)
@@ -112,7 +111,17 @@ class ContentGenerationService : Service() {
 
                 // Generate post using curator abstraction
                 val curator = CuratorFactory.create(this@ContentGenerationService)
-                val result = curator.curatePost(content, includeSource, keepStructure, length)
+                
+                val result = if (useStreaming) {
+                    val accumulatedText = StringBuilder()
+                    curator.curatePostStreaming(content, includeSource, keepStructure, length) { token ->
+                        accumulatedText.append(token)
+                        broadcastPartialResult(accumulatedText.toString(), false)
+                    }
+                    accumulatedText.toString()
+                } else {
+                    curator.curatePost(content, includeSource, keepStructure, length)
+                }
 
                 // Calculate duration
                 val durationMs = System.currentTimeMillis() - startTime
@@ -267,6 +276,19 @@ class ContentGenerationService : Service() {
     }
 
     /**
+     * Broadcasts partial streaming result to MainActivity.
+     */
+    private fun broadcastPartialResult(partialText: String, isRefinement: Boolean) {
+        val broadcast = Intent(BROADCAST_RESULT).apply {
+            putExtra(EXTRA_SUCCESS, true)
+            putExtra(EXTRA_RESULT, partialText)
+            putExtra(EXTRA_IS_REFINEMENT, isRefinement)
+            putExtra(EXTRA_IS_PARTIAL, true)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast)
+    }
+
+    /**
      * Broadcasts error to MainActivity.
      */
     private fun broadcastError(error: String?, isRefinement: Boolean) {
@@ -327,6 +349,7 @@ class ContentGenerationService : Service() {
         const val EXTRA_INCLUDE_SOURCE = "extra_include_source"
         const val EXTRA_KEEP_STRUCTURE = "extra_keep_structure"
         const val EXTRA_LENGTH = "extra_length"
+        const val EXTRA_USE_STREAMING = "extra_use_streaming"
 
         // Result extras
         const val EXTRA_SUCCESS = "extra_success"
@@ -336,5 +359,6 @@ class ContentGenerationService : Service() {
         const val EXTRA_IS_RATE_LIMIT = "extra_is_rate_limit"
         const val EXTRA_RATE_LIMIT_PROVIDER = "extra_rate_limit_provider"
         const val EXTRA_RETRY_DELAY_MS = "extra_retry_delay_ms"
+        const val EXTRA_IS_PARTIAL = "extra_is_partial"
     }
 }

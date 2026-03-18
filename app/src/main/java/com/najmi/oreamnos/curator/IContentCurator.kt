@@ -19,6 +19,20 @@ interface IContentCurator {
     ): String
 
     /**
+     * Curates the input text with streaming token support.
+     * Calls [onToken] for each token/segment as it arrives.
+     * Returns the complete curated text when done.
+     */
+    @Throws(Exception::class)
+    suspend fun curatePostStreaming(
+        inputText: String,
+        includeSource: Boolean,
+        keepStructure: Boolean,
+        length: String? = null,
+        onToken: (String) -> Unit
+    ): String
+
+    /**
      * Sends [prompt] to the AI provider exactly as-is, with no additional system
      * prompt or post-processing. Used by [CardDataExtractor] to get raw JSON output
      * without the Malay social-media framing that [curatePost] applies.

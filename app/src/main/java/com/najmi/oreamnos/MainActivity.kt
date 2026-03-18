@@ -202,7 +202,8 @@ class MainActivity : ComponentActivity() {
         val isRefinement: Boolean = false,
         val isRateLimit: Boolean = false,
         val rateLimitProvider: String? = null,
-        val retryDelayMs: Long = 0
+        val retryDelayMs: Long = 0,
+        val isPartial: Boolean = false
     )
     
     private val serviceResultReceiver = object : BroadcastReceiver() {
@@ -210,6 +211,7 @@ class MainActivity : ComponentActivity() {
             val success = intent.getBooleanExtra(ContentGenerationService.EXTRA_SUCCESS, false)
             val isRefinement = intent.getBooleanExtra(ContentGenerationService.EXTRA_IS_REFINEMENT, false)
             val isRateLimit = intent.getBooleanExtra(ContentGenerationService.EXTRA_IS_RATE_LIMIT, false)
+            val isPartial = intent.getBooleanExtra(ContentGenerationService.EXTRA_IS_PARTIAL, false)
             
             if (isRateLimit) {
                 generationResult.value = GenerationResult(
@@ -223,7 +225,8 @@ class MainActivity : ComponentActivity() {
                 generationResult.value = GenerationResult(
                     success = true,
                     result = intent.getStringExtra(ContentGenerationService.EXTRA_RESULT),
-                    isRefinement = isRefinement
+                    isRefinement = isRefinement,
+                    isPartial = isPartial
                 )
             } else {
                 generationResult.value = GenerationResult(
@@ -401,13 +404,14 @@ class MainActivity : ComponentActivity() {
         AppCompatDelegate.setDefaultNightMode(mode)
     }
     
-    private fun startGeneration(input: String, includeSource: Boolean, keepStructure: Boolean, length: String? = null) {
+    private fun startGeneration(input: String, includeSource: Boolean, keepStructure: Boolean, length: String? = null, useStreaming: Boolean = true) {
         val serviceIntent = Intent(this, ContentGenerationService::class.java).apply {
             action = ContentGenerationService.ACTION_GENERATE
             putExtra(ContentGenerationService.EXTRA_INPUT_TEXT, input)
             putExtra(ContentGenerationService.EXTRA_INCLUDE_SOURCE, includeSource)
             putExtra(ContentGenerationService.EXTRA_KEEP_STRUCTURE, keepStructure)
             putExtra(ContentGenerationService.EXTRA_LENGTH, length)
+            putExtra(ContentGenerationService.EXTRA_USE_STREAMING, useStreaming)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent)
@@ -601,6 +605,61 @@ fun MainScreen(
     LaunchedEffect(generationResult) {
         if (generationResult == null) return@LaunchedEffect
         
+        // Handle partial streaming results differently
+        if (generationResult.isPartial && generationResult.result != null) {
+            // Update preview with partial result - don't clear loading state yet
+            val partialText = generationResult.result
+            
+            // Show partial result in the output area while still loading
+            val matcher = SOURCE_CITATION_PATTERN.find(partialText)
+            if (matcher != null) {
+                generatedSource = matcher.value.trim()
+                val contentWithoutSource = SOURCE_CITATION_PATTERN.replace(partialText, "").trim()
+                val cleaned = TRAILING_NEWLINES_PATTERN.replace(contentWithoutSource, "").trim()
+                var parts = cleaned.split("\n\n", limit = 2)
+                if (parts.size < 2) {
+                    val singleParts = cleaned.split("\n", limit = 2)
+                    if (singleParts.size >= 2 && singleParts[0].length < 100) parts = singleParts
+                }
+                if (parts.size >= 2 && parts[0].length < 150) {
+                    generatedTitle = parts[0].trim()
+                    generatedBody = parts[1].trim()
+                } else {
+                    val firstLineEnd = cleaned.indexOf('\n')
+                    if (firstLineEnd != -1 && firstLineEnd < 100) {
+                        generatedTitle = cleaned.substring(0, firstLineEnd).trim()
+                        generatedBody = cleaned.substring(firstLineEnd + 1).trim()
+                    } else {
+                        generatedTitle = ""
+                        generatedBody = cleaned
+                    }
+                }
+            } else {
+                var parts = partialText.split("\n\n", limit = 2)
+                if (parts.size < 2) {
+                    val singleParts = partialText.split("\n", limit = 2)
+                    if (singleParts.size >= 2 && singleParts[0].length < 100) parts = singleParts
+                }
+                if (parts.size >= 2 && parts[0].length < 150) {
+                    generatedTitle = parts[0].trim()
+                    generatedBody = parts[1].trim()
+                } else {
+                    val firstLineEnd = partialText.indexOf('\n')
+                    if (firstLineEnd != -1 && firstLineEnd < 100) {
+                        generatedTitle = partialText.substring(0, firstLineEnd).trim()
+                        generatedBody = partialText.substring(firstLineEnd + 1).trim()
+                    } else {
+                        generatedTitle = ""
+                        generatedBody = partialText
+                    }
+                }
+            }
+            rebuildOutput()
+            hasResult = true
+            return@LaunchedEffect
+        }
+        
+        // Final result (not partial)
         isLoading = false
         
         when {

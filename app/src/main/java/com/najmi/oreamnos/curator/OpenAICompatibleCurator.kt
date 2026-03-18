@@ -70,6 +70,29 @@ class OpenAICompatibleCurator(
     }
 
     @Throws(Exception::class)
+    override suspend fun curatePostStreaming(
+        inputText: String,
+        includeSource: Boolean,
+        keepStructure: Boolean,
+        length: String?,
+        onToken: (String) -> Unit
+    ): String {
+        // Fallback to non-streaming for OpenAI-compatible APIs
+        // For true streaming, would need SSE support per provider
+        val result = curatePost(inputText, includeSource, keepStructure, length)
+        // Simulate streaming by emitting in chunks
+        val chunkSize = 20
+        var offset = 0
+        while (offset < result.length) {
+            val end = minOf(offset + chunkSize, result.length)
+            onToken(result.substring(offset, end))
+            offset = end
+            kotlinx.coroutines.delay(30)
+        }
+        return result
+    }
+
+    @Throws(Exception::class)
     override suspend fun refinePost(originalPost: String, refinements: List<String>, includeSource: Boolean): String {
         val systemPrompt = "You are refining a Malaysian Malay social media post about football. " +
                 "Apply improvements while maintaining Bahasa Malaysia. Do not include hashtags. Do not include emojis."
