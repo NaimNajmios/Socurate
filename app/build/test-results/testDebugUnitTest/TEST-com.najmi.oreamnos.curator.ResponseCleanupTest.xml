@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.najmi.oreamnos.curator.ResponseCleanupTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-03-18T07:47:27" hostname="NAJMI" time="0.024">
+  <properties/>
+  <testcase name="removeSourceCitation handles null input" classname="com.najmi.oreamnos.curator.ResponseCleanupTest" time="0.007"/>
+  <testcase name="cleanUpResponse handles multilanguage content" classname="com.najmi.oreamnos.curator.ResponseCleanupTest" time="0.012"/>
+  <testcase name="cleanUpResponse removes excessive newlines" classname="com.najmi.oreamnos.curator.ResponseCleanupTest" time="0.0"/>
+  <testcase name="cleanUpResponse removes horizontal rules" classname="com.najmi.oreamnos.curator.ResponseCleanupTest" time="0.001"/>
+  <testcase name="cleanUpResponse removes horizontal whitespace" classname="com.najmi.oreamnos.curator.ResponseCleanupTest" time="0.0"/>
+  <testcase name="cleanUpResponse handles null input" classname="com.najmi.oreamnos.curator.ResponseCleanupTest" time="0.001"/>
+  <testcase name="removeSourceCitation handles empty input" classname="com.najmi.oreamnos.curator.ResponseCleanupTest" time="0.0"/>
+  <testcase name="cleanUpResponseWithMarkdown removes markdown bold markers" classname="com.najmi.oreamnos.curator.ResponseCleanupTest" time="0.0"/>
+  <testcase name="cleanUpResponse returns short responses unchanged" classname="com.najmi.oreamnos.curator.ResponseCleanupTest" time="0.001"/>
+  <testcase name="removeSourceCitation handles source keyword" classname="com.najmi.oreamnos.curator.ResponseCleanupTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

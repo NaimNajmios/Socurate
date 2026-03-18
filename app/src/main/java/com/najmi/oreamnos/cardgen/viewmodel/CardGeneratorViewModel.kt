@@ -52,7 +52,9 @@ sealed class ExportState {
  * Uses StateFlow throughout (unlike [com.najmi.oreamnos.viewmodel.MainViewModel] which
  * uses LiveData). This is the idiomatic pattern for pure Jetpack Compose screens.
  */
-class CardGeneratorViewModel : ViewModel() {
+class CardGeneratorViewModel(
+    private val extractorFactory: (android.content.Context) -> CardDataExtractor = { CardDataExtractor(it) }
+) : ViewModel() {
 
     // ── Input ──────────────────────────────────────────────────
 
@@ -307,7 +309,7 @@ class CardGeneratorViewModel : ViewModel() {
             _extractionState.value = ExtractionState.Loading
             kotlinx.coroutines.delay(100)
             try {
-                val extractor = CardDataExtractor(context)
+                val extractor = extractorFactory(context)
                 val result = extractor.extract(_selectedTemplate.value, text, isRefresh)
                 _extractionState.value = if (result.isSuccess) {
                     val data = result.getOrThrow()

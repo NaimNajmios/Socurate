@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-03-18T07:47:27" hostname="NAJMI" time="0.092">
+  <properties/>
+  <testcase name="stripFences extracts content from json fence" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.06"/>
+  <testcase name="parseJson handles missing fields with fallbacks" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.011"/>
+  <testcase name="parseJson parses TopStats with stat items" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.007"/>
+  <testcase name="parseJson handles invalid JSON gracefully" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.001"/>
+  <testcase name="parseJson handles null values gracefully" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.0"/>
+  <testcase name="parseJson parses JSON with trailing commas" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.001"/>
+  <testcase name="parseJson parses TransferNews correctly" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.001"/>
+  <testcase name="stripFences handles nested braces" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.0"/>
+  <testcase name="stripFences extracts content from plain code fence" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.0"/>
+  <testcase name="parseJson creates PlayerSpotlight with correct fields" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.002"/>
+  <testcase name="parseJson parses MatchPreview correctly" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.002"/>
+  <testcase name="stripFences handles whitespace only" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.0"/>
+  <testcase name="parseJson parses template intent correctly" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.001"/>
+  <testcase name="stripFences returns trimmed string when no JSON found" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.0"/>
+  <testcase name="stripFences handles empty input" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.0"/>
+  <testcase name="stripFences extracts first JSON block when no fence" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.0"/>
+  <testcase name="parseJson creates DetailedScoreboard with correct fields" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.001"/>
+  <testcase name="parseJson creates HeadlineQuote with correct fields" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.0"/>
+  <testcase name="stripFences handles AI prefix with text before JSON" classname="com.najmi.oreamnos.cardgen.extractor.CardDataExtractorTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

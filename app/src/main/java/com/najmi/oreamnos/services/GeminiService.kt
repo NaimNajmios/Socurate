@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.najmi.oreamnos.curator.ResponseCleanup
 import com.najmi.oreamnos.curator.IContentCurator
 import com.najmi.oreamnos.exceptions.RateLimitException
 import com.najmi.oreamnos.prompts.PromptManager
@@ -19,7 +20,6 @@ import java.io.IOException
 import java.util.Random
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import java.util.regex.Pattern
 
 /**
  * Handles communication with the Google Gemini API for content curation.
@@ -596,17 +596,12 @@ class GeminiService(
     }
 
     private fun removeSourceCitation(text: String?): String {
-        if (text.isNullOrEmpty()) return text ?: ""
-
-        var cleaned = SOURCE_CITATION_PATTERN.matcher(text).replaceAll("")
-        if (text != cleaned) {
-            Log.d(TAG, "Removed source citation via regex")
-        }
-
-        return TRAILING_NEWLINES_PATTERN.matcher(cleaned).replaceAll("").trim()
+        return ResponseCleanup.removeSourceCitation(text)
     }
 
-
+    private fun cleanUpResponse(response: String?): String {
+        return ResponseCleanup.cleanUpResponse(response)
+    }
 
     private fun extractTextFromJson(root: JsonObject?): String? {
         if (root == null) return null
@@ -655,36 +650,6 @@ class GeminiService(
         }
 
         return null
-    }
-
-    private fun cleanUpResponse(response: String?): String {
-        if (response.isNullOrBlank()) return response ?: ""
-
-        var cleaned = response.trim()
-
-        // Remove horizontal rule markers
-        cleaned = HORIZONTAL_RULE_PATTERN.matcher(cleaned).replaceAll("")
-
-        // Remove unwanted explanatory phrases
-        for (phrase in UNWANTED_PHRASES) {
-            cleaned = cleaned.replace(phrase, "")
-        }
-
-        // Normalize bullet points to use • character
-        cleaned = BULLET_POINT_PATTERN.matcher(cleaned).replaceAll("$1•$2")
-
-        // Clean up spacing
-        cleaned = MULTIPLE_NEWLINES_PATTERN.matcher(cleaned).replaceAll("\n\n")
-        cleaned = HORIZONTAL_WHITESPACE_PATTERN.matcher(cleaned).replaceAll(" ")
-        cleaned = cleaned.trim()
-
-        // If too short after cleaning, return original
-        if (cleaned.length < 50) {
-            Log.w(TAG, "Response too short after cleaning, returning original")
-            return response
-        }
-
-        return cleaned
     }
 
     private fun parseRetryDelay(errorBody: String?, requestId: String): Long {
@@ -755,43 +720,6 @@ class GeminiService(
     companion object {
         private const val TAG = "GeminiService"
         private val JSON = "application/json; charset=utf-8".toMediaType()
-
-        // Pre-compiled Regex Patterns
-        private val HORIZONTAL_RULE_PATTERN: Pattern = Pattern.compile("(?m)^-{3,}\\s*$")
-        private val MULTIPLE_NEWLINES_PATTERN: Pattern = Pattern.compile("\\n\\s*\\n\\s*\\n+")
-        private val HORIZONTAL_WHITESPACE_PATTERN: Pattern = Pattern.compile("[ \\t]+")
-        private val SOURCE_CITATION_PATTERN: Pattern = Pattern.compile("(?im)^[\\s\\p{Z}]*[*_]*(?:Sumber|Source)[*_]*[\\s\\p{Z}]*[:：].*$")
-        private val TRAILING_NEWLINES_PATTERN: Pattern = Pattern.compile("\\n+$")
-        private val BULLET_POINT_PATTERN: Pattern = Pattern.compile("(?m)^(\\s*)[-*>\u2022\u25e6\u25aa\u25ab\u2023\u2043](\\s+)")
-
-        // Tactical keywords for content detection
-        private val TACTICAL_KEYWORDS = arrayOf(
-            "formation", "tactical", "pressing", "possession", "xg", "expected goals",
-            "pass completion", "progressive passes", "defensive line", "build-up",
-            "counter-attack", "high press", "low block", "transition", "shape",
-            "midfielder", "forward", "defender", "fullback", "winger",
-            "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2", "3-4-3"
-        )
-
-        // Unwanted phrases to remove from AI output
-        private val UNWANTED_PHRASES = arrayOf(
-            "Okay, ini percubaan untuk mengubah teks tersebut",
-            "terjemahkan ke Bahasa Melayu (Malaysia)",
-            "suntikkan sedikit gaya yang kurang formal",
-            "istilah bola sepak Inggeris yang biasa",
-            "Saya cuba gunakan perkataan yang lebih santai",
-            "Saya juga masukkan istilah bola sepak",
-            "Struktur diubah dengan menggabungkan",
-            "Em dash (—) dibuang seperti yang diminta",
-            "Tukar perkataan dari bahasa inggeris",
-            "Semoga ini membantu",
-            "Saya cuba",
-            "Saya juga",
-            "Struktur diubah",
-            "Em dash",
-            "Tukar perkataan",
-            "Semoga ini"
-        )
 
         // Retry configuration
         private const val MAX_RETRIES = 4
