@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,26 +44,38 @@ import kotlinx.coroutines.delay
 @Composable
 fun EnhancedLoadingCard(
     modifier: Modifier = Modifier,
-    estimatedDurationMs: Long = 8000L // Default 8 seconds estimation
+    estimatedDurationMs: Long = 8000L,
+    progressFlow: kotlinx.coroutines.flow.StateFlow<Float>? = null,
+    loadingMessage: String = "Creating your content..."
 ) {
-    var progress by remember { mutableFloatStateOf(0f) }
+    var simulatedProgress by remember { mutableFloatStateOf(0f) }
     var loadingText by remember { mutableStateOf("INITIALIZING...") }
     
-    // Simulate progress over estimated time
-    LaunchedEffect(Unit) {
-        val startTime = System.currentTimeMillis()
-        while (progress < 0.95f) {
-            delay(100)
-            val elapsed = System.currentTimeMillis() - startTime
-            // Use a curve that slows down as it approaches completion
-            progress = (elapsed.toFloat() / estimatedDurationMs).coerceAtMost(0.95f)
-            
-            // Update loading text based on progress
-            loadingText = when {
-                progress < 0.30f -> "INITIALIZING..."
-                progress < 0.60f -> "GENERATING..."
-                progress < 0.90f -> "FINALIZING..."
-                else -> "ALMOST DONE..."
+    val externalProgress = progressFlow?.collectAsState()
+    val progress = externalProgress?.value ?: simulatedProgress
+    
+    // Use external progress if available, otherwise simulate
+    if (progressFlow != null) {
+        loadingText = when {
+            progress < 0.30f -> "INITIALIZING..."
+            progress < 0.60f -> "GENERATING..."
+            progress < 0.90f -> "FINALIZING..."
+            else -> "ALMOST DONE..."
+        }
+    } else {
+        LaunchedEffect(Unit) {
+            val startTime = System.currentTimeMillis()
+            while (simulatedProgress < 0.95f) {
+                delay(100)
+                val elapsed = System.currentTimeMillis() - startTime
+                simulatedProgress = (elapsed.toFloat() / estimatedDurationMs).coerceAtMost(0.95f)
+                
+                loadingText = when {
+                    simulatedProgress < 0.30f -> "INITIALIZING..."
+                    simulatedProgress < 0.60f -> "GENERATING..."
+                    simulatedProgress < 0.90f -> "FINALIZING..."
+                    else -> "ALMOST DONE..."
+                }
             }
         }
     }
@@ -136,7 +149,7 @@ fun EnhancedLoadingCard(
             
             // Subtitle hint
             Text(
-                text = "Creating your content...",
+                text = loadingMessage,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -151,24 +164,37 @@ fun EnhancedLoadingCard(
 fun EnhancedLoadingCardWithCompletion(
     modifier: Modifier = Modifier,
     isComplete: Boolean,
-    onComplete: () -> Unit
+    onComplete: () -> Unit,
+    progressFlow: kotlinx.coroutines.flow.StateFlow<Float>? = null,
+    loadingMessage: String = "Creating your content..."
 ) {
-    var progress by remember { mutableFloatStateOf(0f) }
+    var simulatedProgress by remember { mutableFloatStateOf(0f) }
     var loadingText by remember { mutableStateOf("INITIALIZING...") }
     
-    // Simulate progress
-    LaunchedEffect(Unit) {
-        val startTime = System.currentTimeMillis()
-        while (progress < 0.95f && !isComplete) {
-            delay(100)
-            val elapsed = System.currentTimeMillis() - startTime
-            progress = (elapsed.toFloat() / 8000f).coerceAtMost(0.95f)
-            
-            loadingText = when {
-                progress < 0.30f -> "INITIALIZING..."
-                progress < 0.60f -> "GENERATING..."
-                progress < 0.90f -> "FINALIZING..."
-                else -> "ALMOST DONE..."
+    val externalProgress = progressFlow?.collectAsState()
+    val progress = externalProgress?.value ?: simulatedProgress
+    
+    if (progressFlow != null) {
+        loadingText = when {
+            progress < 0.30f -> "INITIALIZING..."
+            progress < 0.60f -> "GENERATING..."
+            progress < 0.90f -> "FINALIZING..."
+            else -> "ALMOST DONE..."
+        }
+    } else {
+        LaunchedEffect(Unit) {
+            val startTime = System.currentTimeMillis()
+            while (simulatedProgress < 0.95f && !isComplete) {
+                delay(100)
+                val elapsed = System.currentTimeMillis() - startTime
+                simulatedProgress = (elapsed.toFloat() / 8000f).coerceAtMost(0.95f)
+                
+                loadingText = when {
+                    simulatedProgress < 0.30f -> "INITIALIZING..."
+                    simulatedProgress < 0.60f -> "GENERATING..."
+                    simulatedProgress < 0.90f -> "FINALIZING..."
+                    else -> "ALMOST DONE..."
+                }
             }
         }
     }
@@ -176,7 +202,7 @@ fun EnhancedLoadingCardWithCompletion(
     // When complete, animate to 100%
     LaunchedEffect(isComplete) {
         if (isComplete) {
-            progress = 1f
+            simulatedProgress = 1f
             loadingText = "COMPLETE!"
             delay(300)
             onComplete()
@@ -245,7 +271,7 @@ fun EnhancedLoadingCardWithCompletion(
             Spacer(Modifier.height(8.dp))
             
             Text(
-                text = "Creating your content...",
+                text = loadingMessage,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

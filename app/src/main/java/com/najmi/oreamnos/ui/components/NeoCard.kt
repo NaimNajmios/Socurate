@@ -24,10 +24,11 @@ private val DefaultNeoShape = RoundedCornerShape(0.dp)
 @Composable
 fun NeoCard(
     modifier: Modifier = Modifier,
-    shape: Shape = DefaultNeoShape, // Sharp corners
+    shape: Shape = DefaultNeoShape,
     borderWidth: Dp = 2.dp,
     borderColor: Color = MaterialTheme.colorScheme.outline,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
+    contentPadding: Dp = 16.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
@@ -35,10 +36,10 @@ fun NeoCard(
         shape = shape,
         color = backgroundColor,
         border = BorderStroke(borderWidth, borderColor),
-        shadowElevation = 0.dp // Flat
+        shadowElevation = 0.dp
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(contentPadding),
             content = content
         )
     }

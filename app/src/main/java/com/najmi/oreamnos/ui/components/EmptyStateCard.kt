@@ -4,6 +4,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -31,8 +32,10 @@ import com.najmi.oreamnos.R
  * Features a "breathing" and "floating" icon animation to invite interaction.
  */
 @Composable
-fun EmptyStateCard(onPaste: () -> Unit) {
-    // Micro-interactions: Breathing and Floating animation
+fun EmptyStateCard(
+    onPaste: () -> Unit,
+    isVisible: Boolean = true
+) {
     val infiniteTransition = rememberInfiniteTransition(label = "emptyStateAnimations")
 
     val scale by infiniteTransition.animateFloat(
@@ -55,6 +58,18 @@ fun EmptyStateCard(onPaste: () -> Unit) {
         label = "floatingOffset"
     )
 
+    val animatedScale by animateFloatAsState(
+        targetValue = if (isVisible) scale else 1f,
+        animationSpec = tween(300),
+        label = "scaleAnimation"
+    )
+
+    val animatedOffset by animateFloatAsState(
+        targetValue = if (isVisible) offsetY else 0f,
+        animationSpec = tween(300),
+        label = "offsetAnimation"
+    )
+
     NeoCard(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -69,9 +84,9 @@ fun EmptyStateCard(onPaste: () -> Unit) {
                 contentDescription = null,
                 modifier = Modifier
                     .size(80.dp)
-                    .scale(scale)
+                    .scale(animatedScale)
                     .graphicsLayer {
-                        translationY = offsetY
+                        translationY = animatedOffset
                     },
                 tint = MaterialTheme.colorScheme.primary
             )

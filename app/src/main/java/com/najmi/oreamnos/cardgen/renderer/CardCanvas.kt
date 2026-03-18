@@ -48,9 +48,24 @@ import com.najmi.oreamnos.cardgen.utils.GradientBuilder
 
 internal val CardBorder = Color.White.copy(alpha = 0.15f)
 
-internal val CardTextPrimary = Color.White
-internal val CardTextSecondary = Color.White.copy(alpha = 0.75f)
-internal val CardTextMuted = Color.White.copy(alpha = 0.55f)
+internal fun getCardTextColors(backgroundColor: Color): CardTextColors {
+    val isLight = backgroundColor.luminance() > 0.5f
+    return CardTextColors(
+        primary = if (isLight) Color.Black else Color.White,
+        secondary = if (isLight) Color.Black.copy(alpha = 0.75f) else Color.White.copy(alpha = 0.75f),
+        muted = if (isLight) Color.Black.copy(alpha = 0.55f) else Color.White.copy(alpha = 0.55f)
+    )
+}
+
+internal data class CardTextColors(
+    val primary: Color,
+    val secondary: Color,
+    val muted: Color
+)
+
+internal val CardTextPrimary: Color get() = Color.White
+internal val CardTextSecondary: Color get() = Color.White.copy(alpha = 0.75f)
+internal val CardTextMuted: Color get() = Color.White.copy(alpha = 0.55f)
 
 internal fun Int.scaleSp(multiplier: Float): TextUnit = (this * multiplier).sp
 
