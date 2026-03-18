@@ -34,6 +34,8 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -56,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.najmi.oreamnos.cardgen.model.CardConfig
+import com.najmi.oreamnos.cardgen.model.CardTemplate
 import com.najmi.oreamnos.cardgen.model.ExportSize
 import com.najmi.oreamnos.cardgen.model.ImagePosition
 import com.najmi.oreamnos.cardgen.renderer.CardRenderer
@@ -110,6 +113,7 @@ fun CardGeneratorScreen(
     var showExportSheet by remember { mutableStateOf(false) }
     var showDataSheet by remember { mutableStateOf(false) }
     var selectedExportSize by remember { mutableStateOf(ExportSize.SQUARE) }
+    var suggestedTemplate by remember { mutableStateOf<com.najmi.oreamnos.cardgen.model.CardTemplate?>(null) }
 
     // Consume synced text from AppViewModel (auto-sync from Generate screen)
     val latestText by appViewModel.latestGeneratedText.collectAsState()
@@ -132,6 +136,14 @@ fun CardGeneratorScreen(
     LaunchedEffect(extractionState) {
         if (extractionState is ExtractionState.Error) {
             snackbarHostState.showSnackbar((extractionState as ExtractionState.Error).message)
+        }
+        // Auto-detect template: show suggestion dialog if AI suggests a different template
+        if (extractionState is ExtractionState.Success) {
+            val data = (extractionState as ExtractionState.Success).cardData
+            val suggested = data.suggestedTemplate
+            if (suggested != null && suggested != selectedTemplate) {
+                suggestedTemplate = suggested
+            }
         }
     }
 
@@ -227,12 +239,14 @@ fun CardGeneratorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // ── 1. Template picker ─────────────────────────────────
-            TemplatePickerRow(
+            TemplatePickerGrid(
                 selectedTemplate = selectedTemplate,
                 onTemplateSelected = { template ->
                     cardViewModel.selectTemplate(template, context)
                 },
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .height(320.dp)
             )
 
             // ── 2. Card preview ────────────────────────────────────
@@ -350,6 +364,21 @@ fun CardGeneratorScreen(
             }
         )
     }
+
+    // Template Suggestion Dialog
+    suggestedTemplate?.let { suggested ->
+        TemplateSuggestionDialog(
+            suggestedTemplate = suggested,
+            currentTemplate = selectedTemplate,
+            onAccept = {
+                cardViewModel.selectTemplate(suggested, context)
+                suggestedTemplate = null
+            },
+            onDismiss = {
+                suggestedTemplate = null
+            }
+        )
+    }
 }
 
 @Composable
@@ -437,4 +466,46 @@ private fun LayoutOptionsSection(
             )
         }
     }
+}
+
+@Composable
+private fun TemplateSuggestionDialog(
+    suggestedTemplate: CardTemplate,
+    currentTemplate: CardTemplate,
+    onAccept: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Template Dicadangkan",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = "AI mencadangkan template \"${suggestedTemplate.displayName}\" berdasarkan kandungan teks.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Kekal dengan \"${currentTemplate.displayName}\" atau tukar ke template yang dicadangkan?",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onAccept) {
+                Text("Tukar ke ${suggestedTemplate.displayName}")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Kekal")
+            }
+        }
+    )
 }
