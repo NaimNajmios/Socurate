@@ -19,15 +19,20 @@ import androidx.compose.ui.unit.dp
 import com.najmi.oreamnos.cardgen.model.CardConfig
 import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.model.CardTemplate
+import com.najmi.oreamnos.cardgen.renderer.AwardNomineeCanvas
 import com.najmi.oreamnos.cardgen.renderer.BreakingNewsCanvas
+import com.najmi.oreamnos.cardgen.renderer.ContractExpiryCanvas
 import com.najmi.oreamnos.cardgen.renderer.DetailedScoreboardCanvas
 import com.najmi.oreamnos.cardgen.renderer.HeadlineQuoteCanvas
+import com.najmi.oreamnos.cardgen.renderer.InjuryReportCanvas
 import com.najmi.oreamnos.cardgen.renderer.MatchPreviewCanvas
 import com.najmi.oreamnos.cardgen.renderer.MatchStatsComparisonCanvas
 import com.najmi.oreamnos.cardgen.renderer.OnThisDayCanvas
 import com.najmi.oreamnos.cardgen.renderer.PlayerSpotlightCanvas
+import com.najmi.oreamnos.cardgen.renderer.RivalryCanvas
 import com.najmi.oreamnos.cardgen.renderer.SocialPostCanvas
 import com.najmi.oreamnos.cardgen.renderer.StartingXICanvas
+import com.najmi.oreamnos.cardgen.renderer.TableStandingsCanvas
 import com.najmi.oreamnos.cardgen.renderer.TopStatsCanvas
 import com.najmi.oreamnos.cardgen.renderer.TransferNewsCanvas
 import com.najmi.oreamnos.cardgen.viewmodel.ExtractionState
@@ -128,6 +133,11 @@ fun CardCanvas(
         is CardData.StartingXI -> StartingXICanvas(data = cardData, config = cardConfig, modifier = modifier)
         is CardData.MatchStatsComparison -> MatchStatsComparisonCanvas(data = cardData, config = cardConfig, modifier = modifier)
         is CardData.SocialPost -> SocialPostCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.Rivalry -> RivalryCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.TableStandings -> TableStandingsCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.InjuryReport -> InjuryReportCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.ContractExpiry -> ContractExpiryCanvas(data = cardData, config = cardConfig, modifier = modifier)
+        is CardData.AwardNominee -> AwardNomineeCanvas(data = cardData, config = cardConfig, modifier = modifier)
     }
 }
 
@@ -151,8 +161,11 @@ private fun CardPlaceholder(template: CardTemplate) {
     }
 }
 
-/** Aspect ratio for the card preview — all templates use compact square format. */
-private fun aspectForTemplate(template: CardTemplate): Float = 1f
+/** Aspect ratio for the card preview — most templates use compact square format, TableStandings uses portrait. */
+private fun aspectForTemplate(template: CardTemplate): Float = when (template) {
+    CardTemplate.TableStandings -> 1.4f
+    else -> 1f
+}
 
 @Composable
 fun DraggableCanvasElement(

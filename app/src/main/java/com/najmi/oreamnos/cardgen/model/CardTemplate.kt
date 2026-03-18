@@ -74,13 +74,44 @@ sealed class CardTemplate(
         description = "Minimalist Social Post"
     )
 
+    /** Rivalry card: head-to-head player/team comparison. */
+    object Rivalry : CardTemplate(
+        displayName = "Rivalry",
+        description = "Head-to-Head Comparison"
+    )
+
+    /** League table/standings card. */
+    object TableStandings : CardTemplate(
+        displayName = "Table",
+        description = "League Standings"
+    )
+
+    /** Injury report card: squad injury news. */
+    object InjuryReport : CardTemplate(
+        displayName = "Injury",
+        description = "Injury Report"
+    )
+
+    /** Contract expiry card: players with expiring contracts. */
+    object ContractExpiry : CardTemplate(
+        displayName = "Contract",
+        description = "Expiring Contracts"
+    )
+
+    /** Award nominee card: awards season nominees. */
+    object AwardNominee : CardTemplate(
+        displayName = "Award",
+        description = "Award Nominees"
+    )
+
     companion object {
         /** All templates in display order. Lazy to avoid class init order NPE. */
         val all: List<CardTemplate> by lazy {
             listOf(
                 HeadlineQuote, BreakingNews, SocialPost, PlayerSpotlight, TopStats,
                 OnThisDay, TransferNews, MatchPreview, StartingXI, DetailedScoreboard,
-                MatchStatsComparison
+                MatchStatsComparison, Rivalry, TableStandings, InjuryReport, ContractExpiry,
+                AwardNominee
             )
         }
     }

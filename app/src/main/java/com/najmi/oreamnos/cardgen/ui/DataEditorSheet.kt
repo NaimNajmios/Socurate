@@ -257,6 +257,32 @@ private fun DynamicDataEditor(
             MagicEditorField("Timestamp", cardData.timestamp) { v -> onCardDataChange { (it as CardData.SocialPost).copy(timestamp = v) } }
             MagicEditorField("Metrics", cardData.metrics) { v -> onCardDataChange { (it as CardData.SocialPost).copy(metrics = v) } }
         }
+        is CardData.Rivalry -> {
+            MagicEditorField("Player 1", cardData.player1Name) { v -> onCardDataChange { (it as CardData.Rivalry).copy(player1Name = v) } }
+            MagicEditorField("Player 2", cardData.player2Name) { v -> onCardDataChange { (it as CardData.Rivalry).copy(player2Name = v) } }
+            MagicEditorField("Match Context", cardData.matchContext) { v -> onCardDataChange { (it as CardData.Rivalry).copy(matchContext = v) } }
+            MagicEditorField("Head-to-Head", cardData.headToHead) { v -> onCardDataChange { (it as CardData.Rivalry).copy(headToHead = v) } }
+            MagicEditorField("Verdict", cardData.verdict) { v -> onCardDataChange { (it as CardData.Rivalry).copy(verdict = v) } }
+        }
+        is CardData.TableStandings -> {
+            MagicEditorField("League Name", cardData.leagueName) { v -> onCardDataChange { (it as CardData.TableStandings).copy(leagueName = v) } }
+            MagicEditorField("Matchday", cardData.matchday) { v -> onCardDataChange { (it as CardData.TableStandings).copy(matchday = v) } }
+            MagicEditorField("Highlighted Team", cardData.highlightedTeam) { v -> onCardDataChange { (it as CardData.TableStandings).copy(highlightedTeam = v) } }
+        }
+        is CardData.InjuryReport -> {
+            MagicEditorField("Team Name", cardData.teamName) { v -> onCardDataChange { (it as CardData.InjuryReport).copy(teamName = v) } }
+            MagicEditorField("Report Date", cardData.reportDate) { v -> onCardDataChange { (it as CardData.InjuryReport).copy(reportDate = v) } }
+        }
+        is CardData.ContractExpiry -> {
+            MagicEditorField("Team Name", cardData.teamName) { v -> onCardDataChange { (it as CardData.ContractExpiry).copy(teamName = v) } }
+            MagicEditorField("Season", cardData.seasonYear) { v -> onCardDataChange { (it as CardData.ContractExpiry).copy(seasonYear = v) } }
+        }
+        is CardData.AwardNominee -> {
+            MagicEditorField("Award Name", cardData.awardName) { v -> onCardDataChange { (it as CardData.AwardNominee).copy(awardName = v) } }
+            MagicEditorField("Category", cardData.category) { v -> onCardDataChange { (it as CardData.AwardNominee).copy(category = v) } }
+            MagicEditorField("Ceremony Date", cardData.ceremonyDate) { v -> onCardDataChange { (it as CardData.AwardNominee).copy(ceremonyDate = v) } }
+            MagicEditorField("Current Favorite", cardData.currentFavorite) { v -> onCardDataChange { (it as CardData.AwardNominee).copy(currentFavorite = v) } }
+        }
     }
 }
 

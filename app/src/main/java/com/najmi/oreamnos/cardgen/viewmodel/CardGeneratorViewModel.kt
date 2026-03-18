@@ -215,6 +215,41 @@ class CardGeneratorViewModel(
                 timestamp = "Just Now",
                 metrics = "0 Likes"
             )
+            CardTemplate.Rivalry -> CardData.Rivalry(
+                player1Name = extractPlayerName(currentData),
+                player2Name = "Player 2",
+                matchContext = "${extractHomeTeam(currentData)} vs ${extractAwayTeam(currentData)}",
+                player1Stats = emptyList(),
+                player2Stats = emptyList(),
+                headToHead = "0-0-0",
+                verdict = "TBD"
+            )
+            CardTemplate.TableStandings -> CardData.TableStandings(
+                leagueName = extractCompetition(currentData),
+                matchday = "Matchday 1",
+                standings = emptyList(),
+                highlightedTeam = extractHomeTeam(currentData)
+            )
+            CardTemplate.InjuryReport -> CardData.InjuryReport(
+                teamName = extractHomeTeam(currentData),
+                reportDate = "Today",
+                injuries = emptyList(),
+                doubtfits = emptyList(),
+                returns = emptyList()
+            )
+            CardTemplate.ContractExpiry -> CardData.ContractExpiry(
+                teamName = extractHomeTeam(currentData),
+                seasonYear = "2024/25",
+                expiringPlayers = emptyList(),
+                renewals = emptyList()
+            )
+            CardTemplate.AwardNominee -> CardData.AwardNominee(
+                awardName = "Ballon d'Or",
+                category = "Men's Player",
+                nominees = emptyList(),
+                ceremonyDate = "TBD",
+                currentFavorite = extractPlayerName(currentData)
+            )
         }
         
         _mutableCardData.value = newData

@@ -10,12 +10,21 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.TextSnippet
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,9 +38,47 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+
+enum class LoadingType {
+    GENERATING,
+    EXTRACTING,
+    DOWNLOADING,
+    UPLOADING,
+    ANALYZING,
+    CUSTOM
+}
+
+private fun getLoadingConfig(type: LoadingType): Pair<ImageVector, String> {
+    return when (type) {
+        LoadingType.GENERATING -> Icons.Default.Psychology to "Generating content..."
+        LoadingType.EXTRACTING -> Icons.Default.TextSnippet to "Extracting content..."
+        LoadingType.DOWNLOADING -> Icons.Default.CloudDownload to "Downloading..."
+        LoadingType.UPLOADING -> Icons.Default.Upload to "Uploading..."
+        LoadingType.ANALYZING -> Icons.Default.Analytics to "Analyzing..."
+        LoadingType.CUSTOM -> Icons.Default.Psychology to "Processing..."
+    }
+}
+
+private fun getLoadingText(type: LoadingType, progress: Float): String {
+    val prefix = when (type) {
+        LoadingType.GENERATING -> "GENERATING"
+        LoadingType.EXTRACTING -> "EXTRACTING"
+        LoadingType.DOWNLOADING -> "DOWNLOADING"
+        LoadingType.UPLOADING -> "UPLOADING"
+        LoadingType.ANALYZING -> "ANALYZING"
+        LoadingType.CUSTOM -> "PROCESSING"
+    }
+    return when {
+        progress < 0.30f -> "$prefix..."
+        progress < 0.60f -> "IN PROGRESS..."
+        progress < 0.90f -> "ALMOST DONE..."
+        else -> "COMPLETE!"
+    }
+}
 
 /**
  * Enhanced Loading Card with Progress Percentage
@@ -40,28 +87,27 @@ import kotlinx.coroutines.delay
  * - Animated progress percentage (0% -> 100%)
  * - Dynamic loading text based on progress
  * - Pulsing animation effect
+ * - Contextual loading types with icons
  */
 @Composable
 fun EnhancedLoadingCard(
     modifier: Modifier = Modifier,
+    loadingType: LoadingType = LoadingType.GENERATING,
+    customIcon: ImageVector? = null,
     estimatedDurationMs: Long = 8000L,
     progressFlow: kotlinx.coroutines.flow.StateFlow<Float>? = null,
-    loadingMessage: String = "Creating your content..."
+    loadingMessage: String? = null
 ) {
+    val (defaultIcon, defaultMessage) = getLoadingConfig(loadingType)
+    val effectiveIcon = if (loadingType == LoadingType.CUSTOM && customIcon != null) customIcon else defaultIcon
+    val effectiveMessage = loadingMessage ?: defaultMessage
     var simulatedProgress by remember { mutableFloatStateOf(0f) }
-    var loadingText by remember { mutableStateOf("INITIALIZING...") }
     
     val externalProgress = progressFlow?.collectAsState()
     val progress = externalProgress?.value ?: simulatedProgress
     
-    // Use external progress if available, otherwise simulate
-    if (progressFlow != null) {
-        loadingText = when {
-            progress < 0.30f -> "INITIALIZING..."
-            progress < 0.60f -> "GENERATING..."
-            progress < 0.90f -> "FINALIZING..."
-            else -> "ALMOST DONE..."
-        }
+    val loadingText = if (progressFlow != null) {
+        getLoadingText(loadingType, progress)
     } else {
         LaunchedEffect(Unit) {
             val startTime = System.currentTimeMillis()
@@ -69,15 +115,9 @@ fun EnhancedLoadingCard(
                 delay(100)
                 val elapsed = System.currentTimeMillis() - startTime
                 simulatedProgress = (elapsed.toFloat() / estimatedDurationMs).coerceAtMost(0.95f)
-                
-                loadingText = when {
-                    simulatedProgress < 0.30f -> "INITIALIZING..."
-                    simulatedProgress < 0.60f -> "GENERATING..."
-                    simulatedProgress < 0.90f -> "FINALIZING..."
-                    else -> "ALMOST DONE..."
-                }
             }
         }
+        getLoadingText(loadingType, simulatedProgress)
     }
     
     // Pulsing animation
@@ -136,20 +176,30 @@ fun EnhancedLoadingCard(
                 )
             }
             
-            Spacer(Modifier.height(32.dp))
-            
-            // Dynamic loading text
-            Text(
-                text = loadingText,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            // Context icon
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = effectiveIcon,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = loadingText,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
             
             Spacer(Modifier.height(8.dp))
             
             // Subtitle hint
             Text(
-                text = loadingMessage,
+                text = effectiveMessage,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -163,24 +213,24 @@ fun EnhancedLoadingCard(
 @Composable
 fun EnhancedLoadingCardWithCompletion(
     modifier: Modifier = Modifier,
+    loadingType: LoadingType = LoadingType.GENERATING,
+    customIcon: ImageVector? = null,
     isComplete: Boolean,
     onComplete: () -> Unit,
     progressFlow: kotlinx.coroutines.flow.StateFlow<Float>? = null,
-    loadingMessage: String = "Creating your content..."
+    loadingMessage: String? = null
 ) {
+    val (defaultIcon, defaultMessage) = getLoadingConfig(loadingType)
+    val effectiveIcon = if (loadingType == LoadingType.CUSTOM && customIcon != null) customIcon else defaultIcon
+    val effectiveMessage = loadingMessage ?: defaultMessage
+    
     var simulatedProgress by remember { mutableFloatStateOf(0f) }
-    var loadingText by remember { mutableStateOf("INITIALIZING...") }
     
     val externalProgress = progressFlow?.collectAsState()
     val progress = externalProgress?.value ?: simulatedProgress
     
-    if (progressFlow != null) {
-        loadingText = when {
-            progress < 0.30f -> "INITIALIZING..."
-            progress < 0.60f -> "GENERATING..."
-            progress < 0.90f -> "FINALIZING..."
-            else -> "ALMOST DONE..."
-        }
+    val rawLoadingText = if (progressFlow != null) {
+        getLoadingText(loadingType, progress)
     } else {
         LaunchedEffect(Unit) {
             val startTime = System.currentTimeMillis()
@@ -188,22 +238,17 @@ fun EnhancedLoadingCardWithCompletion(
                 delay(100)
                 val elapsed = System.currentTimeMillis() - startTime
                 simulatedProgress = (elapsed.toFloat() / 8000f).coerceAtMost(0.95f)
-                
-                loadingText = when {
-                    simulatedProgress < 0.30f -> "INITIALIZING..."
-                    simulatedProgress < 0.60f -> "GENERATING..."
-                    simulatedProgress < 0.90f -> "FINALIZING..."
-                    else -> "ALMOST DONE..."
-                }
             }
         }
+        getLoadingText(loadingType, simulatedProgress)
     }
+    
+    val displayText = if (isComplete) "COMPLETE!" else rawLoadingText
     
     // When complete, animate to 100%
     LaunchedEffect(isComplete) {
         if (isComplete) {
             simulatedProgress = 1f
-            loadingText = "COMPLETE!"
             delay(300)
             onComplete()
         }
@@ -262,16 +307,28 @@ fun EnhancedLoadingCardWithCompletion(
             
             Spacer(Modifier.height(32.dp))
             
-            Text(
-                text = loadingText,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = effectiveIcon,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = displayText,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
             
             Spacer(Modifier.height(8.dp))
             
             Text(
-                text = loadingMessage,
+                text = effectiveMessage,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

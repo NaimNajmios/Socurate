@@ -155,6 +155,11 @@ private fun TemplatePreviewContent(template: CardTemplate) {
             CardTemplate.StartingXI -> LineupPreview()
             CardTemplate.MatchStatsComparison -> ComparisonPreview()
             CardTemplate.SocialPost -> SocialPreview()
+            CardTemplate.Rivalry -> RivalryPreview()
+            CardTemplate.TableStandings -> TableStandingsPreview()
+            CardTemplate.InjuryReport -> InjuryReportPreview()
+            CardTemplate.ContractExpiry -> ContractExpiryPreview()
+            CardTemplate.AwardNominee -> AwardNomineePreview()
         }
     }
 }
@@ -360,6 +365,57 @@ private fun SocialPreview() {
     }
 }
 
+@Composable
+private fun RivalryPreview() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(text = "RIVALRY", color = Color.White.copy(alpha = 0.5f), fontSize = 6.sp, letterSpacing = 1.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Text(text = "Player 1 VS Player 2", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+        Text(text = "H2H: 3-2-1", color = Color.White.copy(alpha = 0.7f), fontSize = 6.sp)
+    }
+}
+
+@Composable
+private fun TableStandingsPreview() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(text = "LEAGUE TABLE", color = Color.White.copy(alpha = 0.5f), fontSize = 6.sp, letterSpacing = 1.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Text(text = "1. Arsenal 69pts", color = Color.White, fontSize = 7.sp)
+        Text(text = "2. Liverpool 67pts", color = Color.White, fontSize = 7.sp)
+        Text(text = "3. Man City 59pts", color = Color.White, fontSize = 7.sp)
+    }
+}
+
+@Composable
+private fun InjuryReportPreview() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(text = "INJURY REPORT", color = Color.White.copy(alpha = 0.5f), fontSize = 6.sp, letterSpacing = 1.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Text(text = "Player A - Out 3 weeks", color = Color.White, fontSize = 7.sp)
+        Text(text = "Player B - Doubtful", color = Color.White, fontSize = 7.sp)
+    }
+}
+
+@Composable
+private fun ContractExpiryPreview() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(text = "CONTRACT EXPIRY", color = Color.White.copy(alpha = 0.5f), fontSize = 6.sp, letterSpacing = 1.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Text(text = "Player A - June 2025", color = Color.White, fontSize = 7.sp)
+        Text(text = "Player B - Negotiating", color = Color.White, fontSize = 7.sp)
+    }
+}
+
+@Composable
+private fun AwardNomineePreview() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(text = "AWARD NOMINEE", color = Color.White.copy(alpha = 0.5f), fontSize = 6.sp, letterSpacing = 1.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Text(text = "Favorite: Player X", color = Color.Yellow, fontSize = 7.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Nominee 1, 2, 3...", color = Color.White, fontSize = 6.sp)
+    }
+}
+
 private val CardTemplate.previewGradient: Brush
     get() = when (this) {
         CardTemplate.HeadlineQuote -> Brush.verticalGradient(listOf(Color(0xFF1A237E), Color(0xFF0D47A1)))
@@ -373,4 +429,9 @@ private val CardTemplate.previewGradient: Brush
         CardTemplate.StartingXI -> Brush.verticalGradient(listOf(Color(0xFF1A237E), Color(0xFF0D47A1)))
         CardTemplate.MatchStatsComparison -> Brush.verticalGradient(listOf(Color(0xFF004D40), Color(0xFF00695C)))
         CardTemplate.SocialPost -> Brush.verticalGradient(listOf(Color(0xFF212121), Color(0xFF424242)))
+        CardTemplate.Rivalry -> Brush.verticalGradient(listOf(Color(0xFFE65100), Color(0xFFFF9800)))
+        CardTemplate.TableStandings -> Brush.verticalGradient(listOf(Color(0xFF1A237E), Color(0xFF303F9F)))
+        CardTemplate.InjuryReport -> Brush.verticalGradient(listOf(Color(0xFFB71C1C), Color(0xFFE53935)))
+        CardTemplate.ContractExpiry -> Brush.verticalGradient(listOf(Color(0xFF4E342E), Color(0xFF6D4C41)))
+        CardTemplate.AwardNominee -> Brush.verticalGradient(listOf(Color(0xFFFFD700), Color(0xFFFFC107)))
     }

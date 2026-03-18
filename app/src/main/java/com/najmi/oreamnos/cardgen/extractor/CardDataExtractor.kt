@@ -140,6 +140,11 @@ class CardDataExtractor(private val context: Context) {
             CardTemplate.StartingXI -> parseStartingXI(obj)
             CardTemplate.MatchStatsComparison -> parseMatchStatsComparison(obj)
             CardTemplate.SocialPost -> parseSocialPost(obj)
+            CardTemplate.Rivalry -> parseRivalry(obj)
+            CardTemplate.TableStandings -> parseTableStandings(obj)
+            CardTemplate.InjuryReport -> parseInjuryReport(obj)
+            CardTemplate.ContractExpiry -> parseContractExpiry(obj)
+            CardTemplate.AwardNominee -> parseAwardNominee(obj)
         }
     }
 
@@ -201,6 +206,11 @@ class CardDataExtractor(private val context: Context) {
             "FULL_TIME" -> CardTemplate.DetailedScoreboard
             "HISTORY" -> CardTemplate.OnThisDay
             "LINEUP" -> CardTemplate.StartingXI
+            "RIVALRY" -> CardTemplate.Rivalry
+            "STANDINGS" -> CardTemplate.TableStandings
+            "INJURY" -> CardTemplate.InjuryReport
+            "CONTRACT" -> CardTemplate.ContractExpiry
+            "AWARD" -> CardTemplate.AwardNominee
             else -> null
         }
     }
@@ -420,6 +430,205 @@ class CardDataExtractor(private val context: Context) {
             content = obj.optString("content", UNKNOWN),
             timestamp = obj.optString("timestamp", UNKNOWN),
             metrics = obj.optString("metrics", UNKNOWN),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
+        )
+    }
+
+    private fun parseRivalry(obj: JsonObject): CardData.Rivalry {
+        val player1StatsArray = try { obj.getAsJsonArray("player1Stats") } catch (e: Exception) { null }
+        val player2StatsArray = try { obj.getAsJsonArray("player2Stats") } catch (e: Exception) { null }
+
+        val player1Items = mutableListOf<StatItem>()
+        val player2Items = mutableListOf<StatItem>()
+
+        if (player1StatsArray != null) {
+            for (i in 0 until minOf(player1StatsArray.size(), 3)) {
+                val item = player1StatsArray[i]?.asJsonObject
+                if (item != null) {
+                    player1Items.add(StatItem(
+                        label = item.optString("label", "Stat ${i + 1}"),
+                        value = item.optString("value", ZERO_STR),
+                        context = item.optString("context", "")
+                    ))
+                }
+            }
+        }
+
+        if (player2StatsArray != null) {
+            for (i in 0 until minOf(player2StatsArray.size(), 3)) {
+                val item = player2StatsArray[i]?.asJsonObject
+                if (item != null) {
+                    player2Items.add(StatItem(
+                        label = item.optString("label", "Stat ${i + 1}"),
+                        value = item.optString("value", ZERO_STR),
+                        context = item.optString("context", "")
+                    ))
+                }
+            }
+        }
+
+        return CardData.Rivalry(
+            player1Name = obj.optString("player1Name", UNKNOWN),
+            player2Name = obj.optString("player2Name", UNKNOWN),
+            matchContext = obj.optString("matchContext", ""),
+            player1Stats = player1Items,
+            player2Stats = player2Items,
+            headToHead = obj.optString("headToHead", ""),
+            verdict = obj.optString("verdict", ""),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
+        )
+    }
+
+    private fun parseTableStandings(obj: JsonObject): CardData.TableStandings {
+        val standingsArray = try { obj.getAsJsonArray("standings") } catch (e: Exception) { null }
+        val items = mutableListOf<com.najmi.oreamnos.cardgen.model.TableRow>()
+
+        if (standingsArray != null) {
+            for (i in 0 until minOf(standingsArray.size(), 5)) {
+                val item = standingsArray[i]?.asJsonObject
+                if (item != null) {
+                    items.add(com.najmi.oreamnos.cardgen.model.TableRow(
+                        position = item.optInt("position", i + 1),
+                        teamName = item.optString("teamName", UNKNOWN),
+                        played = item.optInt("played", 0),
+                        won = item.optInt("won", 0),
+                        drawn = item.optInt("drawn", 0),
+                        lost = item.optInt("lost", 0),
+                        points = item.optInt("points", 0),
+                        form = item.optString("form", "")
+                    ))
+                }
+            }
+        }
+
+        return CardData.TableStandings(
+            leagueName = obj.optString("leagueName", UNKNOWN),
+            matchday = obj.optString("matchday", ""),
+            standings = items,
+            highlightedTeam = obj.optString("highlightedTeam", ""),
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
+        )
+    }
+
+    private fun parseInjuryReport(obj: JsonObject): CardData.InjuryReport {
+        val injuriesArray = try { obj.getAsJsonArray("injuries") } catch (e: Exception) { null }
+        val doubtfitsArray = try { obj.getAsJsonArray("doubtfits") } catch (e: Exception) { null }
+        val returnsArray = try { obj.getAsJsonArray("returns") } catch (e: Exception) { null }
+
+        val injuries = mutableListOf<com.najmi.oreamnos.cardgen.model.InjuryItem>()
+        val doubtfits = mutableListOf<com.najmi.oreamnos.cardgen.model.InjuryItem>()
+        val returns = mutableListOf<com.najmi.oreamnos.cardgen.model.InjuryItem>()
+
+        injuriesArray?.forEach { element ->
+            val item = element?.asJsonObject
+            if (item != null) {
+                injuries.add(com.najmi.oreamnos.cardgen.model.InjuryItem(
+                    playerName = item.optString("playerName", UNKNOWN),
+                    injury = item.optString("injury", ""),
+                    status = item.optString("status", ""),
+                    position = item.optString("position", "")
+                ))
+            }
+        }
+
+        doubtfitsArray?.forEach { element ->
+            val item = element?.asJsonObject
+            if (item != null) {
+                doubtfits.add(com.najmi.oreamnos.cardgen.model.InjuryItem(
+                    playerName = item.optString("playerName", UNKNOWN),
+                    injury = item.optString("injury", ""),
+                    status = item.optString("status", ""),
+                    position = item.optString("position", "")
+                ))
+            }
+        }
+
+        returnsArray?.forEach { element ->
+            val item = element?.asJsonObject
+            if (item != null) {
+                returns.add(com.najmi.oreamnos.cardgen.model.InjuryItem(
+                    playerName = item.optString("playerName", UNKNOWN),
+                    injury = item.optString("injury", ""),
+                    status = item.optString("status", ""),
+                    position = item.optString("position", "")
+                ))
+            }
+        }
+
+        return CardData.InjuryReport(
+            teamName = obj.optString("teamName", UNKNOWN),
+            reportDate = obj.optString("reportDate", ""),
+            injuries = injuries,
+            doubtfits = doubtfits,
+            returns = returns,
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
+        )
+    }
+
+    private fun parseContractExpiry(obj: JsonObject): CardData.ContractExpiry {
+        val expiringArray = try { obj.getAsJsonArray("expiringPlayers") } catch (e: Exception) { null }
+        val renewalsArray = try { obj.getAsJsonArray("renewals") } catch (e: Exception) { null }
+
+        val expiring = mutableListOf<com.najmi.oreamnos.cardgen.model.ContractPlayer>()
+        val renewals = mutableListOf<com.najmi.oreamnos.cardgen.model.ContractPlayer>()
+
+        expiringArray?.forEach { element ->
+            val item = element?.asJsonObject
+            if (item != null) {
+                expiring.add(com.najmi.oreamnos.cardgen.model.ContractPlayer(
+                    playerName = item.optString("playerName", UNKNOWN),
+                    position = item.optString("position", ""),
+                    expiresIn = item.optString("expiresIn", ""),
+                    marketValue = item.optString("marketValue", ""),
+                    status = item.optString("status", "")
+                ))
+            }
+        }
+
+        renewalsArray?.forEach { element ->
+            val item = element?.asJsonObject
+            if (item != null) {
+                renewals.add(com.najmi.oreamnos.cardgen.model.ContractPlayer(
+                    playerName = item.optString("playerName", UNKNOWN),
+                    position = item.optString("position", ""),
+                    expiresIn = item.optString("expiresIn", ""),
+                    marketValue = item.optString("marketValue", ""),
+                    status = item.optString("status", "")
+                ))
+            }
+        }
+
+        return CardData.ContractExpiry(
+            teamName = obj.optString("teamName", UNKNOWN),
+            seasonYear = obj.optString("seasonYear", ""),
+            expiringPlayers = expiring,
+            renewals = renewals,
+            suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
+        )
+    }
+
+    private fun parseAwardNominee(obj: JsonObject): CardData.AwardNominee {
+        val nomineesArray = try { obj.getAsJsonArray("nominees") } catch (e: Exception) { null }
+        val nominees = mutableListOf<com.najmi.oreamnos.cardgen.model.NomineeItem>()
+
+        nomineesArray?.forEach { element ->
+            val item = element?.asJsonObject
+            if (item != null) {
+                nominees.add(com.najmi.oreamnos.cardgen.model.NomineeItem(
+                    playerName = item.optString("playerName", UNKNOWN),
+                    club = item.optString("club", ""),
+                    achievement = item.optString("achievement", ""),
+                    odds = item.optString("odds", "")
+                ))
+            }
+        }
+
+        return CardData.AwardNominee(
+            awardName = obj.optString("awardName", UNKNOWN),
+            category = obj.optString("category", ""),
+            nominees = nominees,
+            ceremonyDate = obj.optString("ceremonyDate", ""),
+            currentFavorite = obj.optString("currentFavorite", ""),
             suggestedTemplate = mapIntentToTemplate(obj.optString("template_intent", UNKNOWN))
         )
     }

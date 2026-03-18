@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-private val DefaultNeoShape = RoundedCornerShape(0.dp)
+private val DefaultNeoShape = RoundedCornerShape(12.dp)
 private val DefaultCardShape = RoundedCornerShape(12.dp)
 private val ElevatedCardElevation = 3.dp
 private val TonalCardElevation = 1.dp

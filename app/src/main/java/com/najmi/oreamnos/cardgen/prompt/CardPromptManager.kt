@@ -20,7 +20,7 @@ object CardPromptManager {
         "'Clean Sheet', 'Offside', 'Hat-trick', 'Tackle', 'Assist', 'Playmaker', 'Derby', 'Comeback', 'Winger', 'Striker', 'Midfielder', 'Defender', 'Full-back', 'Center-back', 'Goalkeeper', 'Free-kick', 'Penalty', 'Corner Kicks', 'VAR', 'Counter-attack', 'Pressing', 'Cross', 'Header', 'Nutmeg', 'Dribble', 'Volley', 'Bicycle Kick', 'Man of the Match', 'Golden Boot', 'Pitch', 'Box-to-box', 'Sweeper', 'Target Man', 'False Nine', 'High Press', 'Through Ball', 'Overhead Kick'. " +
         "CRITICAL RULE 3: If a specific piece of information (e.g., stats, dates, fees) is NOT explicitly mentioned in the text, you MUST return an empty string \"\" or 0 for numeric fields. Do NOT guess, infer, or provide placeholders like 'N/A', '-', or '—'." +
         "CRITICAL RULE 4: You MUST include a field called 'template_intent' in your JSON. This field should suggest the BEST card template (not necessarily the current one) based on the content. " +
-        "Values MUST be one of: 'PLAYER', 'HEADLINE', 'STATS', 'TRANSFER', 'BREAKING', 'PREVIEW', 'FULL_TIME', 'HISTORY', 'LINEUP'."
+        "Values MUST be one of: 'PLAYER', 'HEADLINE', 'STATS', 'TRANSFER', 'BREAKING', 'PREVIEW', 'FULL_TIME', 'HISTORY', 'LINEUP', 'RIVALRY', 'STANDINGS', 'INJURY', 'CONTRACT', 'AWARD'."
 
     fun buildPrompt(template: CardTemplate, articleText: String, isRefresh: Boolean = false): String {
         val schema = when (template) {
@@ -36,6 +36,11 @@ object CardPromptManager {
             CardTemplate.StartingXI -> startingXISchema()
             CardTemplate.MatchStatsComparison -> matchStatsComparisonSchema()
             CardTemplate.SocialPost -> socialPostSchema()
+            CardTemplate.Rivalry -> rivalrySchema()
+            CardTemplate.TableStandings -> tableStandingsSchema()
+            CardTemplate.InjuryReport -> injuryReportSchema()
+            CardTemplate.ContractExpiry -> contractExpirySchema()
+            CardTemplate.AwardNominee -> awardNomineeSchema()
         }
         
         val cacheBuster = if (isRefresh) {
@@ -63,7 +68,12 @@ object CardPromptManager {
           "assists": 0,
           "minutesPlayed": 90,
           "keyAction": "Satu frasa pendek (maks 3 patah perkataan, e.g. Wira Hat-Trick)",
-          "keyQuote": "Satu ayat menerangkan prestasi pemain tersebut (maks 100 aksara)"
+          "keyQuote": "Satu ayat menerangkan prestasi pemain tersebut (maks 100 aksara)",
+          "nationality": "Negara asal pemain",
+          "appearances": 0,
+          "cleanSheets": 0,
+          "passes": 0,
+          "tackles": 0
         }
     """.trimIndent()
 
@@ -74,7 +84,10 @@ object CardPromptManager {
         {
           "headline": "Tajuk utama atau petikan paling penting (maks 120 aksara)",
           "subtext": "Satu perenggan sokongan ringkas (maks 60 aksara)",
-          "quoteAuthor": "Nama penutur (biarkan kosong jika bukan petikan)"
+          "quoteAuthor": "Nama penutur (biarkan kosong jika bukan petikan)",
+          "authorTitle": "T jawatan автор (e.g. Manager, CEO)",
+          "category": "Kategori berita (e.g. Transfer, Match, Rumor)",
+          "relatedTeams": "Pasukan yang berkaitan (e.g. Man Utd, Arsenal)"
         }
     """.trimIndent()
 
@@ -104,7 +117,11 @@ object CardPromptManager {
           "fee": "Yuran Perpindahan",
           "contractLength": "Tempoh Kontrak (e.g. 5 Tahun)",
           "transferType": "Jenis (e.g. Tetap, Pinjaman, Percuma)",
-          "quote": "Satu petikan ringkas dari pemain, ejen, atau kelab (maks 100 aksara)"
+          "quote": "Satu petikan ringkas dari pemain, ejen, atau kelab (maks 100 aksara)",
+          "feeCategory": "Kategori yuran (e.g. Record, Deadline Day, Loan)",
+          "medicalCompleted": true,
+          "workPermit": true,
+          "agentName": "Nama ejen"
         }
     """.trimIndent()
 
@@ -126,13 +143,18 @@ object CardPromptManager {
         IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
         Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
         {
-          "competition": "Nama Liga/Pertandingan",
+          "competition": "Nama Liga/Pertandingkan",
           "homeTeam": "Nama Pasukan Tuan Rumah",
           "awayTeam": "Nama Pasukan Pelawat",
           "homeForm": "Rekod 5 perlawanan tuan rumah (e.g. M-S-M-K-M)",
           "awayForm": "Rekod 5 perlawanan pelawat (e.g. K-K-S-M-M)",
           "matchTime": "Tarikh dan masa",
-          "stadium": "Nama Stadium"
+          "stadium": "Nama Stadium",
+          "referee": "Nama pengadil",
+          "tvChannel": "Saluran TV (e.g. Sky Sports)",
+          "kickoffTime": "Masa kickoff (e.g. 8:00 PM)",
+          "weather": "Cuaca (e.g. Sunny, Rainy)",
+          "capacity": "Kapasiti stadium"
         }
     """.trimIndent()
 
@@ -150,7 +172,15 @@ object CardPromptManager {
           "possession": "Penguasaan bola (e.g. 55% - 45%)",
           "shotsOnTarget": "Percubaan tepat (e.g. 6 - 2)",
           "competition": "Nama Liga atau Kejohanan",
-          "matchStatus": "Status Tamat (e.g. MASA PENUH, MASA TAMBAHAN, PENALTI)"
+          "matchStatus": "Status Tamat (e.g. MASA PENUH, MASA TAMBAHAN, PENALTI)",
+          "corners": "Corners (e.g. 5 - 3)",
+          "fouls": "Fouls (e.g. 12 - 8)",
+          "yellowCards": "Kuning (e.g. 2 - 1)",
+          "redCards": "Merah (e.g. 0 - 0)",
+          "attendance": "Kehadiran (e.g. 50,000)",
+          "referee": "Nama pengadil",
+          "penaltyShootout": "Penalti (e.g. 4-3)",
+          "assistProviders": "Pembekal assist (e.g. Rashford, Saka)"
         }
     """.trimIndent()
 
@@ -167,7 +197,11 @@ object CardPromptManager {
             { "label": "Stat 1", "value": "Nilai nombor", "context": "Konteks 1" },
             { "label": "Stat 2", "value": "Nilai nombor", "context": "Konteks 2" },
             { "label": "Stat 3", "value": "Nilai nombor", "context": "Konteks 3" }
-          ]
+          ],
+          "venue": "Venue/Stadium",
+          "attendance": "Kehadiran",
+          "result": "Keputusan (e.g. 2-1)",
+          "significance": "Significance (e.g. Title Decider, Derby Day)"
         }
     """.trimIndent()
 
@@ -188,7 +222,12 @@ object CardPromptManager {
           ],
           "manager": "Nama Pengurus",
           "averageAge": "Purata Umur (e.g. 25.4 thn)",
-          "keyAbsences": "Pemain cedera/digantung, dipisahkan dengan koma"
+          "keyAbsences": "Pemain cedera/digantung, dipisahkan dengan koma",
+          "captain": "Nama kapten",
+          "viceCaptain": "Nama naib kapten",
+          "tactics": "Taktik (e.g. High Press, Park Bus)",
+          "injuredPlayers": "Pemain cedera",
+          "suspendedPlayers": "Pemain digantung"
         }
     """.trimIndent()
 
@@ -216,7 +255,123 @@ object CardPromptManager {
           "name": "Nama Sumber (e.g. Astro Arena)",
           "content": "Kandungan post yang paling menarik (maks 280 aksara)",
           "timestamp": "Masa/Tarikh post (e.g. 2 Jam Yang Lalu)",
-          "metrics": "Metrik interaksi (e.g. 1.5K Suka • 230 Simpan)"
+          "metrics": "Metrik interaksi (e.g. 1.5K Suka • 230 Simpan)",
+          "verified": true,
+          "followers": "Bilangan followers (e.g. 100K)",
+          "shares": "Bilangan shares",
+          "bookmarks": "Bilangan bookmarks",
+          "mediaType": "Jenis media (e.g. image, video, text)"
+        }
+    """.trimIndent()
+
+    private fun rivalrySchema(): String = """
+        Extract head-to-head rivalry comparison between two players or teams from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
+        {
+          "player1Name": "Nama Pemain/Pasukan 1",
+          "player2Name": "Nama Pemain/Pasukan 2",
+          "matchContext": "Konteks perlawanan (e.g. Man City vs Liverpool)",
+          "player1Stats": [
+            { "label": "Stat 1 (maks 20 aksara)", "value": "Nilai", "context": "Konteks (maks 40 aksara)" },
+            { "label": "Stat 2", "value": "Nilai", "context": "Konteks" },
+            { "label": "Stat 3", "value": "Nilai", "context": "Konteks" }
+          ],
+          "player2Stats": [
+            { "label": "Stat 1", "value": "Nilai", "context": "Konteks" },
+            { "label": "Stat 2", "value": "Nilai", "context": "Konteks" },
+            { "label": "Stat 3", "value": "Nilai", "context": "Konteks" }
+          ],
+          "headToHead": "Rekod pertemuan sebelumnya (e.g. 5-3-2)",
+          "verdict": "Keputusan atau jangkaan (maks 50 aksara)",
+          "compareType": "Jenis perbandingan (e.g. goals, trophies, matches)",
+          "totalMatches": "Jumlah perlawanan",
+          "draws": "Bilangan seri",
+          "player1Trophies": "Bilangan trofi pemain 1",
+          "player2Trophies": "Bilangan trofi pemain 2",
+          "predictionConfidence": "Keyakinan jangkaan (e.g. High, Medium, Low)"
+        }
+    """.trimIndent()
+
+    private fun tableStandingsSchema(): String = """
+        Extract league table or standings information from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
+        {
+          "leagueName": "Nama Liga (e.g. Liga Perdana Inggeris)",
+          "matchday": "Hari Perlawanan (e.g. Matchday 29)",
+          "standings": [
+            { "position": 1, "teamName": "Nama Pasukan", "played": 29, "won": 20, "drawn": 6, "lost": 3, "points": 66, "form": "WDLWW" },
+            { "position": 2, "teamName": "Nama Pasukan", "played": 29, "won": 19, "drawn": 7, "lost": 3, "points": 64, "form": "WWLWD" },
+            { "position": 3, "teamName": "Nama Pasukan", "played": 29, "won": 18, "drawn": 5, "lost": 6, "points": 59, "form": "WLWWW" }
+          ],
+          "highlightedTeam": "Pasukan untuk disorot (biarkan kosong jika tiada)",
+          "promotionZone": 4,
+          "relegationZone": 18,
+          "gamesInHand": "Perlawanan ditangguhkan (e.g. Arsenal -1)",
+          "pointsBehindLeader": " mata di belakang pemimpin",
+          "topScorer": "Penjaring gol utama",
+          "topAssists": "Pembekal assist utama"
+        }
+    """.trimIndent()
+
+    private fun injuryReportSchema(): String = """
+        Extract injury report information from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
+        {
+          "teamName": "Nama Pasukan",
+          "reportDate": "Tarikh laporan (e.g. 15 Januari 2025)",
+          "injuries": [
+            { "playerName": "Nama Pemain", "injury": "Jenis Cedera (e.g. Hamstring)", "status": "Status (e.g. 3 weeks)", "position": "Posisi", "recoveryPercentage": "Peratus pemulihan", "isLongTerm": true, "surgeryRequired": true }
+          ],
+          "doubtfits": [
+            { "playerName": "Nama Pemain", "injury": "Jenis Cedera", "status": "Status (e.g. 50% - mungkin main)", "position": "Posisi", "recoveryPercentage": "Peratus pemulihan" }
+          ],
+          "returns": [
+            { "playerName": "Nama Pemain", "injury": "Jenis Cedera", "status": "Tarikh jangkaan kembali (e.g. 20 Feb)", "position": "Posisi", "recoveryPercentage": "Peratus pemulihan" }
+          ],
+          "nextMatch": "Perlawanan seterusnya",
+          "recoveryPercentage": "Peratus pemulihan keseluruhan"
+        }
+    """.trimIndent()
+
+    private fun contractExpirySchema(): String = """
+        Extract contract expiry information from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
+        {
+          "teamName": "Nama Pasukan",
+          "seasonYear": "Musim (e.g. 2024/25)",
+          "expiringPlayers": [
+            { "playerName": "Nama Pemain", "position": "Posisi", "expiresIn": "Tinggal berapa lama (e.g. 3 months, June 2025)", "marketValue": "Nilai pasaran (e.g. £45m)", "status": "Status (e.g. Negotiating, Leaving)", "wage": "Gaji mingguan", "askingPrice": "Harga yang diminta", "interestLevel": "Tahap minat (e.g. High, Medium, None)", "negotiationProgress": "Peratus rundingan", "previousClub": "Pasukan sebelumnya" }
+          ],
+          "renewals": [
+            { "playerName": "Nama Pemain", "position": "Posisi", "expiresIn": "Kontrak baru hingga (e.g. 2027)", "marketValue": "Nilai pasaran", "status": "Renewed", "wage": "Gaji", "askingPrice": "Harga", "interestLevel": "Tahap minat" }
+          ],
+          "wage": "Gaji purata keseluruhan",
+          "askingPrice": "Harga yang diminta secara purata",
+          "interestLevel": "Tahap minat keseluruhan"
+        }
+    """.trimIndent()
+
+    private fun awardNomineeSchema(): String = """
+        Extract award nomination information from the football article below.
+        IMPORTANT: Use empty string "" for any field that is not explicitly mentioned in the article. Do NOT guess or infer values.
+        Return ONLY a JSON object with this exact structure (fill in real values, write descriptions in Bahasa Malaysia but use natural English football terminology where appropriate):
+        {
+          "awardName": "Nama Anugerah (e.g. Ballon d'Or 2025)",
+          "category": "Kategori (e.g. Men's Player of the Year)",
+          "nominees": [
+            { "playerName": "Nama Pemain", "club": "Pasukan", "achievement": "Pencapaian utama (e.g. 42 goals)", "odds": "Odds (e.g. 2/1, 33%)", "isFavorite": true, "previousWinner": true, "votes": "Bilangan undi" }
+          ],
+          "ceremonyDate": "Tarikh majlis anugerah (e.g. December 2025)",
+          "currentFavorite": "Favorit semasa (nama pemain)",
+          "votingDeadline": "Tarikh akhir pengundian",
+          "votingMethod": "Kaedah pengundian (e.g. Public, Jury)",
+          "totalNominees": 10,
+          "venue": "Tempat majlis",
+          "host": "Pengacar"
         }
     """.trimIndent()
 }
