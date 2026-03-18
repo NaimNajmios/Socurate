@@ -12,7 +12,7 @@ import com.najmi.oreamnos.model.UsageStats
  * Manages app preferences and secure storage for sensitive data like API keys.
  * Uses EncryptedSharedPreferences for secure storage of API credentials.
  */
-class PreferencesManager(context: Context) {
+class PreferencesManager(context: Context) : IPreferencesManager {
 
     private val appContext: Context = context.applicationContext
     private val securePrefs: SharedPreferences = getEncryptedPreferences()
@@ -42,7 +42,7 @@ class PreferencesManager(context: Context) {
 
     // ==================== GEMINI API KEY ====================
 
-    fun saveApiKey(apiKey: String): Boolean {
+    override fun saveApiKey(apiKey: String): Boolean {
         return try {
             securePrefs.edit().putString(KEY_API_KEY, apiKey).apply()
             true
@@ -52,7 +52,7 @@ class PreferencesManager(context: Context) {
         }
     }
 
-    fun getApiKey(): String? {
+    override fun getApiKey(): String? {
         return try {
             securePrefs.getString(KEY_API_KEY, null)
         } catch (e: Exception) {
@@ -90,11 +90,11 @@ class PreferencesManager(context: Context) {
         return securePrefs.getString(KEY_HASHTAGS, DEFAULT_HASHTAGS) ?: DEFAULT_HASHTAGS
     }
 
-    fun setHashtagsEnabled(enabled: Boolean) {
+    override fun setHashtagsEnabled(enabled: Boolean) {
         securePrefs.edit().putBoolean(KEY_HASHTAGS_ENABLED, enabled).apply()
     }
 
-    fun areHashtagsEnabled(): Boolean {
+    override fun areHashtagsEnabled(): Boolean {
         return securePrefs.getBoolean(KEY_HASHTAGS_ENABLED, true)
     }
 
@@ -111,21 +111,21 @@ class PreferencesManager(context: Context) {
 
     // ==================== THEME ====================
 
-    fun saveTheme(theme: String) {
+    override fun saveTheme(theme: String) {
         securePrefs.edit().putString(KEY_THEME, theme).apply()
     }
 
-    fun getTheme(): String {
+    override fun getTheme(): String {
         return securePrefs.getString(KEY_THEME, THEME_SYSTEM) ?: THEME_SYSTEM
     }
 
     // ==================== SOURCE CITATION ====================
 
-    fun saveSourceEnabled(enabled: Boolean) {
+    override fun saveSourceEnabled(enabled: Boolean) {
         securePrefs.edit().putBoolean(KEY_SOURCE_ENABLED, enabled).apply()
     }
 
-    fun isSourceEnabled(): Boolean {
+    override fun isSourceEnabled(): Boolean {
         return securePrefs.getBoolean(KEY_SOURCE_ENABLED, true)
     }
 
@@ -151,17 +151,17 @@ class PreferencesManager(context: Context) {
 
     // ==================== AI PROVIDER ====================
 
-    fun saveProvider(provider: String) {
+    override fun saveProvider(provider: String) {
         securePrefs.edit().putString(KEY_PROVIDER, provider).apply()
     }
 
-    fun getProvider(): String {
+    override fun getProvider(): String {
         return securePrefs.getString(KEY_PROVIDER, PROVIDER_GEMINI) ?: PROVIDER_GEMINI
     }
 
     // ==================== PROVIDER API KEYS ====================
 
-    fun saveGroqApiKey(apiKey: String): Boolean {
+    override fun saveGroqApiKey(apiKey: String): Boolean {
         return try {
             securePrefs.edit().putString(KEY_GROQ_API_KEY, apiKey).apply()
             true
@@ -171,7 +171,7 @@ class PreferencesManager(context: Context) {
         }
     }
 
-    fun getGroqApiKey(): String? {
+    override fun getGroqApiKey(): String? {
         return try {
             securePrefs.getString(KEY_GROQ_API_KEY, null)
         } catch (e: Exception) {
@@ -179,7 +179,7 @@ class PreferencesManager(context: Context) {
         }
     }
 
-    fun saveOpenRouterApiKey(apiKey: String): Boolean {
+    override fun saveOpenRouterApiKey(apiKey: String): Boolean {
         return try {
             securePrefs.edit().putString(KEY_OPENROUTER_API_KEY, apiKey).apply()
             true
@@ -189,7 +189,7 @@ class PreferencesManager(context: Context) {
         }
     }
 
-    fun getOpenRouterApiKey(): String? {
+    override fun getOpenRouterApiKey(): String? {
         return try {
             securePrefs.getString(KEY_OPENROUTER_API_KEY, null)
         } catch (e: Exception) {
@@ -197,7 +197,7 @@ class PreferencesManager(context: Context) {
         }
     }
 
-    fun saveCerebrasApiKey(apiKey: String): Boolean {
+    override fun saveCerebrasApiKey(apiKey: String): Boolean {
         return try {
             securePrefs.edit().putString(KEY_CEREBRAS_API_KEY, apiKey).apply()
             true
@@ -207,7 +207,7 @@ class PreferencesManager(context: Context) {
         }
     }
 
-    fun getCerebrasApiKey(): String? {
+    override fun getCerebrasApiKey(): String? {
         return try {
             securePrefs.getString(KEY_CEREBRAS_API_KEY, null)
         } catch (e: Exception) {
@@ -217,7 +217,7 @@ class PreferencesManager(context: Context) {
 
     // ==================== HUGGING FACE TOKEN ====================
 
-    fun saveHfToken(token: String): Boolean {
+    override fun saveHfToken(token: String): Boolean {
         return try {
             securePrefs.edit().putString(KEY_HF_TOKEN, token).apply()
             true
@@ -227,7 +227,7 @@ class PreferencesManager(context: Context) {
         }
     }
 
-    fun getHfToken(): String? {
+    override fun getHfToken(): String? {
         return try {
             securePrefs.getString(KEY_HF_TOKEN, null)
         } catch (e: Exception) {
@@ -287,7 +287,7 @@ class PreferencesManager(context: Context) {
 
     // ==================== MODELS PER PROVIDER ====================
 
-    fun saveModelForProvider(provider: String, modelId: String) {
+    override fun saveModelForProvider(provider: String, modelId: String) {
         val key = when (provider) {
             PROVIDER_GROQ -> KEY_GROQ_MODEL
             PROVIDER_OPENROUTER -> KEY_OPENROUTER_MODEL
@@ -297,7 +297,7 @@ class PreferencesManager(context: Context) {
         securePrefs.edit().putString(key, modelId).apply()
     }
 
-    fun getModelForProvider(provider: String): String {
+    override fun getModelForProvider(provider: String): String {
         val (key, defaultModel) = when (provider) {
             PROVIDER_GROQ -> KEY_GROQ_MODEL to DEFAULT_GROQ_MODEL
             PROVIDER_OPENROUTER -> KEY_OPENROUTER_MODEL to DEFAULT_OPENROUTER_MODEL
@@ -337,7 +337,7 @@ class PreferencesManager(context: Context) {
 
     // ==================== USAGE STATS ====================
 
-    fun getUsageStats(): UsageStats {
+    override fun getUsageStats(): UsageStats {
         val json = securePrefs.getString(KEY_USAGE_STATS, null)
         return UsageStats.fromJson(json)
     }
@@ -374,7 +374,7 @@ class PreferencesManager(context: Context) {
         saveUsageStats(stats)
     }
 
-    fun resetUsageStats() {
+    override fun resetUsageStats() {
         saveUsageStats(UsageStats())
     }
 
@@ -398,7 +398,7 @@ class PreferencesManager(context: Context) {
         saveUsageStats(stats)
     }
 
-    fun clearLogs() {
+    override fun clearLogs() {
         val stats = getUsageStats()
         stats.clearLogs()
         saveUsageStats(stats)
@@ -468,11 +468,11 @@ class PreferencesManager(context: Context) {
     
     // ==================== TEXT SIZE PREFERENCE ====================
     
-    fun saveTextSize(size: Int) {
+    override fun saveTextSize(size: Int) {
         securePrefs.edit().putInt(KEY_TEXT_SIZE, size).apply()
     }
     
-    fun getTextSize(): Int {
+    override fun getTextSize(): Int {
         return securePrefs.getInt(KEY_TEXT_SIZE, TEXT_SIZE_MEDIUM)
     }
 }
