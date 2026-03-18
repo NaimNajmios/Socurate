@@ -70,11 +70,13 @@ import com.najmi.oreamnos.services.GeminiService
 import com.najmi.oreamnos.ui.theme.SocurateTheme
 import com.najmi.oreamnos.utils.PreferencesManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.najmi.oreamnos.vision.VisionModel
 import com.najmi.oreamnos.utils.VisionModelManager
 import kotlinx.coroutines.flow.collect
+import androidx.compose.runtime.LaunchedEffect
 
 /**
  * Settings activity for configuring API key, tone, and model selection.
@@ -85,50 +87,73 @@ class SettingsActivity : ComponentActivity() {
     companion object {
         private const val TAG = "SettingsActivity"
         
-        // Gemini models
-        val GEMINI_MODEL_NAMES = arrayOf(
-            "Gemini 3.1 Pro", "Gemini 3 Flash", "Gemini 3.1 Flash Lite",
-            "Gemini 2.5 Pro", "Gemini 2.5 Flash", "Gemini 2.5 Flash Lite"
-        )
-        val GEMINI_MODEL_ENDPOINTS = arrayOf(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent"
-        )
+        private data class ModelConfig(val displayName: String, val id: String)
         
-        // Groq models
-        val GROQ_MODEL_NAMES = arrayOf(
-            "DeepSeek R1 Distill Llama 70B", "Llama 3.3 70B Versatile", "Llama 3.1 8B Instant",
-            "Qwen QwQ 32B", "GPT OSS 120B"
-        )
-        val GROQ_MODEL_IDS = arrayOf(
-            "deepseek-r1-distill-llama-70b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant",
-            "qwen-qwq-32b", "openai/gpt-oss-120b"
-        )
+        private object GeminiModels {
+            val MODELS = listOf(
+                ModelConfig("Gemini 3.1 Pro", "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro:generateContent"),
+                ModelConfig("Gemini 3 Flash", "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent"),
+                ModelConfig("Gemini 3.1 Flash Lite", "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent"),
+                ModelConfig("Gemini 2.5 Pro", "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent"),
+                ModelConfig("Gemini 2.5 Flash", "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"),
+                ModelConfig("Gemini 2.5 Flash Lite", "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent")
+            )
+            val modelNames = MODELS.map { it.displayName }
+            val modelIds = MODELS.map { it.id }
+        }
         
-        // OpenRouter models
-        val OPENROUTER_MODEL_NAMES = arrayOf(
-            "DeepSeek R1 Zero", "DeepSeek V3 Base", "Llama 4 Maverick",
-            "Gemini 2.5 Pro Exp", "GPT OSS 120B", "Llama 3.3 70B Instruct"
-        )
-        val OPENROUTER_MODEL_IDS = arrayOf(
-            "deepseek/deepseek-r1-zero:free", "deepseek/deepseek-v3-base:free", "meta-llama/llama-4-maverick:free",
-            "google/gemini-2.5-pro-exp-03-25:free", "openai/gpt-oss-120b:free", "meta-llama/llama-3.3-70b-instruct:free"
-        )
+        private object GroqModels {
+            val MODELS = listOf(
+                ModelConfig("DeepSeek R1 Distill Llama 70B", "deepseek-r1-distill-llama-70b"),
+                ModelConfig("Llama 3.3 70B Versatile", "llama-3.3-70b-versatile"),
+                ModelConfig("Llama 3.1 8B Instant", "llama-3.1-8b-instant"),
+                ModelConfig("Qwen QwQ 32B", "qwen-qwq-32b"),
+                ModelConfig("GPT OSS 120B", "openai/gpt-oss-120b")
+            )
+            val modelNames = MODELS.map { it.displayName }
+            val modelIds = MODELS.map { it.id }
+        }
         
-        // Cerebras models
-        val CEREBRAS_MODEL_NAMES = arrayOf(
-            "GPT-5.3 Codex Spark", "Llama 3.3 70B", "Llama 3.1 8B", "Z.ai GLM 4.7"
-        )
-        val CEREBRAS_MODEL_IDS = arrayOf(
-            "gpt-5.3-codex-spark", "llama-3.3-70b", "llama3.1-8b", "zai-glm-4.7"
-        )
+        private object OpenRouterModels {
+            val MODELS = listOf(
+                ModelConfig("DeepSeek R1 Zero", "deepseek/deepseek-r1-zero:free"),
+                ModelConfig("DeepSeek V3 Base", "deepseek/deepseek-v3-base:free"),
+                ModelConfig("Llama 4 Maverick", "meta-llama/llama-4-maverick:free"),
+                ModelConfig("Gemini 2.5 Pro Exp", "google/gemini-2.5-pro-exp-03-25:free"),
+                ModelConfig("GPT OSS 120B", "openai/gpt-oss-120b:free"),
+                ModelConfig("Llama 3.3 70B Instruct", "meta-llama/llama-3.3-70b-instruct:free")
+            )
+            val modelNames = MODELS.map { it.displayName }
+            val modelIds = MODELS.map { it.id }
+        }
         
-        val PROVIDER_NAMES = arrayOf("Gemini", "Groq", "OpenRouter", "Cerebras")
-        val PROVIDER_VALUES = arrayOf("gemini", "groq", "openrouter", "cerebras")
+        private object CerebrasModels {
+            val MODELS = listOf(
+                ModelConfig("GPT-5.3 Codex Spark", "gpt-5.3-codex-spark"),
+                ModelConfig("Llama 3.3 70B", "llama-3.3-70b"),
+                ModelConfig("Llama 3.1 8B", "llama3.1-8b"),
+                ModelConfig("Z.ai GLM 4.7", "zai-glm-4.7")
+            )
+            val modelNames = MODELS.map { it.displayName }
+            val modelIds = MODELS.map { it.id }
+        }
+        
+        fun getModelNamesForProvider(provider: String): List<String> = when (provider) {
+            PreferencesManager.PROVIDER_GROQ -> GroqModels.modelNames
+            PreferencesManager.PROVIDER_OPENROUTER -> OpenRouterModels.modelNames
+            PreferencesManager.PROVIDER_CEREBRAS -> CerebrasModels.modelNames
+            else -> GeminiModels.modelNames
+        }
+        
+        fun getModelIdsForProvider(provider: String): List<String> = when (provider) {
+            PreferencesManager.PROVIDER_GROQ -> GroqModels.modelIds
+            PreferencesManager.PROVIDER_OPENROUTER -> OpenRouterModels.modelIds
+            PreferencesManager.PROVIDER_CEREBRAS -> CerebrasModels.modelIds
+            else -> GeminiModels.modelIds
+        }
+        
+        val PROVIDER_NAMES = listOf("Gemini", "Groq", "OpenRouter", "Cerebras")
+        val PROVIDER_VALUES = listOf("gemini", "groq", "openrouter", "cerebras")
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -193,16 +218,11 @@ fun SettingsScreen(
     
     // Get current model arrays based on provider
     val (modelNames, modelIds) = remember(provider) {
-        when (provider) {
-            PreferencesManager.PROVIDER_GROQ -> SettingsActivity.GROQ_MODEL_NAMES to SettingsActivity.GROQ_MODEL_IDS
-            PreferencesManager.PROVIDER_OPENROUTER -> SettingsActivity.OPENROUTER_MODEL_NAMES to SettingsActivity.OPENROUTER_MODEL_IDS
-            PreferencesManager.PROVIDER_CEREBRAS -> SettingsActivity.CEREBRAS_MODEL_NAMES to SettingsActivity.CEREBRAS_MODEL_IDS
-            else -> SettingsActivity.GEMINI_MODEL_NAMES to SettingsActivity.GEMINI_MODEL_ENDPOINTS
-        }
+        SettingsActivity.getModelNamesForProvider(provider) to SettingsActivity.getModelIdsForProvider(provider)
     }
     
     // Load saved model index for current provider
-    remember(provider) {
+    LaunchedEffect(provider) {
         val savedModel = prefsManager.getModelForProvider(provider)
         selectedModelIndex = modelIds.indexOfFirst { it == savedModel }.coerceAtLeast(0)
     }
@@ -309,8 +329,17 @@ fun SettingsScreen(
                                     testConnection(provider, apiKey, modelIds[selectedModelIndex])
                                 }
                                 Toast.makeText(context, "Connection successful! API key saved.", Toast.LENGTH_LONG).show()
+                            } catch (e: kotlinx.coroutines.CancellationException) {
+                                throw e
+                            } catch (e: java.io.IOException) {
+                                Toast.makeText(context, "Network error: ${e.message}", Toast.LENGTH_LONG).show()
                             } catch (e: Exception) {
-                                Toast.makeText(context, "Test failed: ${e.message}", Toast.LENGTH_LONG).show()
+                                Log.e("SettingsActivity", "Connection test failed", e)
+                                val message = when {
+                                    e.message.isNullOrBlank() -> "Unknown error"
+                                    else -> e.message!!
+                                }
+                                Toast.makeText(context, "Test failed: $message", Toast.LENGTH_LONG).show()
                             } finally {
                                 isTesting = false
                             }
@@ -354,48 +383,43 @@ fun SettingsScreen(
                 )
 
                 // On-Device OCR Status (Always Ready)
-                VisionModelRow(
-                    name = "On-Device OCR",
-                    description = "Ready - ML Kit with AI structuring",
-                    status = "READY",
-                    isReady = true
+                VisionModelItem(
+                    model = VisionModel.GEMINI_NANO,
+                    isDownloading = false,
+                    downloadProgress = 0f,
+                    isReady = true,
+                    onDownload = {},
+                    onDelete = {}
                 )
                 
                 Spacer(Modifier.height(16.dp))
                 
                 // PaliGemma Status
-                val paligemma = VisionModel.PALIGEMMA_3B
-                VisionModelRow(
-                    name = "PaliGemma 2 3B",
-                    description = "~3GB · Mid-range friendly",
-                    status = if (installedModels.contains(paligemma)) "READY" else "NOT DOWNLOADED",
-                    isReady = installedModels.contains(paligemma),
-                    isDownloading = downloadingModel == paligemma,
-                    progress = downloadProgress,
+                VisionModelItem(
+                    model = VisionModel.PALIGEMMA_3B,
+                    isDownloading = downloadingModel == VisionModel.PALIGEMMA_3B,
+                    downloadProgress = downloadProgress,
+                    isReady = installedModels.contains(VisionModel.PALIGEMMA_3B),
                     onDownload = {
-                        downloadingModel = paligemma
-                        scope.launch {
-                            visionModelManager.downloadModelFlow(paligemma, hfToken = hfToken).collect { progress ->
-                                when (progress) {
-                                    is VisionModelManager.DownloadProgress.InProgress -> {
-                                        downloadProgress = progress.progress
-                                    }
-                                    is VisionModelManager.DownloadProgress.Completed -> {
-                                        downloadingModel = null
-                                        installedModels = visionModelManager.getInstalledModels()
-                                        Toast.makeText(context, "PaliGemma downloaded!", Toast.LENGTH_SHORT).show()
-                                    }
-                                    is VisionModelManager.DownloadProgress.Failed -> {
-                                        downloadingModel = null
-                                        Toast.makeText(context, "Download failed: ${progress.error}", Toast.LENGTH_LONG).show()
-                                    }
-                                    else -> {}
-                                }
+                        downloadingModel = VisionModel.PALIGEMMA_3B
+                        scope.downloadVisionModel(
+                            model = VisionModel.PALIGEMMA_3B,
+                            visionModelManager = visionModelManager,
+                            hfToken = hfToken,
+                            onProgress = { downloadProgress = it },
+                            onCompleted = {
+                                downloadingModel = null
+                                installedModels = visionModelManager.getInstalledModels()
+                                Toast.makeText(context, "PaliGemma downloaded!", Toast.LENGTH_SHORT).show()
+                            },
+                            onFailed = { error ->
+                                downloadingModel = null
+                                Toast.makeText(context, "Download failed: $error", Toast.LENGTH_LONG).show()
                             }
-                        }
+                        )
                     },
-                    onDelete = {
-                        visionModelManager.deleteModel(paligemma)
+                    onDelete = { 
+                        visionModelManager.deleteModel(VisionModel.PALIGEMMA_3B)
                         installedModels = visionModelManager.getInstalledModels()
                         Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show()
                     }
@@ -404,38 +428,31 @@ fun SettingsScreen(
                 Spacer(Modifier.height(16.dp))
                 
                 // Gemma 3n Status
-                val gemma3n = VisionModel.GEMMA_3N_E2B
-                VisionModelRow(
-                    name = "Gemma 3n E2B",
-                    description = "~2.9GB · Multimodal (vision + text)",
-                    status = if (installedModels.contains(gemma3n)) "READY" else "NOT DOWNLOADED",
-                    isReady = installedModels.contains(gemma3n),
-                    isDownloading = downloadingModel == gemma3n,
-                    progress = downloadProgress,
+                VisionModelItem(
+                    model = VisionModel.GEMMA_3N_E2B,
+                    isDownloading = downloadingModel == VisionModel.GEMMA_3N_E2B,
+                    downloadProgress = downloadProgress,
+                    isReady = installedModels.contains(VisionModel.GEMMA_3N_E2B),
                     onDownload = {
-                        downloadingModel = gemma3n
-                        scope.launch {
-                            visionModelManager.downloadModelFlow(gemma3n, hfToken = hfToken).collect { progress ->
-                                when (progress) {
-                                    is VisionModelManager.DownloadProgress.InProgress -> {
-                                        downloadProgress = progress.progress
-                                    }
-                                    is VisionModelManager.DownloadProgress.Completed -> {
-                                        downloadingModel = null
-                                        installedModels = visionModelManager.getInstalledModels()
-                                        Toast.makeText(context, "Gemma 3n downloaded!", Toast.LENGTH_SHORT).show()
-                                    }
-                                    is VisionModelManager.DownloadProgress.Failed -> {
-                                        downloadingModel = null
-                                        Toast.makeText(context, "Download failed: ${progress.error}", Toast.LENGTH_LONG).show()
-                                    }
-                                    else -> {}
-                                }
+                        downloadingModel = VisionModel.GEMMA_3N_E2B
+                        scope.downloadVisionModel(
+                            model = VisionModel.GEMMA_3N_E2B,
+                            visionModelManager = visionModelManager,
+                            hfToken = hfToken,
+                            onProgress = { downloadProgress = it },
+                            onCompleted = {
+                                downloadingModel = null
+                                installedModels = visionModelManager.getInstalledModels()
+                                Toast.makeText(context, "Gemma 3n downloaded!", Toast.LENGTH_SHORT).show()
+                            },
+                            onFailed = { error ->
+                                downloadingModel = null
+                                Toast.makeText(context, "Download failed: $error", Toast.LENGTH_LONG).show()
                             }
-                        }
+                        )
                     },
                     onDelete = {
-                        visionModelManager.deleteModel(gemma3n)
+                        visionModelManager.deleteModel(VisionModel.GEMMA_3N_E2B)
                         installedModels = visionModelManager.getInstalledModels()
                         Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show()
                     }
@@ -444,38 +461,31 @@ fun SettingsScreen(
                 Spacer(Modifier.height(16.dp))
                 
                 // Gemma 3 1B Status
-                val gemma3_1b = VisionModel.GEMMA_3_1B
-                VisionModelRow(
-                    name = "Gemma 3 1B",
-                    description = "~557MB · Fast text structuring",
-                    status = if (installedModels.contains(gemma3_1b)) "READY" else "NOT DOWNLOADED",
-                    isReady = installedModels.contains(gemma3_1b),
-                    isDownloading = downloadingModel == gemma3_1b,
-                    progress = downloadProgress,
+                VisionModelItem(
+                    model = VisionModel.GEMMA_3_1B,
+                    isDownloading = downloadingModel == VisionModel.GEMMA_3_1B,
+                    downloadProgress = downloadProgress,
+                    isReady = installedModels.contains(VisionModel.GEMMA_3_1B),
                     onDownload = {
-                        downloadingModel = gemma3_1b
-                        scope.launch {
-                            visionModelManager.downloadModelFlow(gemma3_1b, hfToken = hfToken).collect { progress ->
-                                when (progress) {
-                                    is VisionModelManager.DownloadProgress.InProgress -> {
-                                        downloadProgress = progress.progress
-                                    }
-                                    is VisionModelManager.DownloadProgress.Completed -> {
-                                        downloadingModel = null
-                                        installedModels = visionModelManager.getInstalledModels()
-                                        Toast.makeText(context, "Gemma 3 1B downloaded!", Toast.LENGTH_SHORT).show()
-                                    }
-                                    is VisionModelManager.DownloadProgress.Failed -> {
-                                        downloadingModel = null
-                                        Toast.makeText(context, "Download failed: ${progress.error}", Toast.LENGTH_LONG).show()
-                                    }
-                                    else -> {}
-                                }
+                        downloadingModel = VisionModel.GEMMA_3_1B
+                        scope.downloadVisionModel(
+                            model = VisionModel.GEMMA_3_1B,
+                            visionModelManager = visionModelManager,
+                            hfToken = hfToken,
+                            onProgress = { downloadProgress = it },
+                            onCompleted = {
+                                downloadingModel = null
+                                installedModels = visionModelManager.getInstalledModels()
+                                Toast.makeText(context, "Gemma 3 1B downloaded!", Toast.LENGTH_SHORT).show()
+                            },
+                            onFailed = { error ->
+                                downloadingModel = null
+                                Toast.makeText(context, "Download failed: $error", Toast.LENGTH_LONG).show()
                             }
-                        }
+                        )
                     },
                     onDelete = {
-                        visionModelManager.deleteModel(gemma3_1b)
+                        visionModelManager.deleteModel(VisionModel.GEMMA_3_1B)
                         installedModels = visionModelManager.getInstalledModels()
                         Toast.makeText(context, "Model deleted", Toast.LENGTH_SHORT).show()
                     }
@@ -568,12 +578,15 @@ fun SettingsScreen(
                         "Matchday" to PreferencesManager.THEME_MATCHDAY
                     )
                     themeOptions.forEach { (label, value) ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable { theme = value; prefsManager.saveTheme(theme); onThemeChanged(theme); showSaved() }
+                        ) {
                             RadioButton(
                                 selected = theme == value,
                                 onClick = { theme = value; prefsManager.saveTheme(theme); onThemeChanged(theme); showSaved() }
                             )
-                            Text(label, modifier = Modifier.clickable { theme = value; prefsManager.saveTheme(theme); onThemeChanged(theme); showSaved() })
+                            Text(label)
                         }
                     }
                 }
@@ -737,7 +750,8 @@ fun VisionModelRow(
     isDownloading: Boolean = false,
     progress: Float = 0f,
     onDownload: () -> Unit = {},
-    onDelete: () -> Unit = {}
+    onDelete: () -> Unit = {},
+    showAction: Boolean = true
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -773,7 +787,7 @@ fun VisionModelRow(
                     color = if (isReady) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
-                if (status != "READY" || name != "On-Device OCR") {
+                if (showAction) {
                     Spacer(Modifier.width(8.dp))
                     IconButton(
                         onClick = if (isReady) onDelete else onDownload,
@@ -798,6 +812,55 @@ fun VisionModelRow(
                 progress = { progress },
                 modifier = Modifier.fillMaxWidth().height(2.dp)
             )
+        }
+    }
+}
+
+@Composable
+fun VisionModelItem(
+    model: VisionModel,
+    isDownloading: Boolean,
+    downloadProgress: Float,
+    isReady: Boolean,
+    onDownload: () -> Unit,
+    onDelete: () -> Unit
+) {
+    val sizeDescription = if (model.approximateSizeMb > 0) "~${model.approximateSizeMb}MB" else ""
+    val description = buildString {
+        if (sizeDescription.isNotEmpty()) append(sizeDescription)
+        if (model.isMultimodal && sizeDescription.isNotEmpty()) append(" · ")
+        if (model.isMultimodal) append("Multimodal (vision + text)")
+        else if (sizeDescription.isNotEmpty()) append("Fast text structuring")
+        else append(model.description)
+    }.let { if (it.isEmpty()) model.description else it }
+
+    VisionModelRow(
+        name = model.displayName,
+        description = description,
+        status = if (isReady) "READY" else "NOT DOWNLOADED",
+        isReady = isReady,
+        isDownloading = isDownloading,
+        progress = downloadProgress,
+        onDownload = onDownload,
+        onDelete = onDelete,
+        showAction = model.requiresDownload
+    )
+}
+
+private fun CoroutineScope.downloadVisionModel(
+    model: VisionModel,
+    visionModelManager: VisionModelManager,
+    hfToken: String,
+    onProgress: (Float) -> Unit,
+    onCompleted: () -> Unit,
+    onFailed: (String) -> Unit
+) = launch {
+    visionModelManager.downloadModelFlow(model, hfToken = hfToken).collect { progress ->
+        when (progress) {
+            is VisionModelManager.DownloadProgress.InProgress -> onProgress(progress.progress)
+            is VisionModelManager.DownloadProgress.Completed -> onCompleted()
+            is VisionModelManager.DownloadProgress.Failed -> onFailed(progress.error)
+            else -> {}
         }
     }
 }
