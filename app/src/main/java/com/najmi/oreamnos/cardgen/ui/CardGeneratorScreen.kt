@@ -206,6 +206,7 @@ fun CardGeneratorScreen(
                                 snackbarHostState.showSnackbar("Mengemas kini data kad...")
                             }
                         },
+                        isLoading = extractionState is ExtractionState.Loading,
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(Modifier.width(8.dp))

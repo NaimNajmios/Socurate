@@ -118,13 +118,14 @@ fun NeoButton(
     }
 }
 
-@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun NeoOutlinedButton(
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    isLoading: Boolean = false,
     text: String,
     contentColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
@@ -145,20 +146,20 @@ fun NeoOutlinedButton(
                 scaleY = scaleState.value
             }
             .border(
-                border = BorderStroke(2.dp, if (enabled) contentColor else contentColor.copy(alpha = 0.5f)),
+                border = BorderStroke(2.dp, if (enabled && !isLoading) contentColor else contentColor.copy(alpha = 0.5f)),
                 shape = RoundedCornerShape(0.dp)
             )
             .background(Color.Transparent, RoundedCornerShape(0.dp))
             .combinedClickable(
                 interactionSource = interactionSource,
                 indication = LocalIndication.current,
-                enabled = enabled,
+                enabled = enabled && !isLoading,
                 onClick = {
                     haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
                     onClick()
                 },
                 onLongClick = {
-                    if (onLongClick != null) {
+                    if (onLongClick != null && !isLoading) {
                         haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                         onLongClick()
                     }
@@ -167,10 +168,26 @@ fun NeoOutlinedButton(
             .padding(horizontal = 24.dp, vertical = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text.uppercase(),
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-            color = if (enabled) contentColor else contentColor.copy(alpha = 0.5f)
-        )
+        AnimatedContent(
+            targetState = isLoading,
+            transitionSpec = {
+                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+            },
+            label = "buttonContent"
+        ) { loading ->
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = contentColor,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = text.uppercase(),
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    color = if (enabled) contentColor else contentColor.copy(alpha = 0.5f)
+                )
+            }
+        }
     }
 }
