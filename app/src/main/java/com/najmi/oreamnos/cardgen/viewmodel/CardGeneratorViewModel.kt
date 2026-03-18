@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.najmi.oreamnos.cardgen.extractor.CardDataExtractor
 import com.najmi.oreamnos.cardgen.model.CardConfig
+import com.najmi.oreamnos.cardgen.model.CardConfigHistory
 import com.najmi.oreamnos.cardgen.model.CardData
 import com.najmi.oreamnos.cardgen.model.CardTemplate
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,6 +81,9 @@ class CardGeneratorViewModel : ViewModel() {
 
     private val _cardConfig = MutableStateFlow(CardConfig())
     val cardConfig: StateFlow<CardConfig> = _cardConfig.asStateFlow()
+
+    private val _configHistory = CardConfigHistory(CardConfig())
+    val configHistory: CardConfigHistory get() = _configHistory
 
     // ── Background bitmap (from gallery pick) ─────────────────
 
@@ -377,8 +381,38 @@ class CardGeneratorViewModel : ViewModel() {
      * Updates the card configuration (background type, colors, size, etc.).
      */
     fun updateConfig(config: CardConfig) {
+        _configHistory.pushSnapshot(config)
         _cardConfig.value = config
     }
+
+    /**
+     * Undo the last config change.
+     * @return true if undo was successful
+     */
+    fun undoConfig(): Boolean {
+        val previousConfig = _configHistory.undo()
+        if (previousConfig != null) {
+            _cardConfig.value = previousConfig
+            return true
+        }
+        return false
+    }
+
+    /**
+     * Redo a previously undone config change.
+     * @return true if redo was successful
+     */
+    fun redoConfig(): Boolean {
+        val nextConfig = _configHistory.redo()
+        if (nextConfig != null) {
+            _cardConfig.value = nextConfig
+            return true
+        }
+        return false
+    }
+
+    val canUndo: Boolean get() = _configHistory.canUndo
+    val canRedo: Boolean get() = _configHistory.canRedo
 
     /**
      * Sets the background bitmap chosen from the gallery.
