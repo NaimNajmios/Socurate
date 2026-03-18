@@ -37,6 +37,16 @@ A sleek, modern Android application that transforms global football news into po
 - **Typography Controls**: Instantly swap between Default, Classic Serif, and Typewriter Monospace fonts across all components.
 - **Integrated Export**: Dedicated export bottom sheet to directly save or share generated cards.
 
+### 📝 Centralized Prompt Management
+- **PromptManager**: Refactored prompt building for content curation
+  - Centralized in `prompts/PromptManager.kt`
+  - Supports tone, length, and content structure detection
+  - Optimized single-pass text analysis for quotes, bullet points, technical content
+- **CardPromptManager**: Card-specific extraction prompts
+  - Located in `cardgen/prompt/CardPromptManager.kt`
+  - Returns structured JSON for each card template type
+  - 10 template-specific schemas (PlayerSpotlight, Transfer, Match Result, etc.)
+
 ### 🔄 Multi-Provider AI Support
 - **Gemini (Google)**: Default provider with multiple model options
 - **Groq (Llama 3.3)**: Fast inference alternative
@@ -251,6 +261,7 @@ com.najmi.oreamnos/
 │   ├── extractor/             # Parsing AI output to structural data
 │   ├── model/                # Card configuration, templates, ImagePosition
 │   ├── prompt/                # Card-specific AI prompts
+│   │   └── CardPromptManager.kt  # JSON extraction prompts for card templates
 │   ├── renderer/             # Custom Compose-to-Bitmap rendering
 │   ├── ui/                   # Generator UI, background picker, export
 │   └── viewmodel/            # CardGeneratorViewModel
@@ -264,7 +275,7 @@ com.najmi.oreamnos/
 │   ├── UsageStats.kt         # Usage statistics with chart data
 │   └── VisionExtractionResult.kt  # Vision extraction result
 ├── prompts/                    # Prompt Engineering
-│   └── PromptManager.kt       # Centralized prompt building
+│   └── PromptManager.kt       # Centralized prompt building for content curation
 ├── services/                   # Background Services
 │   ├── GeminiService.kt       # Gemini API communication
 │   ├── ContentGenerationService.kt  # Background generation
@@ -348,6 +359,42 @@ IVisionExtractor (interface)
 1. Gemma 3n E2B (if downloaded) - Best results
 2. Gemma 3 1B (if downloaded) - Lightweight option
 3. ML Kit OCR - Always available
+
+### Prompt Management Architecture
+
+The app uses a dual-prompt system for content curation and card data extraction:
+
+```
+PromptManager (content curation)
+├── buildInitialPrompt()        # Main article → Malaysian Malay post
+├── buildPromptFromOcr()       # OCR text → social post
+├── buildPromptFromVisionExtraction()  # Vision AI data → social post
+└── buildRefinementPrompt()    # Post refinements (rephrase, flow, wording)
+
+CardPromptManager (card data extraction)
+├── systemPrompt()             # Base JSON extraction instructions
+└── buildPrompt()              # Template-specific JSON schemas
+    ├── PlayerSpotlight        # Player stats and highlights
+    ├── TransferNews            # Player transfers
+    ├── MatchResult             # Full scoreboard
+    ├── MatchPreview           # Upcoming match details
+    ├── BreakingNews            # Urgent news
+    ├── HeadlineQuote           # Quotes and headlines
+    ├── TopStats                # Statistical comparisons
+    ├── OnThisDay               # Historical moments
+    ├── StartingXI              # Lineups
+    └── SocialPost              # Social media posts
+```
+
+**Content Curation Flow:**
+- `PromptManager` handles all AI prompts for transforming articles into Malaysian Malay social posts
+- Supports tone (formal/casual), length control, and content structure detection
+- Optimized text analysis using single-pass character scanning
+
+**Card Data Extraction Flow:**
+- `CardPromptManager` generates prompts that instruct AI to return ONLY valid JSON
+- Each card template has a specific JSON schema with field constraints
+- Extracted data is parsed by `CardDataExtractor` for card rendering
 
 ### Animation System
 
